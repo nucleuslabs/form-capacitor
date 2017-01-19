@@ -23,20 +23,22 @@ function isFilled(value) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-exports.required = function required(value) {
+function required(value) {
     return isFilled(value) ? OK : 'This field is required.';
-};
+}
 
-exports.optional = function optional(fn) {
+function optional(fn) {
     return (value, ...args) => isEmpty(value) ? OK : fn(value, ...args);
-};
+}
 
-exports.minLength = function minLength(length) {
+function minLength(length) {
     return optional(value => value.length < length ? `Please enter at least ${length} characters.` : OK);
-};
+}
 
-exports.maxLength = function maxLength(length) {
+function maxLength(length) {
     return optional(value => value.length > length ? `Please enter at most ${length} characters.` : OK);
-};
+}
 
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
+
+module.exports = {required, optional, minLength, maxLength};

@@ -18,7 +18,7 @@ class StatelessField extends React.PureComponent {
     // };
 
     render() {
-        const {value, children, dispatch, touched, errors} = this.props;
+        const {value, children, dispatch, touched, errors, rules, defaultValue} = this.props;
         // console.log('FORM ID',this.context.formId);
         // console.log(this.props);
 
@@ -35,14 +35,16 @@ class StatelessField extends React.PureComponent {
             },
         };
 
-        if(touched) {
+        let wrapClass;
+        if(rules.length && value !== defaultValue) { // && touched
             attrs.className = errors.length === 0 ? css.fieldValid : css.fieldError;
+            wrapClass = errors.length === 0 ? css.wrapSuccess : css.wrapDanger;
         }
 
         let input = React.cloneElement(children, util.mergeAttrs(attrs, children.props));
 
         return (
-            <span>
+            <span className={wrapClass}>
                 <span ref={n => {this.inputWrap = n;}}>{input}</span>
                 {this.renderTooltip()}
             </span>
@@ -115,7 +117,7 @@ const getDefaultMessage = (state, props) => {
 };
 
 const getErrors = createSelector([getValue, getTouched, getRules, getDefaultMessage], (value, touched, rules, defaultMessage) => {
-    if(!touched) return [];
+    // if(!touched) return [];
 
     // TODO: how to support promises like in textInput.jsx?
     return rules.map(rule => rule(value)).map(result => {

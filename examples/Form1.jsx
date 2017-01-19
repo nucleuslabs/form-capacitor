@@ -1,4 +1,4 @@
-const {FormProvider, Field} = require('form-capacitor');
+const {FormProvider, Field, Rules} = require('form-capacitor');
 
 module.exports = function Form1({id}) {
     return (
@@ -6,7 +6,7 @@ module.exports = function Form1({id}) {
             <div className="bd-example">
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Email address</label>
-                    <Field name="email">
+                    <Field name="email" rules={Rules.required}>
                         <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"/>
                     </Field>
                     <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone
@@ -15,7 +15,9 @@ module.exports = function Form1({id}) {
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleInputPassword1">Password</label>
-                    <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
+                    <Field name="password" rules={Rules.minLength(6)}>
+                        <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
+                    </Field>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleSelect1">Example select</label>
