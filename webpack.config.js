@@ -14,7 +14,7 @@ module.exports = {
         rules: [
             {
                 test: /\.jsx$/,
-                include: [examplesDir],
+                // include: [examplesDir],
                 loader: 'babel-loader',
                 options: {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
@@ -27,6 +27,9 @@ module.exports = {
     resolve: {
         modules: ['node_modules'],
         extensions: ['.jsx','.js'],
+        alias: {
+            'form-capacitor': path.resolve(__dirname, 'src'),
+        },
     },
     devtool: 'cheap-module-eval-source-map',
     plugins: [

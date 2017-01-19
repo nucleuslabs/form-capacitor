@@ -23,21 +23,7 @@ exports.unflatten = function unflatten(object) {
     return result;
 };
 
-/**
- * Gets the value at `path` of `object`. If the resolved value is `undefined`, look for a `*` key. If that too is `undefined`, the `defaultValue` is returned in its place.
- *
- * @param {Object} object The object to query.
- * @param {Array|string} path The path of the property to get.
- * @param {*} defaultValue The value returned for `undefined` resolved values.
- * @return {*} Returns the resolved value.
- * @see https://lodash.com/docs/4.17.4#get
- */
-exports.glob = function glob(object, path, defaultValue) {
-    // TODO: unflatten `object`
-    return _glob(object, Array.isArray(path) ? path : _4.toPath(path), defaultValue);
-};
-
-function _glob(object, path, defaultValue) {
+const _glob = (object, path, defaultValue) => {
     let [first, ...rest] = path;
     let value = object[first];
     if(value === undefined) {
@@ -51,7 +37,25 @@ function _glob(object, path, defaultValue) {
         return _glob(value, rest, defaultValue);
     }
     return value;
-}
+};
+
+
+/**
+ * Gets the value at `path` of `object`. If the resolved value is `undefined`, look for a `*` key. If that too is `undefined`, the `defaultValue` is returned in its place.
+ *
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path of the property to get.
+ * @param {*} defaultValue The value returned for `undefined` resolved values.
+ * @return {*} Returns the resolved value.
+ * @see https://lodash.com/docs/4.17.4#get
+ */
+exports.glob = function glob(object, path, defaultValue) {
+    if(!object) {
+        console.warn('glob object is falsey');
+        return defaultValue;
+    }
+    return _glob(object, _.toPath(path), defaultValue);
+};
 
 exports.mergeAttrs = function mergeAttrs(merged, ...attrDicts) {
     let eventHandlers = {};

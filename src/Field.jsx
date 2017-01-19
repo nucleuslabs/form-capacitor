@@ -4,7 +4,7 @@ const { connect, connectAdvanced } = require('react-redux');
 const util = require('./util');
 const _ = require('lodash');
 const {toPath} = _;
-import actionTypes from './actionTypes';
+const actionTypes = require('./actionTypes');
 const {fluxStandardAction} = require('./actionCreators');
 const { createSelector } = require('reselect');
 const styles = require('./classNames');
@@ -93,25 +93,25 @@ class Field extends React.PureComponent {
 }
 
 
-function getValue(state, props) {
+const getValue = (state, props) => {
     return _.get(state, ['forms', props.formId, 'data', ...toPath(props.name)], props.defaultValue);
-}
+};
 
-function getFocused(state, props) {
+const getFocused = (state, props) => {
     return _.get(state, ['forms', props.formId, 'ui', ...toPath(props.name), 'focused'], false);
-}
+};
 
-function getTouched(state, props) {
+const getTouched = (state, props) => {
     return _.get(state, ['forms', props.formId, 'ui', ...toPath(props.name), 'touched'], false);
-}
+};
 
-function getRules(state, props) {
-    return util.toArray(props.rules);
-}
+const getRules = (state, props) => {
+    return util.array(props.rules);
+};
 
-function getDefaultMessage(state, props) {
+const getDefaultMessage = (state, props) => {
     return props.defaultMessage;
-}
+};
 
 const getErrors = createSelector([getValue, getTouched, getRules, getDefaultMessage], (value, touched, rules, defaultMessage) => {
     if(!touched) return [];
@@ -127,28 +127,28 @@ const getErrors = createSelector([getValue, getTouched, getRules, getDefaultMess
     }).filter(x => x);
 });
 
-function mapStateToProps(state, props) {
+const mapStateToProps = (state, props) => {
     return {
         value: getValue(state, props),
         focused: getFocused(state, props),
         touched: getTouched(state, props),
         errors: getErrors(state, props),
     };
-}
+};
 
-function mapDispatchToProps(dispatch, {formId,name}) {
+const mapDispatchToProps = (dispatch, {formId,name}) => {
     return {
         dispatch: (actionType, payload) => {
-            dispatch(fluxStandardAction(actionType, {...payload,formId,name}));
+            dispatch(fluxStandardAction(actionType, Object.assign({}, payload, {formId,name})));
         }
     };
-}
+};
 
 Field.propTypes = {
     value: PropTypes.any.isRequired,
     dispatch: PropTypes.func.isRequired,
     children: PropTypes.element.isRequired,
-    formId: PropTypes.string,
+    formId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     focused: PropTypes.bool.isRequired,
     touched: PropTypes.bool.isRequired,
@@ -171,17 +171,23 @@ Field.propTypes = {
 const ContextField = compose(
     getContext({form: PropTypes.object}),
     mapProps(props => {
+        console.log(props.form);
         const form = props.form || {};
         const fieldRules = util.array(props.rules);
-        const baseRules = util.array(util.glob(form.rules,props.name,[]));
-        return {
-            formId: form.id,
-            ..._.omit(props, ['form']),
-            rules: _.concat(baseRules, fieldRules),
-        };
+        const baseRules = form.rules ? util.array(util.glob(form.rules,props.name,[])) : [];
+        return Object.assign(
+            {
+                formId: form.id
+            },
+            _.omit(props, ['form']),
+            {
+                rules: _.concat(baseRules, fieldRules),
+            }
+        );
     }),
     connect(mapStateToProps, mapDispatchToProps)
 )(Field);
+
 
 ContextField.propTypes = {
     children: PropTypes.element.isRequired,
@@ -194,6 +200,7 @@ ContextField.propTypes = {
 ContextField.defaultProps = {
     // formId: 'default',
     defaultMessage: "This field is invalid",
+    defaultValue: '',
 };
 
 // ConnectedField.contextTypes = {

@@ -1,11 +1,31 @@
-const {Provider} = require('react-redux');
-const {withProps} = require('recompose');
-const {createStore} = require('redux');
-const createReducer = require('./createReducer');
+const React = require('react');
+const {PropTypes} = React;
+const ExtraPropTypes = require('./ExtraPropTypes');
+const util = require('./util');
 
-module.exports = withProps(props => ({
-    store: createStore(
-        createReducer(props.initialState || {}), 
-        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-    )
-}))(Provider);
+class FormProvider extends React.Component {
+    getChildContext() {
+        return {
+            form: {
+                id: this.props.id,
+                rules: this.props.rules ? util.unflatten(this.props.rules) : {},
+            },
+        };
+    }
+
+    render() {
+        return this.props.children;
+    }
+}
+
+FormProvider.propTypes = {
+    children: PropTypes.element,
+    id: PropTypes.string.isRequired,
+    rules: PropTypes.object,
+};
+
+FormProvider.childContextTypes = {
+    form: PropTypes.object,
+};
+
+module.exports = FormProvider;
