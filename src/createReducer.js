@@ -1,6 +1,7 @@
 const setIn = require('lodash/fp/set');
 const actionTypes = require('./actionTypes');
 const namespace = require('./namespace');
+const toPath = require('lodash/toPath');
 
 module.exports = function createReducer(initialState) {
     return (state = {[namespace]: initialState}, action) => {

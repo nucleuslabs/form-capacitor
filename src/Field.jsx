@@ -172,7 +172,6 @@ Field.propTypes = {
 const ContextField = compose(
     getContext({form: PropTypes.object}),
     mapProps(props => {
-        console.log(props.form);
         const form = props.form || {};
         const fieldRules = util.array(props.rules);
         const baseRules = form.rules ? util.array(util.glob(form.rules,props.name,[])) : [];
