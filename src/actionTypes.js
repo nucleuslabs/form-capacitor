@@ -1,2 +1,4 @@
-exports.CHANGE = 'form-capacitor$change';
-exports.FOCUS = 'form-capacitor$focus';
+const namespace = require('./namespace');
+
+exports.CHANGE = `${namespace}.change`;
+exports.FOCUS = `${namespace}.focus`;

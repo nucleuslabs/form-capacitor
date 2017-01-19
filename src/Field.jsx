@@ -9,6 +9,7 @@ const {fluxStandardAction} = require('./actionCreators');
 const { createSelector } = require('reselect');
 const styles = require('./classNames');
 const {compose, mapProps, getContext} = require('recompose');
+const namespace = require('./namespace');
 
 class Field extends React.PureComponent {
 
@@ -94,15 +95,15 @@ class Field extends React.PureComponent {
 
 
 const getValue = (state, props) => {
-    return _.get(state, ['forms', props.formId, 'data', ...toPath(props.name)], props.defaultValue);
+    return _.get(state, [namespace, props.formId, 'data', ...toPath(props.name)], props.defaultValue);
 };
 
 const getFocused = (state, props) => {
-    return _.get(state, ['forms', props.formId, 'ui', ...toPath(props.name), 'focused'], false);
+    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'focused'], false);
 };
 
 const getTouched = (state, props) => {
-    return _.get(state, ['forms', props.formId, 'ui', ...toPath(props.name), 'touched'], false);
+    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'touched'], false);
 };
 
 const getRules = (state, props) => {

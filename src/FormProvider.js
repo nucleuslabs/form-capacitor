@@ -1,6 +1,6 @@
 const React = require('react');
 const {PropTypes} = React;
-const ExtraPropTypes = require('./ExtraPropTypes');
+// const XPropTypes = require('./XPropTypes');
 const util = require('./util');
 
 class FormProvider extends React.Component {
