@@ -6,7 +6,7 @@ const util = require('./util');
 export default class Form extends React.Component {
     static propTypes = {
         children: ExtraPropTypes.anyChildren,
-        id: PropTypes.string.isRequired,
+        id: PropTypes.string,
         rules: PropTypes.object,
     };
 
@@ -17,7 +17,7 @@ export default class Form extends React.Component {
     getChildContext() {
         return {
             form: {
-                id: this.props.id,
+                id: this.props.id || this.displayName,
                 rules: this.props.rules ? util.unflatten(this.props.rules) : {},
             },
         };

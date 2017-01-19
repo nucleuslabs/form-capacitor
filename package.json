@@ -4,7 +4,8 @@
   "description": "Form manager for React/Redux",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "http-server ./examples"
   },
   "keywords": [
     "form",
@@ -25,5 +26,9 @@
     "redux": "^3.6.0",
     "react-redux": "^5.0.2"
   },
-  "repository": "https://mnpenner@bitbucket.org/nucleuslabs/form-capacitor"
+  "repository": "https://mnpenner@bitbucket.org/nucleuslabs/form-capacitor",
+  "devDependencies": {
+    "http-server": "^0.9.0",
+    "react-dom": "^15.4.2"
+  }
 }
