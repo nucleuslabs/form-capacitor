@@ -41,7 +41,9 @@ module.exports = function Form1({id}) {
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleTextarea">Example textarea</label>
-                    <textarea className="form-control" id="exampleTextarea" rows={3} defaultValue={""}/>
+                    <Field name="tweet" rules={Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`)}>
+                        <textarea className="form-control" id="exampleTextarea" rows={3}/>
+                    </Field>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleInputFile">File input</label>

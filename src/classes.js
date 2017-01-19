@@ -1,7 +1,7 @@
 module.exports = {
-    errorTooltip: 'error-tooltip',
-    wrapSuccess: 'has-success',
-    wrapDanger: 'has-danger',
+    tooltip: 'error-tooltip',
+    wrapValid: 'has-success',
+    wrapError: 'has-danger',
     fieldValid: 'form-control-success',
     fieldError: 'form-control-danger',
 };

@@ -35,16 +35,21 @@ class StatelessField extends React.PureComponent {
             },
         };
 
-        let wrapClass;
+        let wrapClassName;
         if(rules.length && value !== defaultValue) { // && touched
-            attrs.className = errors.length === 0 ? css.fieldValid : css.fieldError;
-            wrapClass = errors.length === 0 ? css.wrapSuccess : css.wrapDanger;
+            if(errors.length === 0) {
+                attrs.className = css.fieldValid;
+                wrapClassName = css.wrapValid;
+            } else {
+                attrs.className = css.fieldError;
+                wrapClassName = css.wrapError;
+            }
         }
 
         let input = React.cloneElement(children, util.mergeAttrs(attrs, children.props));
 
         return (
-            <span className={wrapClass}>
+            <span className={wrapClassName}>
                 <span ref={n => {this.inputWrap = n;}}>{input}</span>
                 {this.renderTooltip()}
             </span>
@@ -79,7 +84,7 @@ class StatelessField extends React.PureComponent {
             return (
                 <div ref={n => {
                     this.tooltip = n;
-                }} className={css.errorTooltip}>
+                }} className={css.tooltip}>
                     {errors.length > 1
                         ? (
                             <ul>

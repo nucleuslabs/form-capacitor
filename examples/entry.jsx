@@ -7,6 +7,7 @@ const initialState = {
     form1: {
         data: {
             email: "mpenner@nucleuslabs.com",
+            tweet: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin leo lacus, egestas sed neque ut, sodales sollicitudin tellus. Sed ipsum felis, auctor in velit nec, luctus vulputate nisl."
         }
     }
 };
