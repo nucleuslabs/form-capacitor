@@ -7,11 +7,11 @@ const {toPath} = _;
 const actionTypes = require('./actionTypes');
 const {fluxStandardAction} = require('./actionCreators');
 const { createSelector } = require('reselect');
-const styles = require('./classNames');
+const css = require('./classes');
 const {compose, mapProps, getContext} = require('recompose');
 const namespace = require('./namespace');
 
-class Field extends React.PureComponent {
+class StatelessField extends React.PureComponent {
 
     // static contextTypes = {
     //     formId: PropTypes.string,
@@ -36,7 +36,7 @@ class Field extends React.PureComponent {
         };
 
         if(touched) {
-            attrs.className = errors.length === 0 ? styles.fieldValid : styles.fieldError;
+            attrs.className = errors.length === 0 ? css.fieldValid : css.fieldError;
         }
 
         let input = React.cloneElement(children, util.mergeAttrs(attrs, children.props));
@@ -77,7 +77,7 @@ class Field extends React.PureComponent {
             return (
                 <div ref={n => {
                     this.tooltip = n;
-                }} className={styles.errorTooltip}>
+                }} className={css.errorTooltip}>
                     {errors.length > 1
                         ? (
                             <ul>
@@ -145,7 +145,7 @@ const mapDispatchToProps = (dispatch, {formId,name}) => {
     };
 };
 
-Field.propTypes = {
+StatelessField.propTypes = {
     value: PropTypes.any.isRequired,
     dispatch: PropTypes.func.isRequired,
     children: PropTypes.element.isRequired,
@@ -169,7 +169,7 @@ Field.propTypes = {
 
 
 // const ConnectedField = connect(mapStateToProps, mapDispatchToProps)(Field);
-const ContextField = compose(
+const Field = compose(
     getContext({form: PropTypes.object}),
     mapProps(props => {
         const form = props.form || {};
@@ -186,10 +186,10 @@ const ContextField = compose(
         );
     }),
     connect(mapStateToProps, mapDispatchToProps)
-)(Field);
+)(StatelessField);
 
 
-ContextField.propTypes = {
+Field.propTypes = {
     children: PropTypes.element.isRequired,
     formId: PropTypes.string,
     name: PropTypes.string.isRequired,
@@ -197,7 +197,7 @@ ContextField.propTypes = {
     defaultMessage: PropTypes.string,
 };
 
-ContextField.defaultProps = {
+Field.defaultProps = {
     // formId: 'default',
     defaultMessage: "This field is invalid",
     defaultValue: '',
@@ -208,4 +208,4 @@ ContextField.defaultProps = {
 //     store: PropTypes.object.isRequired,
 // };
 
-module.exports = ContextField;
+module.exports = Field;
