@@ -1,4 +1,3 @@
-
 module.exports = function(props) {
-    return <span>hello</span>
+    return <span>world</span>
 };

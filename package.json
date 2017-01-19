@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "http-server ./examples"
+    "serve": "http-server ./examples",
+    "build": "webpack --progress"
   },
   "keywords": [
     "form",
@@ -28,7 +29,12 @@
   },
   "repository": "https://mnpenner@bitbucket.org/nucleuslabs/form-capacitor",
   "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-transform-react-jsx": "^6.8.0",
+    "babel-preset-env": "^1.1.8",
     "http-server": "^0.9.0",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "webpack": "^2.2.0"
   }
 }
