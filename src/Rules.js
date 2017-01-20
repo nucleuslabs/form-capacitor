@@ -34,15 +34,15 @@ function wrap(defaultMessageFunc, ruleFunc, additionalMessageArgs=[]) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function required(value) {
+function required(value) {
     return isFilled(value) ? OK : 'This field is required.';
 }
 
-export function optional(rule) {
+function optional(rule) {
     return (value, ...args) => isEmpty(value) ? OK : rule(value, ...args);
 }
 
-export function minLength(length) {
+function minLength(length) {
     return wrap(
         () => `Please enter at least ${length} characters.`,
         msg => value => value.length < length ? msg : OK,
@@ -50,7 +50,7 @@ export function minLength(length) {
     );
 }
 
-export function maxLength(length) {
+function maxLength(length) {
     return wrap(
         value => `Please enter at most ${length} characters. You've entered ${value.length}.`,
         msg => value => value.length > length ? msg : OK,
@@ -60,4 +60,4 @@ export function maxLength(length) {
 
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
 
-// module.exports = {required, optional, minLength, maxLength};
+module.exports = {required, optional, minLength, maxLength};

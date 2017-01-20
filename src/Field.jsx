@@ -18,7 +18,7 @@ class StatelessField extends React.PureComponent {
     // };
 
     render() {
-        const {value, children, dispatch, touched, errors, rules, defaultValue} = this.props;
+        const {value, children, dispatch, isFocused, wasFocused, isHovering, errors, rules, defaultValue} = this.props;
         // console.log('FORM ID',this.context.formId);
         // console.log(this.props);
 
@@ -28,15 +28,21 @@ class StatelessField extends React.PureComponent {
                 dispatch(actionTypes.CHANGE,{value: ev.target.value});
             },
             onFocus: ev => {
-                dispatch(actionTypes.FOCUS, {focused: true});
+                dispatch(actionTypes.FOCUS, {isFocused: true});
             },
             onBlur: ev => {
-                dispatch(actionTypes.FOCUS, {focused: false});
+                dispatch(actionTypes.FOCUS, {isFocused: false});
+            },
+            onMouseEnter: ev => {
+                dispatch(actionTypes.HOVER, {isHovering: true});
+            },
+            onMouseLeave: ev => {
+                dispatch(actionTypes.HOVER, {isHovering: false});
             },
         };
 
         let wrapClassName;
-        if(rules.length && value !== defaultValue) { // && touched
+        if(rules.length && value !== defaultValue && (isFocused || isHovering)) {
             if(errors.length === 0) {
                 attrs.className = css.fieldValid;
                 wrapClassName = css.wrapValid;
@@ -105,14 +111,15 @@ const getValue = (state, props) => {
     return _.get(state, [namespace, props.formId, 'data', ...toPath(props.name)], props.defaultValue);
 };
 
-const getFocused = (state, props) => {
-    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'focused'], false);
+const getIsFocused = (state, props) => {
+    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isFocused'], false);
 };
-
-const getTouched = (state, props) => {
-    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'touched'], false);
+const getWasFocused = (state, props) => {
+    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasFocused'], false);
 };
-
+const getIsHovering = (state, props) => {
+    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isHovering'], false);
+};
 const getRules = (state, props) => {
     return util.array(props.rules);
 };
@@ -121,11 +128,15 @@ const getDefaultMessage = (state, props) => {
     return props.defaultMessage;
 };
 
-const getErrors = createSelector([getValue, getTouched, getRules, getDefaultMessage], (value, touched, rules, defaultMessage) => {
+const getErrors = createSelector([getValue, getRules, getDefaultMessage], (value, rules, defaultMessage) => {
     // if(!touched) return [];
-
+    
+    let meta = {
+        // wasFocused
+    };
+    
     // TODO: how to support promises like in textInput.jsx?
-    return rules.map(rule => rule(value)).map(result => {
+    return rules.map(rule => rule(value, meta)).map(result => {
         if(util.isNullish(result) || result === true) {
             return false;
         } else if(result === false) {
@@ -138,8 +149,9 @@ const getErrors = createSelector([getValue, getTouched, getRules, getDefaultMess
 const mapStateToProps = (state, props) => {
     return {
         value: getValue(state, props),
-        focused: getFocused(state, props),
-        touched: getTouched(state, props),
+        isFocused: getIsFocused(state, props),
+        wasFocused: getWasFocused(state, props),
+        isHovering: getIsHovering(state, props),
         errors: getErrors(state, props),
     };
 };
@@ -158,8 +170,8 @@ StatelessField.propTypes = {
     children: PropTypes.element.isRequired,
     formId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    focused: PropTypes.bool.isRequired,
-    touched: PropTypes.bool.isRequired,
+    isFocused: PropTypes.bool.isRequired,
+    wasFocused: PropTypes.bool.isRequired,
     errors: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.element])).isRequired,
     rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
 };
