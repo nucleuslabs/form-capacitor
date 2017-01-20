@@ -1,5 +1,21 @@
 :local {
-    .errorTooltip {
+    .wrapValid {
+        composes: global(has-success);
+    }
+
+    .wrapError {
+        composes: global(has-danger);
+    }
+
+    .fieldValid {
+        composes: global(form-control-success);
+    }
+
+    .fieldError {
+        composes: global(form-control-danger);
+    }
+    
+    .tooltip {
         position: absolute;
         border: 1px solid #A4A09C;
         background-color: #FEF6E7;
@@ -9,7 +25,7 @@
         padding: 5px 10px;
         pointer-events: none;
         font: 12px Verdana, Geneva, Arial, Helvetica, sans-serif;
-
+        
         &:after, &:before {
             bottom: 100%;
             left: 50%;

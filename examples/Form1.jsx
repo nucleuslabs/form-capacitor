@@ -1,4 +1,5 @@
-const {FormProvider, Field, Rules} = require('form-capacitor');
+const {FormProvider, Rules} = require('form-capacitor');
+const Field = require('./Field');
 
 module.exports = function Form1({id}) {
     return (

@@ -20,6 +20,14 @@ module.exports = {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
                     plugins: ['transform-react-jsx'],
                 },
+            },
+            {
+                test: /\.less$/,
+                use: [
+                    'style-loader',
+                    { loader: 'css-loader', options: { importLoaders: 1 } },
+                    'less-loader'
+                ]
             }
         ]
     },
