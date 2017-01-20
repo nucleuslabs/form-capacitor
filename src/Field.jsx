@@ -18,10 +18,10 @@ class StatelessField extends React.PureComponent {
     // };
 
     render() {
-        const {value, children, dispatch, isFocused, wasFocused, isHovering, errors, rules, defaultValue} = this.props;
+        const {value, children, dispatch, ui, errors, rules, name} = this.props;
         // console.log('FORM ID',this.context.formId);
         // console.log(this.props);
-
+        
         let attrs = {
             value,
             onChange: ev => {
@@ -42,7 +42,7 @@ class StatelessField extends React.PureComponent {
         };
 
         let wrapClassName;
-        if(rules.length && value !== defaultValue && (isFocused || isHovering)) {
+        if(rules.length && ui.wasFocused) {
             if(errors.length === 0) {
                 attrs.className = css.fieldValid;
                 wrapClassName = css.wrapValid;
@@ -111,6 +111,10 @@ const getValue = (state, props) => {
     return _.get(state, [namespace, props.formId, 'data', ...toPath(props.name)], props.defaultValue);
 };
 
+const getInitialValue = (state, props) => {
+    return _.get(state, [namespace, props.formId, 'initial', ...toPath(props.name)], props.defaultValue);
+};
+
 const getIsFocused = (state, props) => {
     return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isFocused'], false);
 };
@@ -146,14 +150,29 @@ const getErrors = createSelector([getValue, getRules, getDefaultMessage], (value
     }).filter(x => x);
 });
 
+const getIsDirty = createSelector([getValue, getInitialValue], _.isEqual);
+const getIsEmpty = createSelector([getValue, (_,props) => props.defaultValue], _.isEqual);
+const getIsValid = createSelector([getErrors], errors => errors.length === 0);
+
 const mapStateToProps = (state, props) => {
-    return {
-        value: getValue(state, props),
-        isFocused: getIsFocused(state, props),
-        wasFocused: getWasFocused(state, props),
-        isHovering: getIsHovering(state, props),
-        errors: getErrors(state, props),
+    let value = getValue(state, props);
+    let initialValue = getInitialValue(state, props);
+    let errors = getErrors(state, props);
+    
+    let ui = {
+        isDirty: !_.isEqual(value, initialValue),
+        isValid: errors.length === 0,
+        isEmpty: _.isEqual(value, props.defaultValue),
+        isFocused: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isFocused'], false),
+        isHovering: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isHovering'], false),
+        mouseEntered: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'mouseEntered'], false),
+        mouseLeft: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'mouseLeft'], false),
+        wasFocused: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasFocused'], false),
+        wasBlurred: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasBlurred'], false),
+        wasChanged: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasChanged'], false),
     };
+    
+    return {value,ui,errors};
 };
 
 const mapDispatchToProps = (dispatch, {formId,name}) => {
@@ -170,8 +189,9 @@ StatelessField.propTypes = {
     children: PropTypes.element.isRequired,
     formId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    isFocused: PropTypes.bool.isRequired,
-    wasFocused: PropTypes.bool.isRequired,
+    // isFocused: PropTypes.bool.isRequired,
+    // wasFocused: PropTypes.bool.isRequired,
+    ui: PropTypes.object.isRequired,
     errors: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.element])).isRequired,
     rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
 };

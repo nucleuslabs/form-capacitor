@@ -5,7 +5,7 @@ const createReducer = require('./createReducer');
 
 module.exports = withProps(props => ({
     store: createStore(
-        createReducer(props.initialState || {}), 
+        createReducer(props.data || {}), 
         window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
     )
 }))(Provider);

@@ -3,17 +3,15 @@ const Form1 = require('./Form1');
 const Form2 = require('./Form2');
 const FormStoreProvider = require('form-capacitor/FormStoreProvider');
 
-const initialState = {
+const initialData = {
     form1: {
-        data: {
-            email: "mpenner@nucleuslabs.com",
-            tweet: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin leo lacus, egestas sed neque ut, sodales sollicitudin tellus. Sed ipsum felis, auctor in velit nec, luctus vulputate nisl."
-        }
+        email: "mpenner@nucleuslabs.com",
+        tweet: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin leo lacus, egestas sed neque ut, sodales sollicitudin tellus. Sed ipsum felis, auctor in velit nec, luctus vulputate nisl."
     }
 };
 
 ReactDOM.render(
-    <FormStoreProvider initialState={initialState}>
+    <FormStoreProvider data={initialData}>
         <div className="container">
             <h1>Form Capacitor Example</h1>
             <div className="row">

@@ -3,7 +3,16 @@ const actionTypes = require('./actionTypes');
 const namespace = require('./namespace');
 const toPath = require('lodash/toPath');
 
-module.exports = function createReducer(initialState) {
+module.exports = function createReducer(data) {
+    let initialState = {};
+    
+    for(let formId of Object.keys(data)) {
+        initialState[formId] = {
+            data: data[formId],
+            initial: data[formId],
+        }
+    }
+    
     return (state = {[namespace]: initialState}, action) => {
         let {payload} = action;
         switch(action.type) {
@@ -46,5 +55,7 @@ const ui = {
     isHovering: true, // mouse is over input
     mouseEntered: true, // mouse was over input
     mouseLeft: true, // mouse entered input and then left
+    wasSubmitted: true, // form submit was attempted while this input existed
+    wasValid: true, // input was at some point valid
 };
 */
