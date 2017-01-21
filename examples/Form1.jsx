@@ -1,13 +1,24 @@
 const {FormProvider, Rules} = require('form-capacitor');
 const Field = require('./Field');
 
+const validationRules = {
+    tweet: Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`),
+    password: [
+        Rules.required,
+        Rules.minLength(6),
+        pw => /[^a-z0-9]/i.test(pw) ? '' : "Please add a special character.",
+        pw => /[0-9]/i.test(pw) ? '' : "Please add a number.",
+        pw => /[A-Za-z]/i.test(pw) ? '' : "Please add a letter.",
+    ]
+};
+
 module.exports = function Form1({id}) {
     return (
-        <FormProvider id={id}>
+        <FormProvider id={id} rules={validationRules}>
             <div className="bd-example">
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Email address</label>
-                    <Field name="email" rules={Rules.required}>
+                    <Field name="email" rules={[Rules.required, Rules.email]}>
                         <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"/>
                     </Field>
                     <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone
@@ -16,7 +27,7 @@ module.exports = function Form1({id}) {
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleInputPassword1">Password</label>
-                    <Field name="password" rules={Rules.minLength(6)}>
+                    <Field name="password">
                         <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
                     </Field>
                 </div>
@@ -42,7 +53,7 @@ module.exports = function Form1({id}) {
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleTextarea">Example textarea</label>
-                    <Field name="tweet" rules={Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`)}>
+                    <Field name="tweet">
                         <textarea className="form-control" id="exampleTextarea" rows={3}/>
                     </Field>
                 </div>

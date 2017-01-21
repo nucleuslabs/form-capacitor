@@ -22,15 +22,10 @@ function isFilled(value) {
 }
 
 function withMessage(defaultMessageFn, ruleFn, additionalMessageArgs) {
-    let fn = (value, ...ruleArgs) => ruleFn(defaultMessageFn(value, ...additionalMessageArgs))(value, ...ruleArgs);
-    fn.message = msgFn => (value, ...ruleArgs) => ruleFn(msgFn(value, ...additionalMessageArgs))(value, ...ruleArgs);
+    let fn = optional((value, ...ruleArgs) => ruleFn(defaultMessageFn(value, ...additionalMessageArgs))(value, ...ruleArgs));
+    fn.message = msgFn => optional((value, ...ruleArgs) => ruleFn(msgFn(value, ...additionalMessageArgs))(value, ...ruleArgs));
     return fn;
 }
-
-function wrap(defaultMessageFunc, ruleFunc, additionalMessageArgs=[]) {
-    return withMessage(defaultMessageFunc, optional(ruleFunc), additionalMessageArgs);
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,21 +38,27 @@ function optional(rule) {
 }
 
 function minLength(length) {
-    return wrap(
-        () => `Please enter at least ${length} characters.`,
+    return withMessage(
+        value => `Please enter at least ${length} characters (${length - value.length} more).`,
         msg => value => value.length < length ? msg : OK,
         [length]
     );
 }
 
 function maxLength(length) {
-    return wrap(
+    return withMessage(
         value => `Please enter at most ${length} characters. You've entered ${value.length}.`,
         msg => value => value.length > length ? msg : OK,
         [length]
     );
 }
 
+const email = withMessage(
+    () => `Please enter a valid email address.`,
+    msg => value => /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(value) ? OK : msg,
+    [length]
+);
+
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
 
-module.exports = {required, optional, minLength, maxLength};
+module.exports = {required, optional, minLength, maxLength, email};

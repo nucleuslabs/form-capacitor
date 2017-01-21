@@ -75,7 +75,7 @@ class StatelessField extends React.PureComponent {
             
             Object.assign(this.tooltip.style, {
                 left: `${input.offsetLeft - (ttRect.width - inRect.width)/2}px`,
-                top: `${input.offsetTop + inRect.height + 4}px`,
+                top: `${input.offsetTop + inRect.height + 5}px`,
             });
         }
     }
