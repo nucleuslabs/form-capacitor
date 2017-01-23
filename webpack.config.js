@@ -18,7 +18,7 @@ module.exports = {
                 loader: 'babel-loader',
                 options: {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
-                    plugins: ['transform-react-jsx'],
+                    plugins: ['transform-react-jsx', 'transform-class-properties'],
                 },
             },
             {

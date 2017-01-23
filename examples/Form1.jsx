@@ -1,5 +1,6 @@
 const {FormProvider, Rules} = require('form-capacitor');
-const Field = require('./Field');
+const ValueField = require('./ValueField');
+const BootstrapRadio = require('./BootstrapRadio');
 
 const validationRules = {
     tweet: Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`),
@@ -9,8 +10,13 @@ const validationRules = {
         pw => /[^a-z0-9]/i.test(pw) ? '' : "Please add a special character.",
         pw => /[0-9]/i.test(pw) ? '' : "Please add a number.",
         pw => /[A-Za-z]/i.test(pw) ? '' : "Please add a letter.",
-    ]
+    ],
+    radio: value => value !== 'option2' ? "I prefer option2" : '',
 };
+
+function getMultiVal(ev) {
+    return Array.from(ev.target.options).filter(o => o.selected).map(o => o.value);
+}
 
 module.exports = function Form1({id}) {
     return (
@@ -18,44 +24,49 @@ module.exports = function Form1({id}) {
             <div className="bd-example">
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Email address</label>
-                    <Field name="email" rules={[Rules.required, Rules.email]}>
+                    <ValueField name="email" rules={[Rules.required, Rules.email]}>
                         <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"/>
-                    </Field>
+                    </ValueField>
                     <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone
                         else.
                     </small>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleInputPassword1">Password</label>
-                    <Field name="password">
+                    <ValueField name="password">
                         <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
-                    </Field>
+                    </ValueField>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleSelect1">Example select</label>
-                    <select className="form-control" id="exampleSelect1">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                    </select>
+                    <ValueField name="number-select" rules={val => val == '3' ? "3 is unlucky": ''}>
+                        <select className="form-control custom-select" id="exampleSelect1">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </select>
+                    </ValueField>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleSelect2">Example multiple select</label>
-                    <select multiple className="form-control" id="exampleSelect2">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                    </select>
+
+                    <ValueField name="multi-select" rules={val => val.length < 3 ? "Please select at least 3 items" : ""} defaultValue={[2,3]} valueGetter={getMultiVal}>
+                        <select multiple className="form-control" id="exampleSelect2">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </select>
+                    </ValueField>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleTextarea">Example textarea</label>
-                    <Field name="tweet">
+                    <ValueField name="tweet">
                         <textarea className="form-control" id="exampleTextarea" rows={3}/>
-                    </Field>
+                    </ValueField>
                 </div>
                 <div className="form-group">
                     <label htmlFor="exampleInputFile">File input</label>
@@ -67,24 +78,11 @@ module.exports = function Form1({id}) {
                 </div>
                 <fieldset className="form-group">
                     <legend>Radio buttons</legend>
-                    <div className="form-check">
-                        <label className="form-check-label">
-                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" defaultValue="option1" defaultChecked/>
-                            Option one is this and that—be sure to include why it's great
-                        </label>
-                    </div>
-                    <div className="form-check">
-                        <label className="form-check-label">
-                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" defaultValue="option2"/>
-                            Option two can be something else and selecting it will deselect option one
-                        </label>
-                    </div>
-                    <div className="form-check disabled">
-                        <label className="form-check-label">
-                            <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios3" defaultValue="option3" disabled/>
-                            Option three is disabled
-                        </label>
-                    </div>
+                    <BootstrapRadio name="radio" defaultValue="option1" options={[
+                        {value: 'option1', text: "Option one is this and that—be sure to include why it's great"},
+                        {value: 'option2', text: "Option two can be something else and selecting it will deselect option one"},
+                        {value: 'option3', text: "Option three is disabled", disabled: true},
+                    ]}/>
                 </fieldset>
                 <div className="form-check">
                     <label className="form-check-label">

@@ -9,10 +9,16 @@
 
     .fieldValid {
         composes: global(form-control-success);
+        &:global(.custom-control-indicator) {
+            padding-right: 0;
+        }
     }
 
     .fieldError {
         composes: global(form-control-danger);
+        &:global(.custom-control-indicator) {
+            padding-right: 0;
+        }
     }
     
     .tooltip {
