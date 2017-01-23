@@ -1,3 +1,5 @@
+const actionTypes = require('./actionTypes');
+
 /**
  * Creates a flux standard action.
  *
@@ -7,7 +9,7 @@
  * @returns {Object} Action object.
  * @see https://github.com/acdlite/flux-standard-action
  */
-exports.fluxStandardAction = function fluxStandardAction(type, payload, meta) {
+function fluxStandardAction(type, payload, meta) {
     let action = {type};
     action.payload = payload;
     if(payload instanceof Error) {
@@ -17,4 +19,27 @@ exports.fluxStandardAction = function fluxStandardAction(type, payload, meta) {
         action.meta = meta;
     }
     return action;
+}
+
+exports.change = function(formId, name, value) {
+    return fluxStandardAction(actionTypes.CHANGE, {formId,name,value});
+};
+exports.focus = function(formId, name) {
+    return fluxStandardAction(actionTypes.FOCUS, {formId,name,isFocused:true});
+};
+
+exports.blur = function(formId, name) {
+    return fluxStandardAction(actionTypes.FOCUS, {formId,name,isFocused:false});
+};
+
+exports.mouseEnter = function(formId, name) {
+    return fluxStandardAction(actionTypes.HOVER, {formId,name,isHovering:true});
+};
+
+exports.mouseLeave = function(formId, name) {
+    return fluxStandardAction(actionTypes.HOVER, {formId,name,isHovering:false});
+};
+
+exports.submit = function(formId) {
+    return fluxStandardAction(actionTypes.SUBMIT, {formId});
 };

@@ -1,28 +1,25 @@
-const actionTypes = require('./actionTypes');
-const {fluxStandardAction} = require('./actionCreators');
+const actions = require('./actionCreators');
 
 module.exports = function mapDispatchToProps(dispatch, {formId,name}) {
+    
     return {
-        // dispatch: (actionType, payload) => {
-        //     dispatch(fluxStandardAction(actionType, Object.assign({}, payload, {formId,name})));
-        // },
         dispatchChange: value => {
-            dispatch(fluxStandardAction(actionTypes.CHANGE, {formId,name,value}));
+            dispatch(actions.change(formId,name,value));
         },
         dispatchFocus: () => {
-            dispatch(fluxStandardAction(actionTypes.FOCUS, {formId,name,isFocused:true}));
+            dispatch(actions.focus(formId,name));
         },
         dispatchBlur: () => {
-            dispatch(fluxStandardAction(actionTypes.FOCUS, {formId,name,isFocused:false}));
+            dispatch(actions.blur(formId,name));
         },
         dispatchMouseEnter: () => {
-            dispatch(fluxStandardAction(actionTypes.HOVER, {formId,name,isHovering:true}));
+            dispatch(actions.mouseEnter(formId,name));
         },
         dispatchMouseLeave: () => {
-            dispatch(fluxStandardAction(actionTypes.HOVER, {formId,name,isHovering:false}));
+            dispatch(actions.mouseLeave(formId,name));
         },
         dispatchSubmit: () => {
-            dispatch(fluxStandardAction(actionTypes.SUBMIT, {formId}));
+            dispatch(actions.submit(formId));
         },
     };
 };
