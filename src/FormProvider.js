@@ -3,6 +3,9 @@ const {PropTypes} = React;
 // const XPropTypes = require('./XPropTypes');
 const util = require('./util');
 
+/**
+ * @deprecated Use connectForm() instead
+ */
 class FormProvider extends React.Component {
     getChildContext() {
         return {

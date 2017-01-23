@@ -6,6 +6,7 @@ const _ = require('lodash');
 const {compose, mapProps, getContext} = require('recompose');
 const namespace = require('./namespace');
 
+// TODO: you can't get the form data for submission with this...
 function connectDispatcher() {
     return compose(
         getContext({form: PropTypes.object}),

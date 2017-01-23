@@ -15,19 +15,20 @@
     "redux"
   ],
   "author": "Mark Penner <mpenner@nucleuslabs.com>",
+  "repository": "https://mnpenner@bitbucket.org/nucleuslabs/form-capacitor",
   "license": "MIT",
   "dependencies": {
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "recompose": "^0.21.2",
-    "reselect": "^2.5.4"
+    "reselect": "^2.5.4",
+    "shortid": "^2.2.6"
   },
   "peerDependencies": {
     "react": "^15.4.2",
     "redux": "^3.6.0",
     "react-redux": "^5.0.2"
   },
-  "repository": "https://mnpenner@bitbucket.org/nucleuslabs/form-capacitor",
   "devDependencies": {
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
@@ -39,7 +40,6 @@
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "react-dom": "^15.4.2",
-    "shortid": "^2.2.6",
     "style-loader": "^0.13.1",
     "webpack": "^2.2.0"
   }

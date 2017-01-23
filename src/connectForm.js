@@ -1,38 +1,41 @@
 const React = require('react');
 const {PropTypes} = React;
-const { connect, connectAdvanced } = require('react-redux');
+const {connect, connectAdvanced} = require('react-redux');
 const util = require('./util');
 const _ = require('lodash');
-const {compose, mapProps, getContext} = require('recompose');
+const {compose, mapProps, getContext, withContext} = require('recompose');
 const namespace = require('./namespace');
 const actions = require('./actionCreators');
+const ShortId = require('shortid');
 
 function mapStateToProps(state, props) {
     return {
-        data: _.get(state, [namespace, props.formId, 'data'], {}),
+        data: _.get(state, [namespace, props.id, 'data'], {}), // TODO: get default values in here somehow
     };
 }
 
-function mapDispatchToProps(dispatch, {formId}) {
+function mapDispatchToProps(dispatch, {id}) {
     return {
+        // TODO: rename to validate() and return true or false
         dispatchSubmit: () => {
-            dispatch(actions.submit(formId));
+            dispatch(actions.submit(id));
         },
     };
 }
 
-function connectForm() {
+function connectForm({rules}) {
     return compose(
-        getContext({form: PropTypes.object}),
-        mapProps(props => {
-            const form = props.form || {};
-            return Object.assign(
-                {
-                    id: form.id
+        withContext(
+            {
+                form: PropTypes.object,
+            },
+            props => ({
+                form: {
+                    id: props.id || ShortId.generate(),
+                    rules: rules ? util.unflatten(rules) : {},
                 },
-                _.omit(props, ['form']),
-            );
-        }),
+            })
+        ),
         connect(mapStateToProps, mapDispatchToProps)
     );
 }
