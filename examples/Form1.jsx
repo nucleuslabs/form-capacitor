@@ -1,6 +1,7 @@
 const {FormProvider, Rules} = require('form-capacitor');
 const ValueField = require('./ValueField');
 const BootstrapRadio = require('./BootstrapRadio');
+const SubmitButton = require('./SubmitButton');
 
 const validationRules = {
     tweet: Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`),
@@ -90,7 +91,7 @@ module.exports = function Form1({id}) {
                         Check me out
                     </label>
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <SubmitButton>Submit</SubmitButton>
             </div>
         </FormProvider>
     );

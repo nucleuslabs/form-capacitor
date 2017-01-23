@@ -38,6 +38,10 @@ module.exports = function createReducer(data) {
                 }
                 break;
             }
+            case actionTypes.SUBMIT: {
+                state = setIn([namespace, payload.formId, 'submitted'], true, state);
+                break;
+            }
         }
         return state;
     };

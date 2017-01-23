@@ -2,7 +2,6 @@ const React = require('react');
 const {PropTypes} = React;
 const util = require('form-capacitor/util');
 const _ = require('lodash');
-const actionTypes = require('form-capacitor/actionTypes');
 const css = require('./style.less');
 const connectField = require('form-capacitor/connectField');
 
@@ -20,24 +19,16 @@ class StatelessValueField extends React.PureComponent {
         let attrs = {
             value,
             onChange: ev => {
-                dispatch(actionTypes.CHANGE,{value: valueGetter(ev)});
+                this.props.dispatchChange(valueGetter(ev));
             },
-            onFocus: ev => {
-                dispatch(actionTypes.FOCUS, {isFocused: true});
-            },
-            onBlur: ev => {
-                dispatch(actionTypes.FOCUS, {isFocused: false});
-            },
-            onMouseEnter: ev => {
-                dispatch(actionTypes.HOVER, {isHovering: true});
-            },
-            onMouseLeave: ev => {
-                dispatch(actionTypes.HOVER, {isHovering: false});
-            },
+            onFocus: this.props.dispatchFocus,
+            onBlur: this.props.dispatchBlur,
+            onMouseEnter: this.props.dispatchMouseEnter,
+            onMouseLeave: this.props.dispatchMouseLeave,
         };
 
         let wrapClassName;
-        if(rules.length && ui.wasFocused) {
+        if(rules.length && (ui.wasFocused || ui.wasSubmitted)) {
             if(errors.length === 0) {
                 attrs.className = css.fieldValid;
                 wrapClassName = css.wrapValid;
@@ -83,7 +74,7 @@ class StatelessValueField extends React.PureComponent {
     renderTooltip() {
         const {errors, ui} = this.props;
 
-        if((ui.isFocused || (ui.isHovering && ui.wasFocused)) && errors.length) {
+        if((ui.isFocused || (ui.isHovering && (ui.wasFocused || ui.wasSubmitted))) && errors.length) {
             return (
                 <div ref={n => {this.tooltip = n}} className={css.tooltip}>
                     {errors.length > 1
@@ -103,7 +94,7 @@ class StatelessValueField extends React.PureComponent {
 
 StatelessValueField.propTypes = {
     value: PropTypes.any.isRequired,
-    dispatch: PropTypes.func.isRequired,
+    // dispatch: PropTypes.func.isRequired,
     children: PropTypes.element.isRequired,
     formId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,

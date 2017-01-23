@@ -17,5 +17,5 @@ Form manager for [`react-redux`](https://github.com/reactjs/react-redux).
 | `isHovering`   | mouse is over input |
 | `mouseEntered` | mouse was over input |
 | `mouseLeft`    | mouse entered input and then left |
-| `wasSubmitted` | form submit was attempted while | this input existed
-| `wasValid`     | input was at some point valid |
+| `wasSubmitted` | form was submitted |
+| TODO: `wasValid`     | input was at some point valid |

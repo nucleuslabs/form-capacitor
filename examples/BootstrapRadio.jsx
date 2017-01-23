@@ -1,18 +1,12 @@
 const React = require('react');
 const {PropTypes} = React;
-const util = require('form-capacitor/util');
 const _ = require('lodash');
-const actionTypes = require('form-capacitor/actionTypes');
 const css = require('./style.less');
-const connectField = require('form-capacitor/connectField');
+const {connectField,util} = require('form-capacitor');
 const ShortId = require('shortid');
 const classNames = require('classnames');
 
 class StatelessBootstrapRadio extends React.PureComponent {
-
-    // static contextTypes = {
-    //     formId: PropTypes.string,
-    // };
     
     constructor(props) {
         super(props);
@@ -20,51 +14,15 @@ class StatelessBootstrapRadio extends React.PureComponent {
     }
     
     onChange = ev => {
-        this.props.dispatch(actionTypes.CHANGE,{value: ev.target.value});
-    };
-
-    onMouseEnter = ev => {
-        this.props.dispatch(actionTypes.HOVER, {isHovering: true});
-    };
-        
-    onMouseLeave = ev => {
-        this.props.dispatch(actionTypes.HOVER, {isHovering: false});
-    };
-
-    onFocus = ev => {
-        this.props.dispatch(actionTypes.FOCUS, {isFocused: true});
-    };
-    
-    onBlur = ev => {
-        this.props.dispatch(actionTypes.FOCUS, {isFocused: false});
+        this.props.dispatchChange(ev.target.value);
     };
 
     render() {
         const {value, children, dispatch, ui, errors, rules, name, options} = this.props;
-        // console.log('FORM ID',this.context.formId);
-        // console.log(this.props);
 
-        let attrs = {
-            value,
-            onChange: ev => {
-                // dispatch(actionTypes.CHANGE,{value: valueGetter(ev)});
-            },
-            onFocus: ev => {
-                dispatch(actionTypes.FOCUS, {isFocused: true});
-            },
-            onBlur: ev => {
-                dispatch(actionTypes.FOCUS, {isFocused: false});
-            },
-            onMouseEnter: ev => {
-                dispatch(actionTypes.HOVER, {isHovering: true});
-            },
-            onMouseLeave: ev => {
-                dispatch(actionTypes.HOVER, {isHovering: false});
-            },
-        };
 
         let wrapClassName, inputClassName;
-        if(rules.length && ui.wasFocused) {
+        if(rules.length && (ui.wasFocused || ui.wasSubmitted)) {
             if(errors.length === 0) {
                 inputClassName = css.fieldValid;
                 wrapClassName = css.wrapValid;
@@ -76,14 +34,14 @@ class StatelessBootstrapRadio extends React.PureComponent {
 
 
         return (
-            <div ref={n => {this.inputWrap = n}} className="custom-controls-stacked" onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
+            <div ref={n => {this.inputWrap = n}} className="custom-controls-stacked" onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
                 {options.map(o => {
                     let disabled = !!o.disabled;
                     let checked = _.isEqual(value, o.value);
                     return (
                         <div key={o.key || o.value} className={classNames('form-group',checked && wrapClassName,{disabled})}>
                             <label className="custom-control custom-radio">
-                                <input type="radio" className="custom-control-input" name={this.name} value={o.value} checked={checked} disabled={disabled} onChange={this.onChange} onFocus={this.onFocus} onBlur={this.onBlur}/>
+                                <input type="radio" className="custom-control-input" name={this.name} value={o.value} checked={checked} disabled={disabled} onChange={this.onChange} onFocus={this.props.dispatchFocus} onBlur={this.props.dispatchBlur}/>
                                 <span className={classNames('custom-control-indicator',checked && inputClassName)}/>
                                 <span className="custom-control-description">{o.text}</span>
                             </label>
@@ -120,7 +78,7 @@ class StatelessBootstrapRadio extends React.PureComponent {
     renderTooltip() {
         const {errors, ui} = this.props;
 
-        if((ui.isFocused || (ui.isHovering && ui.wasFocused)) && errors.length) {
+        if((ui.isFocused || (ui.isHovering && (ui.wasFocused || ui.wasSubmitted))) && errors.length) {
             return (
                 <div ref={n => {this.tooltip = n}} className={css.tooltip}>
                     {errors.length > 1
@@ -140,7 +98,7 @@ class StatelessBootstrapRadio extends React.PureComponent {
 
 StatelessBootstrapRadio.propTypes = {
     value: PropTypes.any.isRequired,
-    dispatch: PropTypes.func.isRequired,
+    // dispatch: PropTypes.func.isRequired,
     formId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     ui: PropTypes.object.isRequired,
