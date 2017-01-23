@@ -79,6 +79,9 @@ class Form1 extends React.PureComponent {
                         ]}/>
                     </fieldset>
                     <BootstrapCheckbox name="tac">I agree to the <a href="#">Terms & Conditions</a></BootstrapCheckbox>
+                    {this.props.data.tac 
+                        ? <BootstrapCheckbox name="newsletter" defaultValue={true}>Give me the newsletter</BootstrapCheckbox>
+                        : null}
                     <button type="submit" className="btn btn-primary">Submit</button>
                 </div>
             </form>
@@ -88,7 +91,7 @@ class Form1 extends React.PureComponent {
     submit = ev => {
         ev.preventDefault();
         this.props.dispatchSubmit();
-        // alert(`Submitting ${JSON.stringify(this.props.data,null,2)}`);
+        console.log(`Submitting ${JSON.stringify(this.props.data,null,2)}`);
     }
 }
 
