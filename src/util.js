@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const classNames = require('classnames');
+const { defaultMemoize, createSelectorCreator } = require('reselect');
 
 /**
  * Unflatten an object. e.g.,
@@ -115,3 +116,8 @@ exports.array = function array(x) {
     if(!x) return [];
     return Array.isArray(x) ? [...x] : [x];
 };
+
+exports.createDeepEqualSelector = createSelectorCreator(
+    defaultMemoize,
+    _.isEqual
+);

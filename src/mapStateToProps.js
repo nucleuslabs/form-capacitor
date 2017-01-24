@@ -1,5 +1,6 @@
 const util = require('./util');
 const _ = require('lodash');
+const getOr = require('lodash/fp/getOr');
 const {toPath} = _;
 const actionTypes = require('./actionTypes');
 const { createSelector, defaultMemoize, createSelectorCreator } = require('reselect');
@@ -11,11 +12,6 @@ const defaultValueGetter = (_,p) => p.defaultValue;
 const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], {});
 
 
-const createDeepEqualSelector = createSelectorCreator(
-    defaultMemoize,
-    _.isEqual
-);
-
 // const getIsDirty = createSelector([getValue, getInitialValue], _.isEqual);
 // const getIsEmpty = createSelector([getValue, (_,props) => props.defaultValue], _.isEqual);
 // const getIsValid = createSelector([getErrors], errors => errors.length === 0);
@@ -23,7 +19,7 @@ const createDeepEqualSelector = createSelectorCreator(
 
 module.exports = function mapStateToProps() {
     const namePathSelector = createSelector((_, p) => p.name, toPath);
-    const stateUiSelector = createDeepEqualSelector([stateGetter,namePathSelector], (state,np) => Object.assign({
+    const stateUiSelector = util.createDeepEqualSelector([stateGetter,namePathSelector], (state,np) => Object.assign({
         isFocused: false,
         isHovering: false,
         mouseEntered: false,
@@ -32,9 +28,11 @@ module.exports = function mapStateToProps() {
         wasBlurred: false,
         wasChanged: false,
     }, _.get(state, ['ui', ...np], {})));
-    const valueSelector = createSelector([stateGetter,namePathSelector, defaultValueGetter], (state,np,dv) => _.get(state, ['data', ...np], dv));
-    const initialValueSelector = createSelector([stateGetter,namePathSelector, defaultValueGetter], (state,np,dv) => _.get(state, ['initial', ...np], dv));
-    const errorSelector = createDeepEqualSelector([valueSelector, (_,p) => p.rules, (_,p) => p.defaultMessage, stateUiSelector], (value, rules, defaultMessage, ui) => {
+    const dataGetter = createSelector(stateGetter, getOr({},'data'));
+    const valueSelector = createSelector([dataGetter,namePathSelector, defaultValueGetter], (data,np,dv) => _.get(data, np, dv));
+    const initialGetter = createSelector(stateGetter, getOr({},'initial'));
+    const initialValueSelector = createSelector([initialGetter,namePathSelector, defaultValueGetter], (init,np,dv) => _.get(init, np, dv));
+    const errorSelector = util.createDeepEqualSelector([valueSelector, (_,p) => p.rules, (_,p) => p.defaultMessage, stateUiSelector], (value, rules, defaultMessage, ui) => {
         // TODO: how to support promises like in textInput.jsx?
         return rules.map(rule => rule(value, ui)).map(result => {
             if(util.isNullish(result) || result === true) {
@@ -51,7 +49,7 @@ module.exports = function mapStateToProps() {
     const isEmptySelector = createSelector([valueSelector,defaultValueGetter], _.isEqual);
     const wasSubmittedSelector = createSelector(stateGetter, state => _.get(state, 'submit', 0) > 0);
     
-    const uiSelector = createDeepEqualSelector([stateUiSelector,isDirtySelector,isValidSelector,isEmptySelector,wasSubmittedSelector], (ui,isDirty,isValid,isEmpty,wasSubmitted) => ({
+    const uiSelector = util.createDeepEqualSelector([stateUiSelector,isDirtySelector,isValidSelector,isEmptySelector,wasSubmittedSelector], (ui,isDirty,isValid,isEmpty,wasSubmitted) => ({
         isFocused: ui.isFocused,
         isHovering: ui.isHovering,
         mouseEntered: ui.mouseEntered,

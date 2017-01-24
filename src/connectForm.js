@@ -7,13 +7,16 @@ const {compose, mapProps, getContext, withContext, lifecycle} = require('recompo
 const namespace = require('./namespace');
 const actions = require('./actionCreators');
 const ShortId = require('shortid');
+const { createSelector } = require('reselect');
+
+const stateGetter = (s,p) => _.get(s, [namespace, p.id], {});
 
 function mapStateToProps(state, props) {
-    // console.log('mapStateToProps');
-    return {
-        data: _.get(state, [namespace, props.id, 'data'], {}), // TODO: get default values in here somehow
-        // isValid: Array.from(props.form.fields.values()).every(f => f.props.ui.isValid),
-    };
+    const dataSelector = createSelector(stateGetter, state => _.get(state, 'data', {}));
+
+    return (state, props) => ({
+        data: dataSelector(state, props),
+    });
 }
 
 function mapDispatchToProps(dispatch, {id,form}) {
