@@ -3,14 +3,16 @@ const {PropTypes} = React;
 const {connect, connectAdvanced} = require('react-redux');
 const util = require('./util');
 const _ = require('lodash');
-const {compose, mapProps, getContext, withContext} = require('recompose');
+const {compose, mapProps, getContext, withContext, lifecycle} = require('recompose');
 const namespace = require('./namespace');
 const actions = require('./actionCreators');
 const ShortId = require('shortid');
 
 function mapStateToProps(state, props) {
+    // console.log('mapStateToProps');
     return {
         data: _.get(state, [namespace, props.id, 'data'], {}), // TODO: get default values in here somehow
+        // isValid: Array.from(props.form.fields.values()).every(f => f.props.ui.isValid),
     };
 }
 
@@ -40,10 +42,6 @@ function connectForm({rules}) {
             })
         ),
         getContext(contextTypes),
-        // mapProps(props => Object.assign({
-        //     fields: props.form.fields,
-        //    
-        // },_.omit(props,['form']))),
         connect(mapStateToProps, mapDispatchToProps)
     );
 }

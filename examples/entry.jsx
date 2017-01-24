@@ -1,3 +1,10 @@
+const React = require('react');
+
+if (process.env.NODE_ENV !== 'production') {
+    const {whyDidYouUpdate} = require('why-did-you-update');
+    whyDidYouUpdate(React)
+}
+
 const ReactDOM = require('react-dom');
 const Form1 = require('./Form1');
 const Form2 = require('./Form2');

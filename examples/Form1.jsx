@@ -18,7 +18,7 @@ class Form1 extends React.PureComponent {
                 <div className="bd-example">
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Email address</label>
-                        <ValueField name="email" rules={[Rules.required, Rules.email]}>
+                        <ValueField name="email">
                             <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"/>
                         </ValueField>
                         <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone
@@ -33,7 +33,7 @@ class Form1 extends React.PureComponent {
                     </div>
                     <div className="form-group">
                         <label htmlFor="exampleSelect1">Example select</label>
-                        <ValueField name="number-select" rules={val => val == '3' ? "3 is unlucky": ''}>
+                        <ValueField name="numberselect">
                             <select className="form-control custom-select" id="exampleSelect1">
                                 <option>1</option>
                                 <option>2</option>
@@ -46,7 +46,7 @@ class Form1 extends React.PureComponent {
                     <div className="form-group">
                         <label htmlFor="exampleSelect2">Example multiple select</label>
     
-                        <ValueField name="multi-select" rules={val => val.length < 3 ? "Please select at least 3 items" : ""} defaultValue={[2,3]} valueGetter={getMultiVal}>
+                        <ValueField name="multiselect" defaultValue={[2,3]} valueGetter={getMultiVal}>
                             <select multiple className="form-control" id="exampleSelect2">
                                 <option>1</option>
                                 <option>2</option>
@@ -97,6 +97,9 @@ class Form1 extends React.PureComponent {
 }
 
 const rules = {
+    email: [Rules.required, Rules.email],
+    multiselect: val => val.length < 3 ? "Please select at least 3 items" : "",
+    numberselect: val => val == '3' ? "3 is unlucky": '',
     tweet: Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`),
     password: [
         Rules.required,
