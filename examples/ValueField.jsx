@@ -28,7 +28,7 @@ class StatelessValueField extends React.PureComponent {
         };
 
         let wrapClassName;
-        if(rules.length && (ui.wasFocused || ui.wasSubmitted)) {
+        if(rules.length && (ui.wasFocused || ui.formValidated)) {
             if(errors.length === 0) {
                 attrs.className = css.fieldValid;
                 wrapClassName = css.wrapValid;
@@ -74,7 +74,7 @@ class StatelessValueField extends React.PureComponent {
     renderTooltip() {
         const {errors, ui} = this.props;
 
-        if((ui.isFocused || (ui.isHovering && (ui.wasFocused || ui.wasSubmitted))) && errors.length) {
+        if((ui.isFocused || (ui.isHovering && (ui.wasFocused || ui.formValidated))) && errors.length) {
             return (
                 <div ref={n => {this.tooltip = n}} className={css.tooltip}>
                     {errors.length > 1

@@ -61,7 +61,7 @@ const ui = {
     isHovering: true, // mouse is over input
     mouseEntered: true, // mouse was over input
     mouseLeft: true, // mouse entered input and then left
-    wasSubmitted: true, // form submit was attempted while this input existed
+    formValidated: true, // form submit was attempted while this input existed
     wasValid: true, // input was at some point valid
 };
 */

@@ -47,9 +47,9 @@ module.exports = function mapStateToProps() {
     const isDirtySelector = createSelector([valueSelector,initialValueSelector], (value,initialValue) => !_.isEqual(value, initialValue));
     const isValidSelector = createSelector(errorSelector, errors => errors.length === 0);
     const isEmptySelector = createSelector([valueSelector,defaultValueGetter], _.isEqual);
-    const wasSubmittedSelector = createSelector(stateGetter, state => _.get(state, 'submit', 0) > 0);
+    const formValidatedSelector = createSelector(stateGetter, state => _.get(state, 'submit', 0) > 0);
     
-    const uiSelector = util.createDeepEqualSelector([stateUiSelector,isDirtySelector,isValidSelector,isEmptySelector,wasSubmittedSelector], (ui,isDirty,isValid,isEmpty,wasSubmitted) => ({
+    const uiSelector = util.createDeepEqualSelector([stateUiSelector,isDirtySelector,isValidSelector,isEmptySelector,formValidatedSelector], (ui,isDirty,isValid,isEmpty,formValidated) => ({
         isFocused: ui.isFocused,
         isHovering: ui.isHovering,
         mouseEntered: ui.mouseEntered,
@@ -60,7 +60,7 @@ module.exports = function mapStateToProps() {
         isDirty,
         isValid,
         isEmpty,
-        wasSubmitted,
+        formValidated,
     }));
 
     return (state, props) => ({
@@ -85,7 +85,7 @@ module.exports = function mapStateToProps() {
     //     wasFocused: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasFocused'], false),
     //     wasBlurred: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasBlurred'], false),
     //     wasChanged: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasChanged'], false),
-    //     wasSubmitted: !!_.get(state, [namespace, props.form.id, 'submit'], false),
+    //     formValidated: !!_.get(state, [namespace, props.form.id, 'submit'], false),
     // };
     //
     // return {value,ui,errors};

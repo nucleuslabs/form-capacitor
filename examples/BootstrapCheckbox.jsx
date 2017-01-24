@@ -18,7 +18,7 @@ class StatelessBootstrapCheckbox extends React.PureComponent {
 
 
         let wrapClassName, inputClassName;
-        if(rules.length && (ui.wasFocused || ui.wasSubmitted)) {
+        if(rules.length && (ui.wasFocused || ui.formValidated)) {
             if(errors.length === 0) {
                 inputClassName = css.fieldValid;
                 wrapClassName = css.wrapValid;
@@ -27,7 +27,6 @@ class StatelessBootstrapCheckbox extends React.PureComponent {
                 wrapClassName = css.wrapError;
             }
         }
-
 
         return (
             <div>
@@ -68,7 +67,7 @@ class StatelessBootstrapCheckbox extends React.PureComponent {
     renderTooltip() {
         const {errors, ui} = this.props;
 
-        if((ui.isFocused || (ui.isHovering && (ui.wasFocused || ui.wasSubmitted))) && errors.length) {
+        if((ui.isFocused || (ui.isHovering && (ui.wasFocused || ui.formValidated))) && errors.length) {
             return (
                 <div ref={n => {this.tooltip = n}} className={css.tooltip}>
                     {errors.length > 1
