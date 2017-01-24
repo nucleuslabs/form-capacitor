@@ -90,8 +90,9 @@ class Form1 extends React.PureComponent {
     
     submit = ev => {
         ev.preventDefault();
-        this.props.dispatchSubmit();
-        console.log(`Submitting ${JSON.stringify(this.props.data,null,2)}`);
+        if(this.props.validate()) {
+            console.log(`Submitting ${JSON.stringify(this.props.data, null, 2)}`);
+        }
     }
 }
 

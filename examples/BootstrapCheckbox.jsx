@@ -89,7 +89,7 @@ class StatelessBootstrapCheckbox extends React.PureComponent {
 StatelessBootstrapCheckbox.propTypes = {
     value: PropTypes.any.isRequired,
     // dispatch: PropTypes.func.isRequired,
-    formId: PropTypes.string.isRequired,
+    // formId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     ui: PropTypes.object.isRequired,
     errors: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.element])).isRequired,
@@ -99,7 +99,7 @@ StatelessBootstrapCheckbox.propTypes = {
 const BootstrapCheckbox = connectField()(StatelessBootstrapCheckbox);
 
 BootstrapCheckbox.propTypes = {
-    formId: PropTypes.string,
+    // formId: PropTypes.string,
     name: PropTypes.string.isRequired,
     rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
     defaultMessage: PropTypes.string,

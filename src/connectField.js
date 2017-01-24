@@ -11,13 +11,17 @@ function connectField() {
         toClass,
         getContext({form: PropTypes.object}),
         mapProps(props => {
-            const form = props.form || {};
-            const formId = props.formId || form.id;
+            const form = props.form || {
+                id: props.formId,
+                rules: [],
+                fields: null,
+            };
+            // const formId = props.formId || form.id;
             const fieldRules = util.array(props.rules);
             const baseRules = form.rules ? util.array(util.glob(form.rules,props.name,[])) : [];
             let newProps = Object.assign(
                 {
-                    formId, // TODO: delete this
+                    // formId, // TODO: delete this
                     form,
                 },
                 // _.omit(props, ['form']),

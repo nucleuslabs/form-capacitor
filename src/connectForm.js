@@ -16,16 +16,9 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch, {id,form}) {
     return {
-        // TODO: rename to validate() and return true or false
-        dispatchSubmit: () => {
-            
-            
-            // console.log(Array.from(fields));
-            let isValid = Array.from(form.fields.values()).every(f => f.props.ui.isValid);
-            
-            console.log('form is valid',isValid);
-            
+        validate: () => { // FIXME: not sure if this should trigger a submit or not....
             dispatch(actions.submit(id));
+            return Array.from(form.fields.values()).every(f => f.props.ui.isValid);
         },
     };
 }

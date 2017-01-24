@@ -1,26 +1,26 @@
 const actions = require('./actionCreators');
 
-module.exports = function mapDispatchToProps(dispatch, {formId,name}) {
+module.exports = function mapDispatchToProps(dispatch, {form,name}) {
     
     // TODO: nest all of these under 'actions'?
     return {
         dispatchChange: value => {
-            dispatch(actions.change(formId,name,value));
+            dispatch(actions.change(form.id,name,value));
         },
         dispatchFocus: () => {
-            dispatch(actions.focus(formId,name));
+            dispatch(actions.focus(form.id,name));
         },
         dispatchBlur: () => {
-            dispatch(actions.blur(formId,name));
+            dispatch(actions.blur(form.id,name));
         },
         dispatchMouseEnter: () => {
-            dispatch(actions.mouseEnter(formId,name));
+            dispatch(actions.mouseEnter(form.id,name));
         },
         dispatchMouseLeave: () => {
-            dispatch(actions.mouseLeave(formId,name));
+            dispatch(actions.mouseLeave(form.id,name));
         },
         dispatchSubmit: () => {
-            dispatch(actions.submit(formId));
+            dispatch(actions.submit(form.id));
         },
     };
 };

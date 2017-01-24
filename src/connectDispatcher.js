@@ -10,15 +10,15 @@ const namespace = require('./namespace');
 function connectDispatcher() {
     return compose(
         getContext({form: PropTypes.object}),
-        mapProps(props => {
-            const form = props.form || {};
-            return Object.assign(
-                {
-                    formId: form.id
-                },
-                _.omit(props, ['form'])
-            );
-        }),
+        // mapProps(props => {
+        //     const form = props.form || {};
+        //     return Object.assign(
+        //         {
+        //             formId: form.id
+        //         },
+        //         _.omit(props, ['form'])
+        //     );
+        // }),
         connect(null, require('./mapDispatchToProps'))
     );
 }

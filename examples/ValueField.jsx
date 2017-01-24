@@ -96,7 +96,7 @@ StatelessValueField.propTypes = {
     value: PropTypes.any.isRequired,
     // dispatch: PropTypes.func.isRequired,
     children: PropTypes.element.isRequired,
-    formId: PropTypes.string.isRequired,
+    // formId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     ui: PropTypes.object.isRequired,
     errors: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.element])).isRequired,
@@ -108,7 +108,7 @@ const ValueField = connectField()(StatelessValueField);
 
 ValueField.propTypes = {
     children: PropTypes.element.isRequired,
-    formId: PropTypes.string,
+    // formId: PropTypes.string,
     name: PropTypes.string.isRequired,
     rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
     defaultMessage: PropTypes.string,

@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const setIn = require('lodash/fp/set');
 const actionTypes = require('./actionTypes');
 const namespace = require('./namespace');
@@ -39,7 +40,8 @@ module.exports = function createReducer(data) {
                 break;
             }
             case actionTypes.SUBMIT: {
-                state = setIn([namespace, payload.formId, 'submitted'], true, state);
+                let submitCount = _.get(state, [namespace, payload.formId, 'submit'], 0);
+                state = setIn([namespace, payload.formId, 'submit'], submitCount+1, state);
                 break;
             }
         }

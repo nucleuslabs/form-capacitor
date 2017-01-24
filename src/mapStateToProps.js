@@ -7,21 +7,21 @@ const namespace = require('./namespace');
 
 
 const getValue = (state, props) => {
-    return _.get(state, [namespace, props.formId, 'data', ...toPath(props.name)], props.defaultValue);
+    return _.get(state, [namespace, props.form.id, 'data', ...toPath(props.name)], props.defaultValue);
 };
 
 const getInitialValue = (state, props) => {
-    return _.get(state, [namespace, props.formId, 'initial', ...toPath(props.name)], props.defaultValue);
+    return _.get(state, [namespace, props.form.id, 'initial', ...toPath(props.name)], props.defaultValue);
 };
 
 const getIsFocused = (state, props) => {
-    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isFocused'], false);
+    return _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'isFocused'], false);
 };
 const getWasFocused = (state, props) => {
-    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasFocused'], false);
+    return _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasFocused'], false);
 };
 const getIsHovering = (state, props) => {
-    return _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isHovering'], false);
+    return _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'isHovering'], false);
 };
 const getRules = (state, props) => {
     return util.array(props.rules);
@@ -58,19 +58,19 @@ module.exports = function mapStateToProps(state, props) {
     let value = getValue(state, props);
     let initialValue = getInitialValue(state, props);
     let errors = getErrors(state, props);
-
+    
     let ui = {
         isDirty: !_.isEqual(value, initialValue),
         isValid: errors.length === 0,
         isEmpty: _.isEqual(value, props.defaultValue),
-        isFocused: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isFocused'], false),
-        isHovering: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'isHovering'], false),
-        mouseEntered: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'mouseEntered'], false),
-        mouseLeft: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'mouseLeft'], false),
-        wasFocused: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasFocused'], false),
-        wasBlurred: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasBlurred'], false),
-        wasChanged: _.get(state, [namespace, props.formId, 'ui', ...toPath(props.name), 'wasChanged'], false),
-        wasSubmitted: _.get(state, [namespace, props.formId, 'submitted'], false),
+        isFocused: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'isFocused'], false),
+        isHovering: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'isHovering'], false),
+        mouseEntered: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'mouseEntered'], false),
+        mouseLeft: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'mouseLeft'], false),
+        wasFocused: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasFocused'], false),
+        wasBlurred: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasBlurred'], false),
+        wasChanged: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasChanged'], false),
+        wasSubmitted: !!_.get(state, [namespace, props.form.id, 'submit'], false),
     };
 
     return {value,ui,errors};
