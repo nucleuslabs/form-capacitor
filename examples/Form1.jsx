@@ -1,5 +1,5 @@
 const React = require('react');
-const {FormProvider, Rules, connectForm} = require('form-capacitor');
+const {FormProvider, Rules, connectForm, dependantRule} = require('form-capacitor');
 const ValueField = require('./ValueField');
 const BootstrapRadio = require('./BootstrapRadio');
 const BootstrapCheckbox = require('./BootstrapCheckbox');
@@ -114,6 +114,7 @@ const rules = {
         pw => /[0-9]/i.test(pw) ? '' : "Please add a number.",
         pw => /[A-Za-z]/i.test(pw) ? '' : "Please add a letter.",
     ],
+    confirmPassword: dependantRule(['password'], (val,pw) => val !== pw ? "Passwords do not match" : ''),
     radio: value => value !== 'option2' ? "I prefer option2" : '',
     tac: checked => checked ? '' : "You must agree!",
 };

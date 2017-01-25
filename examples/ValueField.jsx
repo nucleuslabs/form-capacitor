@@ -100,7 +100,7 @@ StatelessValueField.propTypes = {
     name: PropTypes.string.isRequired,
     ui: PropTypes.object.isRequired,
     errors: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.element])).isRequired,
-    rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
+    rules: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func.isRequired,PropTypes.object.isRequired])),
     valueGetter: PropTypes.func.isRequired,
 };
 
