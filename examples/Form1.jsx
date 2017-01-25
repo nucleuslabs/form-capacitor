@@ -32,6 +32,12 @@ class Form1 extends React.PureComponent {
                         </ValueField>
                     </div>
                     <div className="form-group">
+                        <label htmlFor="exampleInputPassword2">Confirm Password</label>
+                        <ValueField name="confirmPassword">
+                            <input type="password" className="form-control" id="exampleInputPassword2" placeholder="Re-type password"/>
+                        </ValueField>
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="exampleSelect1">Example select</label>
                         <ValueField name="numberselect">
                             <select className="form-control custom-select" id="exampleSelect1">

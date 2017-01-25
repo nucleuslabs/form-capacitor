@@ -68,25 +68,4 @@ module.exports = function mapStateToProps() {
         errors: errorSelector(state, props),
         ui: uiSelector(state, props),
     });
-
-    
-    // let value = getValue(state, props);
-    // let initialValue = getInitialValue(state, props);
-    // let errors = errorSelector(state, props);
-    //
-    // let ui = {
-    //     isDirty: !_.isEqual(value, initialValue),
-    //     isValid: errors.length === 0,
-    //     isEmpty: _.isEqual(value, props.defaultValue),
-    //     isFocused: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'isFocused'], false),
-    //     isHovering: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'isHovering'], false),
-    //     mouseEntered: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'mouseEntered'], false),
-    //     mouseLeft: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'mouseLeft'], false),
-    //     wasFocused: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasFocused'], false),
-    //     wasBlurred: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasBlurred'], false),
-    //     wasChanged: _.get(state, [namespace, props.form.id, 'ui', ...toPath(props.name), 'wasChanged'], false),
-    //     formValidated: !!_.get(state, [namespace, props.form.id, 'submit'], false),
-    // };
-    //
-    // return {value,ui,errors};
 };
