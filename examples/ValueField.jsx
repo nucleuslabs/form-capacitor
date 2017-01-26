@@ -117,7 +117,8 @@ ValueField.propTypes = {
 
 ValueField.defaultProps = {
     // formId: 'default',
-    defaultMessage: "This field is invalid",
+    defaultErrorMessage: "This field is invalid",
+    defaultPendingMessage: "Checking...",
     defaultValue: '',
     valueGetter: ev => ev.target.value,
 };

@@ -8,4 +8,5 @@ exports.connectForm = require('./connectForm');
 // exports.actionTypes = require('./actionTypes');
 // exports.actionCreators = require('./actionCreators');
 exports.util = require('./util');
-exports.dependantRule = require('./dependantRule').dependantRule;
+exports.dependantRule = require('./specialRules').dependantRule;
+exports.asyncRule = require('./specialRules').asyncRule;

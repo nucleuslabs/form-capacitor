@@ -1,5 +1,5 @@
 const React = require('react');
-const {FormProvider, Rules, connectForm, dependantRule} = require('form-capacitor');
+const {FormProvider, Rules, connectForm, dependantRule, asyncRule} = require('form-capacitor');
 const ValueField = require('./ValueField');
 const BootstrapRadio = require('./BootstrapRadio');
 const BootstrapCheckbox = require('./BootstrapCheckbox');
@@ -102,8 +102,14 @@ class Form1 extends React.PureComponent {
     }
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const rules = {
-    email: [Rules.required, Rules.email],
+    email: [Rules.required, Rules.email, email => sleep(1000).then(() => {
+        if(email == 'mpenner@nucleuslabs.com') return "That email address is already registered";
+    })],
     multiselect: val => val.length < 3 ? "Please select at least 3 items" : "",
     numberselect: val => val == '3' ? "3 is unlucky": '',
     tweet: Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`),
@@ -113,6 +119,9 @@ const rules = {
         pw => /[^a-z0-9]/i.test(pw) ? '' : "Please add a special character.",
         pw => /[0-9]/i.test(pw) ? '' : "Please add a number.",
         pw => /[A-Za-z]/i.test(pw) ? '' : "Please add a letter.",
+        asyncRule(pw => sleep(1000).then(() => {
+            if(pw == 'password') return "Password was recently used";
+        }), "Checking if password was recently used..."),
     ],
     confirmPassword: dependantRule(['password'], (val,pw) => val !== pw ? "Passwords do not match" : ''),
     radio: value => value !== 'option2' ? "I prefer option2" : '',

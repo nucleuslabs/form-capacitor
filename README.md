@@ -26,15 +26,17 @@ See also: [redux-form meta props](http://redux-form.com/6.4.3/docs/api/Field.md/
 
 ## TODO
 
-- contingent validation rules
+- ~~contingent validation rules~~ [dependantRule]
+- async validation rules + ui states
+- `setFocus`
+- Rename `dispatchXXX` methods to something like `actions.xxx`?
+- Rename `onChange`, `onFocus`, onXXX props to `input.onChange` or `events.xxx`?
 - `form.validate()` checks if all *rendered* inputs are valid. We should probably
 add another property to check if *all* inputs, or at least select inputs are valid
 - onSubmit validation rules
-- async validation rules + ui states
 - [`<FormSection>`](http://redux-form.com/6.4.3/docs/api/FormSection.md/)
 - [`format` and `parse`](http://redux-form.com/6.4.3/docs/ValueLifecycle.md/)
 - warnings
-- `setFocus`
 - `destroy` (delete state) and `reset` form (revert to initial values, clear UI state)
 - More features from React-Redux...
 
