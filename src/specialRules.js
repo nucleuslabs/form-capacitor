@@ -33,7 +33,7 @@ module.exports = {dependantRule, asyncRule, isDependant, isAsync};
 // FIXME: rule object should look something like
 
 let rule = {
-    isAsync: true,
+    isAsync: true, // isValid is expected to return a Promise. Validation rule will not run if other synchronous validation rules are failing
     pendingMessage: "Checking...",
     errorMessage: "Password is too weak", // {string|Function} message to display if input is not valid
     isValid: (pw,confirm) => pw === confirm,

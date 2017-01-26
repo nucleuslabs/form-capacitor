@@ -5,6 +5,11 @@ const util = require('./util');
 const _ = require('lodash');
 const {compose, mapProps, getContext, toClass, withProps, withPropsOnChange, pure, shouldUpdate} = require('recompose');
 const namespace = require('./namespace');
+const { createSelector, defaultMemoize, createSelectorCreator } = require('reselect');
+const shallowEqual = require('./shallowEqual');
+
+const mapStateToProps = require('./mapStateToProps');
+const mapDispatchToProps = require('./mapDispatchToProps');
 
 function connectField() {
     return compose(
@@ -24,7 +29,20 @@ function connectField() {
                 rules: _.concat(baseRules, fieldRules),
             };
         }),
-        connect(require('./mapStateToProps'), require('./mapDispatchToProps')),
+        // connect(require('./mapStateToProps'), require('./mapDispatchToProps')),
+        connectAdvanced((dispatch, factoryOptions) => {
+            let stateSelector = mapStateToProps();
+            let dispatchSelector = createSelector(d => d, (_, p) => p.form, (_, p) => p.name, mapDispatchToProps);
+            let lastProps = {};
+            
+            return (state, props) => {
+                let newProps = Object.assign(stateSelector(state, props), dispatchSelector(dispatch, props), props);
+                if(shallowEqual(lastProps, newProps)) {
+                    return lastProps;
+                }
+                return lastProps = newProps;
+            }
+        }),
         withPropsOnChange((prevProps,nextProps) => !!nextProps.form.fields, ({name,form}) => {
             return {
                 ref: node => {

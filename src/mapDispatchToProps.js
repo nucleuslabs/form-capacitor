@@ -1,6 +1,6 @@
 const actions = require('./actionCreators');
 
-module.exports = function mapDispatchToProps(dispatch, {form,name}) {
+module.exports = function mapDispatchToProps(dispatch, form, name) {
     
     // TODO: nest all of these under 'actions'?
     return {
