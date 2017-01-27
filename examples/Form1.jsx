@@ -3,7 +3,6 @@ const {FormProvider, Rules, connectForm, dependantRule, asyncRule} = require('fo
 const ValueField = require('./ValueField');
 const BootstrapRadio = require('./BootstrapRadio');
 const BootstrapCheckbox = require('./BootstrapCheckbox');
-const SubmitButton = require('./SubmitButton');
 
 
 function getMultiVal(ev) {
