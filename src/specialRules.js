@@ -37,7 +37,9 @@ let rule = {
     pendingMessage: "Checking...",
     errorMessage: "Password is too weak", // {string|Function} message to display if input is not valid
     isValid: (pw,confirm) => pw === confirm,
-    precondition: (value,ui) => value.length > 6, // {Function} if precondition fails, validation rule is not ran (not cached)
+    precondition: (value,ui) => value.length > 6, // {Function} if precondition fails, validation rule is not ran (not cached). Probably not needed if sync functions run first.
     dependsOn: ['password'], 
     isOptional: true, // don't run validation rule if _.isEqual(value,defaultValue)
 };
+
+// The default/built-in rules can all be Rule objects w/ a "withErrorMessage" function which will return a new instance but with that message. (Rules should be immutable so that they can be properly memoized)
