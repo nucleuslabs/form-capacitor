@@ -15,7 +15,7 @@ function connectField() {
     return compose(
         toClass,
         getContext({form: PropTypes.object}),
-        withPropsOnChange(['name','rules','form','formId'], props => {
+        withPropsOnChange(['name','rules','formId'], props => {
             // console.log(props.name,'changing');
             const form = props.form || {
                 id: props.formId,
@@ -43,16 +43,18 @@ function connectField() {
                 return lastProps = newProps;
             }
         }),
-        withPropsOnChange((prevProps,nextProps) => !!nextProps.form.fields, ({name,form}) => {
-            return {
-                ref: node => {
-                    if(node) {
-                        form.fields.set(name, node);
-                    } else {
-                        form.fields.delete(name);
+        withPropsOnChange(['name'], ({name,form}) => {
+            if(form.fields) {
+                return {
+                    ref: node => {
+                        if(node) {
+                            form.fields.set(name, node);
+                        } else {
+                            form.fields.delete(name);
+                        }
                     }
-                }
-            };
+                };
+            }
         })
     );
 }
