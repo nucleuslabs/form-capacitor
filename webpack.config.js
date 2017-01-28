@@ -9,6 +9,7 @@ module.exports = {
         path: examplesDir,
         filename: 'bundle.js',
         publicPath: '/',
+        pathinfo: true,
     },
     module: {
         rules: [
@@ -22,11 +23,18 @@ module.exports = {
                 },
             },
             {
+                test: /\.(jpe?g|png|gif|svg)($|\?)/i,
+                loader: 'url-loader',
+                options: {
+                    limit: 1024*2,
+                }
+            },
+            {
                 test: /\.less$/,
                 use: [
                     'style-loader',
-                    { loader: 'css-loader', options: { importLoaders: 1 } },
-                    'less-loader'
+                    {loader: 'css-loader', options: {importLoaders: 2}},
+                    {loader: 'less-loader', options: {strictMath: true, strictUnits: true}},
                 ]
             }
         ]
@@ -34,7 +42,7 @@ module.exports = {
     target: 'web',
     resolve: {
         modules: ['node_modules'],
-        extensions: ['.jsx','.js'],
+        extensions: ['.jsx', '.js'],
         alias: {
             'form-capacitor': path.resolve(__dirname, 'src'),
         },

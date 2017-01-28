@@ -2,7 +2,7 @@ const React = require('react');
 const {PropTypes} = React;
 const util = require('form-capacitor/util');
 const _ = require('lodash');
-const css = require('./style.less');
+const css = require('./ValueField.less');
 const connectField = require('form-capacitor/connectField');
 
 class StatelessValueField extends React.PureComponent {
