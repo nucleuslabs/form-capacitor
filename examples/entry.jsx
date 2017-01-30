@@ -6,8 +6,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const ReactDOM = require('react-dom');
-const Form1 = require('./Form1');
-const Form2 = require('./Form2');
+const BootstrapForm = require('./BootstrapForm');
+const OceanicForm = require('./OceanicForm');
 const FormStoreProvider = require('form-capacitor/FormStoreProvider');
 
 const initialData = {
@@ -23,12 +23,12 @@ ReactDOM.render(
             <h1>Form Capacitor Example</h1>
             <div className="row">
                 <div className="col-6">
-                    <h2>Form 1</h2>
-                    <Form1 id="form1"/>
+                    <h2>Bootstrap Form</h2>
+                    <BootstrapForm id="form1"/>
                 </div>
                 <div className="col-6">
-                    <h2>Form 2</h2>
-                    <Form2 id="form2"/>
+                    <h2>Oceanic Form</h2>
+                    <OceanicForm id="form2"/>
                 </div>
             </div>
         </div>

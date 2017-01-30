@@ -9,7 +9,7 @@ function getMultiVal(ev) {
     return Array.from(ev.target.options).filter(o => o.selected).map(o => o.value);
 }
 
-class Form1 extends React.PureComponent {
+class BootstrapForm extends React.PureComponent {
     
     render() {
         return (
@@ -127,4 +127,4 @@ const rules = {
     tac: checked => checked ? '' : "You must agree!",
 };
 
-module.exports = connectForm({rules})(Form1);
+module.exports = connectForm({rules})(BootstrapForm);

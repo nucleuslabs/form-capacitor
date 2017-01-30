@@ -3,12 +3,12 @@ const {FormProvider, Rules, connectForm, dependantRule, asyncRule} = require('fo
 const TextBox = require('./TextBox');
 
 
-class Form2 extends React.PureComponent {
+class OceanicForm extends React.PureComponent {
 
     render() {
         return (
             <form>
-                <TextBox placeholder="Please enter your email" required={true}/>
+                <TextBox name="email" placeholder="Email address" required={true}/>
             </form>
         );
     }
@@ -22,4 +22,4 @@ const rules = {
 
 };
 
-module.exports = connectForm({rules})(Form2);
+module.exports = connectForm({rules})(OceanicForm);

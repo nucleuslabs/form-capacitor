@@ -6,29 +6,19 @@ const {connectField,util} = require('form-capacitor');
 const ShortId = require('shortid');
 const classNames = require('classnames');
 
+const SKIP = false;
+
 class StatelessTextBox extends React.PureComponent {
-
-
+    
     onChange = ev => {
         this.props.dispatchChange(ev.target.value);
     };
 
     render() {
-
-        // let wrapClassName, inputClassName;
-        // if(rules.length && (ui.wasFocused || ui.formValidated)) {
-        //     if(errors.length === 0) {
-        //         inputClassName = css.fieldValid;
-        //         wrapClassName = css.wrapValid;
-        //     } else {
-        //         inputClassName = css.fieldError;
-        //         wrapClassName = css.wrapError;
-        //     }
-        // }
-
+        
         return (
-            <label className={css.wrap} onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
-                <input className={css.input} onChange={this.props.onChange} onFocus={this.props.dispatchFocus} onBlur={this.props.dispatchBlur} required={this.props.required} />
+            <label className={classNames(css.wrap,this.props.ui.isFocused ? css.focused : SKIP, this.props.value === '' ? css.empty : css.filled)} onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
+                <input className={css.input} onChange={this.onChange} onFocus={this.props.dispatchFocus} onBlur={this.props.dispatchBlur} required={this.props.required} />
                 <span className={css.placeholder}>{this.props.placeholder}</span>
                 {this.props.required ? <span className={css.required}/> : null}
             </label>

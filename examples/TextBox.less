@@ -4,21 +4,57 @@
         border: 1px solid #ddd;
         border-radius: 3px;
         position: relative;
+        width: 100%; // optional
+        padding: 2px 5px;
+        transition: all 150ms
     }
     
     .input {
         border: none;
-        width: calc(100% - 22px);
+        width: calc(100% - 20px);
         outline: none;
-        padding-left: 5px;
+        padding: 14px 3px 1px 3px;
     }
     
     .placeholder {
         color: #666;
         position: absolute;
-        top: 4px;
+        top: 50%;
+        transform: translateY(-50%);
         left: 8px;
         pointer-events: none;
+        max-width: calc(100% - 30px);
+        overflow: hidden;
+        display: inline-block;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transition: all 150ms
+    }
+    
+    .focused, .filled {
+        .placeholder {
+            font-size: .7em;
+            transform: none;
+            top: 3px;
+            transition: all 150ms
+        }
+    }
+    
+    .filled {
+        .placeholder {
+            color: #888;
+        }
+    }
+    
+    .focused {
+        .placeholder {
+            color: #0069ff;
+            transition: all 150ms
+        }
+        &.wrap {
+            border-color: #0069ff;
+            transition: all 150ms
+        }
     }
     
     .icon {
@@ -26,14 +62,14 @@
         height: 16px;
         display: inline-block;
         position: absolute;
-        top: 5px;
+        top: 50%;
+        transform: translateY(-50%);
         right: 5px;
     }
     
     .required {
         composes: icon;
         background-image: url(../examples/asterisk.svg);
-       
     }
     
     // copy style from https://www.digitalocean.com/products/monitoring/?utm_source=product-broadcast&utm_medium=email&mkt_tok=eyJpIjoiTmpRNE5UQmhZek5oTlRVNSIsInQiOiJOWnVRNDErdTd4Nlg3VmViaWFmOUpKUHY5RHV1THp2ZEVxUVNGV0ZtM3k4aGtyMTRHck1VbzRkY3pzQ01qckZkVEJRcnp1Qlh1N2xNSW5yY2hhUjdpd2tDNDlOTk0zZ3puaHlmSzQ0MUFTam5ndW9Pb3ZSUnZsVE90SGxCeERyNiJ9
