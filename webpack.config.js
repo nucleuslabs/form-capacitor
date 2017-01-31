@@ -20,7 +20,7 @@ module.exports = {
                 loader: 'babel-loader',
                 options: {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
-                    plugins: ['transform-react-jsx', 'transform-class-properties'],
+                    plugins: ['transform-react-jsx', 'transform-class-properties', 'transform-object-rest-spread'],
                 },
             },
             {

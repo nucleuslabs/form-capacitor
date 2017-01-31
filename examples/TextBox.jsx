@@ -12,15 +12,13 @@ const SKIP = false;
 
 class StatelessTextBox extends React.PureComponent {
     
-    onChange = ev => {
-        this.props.dispatchChange(ev.target.value);
-    };
-
     render() {
+        let labelEvents = util.pick(this.props.events, {onMouseEnter:1,onMouseLeave:1});
+        let inputEvents = util.pick(this.props.events, {onChange:1,onFocus:1,onBlur:1});
         
         return (
-            <label className={classNames(css.wrap,this.props.ui.isFocused ? css.focused : SKIP, this.props.value === '' ? css.empty : css.filled, this.props.ui.isValid === true ? css.valid : (this.props.ui.isValid === false ? css.invalid : SKIP))} onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
-                <input className={css.input} onChange={this.onChange} onFocus={this.props.dispatchFocus} onBlur={this.props.dispatchBlur} required={this.props.required} />
+            <label className={classNames(css.wrap,this.props.ui.isFocused ? css.focused : SKIP, this.props.value === '' ? css.empty : css.filled, this.props.ui.isValid === true ? css.valid : (this.props.ui.isValid === false ? css.invalid : SKIP))} {...labelEvents}>
+                <input className={css.input} {...inputEvents} required={this.props.required} />
                 <span className={css.placeholder}>{this.props.placeholder}</span>
                 {this.renderIcon()}
             </label>

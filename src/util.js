@@ -121,3 +121,14 @@ exports.createDeepEqualSelector = createSelectorCreator(
     defaultMemoize,
     _.isEqual
 );
+
+exports.pick = function pick(src, props, dest={}) {
+    return Object.keys(props).reduce((dest,p) => {
+        if(typeof props[p] === 'string') {
+            dest[props[p]] = src[p];
+        } else if(props[p]) {
+            dest[p] = src[p];
+        }
+        return dest;
+    },dest);
+};

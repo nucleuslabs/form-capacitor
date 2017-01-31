@@ -19,12 +19,12 @@ class StatelessValueField extends React.PureComponent {
         let attrs = {
             value,
             onChange: ev => {
-                this.props.dispatchChange(valueGetter(ev));
+                this.props.actions.change(valueGetter(ev));
             },
-            onFocus: this.props.dispatchFocus,
-            onBlur: this.props.dispatchBlur,
-            onMouseEnter: this.props.dispatchMouseEnter,
-            onMouseLeave: this.props.dispatchMouseLeave,
+            onFocus: this.props.events.onFocus,
+            onBlur: this.props.events.onBlur,
+            onMouseEnter: this.props.events.onMouseEnter,
+            onMouseLeave: this.props.events.onMouseLeave,
         };
 
         let wrapClassName;

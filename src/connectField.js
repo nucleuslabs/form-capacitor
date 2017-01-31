@@ -119,24 +119,34 @@ const mapDispatchToProps = function mapDispatchToProps(dispatch, form, name) {
 
     // TODO: nest all of these under 'actions'?
     return {
-        dispatchChange: value => {
-            dispatch(actions.change(form.id,name,value));
+        actions: {
+            change: value => {
+                dispatch(actions.change(form.id, name, value));
+            },
         },
-        dispatchFocus: () => {
-            dispatch(actions.focus(form.id,name));
-        },
-        dispatchBlur: () => {
-            dispatch(actions.blur(form.id,name));
-        },
-        dispatchMouseEnter: () => {
-            dispatch(actions.mouseEnter(form.id,name));
-        },
-        dispatchMouseLeave: () => {
-            dispatch(actions.mouseLeave(form.id,name));
-        },
-        dispatchSubmit: () => {
-            dispatch(actions.submit(form.id));
-        },
+        events: {
+            onChange: ev => {
+                dispatch(actions.change(form.id,name,ev.target.value));
+            },
+            onCheck: ev => {
+                dispatch(actions.change(form.id,name,ev.target.checked));
+            },
+            onFocus: () => {
+                dispatch(actions.focus(form.id,name));
+            },
+            onBlur: () => {
+                dispatch(actions.blur(form.id,name));
+            },
+            onMouseEnter: () => {
+                dispatch(actions.mouseEnter(form.id,name));
+            },
+            onMouseLeave: () => {
+                dispatch(actions.mouseLeave(form.id,name));
+            },
+            onSubmit: () => {
+                dispatch(actions.submit(form.id));
+            },
+        }
     };
 };
 

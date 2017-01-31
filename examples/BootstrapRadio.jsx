@@ -12,10 +12,6 @@ class StatelessBootstrapRadio extends React.PureComponent {
         super(props);
         this.name = ShortId.generate();
     }
-    
-    onChange = ev => {
-        this.props.dispatchChange(ev.target.value);
-    };
 
     render() {
         const {value, children, dispatch, ui, errors, rules, name, options} = this.props;
@@ -32,16 +28,18 @@ class StatelessBootstrapRadio extends React.PureComponent {
             }
         }
 
+        let radioEvents = util.pick(this.props.events, {onFocus:1,onBlur:1,onChange:1});
+        let wrapEvents = util.pick(this.props.events, {onMouseEnter:1,onMouseLeave:1});
 
         return (
-            <div ref={n => {this.inputWrap = n}} className="custom-controls-stacked" onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
+            <div ref={n => {this.inputWrap = n}} className="custom-controls-stacked" {...wrapEvents}>
                 {options.map(o => {
                     let disabled = !!o.disabled;
                     let checked = _.isEqual(value, o.value);
                     return (
                         <div key={o.key || o.value} className={classNames('form-group',checked && wrapClassName,{disabled})}>
                             <label className="custom-control custom-radio">
-                                <input type="radio" className="custom-control-input" name={this.name} value={o.value} checked={checked} disabled={disabled} onChange={this.onChange} onFocus={this.props.dispatchFocus} onBlur={this.props.dispatchBlur}/>
+                                <input type="radio" className="custom-control-input" name={this.name} value={o.value} checked={checked} disabled={disabled} {...radioEvents}/>
                                 <span className={classNames('custom-control-indicator',checked && inputClassName)}/>
                                 <span className="custom-control-description">{o.text}</span>
                             </label>

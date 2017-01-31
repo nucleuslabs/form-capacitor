@@ -20,6 +20,7 @@ function mapStateToProps(state, props) {
 }
 
 function mapDispatchToProps(dispatch, {id,form}) {
+    // TODO: add setInput
     return {
         validate: () => { // FIXME: not sure if this should trigger a submit or not....
             dispatch(actions.submit(id));

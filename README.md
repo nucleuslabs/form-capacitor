@@ -29,8 +29,9 @@ See also: [redux-form meta props](http://redux-form.com/6.4.3/docs/api/Field.md/
 - ~~contingent validation rules~~ [dependantRule]
 - async validation rules + ui states
 - `setFocus`
-- Rename `dispatchXXX` methods to something like `actions.xxx`?
-- Rename `onChange`, `onFocus`, onXXX props to `input.onChange` or `events.xxx`?
+- ~~Rename `dispatchXXX` methods to something like `actions.xxx`?~~
+- ~~Rename `onChange`, `onFocus`, onXXX props to `input.onChange` or `events.xxx`?~~
+- Add `form.props.actions.setValue` and `form.props.actions.setFocus`
 - `form.validate()` checks if all *rendered* inputs are valid. We should probably
 add another property to check if *all* inputs, or at least select inputs are valid
 - onSubmit validation rules

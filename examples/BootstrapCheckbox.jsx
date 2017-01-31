@@ -7,11 +7,6 @@ const ShortId = require('shortid');
 const classNames = require('classnames');
 
 class StatelessBootstrapCheckbox extends React.PureComponent {
-    
-
-    onChange = ev => {
-        this.props.dispatchChange(ev.target.checked);
-    };
 
     render() {
         const {value, children, dispatch, ui, errors, rules, name, options, disabled} = this.props;
@@ -28,11 +23,14 @@ class StatelessBootstrapCheckbox extends React.PureComponent {
             }
         }
 
+        let cbEvents = util.pick(this.props.events, {onFocus:1,onBlur:1,onCheck:'onChange'});
+        let wrapEvents = util.pick(this.props.events, {onMouseEnter:1,onMouseLeave:1});
+
         return (
             <div>
-                <div className={classNames('form-group',wrapClassName,{disabled})} onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
+                <div className={classNames('form-group',wrapClassName,{disabled})} {...wrapEvents}>
                     <label ref={n => {this.inputWrap = n}} className="custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" checked={value} disabled={disabled} onChange={this.onChange} onFocus={this.props.dispatchFocus} onBlur={this.props.dispatchBlur}/>
+                        <input type="checkbox" className="custom-control-input" checked={value} disabled={disabled} {...cbEvents}/>
                         <span className={classNames('custom-control-indicator',inputClassName)}/>
                         <span className="custom-control-description">{children}</span>
                     </label>

@@ -1,3 +1,3 @@
-exports.asterisk = require('./asterisk.svg');
-exports.checkmark = require('./checkmark.svg');
-exports.cross = require('./cross.svg');
+exports.asterisk = require('./icons/asterisk.svg');
+exports.checkmark = require('./icons/checkmark.svg');
+exports.cross = require('./icons/cross.svg');
