@@ -1,6 +1,7 @@
 const path = require('path');
 const examplesDir = path.resolve(__dirname, 'examples');
 const {ProvidePlugin} = require('webpack');
+const SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
 
 module.exports = {
     context: examplesDir,
@@ -23,11 +24,15 @@ module.exports = {
                 },
             },
             {
-                test: /\.(jpe?g|png|gif|svg)($|\?)/i,
+                test: /\.(jpe?g|png|gif)($|\?)/i,
                 loader: 'url-loader',
                 options: {
                     limit: 1024*2,
                 }
+            },
+            {
+                test: /\.svg($|\?)/i,
+                loader: 'external-svg-sprite-loader',
             },
             {
                 test: /\.less$/,
@@ -52,5 +57,6 @@ module.exports = {
         new ProvidePlugin({
             React: 'react',
         }),
+        new SvgStorePlugin(),
     ]
 };

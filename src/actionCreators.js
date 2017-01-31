@@ -43,3 +43,7 @@ exports.mouseLeave = function(formId, name) {
 exports.submit = function(formId) {
     return fluxStandardAction(actionTypes.SUBMIT, {formId});
 };
+
+exports.asyncValidation = function(formId, name, complete) {
+    return fluxStandardAction(actionTypes.ASYNC_VALIDATION, {formId, name, complete});
+};

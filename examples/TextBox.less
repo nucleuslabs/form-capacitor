@@ -5,15 +5,20 @@
         border-radius: 3px;
         position: relative;
         width: 100%; // optional
-        padding: 2px 5px;
-        transition: all 150ms
+        padding: 0;
+        transition: all 150ms;
+        
+        //&.invalid {
+        //    border-color: rgb(242, 80, 65);
+        //}
     }
     
     .input {
+        background-color: transparent;
         border: none;
         width: calc(100% - 20px);
         outline: none;
-        padding: 14px 3px 1px 3px;
+        padding: 16px 10px 3px 10px;
     }
     
     .placeholder {
@@ -21,7 +26,7 @@
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        left: 8px;
+        left: 10px;
         pointer-events: none;
         max-width: calc(100% - 30px);
         overflow: hidden;
@@ -64,7 +69,7 @@
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        right: 5px;
+        right: 10px;
     }
     
     .required {
@@ -73,4 +78,60 @@
     }
     
     // copy style from https://www.digitalocean.com/products/monitoring/?utm_source=product-broadcast&utm_medium=email&mkt_tok=eyJpIjoiTmpRNE5UQmhZek5oTlRVNSIsInQiOiJOWnVRNDErdTd4Nlg3VmViaWFmOUpKUHY5RHV1THp2ZEVxUVNGV0ZtM3k4aGtyMTRHck1VbzRkY3pzQ01qckZkVEJRcnp1Qlh1N2xNSW5yY2hhUjdpd2tDNDlOTk0zZ3puaHlmSzQ0MUFTam5ndW9Pb3ZSUnZsVE90SGxCeERyNiJ9
+
+
+
+   
+}
+
+
+.loader {
+    //font-size: 10px;
+    //margin: 50px auto;
+    text-indent: -9999em;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #0069ff;
+    background: linear-gradient(to right, #0069ff 10%, rgba(255, 255, 255, 0) 42%);
+    position: absolute;
+    animation: load3 800ms infinite linear;
+    transform: translateZ(0);
+
+    &:before {
+        width: 50%;
+        height: 50%;
+        background: #0069ff;
+        border-radius: 100% 0 0 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: '';
+    }
+
+    &:after {
+        background: white;
+        width: 65%;
+        height: 65%;
+        border-radius: 50%;
+        content: '';
+        margin: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+    }
+}
+
+@keyframes load3 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
 }

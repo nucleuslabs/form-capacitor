@@ -5,6 +5,8 @@ const css = require('./TextBox.less');
 const {connectField,util} = require('form-capacitor');
 const ShortId = require('shortid');
 const classNames = require('classnames');
+const Svg = require('./Svg');
+const glyphs = require('./glyphs');
 
 const SKIP = false;
 
@@ -17,12 +19,28 @@ class StatelessTextBox extends React.PureComponent {
     render() {
         
         return (
-            <label className={classNames(css.wrap,this.props.ui.isFocused ? css.focused : SKIP, this.props.value === '' ? css.empty : css.filled)} onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
+            <label className={classNames(css.wrap,this.props.ui.isFocused ? css.focused : SKIP, this.props.value === '' ? css.empty : css.filled, this.props.ui.isValid === true ? css.valid : (this.props.ui.isValid === false ? css.invalid : SKIP))} onMouseEnter={this.props.dispatchMouseEnter} onMouseLeave={this.props.dispatchMouseLeave}>
                 <input className={css.input} onChange={this.onChange} onFocus={this.props.dispatchFocus} onBlur={this.props.dispatchBlur} required={this.props.required} />
                 <span className={css.placeholder}>{this.props.placeholder}</span>
-                {this.props.required ? <span className={css.required}/> : null}
+                {this.renderIcon()}
             </label>
         );
+    }
+    
+    renderIcon() {
+        if(this.props.ui.pendingValidations) {
+            return <span className={css.icon}><div className="loader"/></span>;
+        }
+        
+        if(this.props.required && this.props.value === '') {
+            return <Svg title="Required" glyph={glyphs.asterisk} className={css.icon} fill="#f25041"/>;
+        }
+
+        if(this.props.ui.isValid) {
+            return <Svg title="Valid" glyph={glyphs.checkmark} className={css.icon} fill={this.props.ui.isFocused ? '#91DC5A' : '#ccc'}/>;
+        } else {
+            return <Svg title="Invalid" glyph={glyphs.cross} className={css.icon} fill="#f25041"/>;
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {

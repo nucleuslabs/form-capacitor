@@ -19,7 +19,9 @@ function sleep(ms) {
 }
 
 const rules = {
-
+    email: [Rules.required, Rules.email, email => sleep(750).then(() => {
+        if(email == 'mpenner@nucleuslabs.com') return "That email address is already registered";
+    })],
 };
 
 module.exports = connectForm({rules})(OceanicForm);

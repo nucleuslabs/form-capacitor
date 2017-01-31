@@ -19,7 +19,7 @@ const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], {});
 const ruleCache = new DeepMap();
 const notFound = Symbol();
 
-function getErrors(value, rules, defaultErrorMessage, defaultPendingMessage, ui, formData) {
+function getErrors(value, rules, defaultErrorMessage, defaultPendingMessage, ui, formData, dispatch,formId, name) {
     // TODO: how to support promises like in textInput.jsx?
     return rules.map(rule => {
         let fn, args;
@@ -39,21 +39,25 @@ function getErrors(value, rules, defaultErrorMessage, defaultPendingMessage, ui,
         }
         let key = [fn, ...args.slice(0, fn.length)]; // FIXME: the slice is to lop off `ui` if it isn't used so that `ui` changes don't bust the cache, but this could be flakey
         let err = ruleCache.get(key,notFound);
+        // console.log(`GET ERRORS FOR ${formId}.${name}`);
         if(err === notFound) {
             err = fn(...args);
             ruleCache.set(key, err); // TODO: should we cache everything or just promises?
             if(err instanceof Promise) {
+                dispatch(actions.asyncValidation(formId,name,false));
                 err.then(val => {
                     // console.log('promise resolved',key,val);
                     ruleCache.set(key, val);
+                    dispatch(actions.asyncValidation(formId,name,true));
                 }, () => {
                     // console.log('promise rejected',key);
                     ruleCache.delete(key);
+                    dispatch(actions.asyncValidation(formId,name,true));
                 });
             }
         }
         if(err instanceof Promise) {
-            return pendingMessage;
+            return '';
         } else if(util.isNullish(err) || err === true) {
             return false;
         } else if(err === false) {
@@ -64,7 +68,7 @@ function getErrors(value, rules, defaultErrorMessage, defaultPendingMessage, ui,
 }
 
 
-const mapStateToProps = function mapStateToProps() {
+const mapStateToProps = function mapStateToProps(dispatch) {
     const namePathSelector = createSelector((_, p) => p.name, toPath);
     const stateUiSelector = util.createDeepEqualSelector([stateGetter,namePathSelector], (state,np) => Object.assign({
         isFocused: false,
@@ -79,7 +83,10 @@ const mapStateToProps = function mapStateToProps() {
     const valueSelector = createSelector([dataGetter,namePathSelector, defaultValueGetter], (data,np,dv) => _.get(data, np, dv));
     const initialGetter = createSelector(stateGetter, getOr({},'initial'));
     const initialValueSelector = createSelector([initialGetter,namePathSelector, defaultValueGetter], (init,np,dv) => _.get(init, np, dv));
-    const errorSelector = util.createDeepEqualSelector([valueSelector, (_,p) => p.rules, (_,p) => p.defaultErrorMessage, (_,p) => p.defaultPendingMessage, stateUiSelector, dataGetter], getErrors);
+    const errorSelector = util.createDeepEqualSelector(
+        [valueSelector, (_,p) => p.rules, (_,p) => p.defaultErrorMessage, (_,p) => p.defaultPendingMessage, stateUiSelector, dataGetter, () => dispatch, (_, p) => p.form.id, (_, p) => p.name], 
+        getErrors
+    );
 
     const isDirtySelector = createSelector([valueSelector,initialValueSelector], (value,initialValue) => !_.isEqual(value, initialValue));
     const isValidSelector = createSelector(errorSelector, errors => errors.length === 0);
@@ -94,6 +101,7 @@ const mapStateToProps = function mapStateToProps() {
         wasFocused: ui.wasFocused,
         wasBlurred: ui.wasBlurred,
         wasChanged: ui.wasChanged,
+        pendingValidations: ui.pendingValidations,
         isDirty,
         isValid,
         isEmpty,
@@ -151,19 +159,7 @@ function connectField() {
             };
         }),
         // connect(require('./mapStateToProps'), require('./mapDispatchToProps')),
-        connectAdvanced((dispatch, factoryOptions) => {
-            let stateSelector = mapStateToProps();
-            let dispatchSelector = createSelector(d => d, (_, p) => p.form, (_, p) => p.name, mapDispatchToProps);
-            let lastProps = {};
-            
-            return (state, props) => {
-                let newProps = Object.assign(stateSelector(state, props), dispatchSelector(dispatch, props), props);
-                if(shallowEqual(lastProps, newProps)) {
-                    return lastProps;
-                }
-                return lastProps = newProps;
-            }
-        }),
+        connectAdvanced(selectorFactory),
         withPropsOnChange(['name'], ({name,form}) => {
             if(form.fields) {
                 return {
@@ -178,6 +174,20 @@ function connectField() {
             }
         })
     );
+}
+
+function selectorFactory(dispatch, factoryOptions) {
+    let stateSelector = mapStateToProps(dispatch);
+    let dispatchSelector = createSelector(d => d, (_, p) => p.form, (_, p) => p.name, mapDispatchToProps);
+    let prevProps = {};
+
+    return (state, props) => {
+        let nextProps = Object.assign(stateSelector(state, props), dispatchSelector(dispatch, props), props);
+        if(shallowEqual(prevProps, nextProps)) {
+            return prevProps;
+        }
+        return prevProps = nextProps;
+    }
 }
 
 

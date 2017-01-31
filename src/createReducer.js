@@ -44,6 +44,12 @@ module.exports = function createReducer(data) {
                 state = setIn([namespace, payload.formId, 'submit'], submitCount+1, state);
                 break;
             }
+            case actionTypes.ASYNC_VALIDATION: {
+                let path = [namespace, payload.formId, 'ui', ...toPath(payload.name), 'pendingValidations'];
+                let pending = _.get(state, path, 0);
+                state = setIn(path, payload.complete ? pending-1 : pending+1, state);
+                break;
+            }
         }
         return state;
     };

@@ -36,6 +36,7 @@
     "babel-plugin-transform-react-jsx": "^6.8.0",
     "babel-preset-env": "^1.1.8",
     "css-loader": "^0.26.1",
+    "external-svg-sprite-loader": "^1.0.3",
     "file-loader": "^0.9.0",
     "http-server": "^0.9.0",
     "less": "^2.7.2",
