@@ -6,7 +6,7 @@ const {connectField,util} = require('form-capacitor');
 const ShortId = require('shortid');
 const classNames = require('classnames');
 const Svg = require('./Svg');
-const glyphs = require('./glyphs');
+const sprites = require('./sprites');
 
 const SKIP = false;
 
@@ -31,13 +31,13 @@ class StatelessTextBox extends React.PureComponent {
         }
         
         if(this.props.required && this.props.value === '') {
-            return <Svg title="Required" glyph={glyphs.asterisk} className={css.icon} fill="#f25041"/>;
+            return <Svg title="Required" sprite={sprites.asterisk} className={css.icon} fill="#f25041"/>;
         }
 
         if(this.props.ui.isValid) {
-            return <Svg title="Valid" glyph={glyphs.checkmark} className={css.icon} fill={this.props.ui.isFocused ? '#91DC5A' : '#ccc'}/>;
+            return <Svg title="Valid" sprite={sprites.checkmark} className={css.icon} fill={this.props.ui.isFocused ? '#91DC5A' : '#ccc'}/>;
         } else {
-            return <Svg title="Invalid" glyph={glyphs.cross} className={css.icon} fill="#f25041"/>;
+            return <Svg title="Invalid" sprite={sprites.cross} className={css.icon} fill="#f25041"/>;
         }
     }
 

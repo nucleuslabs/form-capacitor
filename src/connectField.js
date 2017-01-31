@@ -67,88 +67,38 @@ function getErrors(value, rules, defaultErrorMessage, defaultPendingMessage, ui,
     }).filter(x => x);
 }
 
-
-const mapStateToProps = function mapStateToProps(dispatch) {
-    const namePathSelector = createSelector((_, p) => p.name, toPath);
-    const stateUiSelector = util.createDeepEqualSelector([stateGetter,namePathSelector], (state,np) => Object.assign({
-        isFocused: false,
-        isHovering: false,
-        mouseEntered: false,
-        mouseLeft: false,
-        wasFocused: false,
-        wasBlurred: false,
-        wasChanged: false,
-    }, _.get(state, ['ui', ...np], {})));
-    const dataGetter = createSelector(stateGetter, getOr({},'data'));
-    const valueSelector = createSelector([dataGetter,namePathSelector, defaultValueGetter], (data,np,dv) => _.get(data, np, dv));
-    const initialGetter = createSelector(stateGetter, getOr({},'initial'));
-    const initialValueSelector = createSelector([initialGetter,namePathSelector, defaultValueGetter], (init,np,dv) => _.get(init, np, dv));
-    const errorSelector = util.createDeepEqualSelector(
-        [valueSelector, (_,p) => p.rules, (_,p) => p.defaultErrorMessage, (_,p) => p.defaultPendingMessage, stateUiSelector, dataGetter, () => dispatch, (_, p) => p.form.id, (_, p) => p.name], 
-        getErrors
-    );
-
-    const isDirtySelector = createSelector([valueSelector,initialValueSelector], (value,initialValue) => !_.isEqual(value, initialValue));
-    const isValidSelector = createSelector(errorSelector, errors => errors.length === 0);
-    const isEmptySelector = createSelector([valueSelector,defaultValueGetter], _.isEqual);
-    const formValidatedSelector = createSelector(stateGetter, state => _.get(state, 'submit', 0) > 0);
-
-    const uiSelector = util.createDeepEqualSelector([stateUiSelector,isDirtySelector,isValidSelector,isEmptySelector,formValidatedSelector], (ui,isDirty,isValid,isEmpty,formValidated) => ({
-        isFocused: ui.isFocused,
-        isHovering: ui.isHovering,
-        mouseEntered: ui.mouseEntered,
-        mouseLeft: ui.mouseLeft,
-        wasFocused: ui.wasFocused,
-        wasBlurred: ui.wasBlurred,
-        wasChanged: ui.wasChanged,
-        pendingValidations: ui.pendingValidations,
-        isDirty,
-        isValid,
-        isEmpty,
-        formValidated,
-    }));
-
-    return (state, props) => ({
-        value: valueSelector(state, props),
-        errors: errorSelector(state, props),
-        ui: uiSelector(state, props),
-    });
-};
-
-const mapDispatchToProps = function mapDispatchToProps(dispatch, form, name) {
-
-    // TODO: nest all of these under 'actions'?
+function mapDispatchToProps(dispatch, formId, name) {
     return {
         actions: {
             change: value => {
-                dispatch(actions.change(form.id, name, value));
+                dispatch(actions.change(formId, name, value));
             },
         },
         events: {
             onChange: ev => {
-                dispatch(actions.change(form.id,name,ev.target.value));
+                dispatch(actions.change(formId, name, ev.target.value));
             },
             onCheck: ev => {
-                dispatch(actions.change(form.id,name,ev.target.checked));
+                dispatch(actions.change(formId, name, ev.target.checked));
             },
             onFocus: () => {
-                dispatch(actions.focus(form.id,name));
+                dispatch(actions.focus(formId, name));
             },
             onBlur: () => {
-                dispatch(actions.blur(form.id,name));
+                dispatch(actions.blur(formId, name));
             },
             onMouseEnter: () => {
-                dispatch(actions.mouseEnter(form.id,name));
+                dispatch(actions.mouseEnter(formId, name));
             },
             onMouseLeave: () => {
-                dispatch(actions.mouseLeave(form.id,name));
+                dispatch(actions.mouseLeave(formId, name));
             },
             onSubmit: () => {
-                dispatch(actions.submit(form.id));
+                dispatch(actions.submit(formId));
             },
         }
     };
-};
+}
 
 function connectField() {
     return compose(
@@ -187,15 +137,59 @@ function connectField() {
 }
 
 function selectorFactory(dispatch, factoryOptions) {
-    let stateSelector = mapStateToProps(dispatch);
-    let dispatchSelector = createSelector(d => d, (_, p) => p.form, (_, p) => p.name, mapDispatchToProps);
+    let dispatchSelector = defaultMemoize(mapDispatchToProps);
     let prevProps = {};
 
+    const namePathSelector = createSelector((_, p) => p.name, toPath);
+    const stateUiSelector = util.createDeepEqualSelector([stateGetter,namePathSelector], (state,np) => Object.assign({
+        isFocused: false,
+        isHovering: false,
+        mouseEntered: false,
+        mouseLeft: false,
+        wasFocused: false,
+        wasBlurred: false,
+        wasChanged: false,
+    }, _.get(state, ['ui', ...np], {})));
+    const dataGetter = createSelector(stateGetter, getOr({},'data'));
+    const valueSelector = createSelector([dataGetter,namePathSelector, defaultValueGetter], (data,np,dv) => _.get(data, np, dv));
+    const initialGetter = createSelector(stateGetter, getOr({},'initial'));
+    const initialValueSelector = createSelector([initialGetter,namePathSelector, defaultValueGetter], (init,np,dv) => _.get(init, np, dv));
+    const errorSelector = util.createDeepEqualSelector(
+        [valueSelector, (_,p) => p.rules, (_,p) => p.defaultErrorMessage, (_,p) => p.defaultPendingMessage, stateUiSelector, dataGetter, () => dispatch, (_, p) => p.form.id, (_, p) => p.name],
+        getErrors
+    );
+
+    const isDirtySelector = createSelector([valueSelector,initialValueSelector], (value,initialValue) => !_.isEqual(value, initialValue));
+    const isValidSelector = createSelector(errorSelector, errors => errors.length === 0);
+    const isEmptySelector = createSelector([valueSelector,defaultValueGetter], _.isEqual);
+    const formValidatedSelector = createSelector(stateGetter, state => _.get(state, 'submit', 0) > 0);
+
+    const uiSelector = util.createDeepEqualSelector([stateUiSelector,isDirtySelector,isValidSelector,isEmptySelector,formValidatedSelector], (ui,isDirty,isValid,isEmpty,formValidated) => ({
+        isFocused: ui.isFocused,
+        isHovering: ui.isHovering,
+        mouseEntered: ui.mouseEntered,
+        mouseLeft: ui.mouseLeft,
+        wasFocused: ui.wasFocused,
+        wasBlurred: ui.wasBlurred,
+        wasChanged: ui.wasChanged,
+        pendingValidations: ui.pendingValidations,
+        isDirty,
+        isValid,
+        isEmpty,
+        formValidated,
+    }));
+
     return (state, props) => {
-        let nextProps = Object.assign(stateSelector(state, props), dispatchSelector(dispatch, props), props);
+        let nextProps = Object.assign({
+            value: valueSelector(state, props),
+            errors: errorSelector(state, props),
+            ui: uiSelector(state, props),
+        }, dispatchSelector(dispatch, props.form.id, props.name), props);
+        
         if(shallowEqual(prevProps, nextProps)) {
             return prevProps;
         }
+        
         return prevProps = nextProps;
     }
 }
