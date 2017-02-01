@@ -1,13 +1,14 @@
 const path = require('path');
 const examplesDir = path.resolve(__dirname, 'examples');
+const srcDir = path.resolve(__dirname, 'src');
 const {ProvidePlugin} = require('webpack');
 const SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
 
 // TODO: move this under examples/.
 
 module.exports = {
-    context: examplesDir,
-    entry: './entry',
+    context: __dirname,
+    entry: './examples/entry',
     output: {
         path: examplesDir,
         filename: 'bundle.js',
@@ -17,16 +18,17 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.jsx$/,
-                // include: [examplesDir],
+                test: /\.jsx?$/,
+                include: [examplesDir,srcDir],
                 loader: 'babel-loader',
                 options: {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
-                    plugins: ['transform-react-jsx', 'transform-class-properties', 'transform-object-rest-spread'],
+                    plugins: ['transform-react-jsx', 'transform-class-properties', 'syntax-object-rest-spread', 'transform-object-rest-spread'],
                 },
             },
             {
                 test: /\.(jpe?g|png|gif)($|\?)/i,
+                include: [examplesDir],
                 loader: 'url-loader',
                 options: {
                     limit: 1024*2,
@@ -34,10 +36,12 @@ module.exports = {
             },
             {
                 test: /\.svg($|\?)/i,
+                include: [examplesDir],
                 loader: 'external-svg-sprite-loader',
             },
             {
                 test: /\.less$/,
+                include: [examplesDir],
                 use: [
                     'style-loader',
                     {loader: 'css-loader', options: {importLoaders: 2}},

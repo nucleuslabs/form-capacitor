@@ -101,7 +101,7 @@ StatelessBootstrapRadio.propTypes = {
     name: PropTypes.string.isRequired,
     ui: PropTypes.object.isRequired,
     errors: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.element])).isRequired,
-    rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
+    // rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
 };
 
 const BootstrapRadio = connectField()(StatelessBootstrapRadio);
@@ -109,7 +109,7 @@ const BootstrapRadio = connectField()(StatelessBootstrapRadio);
 BootstrapRadio.propTypes = {
     // formId: PropTypes.string,
     name: PropTypes.string.isRequired,
-    rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
+    // rules: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.func.isRequired)]),
     defaultMessage: PropTypes.string,
     options: PropTypes.array.isRequired,
 };

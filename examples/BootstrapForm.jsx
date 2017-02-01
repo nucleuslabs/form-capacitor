@@ -106,25 +106,39 @@ function sleep(ms) {
 }
 
 const rules = {
-    email: [Rules.required, Rules.email, email => sleep(1000).then(() => {
-        if(email == 'mpenner@nucleuslabs.com') return "That email address is already registered";
-    })],
-    multiselect: val => val.length < 3 ? "Please select at least 3 items" : "",
-    numberselect: val => val == '3' ? "3 is unlucky": '',
-    tweet: Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`),
+    email: [Rules.required, Rules.email, Rules.async(email => sleep(1000).then(() => email == 'mpenner@nucleuslabs.com'), {message: "That email address is already registered"})],
+    multiselect: Rules.minLength(3, (v,n) => `Please select ${n-v.length} more items`),
+    numberselect: Rules.custom(val => val != '3', {message: "3 is unlucky"}),
+    tweet: Rules.maxLength(140,(val,len) => `Please delete ${val.length - len} characters`),
     password: [
         Rules.required,
         Rules.minLength(6),
-        pw => /[^a-z0-9]/i.test(pw) ? '' : "Please add a special character.",
-        pw => /[0-9]/i.test(pw) ? '' : "Please add a number.",
-        pw => /[A-Za-z]/i.test(pw) ? '' : "Please add a letter.",
-        asyncRule(pw => sleep(1000).then(() => {
-            if(pw == 'password') return "Password was recently used";
-        }), "Checking if password was recently used..."),
+        Rules.custom(pw => /[^a-z0-9]/i.test(pw), {message: "Please add a special character."}),
+        Rules.custom(pw => /[0-9]/i.test(pw), {message: "Please add a number."}),
+        Rules.custom(pw => /[A-Za-z]/i.test(pw), {message: "Please add a letter."}),
     ],
-    confirmPassword: dependantRule(['password'], (val,pw) => val !== pw ? "Passwords do not match" : ''),
-    radio: value => value !== 'option2' ? "I prefer option2" : '',
-    tac: checked => checked ? '' : "You must agree!",
+    confirmPassword: Rules.custom((val,pw) => val === pw, {dependsOn:['password'],message:"Passwords do not match"}),
+    radio: Rules.custom(val => val !== 'option2', {message:"I prefer option two"}),
+    tac: Rules.custom(x => x, {message: "You must agree"}),
+    
+    // multiselect: val => val.length < 3 ? "Please select at least 3 items" : "",
+    // numberselect: val => val == '3' ? "3 is unlucky": '',
+    // tweet: Rules.maxLength(140).message((val,len) => `Please delete ${val.length - len} characters`),
+    // password: [
+    //     Rules.required,
+    //     Rules.minLength(6),
+    //     pw => /[^a-z0-9]/i.test(pw) ? '' : "Please add a special character.",
+    //     pw => /[0-9]/i.test(pw) ? '' : "Please add a number.",
+    //     pw => /[A-Za-z]/i.test(pw) ? '' : "Please add a letter.",
+    //     asyncRule(pw => sleep(1000).then(() => {
+    //         if(pw == 'password') return "Password was recently used";
+    //     }), "Checking if password was recently used..."),
+    // ],
+    // confirmPassword: dependantRule(['password'], (val,pw) => val !== pw ? "Passwords do not match" : ''),
+    // radio: value => value !== 'option2' ? "I prefer option2" : '',
+    // tac: checked => checked ? '' : "You must agree!",
 };
+
+// console.log(rules);
 
 module.exports = connectForm({rules})(BootstrapForm);

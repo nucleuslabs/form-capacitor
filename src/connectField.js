@@ -17,9 +17,116 @@ const defaultValueGetter = (_,p) => p.defaultValue;
 const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], {});
 
 const ruleCache = new DeepMap();
-const notFound = Symbol();
+const notFound = Symbol('NotFound');
+const noError = Symbol('NoError');
+const pending = Symbol('Pending');
 
-function getErrors(value, rules, defaultErrorMessage, defaultPendingMessage, ui, formData, dispatch,formId, name) {
+const errTypeToProp = {
+    // 'err': 'errors',
+    'error': 'errors',
+    // 'warn': 'warnings',
+    'warning': 'warnings',
+};
+
+// window.RULE_CACHE = ruleCache;
+
+
+function getErrorMessage(rule, args) {
+    if(_.isFunction(rule.message)) {
+        return rule.message(...args);
+    } else if(_.isString(rule.message)) {
+        return rule.message;
+    } else {
+        throw new Error(`Unsupported rule message type`);
+    }
+}
+
+function getErrors(value, rules, formData, dispatch,formId, name, pendingValidations) {
+    const getValue = f => _.get(formData, f);
+    
+    // console.log(formId,name,pendingValidations);
+    
+    let out = {
+        errors: [],
+        warnings: [],
+    };
+    
+    
+    if(rules.length > 1) {
+        // sort async functions to the end so that they can be skipped if other validation rules are already failing
+        rules = [...rules].sort((a, b) => {
+            if(!!a.isAsync === !!b.isAsync) return 0;
+            return a.isAsync ? 1 : -1;
+        });
+    }
+    
+    for(let rule of rules) {
+        if(rule.isOptional && util.isEmpty(value)) {
+            continue;
+        }
+        
+        let dependsOn = util.array(rule.dependsOn);
+        let args = [value];
+        if(dependsOn.length) {
+            args.push(...dependsOn.map(getValue));
+        }
+
+        if(!rule.precondition(...args)) {
+            continue;
+        }
+        
+        let errKey = errTypeToProp[rule.type];
+        
+        if(!errKey) {
+            throw new Error(`Unsupported rule type: ${rule.type}`);
+        }
+        let cacheKey = [rule,formId,name];
+        let result = ruleCache.get(cacheKey);
+        let handled = false;
+        
+        if(result) {
+            let [lastArgs, lastError] = result;
+
+            if(rule.compare(args,lastArgs)) {
+                handled = true;
+                // console.log('cache hit');
+                if(lastError !== noError && lastError !== pending) {
+                    out[errKey].push(lastError);
+                }
+            }
+        }
+
+        if(!handled) {
+            if(rule.isAsync) { 
+                if(rule.type === 'error' && out[errKey].length) {
+                    // skip if other error rules are already failing
+                    continue; 
+                }
+                
+                ruleCache.set(cacheKey,[args,pending]);
+                dispatch(actions.asyncValidation(formId,name,false));
+                rule.isValid(...args).then(isValid => {
+                    let message = isValid ? noError : getErrorMessage(rule, args);
+                    ruleCache.set(cacheKey,[args,message]); // fixme: might overwrite a newer error...
+                    dispatch(actions.asyncValidation(formId,name,true));
+                }, () => {
+                    ruleCache.delete(cacheKey);
+                    dispatch(actions.asyncValidation(formId,name,true));
+                });
+            } else {
+                let isValid = rule.isValid(...args);
+                let message = noError;
+                if(!isValid) {
+                    message = getErrorMessage(rule, args);
+                    out[errKey].push(message);
+                }
+                ruleCache.set(cacheKey,[args,message]);
+            }
+        }
+    }
+    
+    return out;
+    
     // TODO: how to support promises like in textInput.jsx?
     return rules.map(rule => {
         let fn, args;
@@ -149,22 +256,25 @@ function selectorFactory(dispatch, factoryOptions) {
         wasFocused: false,
         wasBlurred: false,
         wasChanged: false,
+        pendingValidations: 0,
     }, _.get(state, ['ui', ...np], {})));
     const dataGetter = createSelector(stateGetter, getOr({},'data'));
     const valueSelector = createSelector([dataGetter,namePathSelector, defaultValueGetter], (data,np,dv) => _.get(data, np, dv));
-    const initialGetter = createSelector(stateGetter, getOr({},'initial'));
-    const initialValueSelector = createSelector([initialGetter,namePathSelector, defaultValueGetter], (init,np,dv) => _.get(init, np, dv));
+    const initialSelector = createSelector(stateGetter, getOr({},'initial'));
+    const initialValueSelector = createSelector([initialSelector,namePathSelector, defaultValueGetter], (init,np,dv) => _.get(init, np, dv));
+    const pendingValidationsSelector = createSelector(stateUiSelector, ui => ui.pendingValidations);
+    
     const errorSelector = util.createDeepEqualSelector(
-        [valueSelector, (_,p) => p.rules, (_,p) => p.defaultErrorMessage, (_,p) => p.defaultPendingMessage, stateUiSelector, dataGetter, () => dispatch, (_, p) => p.form.id, (_, p) => p.name],
+        [valueSelector, (_,p) => p.rules, dataGetter, () => dispatch, (_, p) => p.form.id, (_, p) => p.name, pendingValidationsSelector],
         getErrors
     );
 
     const isDirtySelector = createSelector([valueSelector,initialValueSelector], (value,initialValue) => !_.isEqual(value, initialValue));
-    const isValidSelector = createSelector(errorSelector, errors => errors.length === 0);
+    // const isValidSelector = createSelector(errorSelector, errors => errors.length === 0);
     const isEmptySelector = createSelector([valueSelector,defaultValueGetter], _.isEqual);
     const formValidatedSelector = createSelector(stateGetter, state => _.get(state, 'submit', 0) > 0);
 
-    const uiSelector = util.createDeepEqualSelector([stateUiSelector,isDirtySelector,isValidSelector,isEmptySelector,formValidatedSelector], (ui,isDirty,isValid,isEmpty,formValidated) => ({
+    const uiSelector = util.createDeepEqualSelector([stateUiSelector,isDirtySelector,isEmptySelector,formValidatedSelector], (ui,isDirty,isEmpty,formValidated) => ({
         isFocused: ui.isFocused,
         isHovering: ui.isHovering,
         mouseEntered: ui.mouseEntered,
@@ -172,19 +282,20 @@ function selectorFactory(dispatch, factoryOptions) {
         wasFocused: ui.wasFocused,
         wasBlurred: ui.wasBlurred,
         wasChanged: ui.wasChanged,
-        pendingValidations: ui.pendingValidations,
+        isValidating: ui.pendingValidations > 0,
         isDirty,
-        isValid,
         isEmpty,
         formValidated,
     }));
 
     return (state, props) => {
-        let nextProps = Object.assign({
+        let nextProps = {
             value: valueSelector(state, props),
-            errors: errorSelector(state, props),
             ui: uiSelector(state, props),
-        }, dispatchSelector(dispatch, props.form.id, props.name), props);
+            ...errorSelector(state, props),
+            ...dispatchSelector(dispatch, props.form.id, props.name),
+            ...props,
+        };
         
         if(shallowEqual(prevProps, nextProps)) {
             return prevProps;

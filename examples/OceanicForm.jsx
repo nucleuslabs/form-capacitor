@@ -19,9 +19,16 @@ function sleep(ms) {
 }
 
 const rules = {
-    email: [Rules.required, Rules.email, email => sleep(750).then(() => {
-        if(email == 'mpenner@nucleuslabs.com') return "That email address is already registered";
-    })],
+    // email: [Rules.required, Rules.email, email => sleep(750).then(() => {
+    //     if(email == 'mpenner@nucleuslabs.com') return "That email address is already registered";
+    // })],
+    
+    email: [
+        Rules.required,
+        Rules.async(email => sleep(750).then(() => email !== 'mpenner@nucleuslabs.com'), {message:"That email address is already registered"}),
+        Rules.email,
+        Rules.custom(email => /@nucleuslabs.com$/i.test(email), {message:"Not a company email address",type:'warning'})
+    ]
 };
 
 module.exports = connectForm({rules})(OceanicForm);

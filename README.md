@@ -33,6 +33,7 @@ See also: [redux-form meta props](http://redux-form.com/6.4.3/docs/api/Field.md/
 - `form.props.actions.resetForm`
 - ~~Rename `dispatchXXX` methods to something like `actions.xxx`?~~
 - ~~Rename `onChange`, `onFocus`, onXXX props to `input.onChange` or `events.xxx`?~~
+- OceanicForm.props.data: Value did not change. Avoidable re-render!
 - warnings (scheduling conflicts, weak passwords)
 - `form.validate()` checks if all *rendered* inputs are valid. We should probably
 add another property to check if *all* inputs, or at least select inputs are valid

@@ -132,3 +132,21 @@ exports.pick = function pick(src, props, dest={}) {
         return dest;
     },dest);
 };
+
+exports.arrayCompare = function arrayCompare(arr1, arr2) {
+    return arr1.length === arr2.length && arr1.every((v,i) => Object.is(v,arr2[i]));
+};
+
+
+exports.isEmpty = function isEmpty(value) {
+    if(_.isString(value) || _.isArray(value)) {
+        return !value.length;
+    }
+    if(value instanceof Map || value instanceof Set) {
+        return !value.size;
+    }
+    if(_.isPlainObject(value)) {
+        return !_.size(value);
+    }
+    return !value;
+}

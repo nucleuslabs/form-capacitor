@@ -1,64 +1,50 @@
 const _ = require('lodash');
-// const {Seq} = require('immutable');
-// import {hasProp} from '../../functions';
+const util = require('./util');
 
-const OK = true;
-
-function isEmpty(value) {
-    if(_.isString(value) || _.isArray(value)) {
-        return !value.length;
-    }
-    if(value instanceof Map || value instanceof Set) {
-        return !value.size;
-    }
-    if(_.isPlainObject(value)) {
-        return !_.size(value);
-    }
-    return !value;
-}
 
 function isFilled(value) {
-    return !isEmpty(value);
+    return !util.isEmpty(value);
 }
 
-function withMessage(defaultMessageFn, ruleFn, additionalMessageArgs) {
-    let fn = optional((value, ...ruleArgs) => ruleFn(defaultMessageFn(value, ...additionalMessageArgs))(value, ...ruleArgs));
-    fn.message = msgFn => optional((value, ...ruleArgs) => ruleFn(msgFn(value, ...additionalMessageArgs))(value, ...ruleArgs));
-    return fn;
+function custom(isValidFn, options) {
+    return {
+        isAsync: false, // isValid is expected to return a Promise. Validation rule will not run if other synchronous validation rules are failing
+        message: "This field is invalid.", // {string|Function} message to display if input is not valid
+        isValid: isValidFn,
+        precondition: () => true, // {Function} if precondition fails, validation rule is not ran (not cached). Probably not needed if sync functions run first.
+        dependsOn: [],
+        isOptional: true, // don't run validation rule if _.isEqual(value,defaultValue)
+        type: 'error', // "error" or "warning"
+        compare: util.arrayCompare, 
+        ...options,
+    }
+}
+
+function async(isValidFn, options) {
+    return custom(isValidFn, {isAsync: true, ...options});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function required(value) {
-    return isFilled(value) ? OK : 'This field is required.';
+const required = custom(isFilled, {
+    message: 'This field is required.',
+    isOptional: false,
+});
+
+function minLength(length,message=(value,length) => `Please enter at least ${length} characters (${length - value.length} more).`) {
+    return custom(val => val.length >= length, {message: value => message(value,length)});
 }
 
-function optional(rule) {
-    return (value, ...args) => isEmpty(value) ? OK : rule(value, ...args);
+function maxLength(length,message=(value,length) => `Please enter at most ${length} characters. You've entered ${value.length}.`) {
+    return custom(val => val.length <= length, {message: value => message(value,length)});
 }
 
-function minLength(length) {
-    return withMessage(
-        value => `Please enter at least ${length} characters (${length - value.length} more).`,
-        msg => value => value.length < length ? msg : OK,
-        [length]
-    );
-}
+const email = custom(value => /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(value), {
+    message: `Please enter a valid email address.`,
+});
 
-function maxLength(length) {
-    return withMessage(
-        value => `Please enter at most ${length} characters. You've entered ${value.length}.`,
-        msg => value => value.length > length ? msg : OK,
-        [length]
-    );
-}
 
-const email = withMessage(
-    () => `Please enter a valid email address.`,
-    msg => value => /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(value) ? OK : msg,
-    [length]
-);
 
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
 
-module.exports = {required, optional, minLength, maxLength, email};
+module.exports = {required, minLength, maxLength, email, custom, async};
