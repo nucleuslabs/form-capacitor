@@ -28,7 +28,7 @@ class StatelessTextBox extends React.PureComponent {
     renderIcon() {
         if(this.props.ui.pendingValidations) {
             // return <span className={css.icon}><div className="loader"/></span>;
-            return <Svg title="Validating..." sprite={sprites.loader} className={classNames(css.icon,css.spin)} stroke="#008bff"/>;
+            return <Svg title="Validating..." sprite={sprites.loader} className={classNames(css.icon,css.spin)} fill="#008bff"/>;
         }
         
         if(this.props.required && this.props.value === '') {
