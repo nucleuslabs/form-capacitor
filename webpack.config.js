@@ -3,6 +3,8 @@ const examplesDir = path.resolve(__dirname, 'examples');
 const {ProvidePlugin} = require('webpack');
 const SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
 
+// TODO: move this under examples/.
+
 module.exports = {
     context: examplesDir,
     entry: './entry',

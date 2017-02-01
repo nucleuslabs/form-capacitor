@@ -15,7 +15,7 @@
     "redux"
   ],
   "author": "Mark Penner <mpenner@nucleuslabs.com>",
-  "repository": "https://mnpenner@bitbucket.org/nucleuslabs/form-capacitor",
+  "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",
   "license": "MIT",
   "dependencies": {
     "classnames": "^2.2.5",
