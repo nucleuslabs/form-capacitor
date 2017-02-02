@@ -20,7 +20,7 @@ class StatelessTextBox extends React.PureComponent {
                 this.props.ui.isFocused ? css.focused : false, 
                 this.props.value === '' ? css.empty : css.filled, 
             )} {...labelEvents}>
-                <input className={css.input} {...inputEvents} required={this.props.required} />
+                <input value={this.props.value} className={css.input} {...inputEvents} required={this.props.required} />
                 <span className={css.placeholder}>{this.props.placeholder}</span>
                 {this.renderIcon()}
             </label>

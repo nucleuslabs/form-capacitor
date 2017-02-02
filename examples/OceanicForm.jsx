@@ -5,10 +5,16 @@ const TextBox = require('./TextBox');
 
 class OceanicForm extends React.PureComponent {
 
+    setEmail = ev => {
+        ev.preventDefault();
+        this.props.setInput('email','mpenner@nucleuslabs.com');    
+    };
+    
     render() {
         return (
             <form>
                 <TextBox name="email" placeholder="Email address" required={true}/>
+                <button onClick={this.setEmail}>Set Email</button>
             </form>
         );
     }

@@ -13,13 +13,19 @@ const {emptyObject, emptyArray} = require('./consts');
 
 const stateGetter = (s,p) => _.get(s, [namespace, p.id], emptyObject);
 
-function mapDispatchToProps(dispatch, form) {
+function mapDispatchToProps(dispatch, form, data) {
     // TODO: add setInput
     return {
         validate: () => { // FIXME: not sure if this should trigger a submit or not....
             dispatch(actions.submit(form.id));
             return Array.from(form.fields.values()).every(f => f.props.ui.isValid);
         },
+        setInput: (name, value) => {
+            if(_.isFunction(value)) {
+                value = value(_.get(data, name));
+            }
+            dispatch(actions.change(form.id, name, value));
+        }
     };
 }
 
@@ -53,9 +59,10 @@ function selectorFactory(dispatch, factoryOptions) {
     let prevProps = {};
     
     return (state, props) => {
+        let data = dataSelector(state, props);
         let nextProps = {
-            data: dataSelector(state, props),
-            ...dispatchSelector(dispatch, props.form),
+            data,
+            ...dispatchSelector(dispatch, props.form, data),
             ...props,
         };
 
