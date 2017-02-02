@@ -1,6 +1,5 @@
 const path = require('path');
-const examplesDir = path.resolve(__dirname, 'examples');
-const srcDir = path.resolve(__dirname, 'src');
+const srcDir = path.resolve(__dirname,'../../src');
 const {ProvidePlugin} = require('webpack');
 const SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
 
@@ -8,9 +7,9 @@ const SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
 
 module.exports = {
     context: __dirname,
-    entry: './examples/entry',
+    entry: './entry',
     output: {
-        path: examplesDir,
+        path: __dirname,
         filename: 'bundle.js',
         publicPath: '/',
         pathinfo: true,
@@ -19,7 +18,7 @@ module.exports = {
         rules: [
             {
                 test: /\.jsx?$/,
-                include: [examplesDir,srcDir],
+                include: [__dirname,srcDir],
                 loader: 'babel-loader',
                 options: {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
@@ -28,7 +27,7 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|gif)($|\?)/i,
-                include: [examplesDir],
+                include: [__dirname],
                 loader: 'url-loader',
                 options: {
                     limit: 1024*2,
@@ -36,12 +35,12 @@ module.exports = {
             },
             {
                 test: /\.svg($|\?)/i,
-                include: [examplesDir],
+                include: [__dirname],
                 loader: 'external-svg-sprite-loader',
             },
             {
                 test: /\.less$/,
-                include: [examplesDir],
+                include: [__dirname],
                 use: [
                     'style-loader',
                     {loader: 'css-loader', options: {importLoaders: 2}},
@@ -55,7 +54,7 @@ module.exports = {
         modules: ['node_modules'],
         extensions: ['.jsx', '.js'],
         alias: {
-            'form-capacitor': path.resolve(__dirname, 'src'),
+            'form-capacitor': srcDir,
         },
     },
     // devtool: 'cheap-module-eval-source-map',

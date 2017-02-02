@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 const ReactDOM = require('react-dom');
 const BootstrapForm = require('./BootstrapForm');
 const OceanicForm = require('./OceanicForm');
-const FormStoreProvider = require('form-capacitor/FormStoreProvider');
+const {FormStoreProvider} = require('form-capacitor');
 
 const initialData = {
     form1: {

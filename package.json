@@ -1,12 +1,13 @@
 {
   "name": "form-capacitor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Form manager for React/Redux",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "http-server ./examples",
-    "build": "webpack --progress"
+    "build": "rm -r dist/* && babel src --out-dir dist",
+    "prepublish": "npm run build",
+    "dev": "concurrently -k -n \"http,wp\" -c \"bgGreen.bold.white,bgBlue.bold.white\" -p \"{name}\" \"http-server ./examples/bootstrap\" \"webpack --config examples/bootstrap/webpack.config.js --watch\""
   },
   "keywords": [
     "form",
@@ -30,6 +31,7 @@
     "react-redux": "^5.0.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.22.2",
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
     "babel-plugin-syntax-object-rest-spread": "^6.13.0",
@@ -37,6 +39,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.22.0",
     "babel-plugin-transform-react-jsx": "^6.8.0",
     "babel-preset-env": "^1.1.8",
+    "concurrently": "^3.1.0",
     "css-loader": "^0.26.1",
     "external-svg-sprite-loader": "^1.0.3",
     "file-loader": "^0.9.0",
