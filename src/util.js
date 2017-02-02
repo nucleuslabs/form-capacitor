@@ -149,4 +149,4 @@ exports.isEmpty = function isEmpty(value) {
         return !_.size(value);
     }
     return !value;
-}
+};

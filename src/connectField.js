@@ -142,30 +142,30 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
 function mapDispatchToProps(dispatch, formId, name) {
     return {
         actions: {
-            change: value => {
+            change(value) {
                 dispatch(actions.change(formId, name, value));
             },
         },
         events: {
-            onChange: ev => {
+            onChange(ev) {
                 dispatch(actions.change(formId, name, ev.target.value));
             },
-            onCheck: ev => {
+            onCheck(ev) {
                 dispatch(actions.change(formId, name, ev.target.checked));
             },
-            onFocus: () => {
+            onFocus() {
                 dispatch(actions.focus(formId, name));
             },
-            onBlur: () => {
+            onBlur() {
                 dispatch(actions.blur(formId, name));
             },
-            onMouseEnter: () => {
+            onMouseEnter() {
                 dispatch(actions.mouseEnter(formId, name));
             },
-            onMouseLeave: () => {
+            onMouseLeave() {
                 dispatch(actions.mouseLeave(formId, name));
             },
-            onSubmit: () => {
+            onSubmit() {
                 dispatch(actions.submit(formId));
             },
         }
