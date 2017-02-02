@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const util = require('./util');
-
+const ShortId = require('shortid');
 
 function isFilled(value) {
     return !util.isEmpty(value);
@@ -8,6 +8,7 @@ function isFilled(value) {
 
 function custom(validateFn, options) {
     return {
+        id: ShortId.generate(), // makes this rule serializeable
         isAsync: false, // validate is expected to return a Promise. Validation rule will not run if other synchronous validation rules are failing
         message: "This field is invalid.", // {string|Function} message to display if input is not valid
         validate: validateFn,
@@ -27,19 +28,21 @@ function async(validateFn, options) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const required = custom(isFilled, {
+    id: 'required',
     message: 'This field is required.',
     isOptional: false,
 });
 
 function minLength(length,message=(value,length) => `Please enter at least ${length} characters (${length - value.length} more).`) {
-    return custom(val => val.length >= length, {message: value => message(value,length)});
+    return custom(val => val.length >= length, {id:'minLength',message: value => message(value,length)});
 }
 
 function maxLength(length,message=(value,length) => `Please enter at most ${length} characters. You've entered ${value.length}.`) {
-    return custom(val => val.length <= length, {message: value => message(value,length)});
+    return custom(val => val.length <= length, {id:'maxLength',message: value => message(value,length)});
 }
 
 const email = custom(value => /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(value), {
+    id: 'email',
     message: `Please enter a valid email address.`,
 });
 

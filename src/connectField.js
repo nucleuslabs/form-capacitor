@@ -28,7 +28,7 @@ const errTypeToProp = {
     'warning': 'warnings',
 };
 
-// window.RULE_CACHE = ruleCache;
+window.RULE_CACHE = ruleCache;
 const noErrors = Object.freeze([]);
 
 
@@ -92,15 +92,27 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
             throw new Error(`Unsupported rule type: ${rule.type}`);
         }
         let cacheKey = [rule,formId,name];
+        
+        if(rule.isAsync) {
+            cacheKey.push(...args);
+        }
+        
         let result = ruleCache.get(cacheKey);
         
         if(result) {
-            let [lastArgs, lastMessages] = result;
-
-            if(rule.compare(args,lastArgs)) {
-                props[errKey].push(...lastMessages);
+            if(rule.isAsync) {
+                // fixme: rule.compare isn't used here because we want to cache more than one entry
+                props[errKey].push(...result);
                 continue;
+            } else {
+                let [lastArgs, lastMessages] = result;
+
+                if(rule.compare(args,lastArgs)) {
+                    props[errKey].push(...lastMessages);
+                    continue;
+                }
             }
+        
         }
 
         if(rule.isAsync) { 
@@ -109,10 +121,10 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
                 continue; 
             }
             
-            ruleCache.set(cacheKey,[args,noErrors]);
+            ruleCache.set(cacheKey,noErrors);
             dispatch(actions.asyncValidation(formId,name,false));
             rule.validate(...args).then(result => {
-                ruleCache.set(cacheKey,[args,getErrorMessages(result, rule, args)]); // FIXME: might overwrite a newer error...
+                ruleCache.set(cacheKey,getErrorMessages(result, rule, args)); 
                 dispatch(actions.asyncValidation(formId,name,true));
             }, () => {
                 ruleCache.delete(cacheKey);
