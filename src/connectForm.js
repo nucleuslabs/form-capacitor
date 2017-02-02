@@ -21,7 +21,7 @@ function mapDispatchToProps(dispatch, form, data) {
         validate() { 
             // FIXME: not sure if this should trigger a submit or not....
             dispatch(actions.submit(form.id));
-            return Array.from(form.fields.values()).every(f => f.props.ui.isValid);
+            return Array.from(form.fields.values()).every(f => f.props.errors.length === 0);
         },
         setField(name, value) {
             if(_.isFunction(value)) {
