@@ -95,11 +95,11 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
         let handled = false;
         
         if(result) {
-            let [lastArgs, lastResult] = result;
+            let [lastArgs, lastMessages] = result;
 
             if(rule.compare(args,lastArgs)) {
                 handled = true;
-                props[errKey].push(...lastResult)
+                props[errKey].push(...lastMessages)
             }
         }
 
@@ -113,7 +113,7 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
                 ruleCache.set(cacheKey,[args,[]]);
                 dispatch(actions.asyncValidation(formId,name,false));
                 rule.validate(...args).then(result => {
-                    ruleCache.set(cacheKey,[args,getErrorMessages(result, rule, args)]); // fixme: might overwrite a newer error...
+                    ruleCache.set(cacheKey,[args,getErrorMessages(result, rule, args)]); // FIXME: might overwrite a newer error...
                     dispatch(actions.asyncValidation(formId,name,true));
                 }, () => {
                     ruleCache.delete(cacheKey);

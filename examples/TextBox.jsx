@@ -8,8 +8,6 @@ const classNames = require('classnames');
 const Svg = require('./Svg');
 const sprites = require('./sprites');
 
-const SKIP = false;
-
 class StatelessTextBox extends React.PureComponent {
     
     render() {
@@ -19,9 +17,8 @@ class StatelessTextBox extends React.PureComponent {
         return (
             <label className={classNames(
                 css.wrap,
-                this.props.ui.isFocused ? css.focused : SKIP, 
+                this.props.ui.isFocused ? css.focused : false, 
                 this.props.value === '' ? css.empty : css.filled, 
-                this.props.errors === 0 ? css.valid : css.invalid
             )} {...labelEvents}>
                 <input className={css.input} {...inputEvents} required={this.props.required} />
                 <span className={css.placeholder}>{this.props.placeholder}</span>
@@ -37,7 +34,7 @@ class StatelessTextBox extends React.PureComponent {
         }
         
         if(this.props.required && this.props.value === '') {
-            return <Svg title="Required" sprite={sprites.asterisk} className={css.icon} fill="#f25041"/>;
+            return <Svg title="Required" sprite={sprites.asterisk} className={css.icon} fill={this.props.ui.wasFocused ? '#f25041' : '#ccc'}/>;
         }
 
         if(this.props.errors.length > 0) {
@@ -62,8 +59,6 @@ class StatelessTextBox extends React.PureComponent {
     afterRender() {
 
     }
-
-
 }
 
 const TextBox = connectField()(StatelessTextBox);
