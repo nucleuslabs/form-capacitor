@@ -10,7 +10,6 @@ const namespace = require('./namespace');
 const { createSelector, defaultMemoize, createSelectorCreator } = require('reselect');
 const shallowEqual = require('./shallowEqual');
 const actions = require('./actionCreators');
-const {isDependant,isAsync} = require('./specialRules');
 const DeepMap = require('./DeepMap');
 const {emptyObject, emptyArray} = require('./consts');
 
@@ -183,6 +182,7 @@ function connectField() {
                 id: props.formId,
                 rules: [],
                 fields: null,
+                inputs: null,
             };
             const fieldRules = util.array(props.rules);
             const baseRules = form.rules ? util.array(util.glob(form.rules,props.name,[])) : [];
@@ -194,17 +194,26 @@ function connectField() {
         // connect(require('./mapStateToProps'), require('./mapDispatchToProps')),
         connectAdvanced(selectorFactory),
         withPropsOnChange(['name'], ({name,form}) => {
+            let props = {};
             if(form.fields) {
-                return {
-                    ref: node => {
-                        if(node) {
-                            form.fields.set(name, node);
-                        } else {
-                            form.fields.delete(name);
-                        }
+                props.ref = node => {
+                    if(node) {
+                        form.fields.set(name, node);
+                    } else {
+                        form.fields.delete(name);
                     }
                 };
             }
+            if(form.inputs) {
+                props.focusRef = node => {
+                    if(node) {
+                        form.inputs.set(name, node);
+                    } else {
+                        form.inputs.delete(name);
+                    }
+                };
+            }
+            return props;
         })
     );
 }

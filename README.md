@@ -34,8 +34,8 @@ See also: [redux-form meta props](http://redux-form.com/6.4.3/docs/api/Field.md/
 - ~~warnings (scheduling conflicts, weak passwords)~~
 - ~~Fix async race condition~~
 - ~~OceanicForm.props.data: Value did not change. Avoidable re-render!~~
-- `form.props.actions.setFocus`
-- `form.props.actions.setValue`
+- ~~`form.props.actions.setFocus`~~
+- ~~`form.props.actions.setField`~~
 - `form.props.actions.resetForm`
 - `form.validate()` checks if all *rendered* inputs are valid. We should probably
 add another property to check if *all* inputs, or at least select inputs are valid

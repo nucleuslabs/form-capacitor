@@ -7,14 +7,21 @@ class OceanicForm extends React.PureComponent {
 
     setEmail = ev => {
         ev.preventDefault();
-        this.props.setInput('email','mpenner@nucleuslabs.com');    
+        this.props.setField('email','mpenner@nucleuslabs.com');    
     };
-    
+
+    setFocus = ev => {
+        ev.preventDefault();
+        this.props.setFocus('email');
+    };
+
+
     render() {
         return (
             <form>
                 <TextBox name="email" placeholder="Email address" required={true}/>
                 <button onClick={this.setEmail}>Set Email</button>
+                <button onClick={this.setFocus}>Set Focus</button>
             </form>
         );
     }
