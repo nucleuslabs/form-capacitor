@@ -37,10 +37,8 @@ function getErrorMessages(result, rule, args) {
     if(result === false) {
         if(_.isFunction(rule.message)) {
             return util.array(rule.message(...args));
-        } else if(_.isString(rule.message)) {
-            return util.array(rule.message);
         } else {
-            throw new Error(`Unsupported rule.message type`);
+            return util.array(rule.message);
         }
     }
     if(result) {
