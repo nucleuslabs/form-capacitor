@@ -1,8 +1,8 @@
 {
   "name": "form-capacitor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Form manager for React/Redux",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "http-server ./examples",
