@@ -57,7 +57,7 @@ module.exports = {
             'form-capacitor': srcDir,
         },
     },
-    // devtool: 'cheap-module-eval-source-map',
+    devtool: 'cheap-module-eval-source-map',
     plugins: [
         new ProvidePlugin({
             React: 'react',
