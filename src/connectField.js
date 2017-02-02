@@ -29,11 +29,12 @@ const errTypeToProp = {
 };
 
 // window.RULE_CACHE = ruleCache;
+const noErrors = Object.freeze([]);
 
 
 function getErrorMessages(result, rule, args) {
     if(result === true) {
-        return [];
+        return noErrors;
     }
     if(result === false) {
         if(_.isFunction(rule.message)) {
@@ -48,7 +49,7 @@ function getErrorMessages(result, rule, args) {
         // if result is not a boolean, it ought to be an error message or blank
         return util.array(result);
     }
-    return [];
+    return noErrors;
 }
 
 function getErrors(value, rules, formData, dispatch,formId, name, pendingValidations) {
@@ -65,7 +66,7 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
     if(rules.length > 1) {
         // sort async functions to the end so that they can be skipped if other validation rules are already failing
         rules = [...rules].sort((a, b) => {
-            if(!!a.isAsync === !!b.isAsync) return 0;
+            if(a.isAsync === b.isAsync) return 0;
             return a.isAsync ? 1 : -1;
         });
     }
@@ -92,39 +93,36 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
         }
         let cacheKey = [rule,formId,name];
         let result = ruleCache.get(cacheKey);
-        let handled = false;
         
         if(result) {
             let [lastArgs, lastMessages] = result;
 
             if(rule.compare(args,lastArgs)) {
-                handled = true;
-                props[errKey].push(...lastMessages)
+                props[errKey].push(...lastMessages);
+                continue;
             }
         }
 
-        if(!handled) {
-            if(rule.isAsync) { 
-                if(rule.type === 'error' && props[errKey].length) {
-                    // skip if other error rules are already failing
-                    continue; 
-                }
-                
-                ruleCache.set(cacheKey,[args,[]]);
-                dispatch(actions.asyncValidation(formId,name,false));
-                rule.validate(...args).then(result => {
-                    ruleCache.set(cacheKey,[args,getErrorMessages(result, rule, args)]); // FIXME: might overwrite a newer error...
-                    dispatch(actions.asyncValidation(formId,name,true));
-                }, () => {
-                    ruleCache.delete(cacheKey);
-                    dispatch(actions.asyncValidation(formId,name,true));
-                });
-            } else {
-                let result = rule.validate(...args);
-                let messages = getErrorMessages(result, rule, args);
-                props[errKey].push(...getErrorMessages(result,rule, args));
-                ruleCache.set(cacheKey,[args,messages]);
+        if(rule.isAsync) { 
+            if(rule.type === 'error' && props[errKey].length) {
+                // skip if other error rules are already failing
+                continue; 
             }
+            
+            ruleCache.set(cacheKey,[args,noErrors]);
+            dispatch(actions.asyncValidation(formId,name,false));
+            rule.validate(...args).then(result => {
+                ruleCache.set(cacheKey,[args,getErrorMessages(result, rule, args)]); // FIXME: might overwrite a newer error...
+                dispatch(actions.asyncValidation(formId,name,true));
+            }, () => {
+                ruleCache.delete(cacheKey);
+                dispatch(actions.asyncValidation(formId,name,true));
+            });
+        } else {
+            let result = rule.validate(...args);
+            let messages = getErrorMessages(result, rule, args);
+            props[errKey].push(...getErrorMessages(result,rule, args));
+            ruleCache.set(cacheKey,[args,messages]);
         }
     }
     

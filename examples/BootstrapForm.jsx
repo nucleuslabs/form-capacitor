@@ -25,6 +25,13 @@ class BootstrapForm extends React.PureComponent {
                         </small>
                     </div>
                     <div className="form-group">
+                        <label htmlFor="serverField">Server generated error messages</label>
+                        <ValueField name="serverField">
+                            <input type="email" className="form-control" id="serverField" aria-describedby="emailHelp" placeholder="Type anything"/>
+                        </ValueField>
+                    </div>
+
+                    <div className="form-group">
                         <label htmlFor="exampleInputPassword1">Password</label>
                         <ValueField name="password">
                             <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
@@ -116,19 +123,19 @@ const rules = {
         Rules.required, 
         Rules.email, 
         Rules.async(email => sleep(1000).then(() => email !== 'mpenner@nucleuslabs.com'), {message: "That email address is already registered"}),
-        Rules.async(email => sleep(250).then(() => {
-            let atk = getRandomInt(1,20);
-            let def = getRandomInt(1,20);
-            let errors = [];
-            if(atk < 10) {
-                errors.push(<span>You rolled a <b>{atk}</b> for attack. Critical miss!</span>);
-            }
-            if(def < 10) {
-                errors.push(<span>You rolled a <b>{def}</b> for defense. Critical hit!</span>);
-            }
-            return errors;
-        })),
     ],
+    serverField: Rules.async(email => sleep(250).then(() => {
+        let atk = getRandomInt(1,20);
+        let def = getRandomInt(1,20);
+        let errors = [];
+        if(atk < 10) {
+            errors.push(<span>You rolled a <b>{atk}</b> for attack. Critical miss!</span>);
+        }
+        if(def < 10) {
+            errors.push(<span>You rolled a <b>{def}</b> for defense. Critical hit!</span>);
+        }
+        return errors;
+    })),
     multiselect: Rules.minLength(3, (v,n) => `Please select ${n-v.length} more items`),
     numberselect: Rules.custom(val => val != '3', {message: "3 is unlucky"}),
     tweet: Rules.maxLength(140,(val,len) => `Please delete ${val.length - len} characters`),
