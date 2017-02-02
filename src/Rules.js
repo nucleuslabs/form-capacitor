@@ -6,22 +6,22 @@ function isFilled(value) {
     return !util.isEmpty(value);
 }
 
-function custom(isValidFn, options) {
+function custom(validateFn, options) {
     return {
-        isAsync: false, // isValid is expected to return a Promise. Validation rule will not run if other synchronous validation rules are failing
+        isAsync: false, // validate is expected to return a Promise. Validation rule will not run if other synchronous validation rules are failing
         message: "This field is invalid.", // {string|Function} message to display if input is not valid
-        isValid: isValidFn,
+        validate: validateFn,
         precondition: () => true, // {Function} if precondition fails, validation rule is not ran (not cached). Probably not needed if sync functions run first.
         dependsOn: [],
         isOptional: true, // don't run validation rule if _.isEqual(value,defaultValue)
         type: 'error', // "error" or "warning"
-        compare: util.arrayCompare, 
+        compare: util.arrayCompare, // checks if the input args the same as last time and if so, returns the cached/memoized error message
         ...options,
     }
 }
 
-function async(isValidFn, options) {
-    return custom(isValidFn, {isAsync: true, ...options});
+function async(validateFn, options) {
+    return custom(validateFn, {isAsync: true, ...options});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

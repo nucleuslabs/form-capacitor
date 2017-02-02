@@ -33,18 +33,22 @@ class StatelessTextBox extends React.PureComponent {
     renderIcon() {
         if(this.props.ui.isValidating) {
             // return <span className={css.icon}><div className="loader"/></span>;
-            return <Svg title="Validating..." sprite={sprites.loader} className={classNames(css.icon,css.spin)} fill="#008bff"/>;
+            return <Svg title="Validating" sprite={sprites.loader} className={classNames(css.icon,css.spin)} fill="#008bff"/>;
         }
         
         if(this.props.required && this.props.value === '') {
             return <Svg title="Required" sprite={sprites.asterisk} className={css.icon} fill="#f25041"/>;
         }
 
-        if(this.props.errors.length === 0) {
-            return <Svg title="Valid" sprite={sprites.checkmark} className={css.icon} fill={this.props.ui.isFocused ? '#91DC5A' : '#ccc'}/>;
-        } else {
+        if(this.props.errors.length > 0) {
             return <Svg title="Invalid" sprite={sprites.cross} className={css.icon} fill="#f25041"/>;
+        } 
+        
+        if(this.props.warnings.length > 0) {
+            return <Svg title="Warning" sprite={sprites.warning} className={css.icon} fill="#F5DA55"/>;
         }
+        
+        return <Svg title="Valid" sprite={sprites.checkmark} className={css.icon} fill={this.props.ui.isFocused ? '#91DC5A' : '#ccc'}/>;
     }
 
     componentDidUpdate(prevProps, prevState) {

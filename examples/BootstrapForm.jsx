@@ -105,8 +105,30 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 const rules = {
-    email: [Rules.required, Rules.email, Rules.async(email => sleep(1000).then(() => email == 'mpenner@nucleuslabs.com'), {message: "That email address is already registered"})],
+    email: [
+        Rules.required, 
+        Rules.email, 
+        Rules.async(email => sleep(1000).then(() => email !== 'mpenner@nucleuslabs.com'), {message: "That email address is already registered"}),
+        Rules.async(email => sleep(250).then(() => {
+            let atk = getRandomInt(1,20);
+            let def = getRandomInt(1,20);
+            let errors = [];
+            if(atk < 10) {
+                errors.push(<span>You rolled a <b>{atk}</b> for attack. Critical miss!</span>);
+            }
+            if(def < 10) {
+                errors.push(<span>You rolled a <b>{def}</b> for defense. Critical hit!</span>);
+            }
+            return errors;
+        })),
+    ],
     multiselect: Rules.minLength(3, (v,n) => `Please select ${n-v.length} more items`),
     numberselect: Rules.custom(val => val != '3', {message: "3 is unlucky"}),
     tweet: Rules.maxLength(140,(val,len) => `Please delete ${val.length - len} characters`),

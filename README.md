@@ -28,6 +28,7 @@ See also: [redux-form meta props](http://redux-form.com/6.4.3/docs/api/Field.md/
 
 - ~~contingent validation rules~~ [dependantRule]
 - async validation rules + ui states
+- dynamic error message for ajax rules?
 - `form.props.actions.setFocus`
 - `form.props.actions.setValue`
 - `form.props.actions.resetForm`

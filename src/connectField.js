@@ -17,9 +17,9 @@ const defaultValueGetter = (_,p) => p.defaultValue;
 const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], {});
 
 const ruleCache = new DeepMap();
-const notFound = Symbol('NotFound');
-const noError = Symbol('NoError');
-const pending = Symbol('Pending');
+// const notFound = Symbol('NotFound');
+// const noError = Symbol('NoError');
+// const pending = Symbol('Pending');
 
 const errTypeToProp = {
     // 'err': 'errors',
@@ -31,14 +31,24 @@ const errTypeToProp = {
 // window.RULE_CACHE = ruleCache;
 
 
-function getErrorMessage(rule, args) {
-    if(_.isFunction(rule.message)) {
-        return rule.message(...args);
-    } else if(_.isString(rule.message)) {
-        return rule.message;
-    } else {
-        throw new Error(`Unsupported rule message type`);
+function getErrorMessages(result, rule, args) {
+    if(result === true) {
+        return [];
     }
+    if(result === false) {
+        if(_.isFunction(rule.message)) {
+            return util.array(rule.message(...args));
+        } else if(_.isString(rule.message)) {
+            return util.array(rule.message);
+        } else {
+            throw new Error(`Unsupported rule.message type`);
+        }
+    }
+    if(result) {
+        // if result is not a boolean, it ought to be an error message or blank
+        return util.array(result);
+    }
+    return [];
 }
 
 function getErrors(value, rules, formData, dispatch,formId, name, pendingValidations) {
@@ -46,7 +56,7 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
     
     // console.log(formId,name,pendingValidations);
     
-    let out = {
+    let props = {
         errors: [],
         warnings: [],
     };
@@ -85,93 +95,40 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
         let handled = false;
         
         if(result) {
-            let [lastArgs, lastError] = result;
+            let [lastArgs, lastResult] = result;
 
             if(rule.compare(args,lastArgs)) {
                 handled = true;
-                // console.log('cache hit');
-                if(lastError !== noError && lastError !== pending) {
-                    out[errKey].push(lastError);
-                }
+                props[errKey].push(...lastResult)
             }
         }
 
         if(!handled) {
             if(rule.isAsync) { 
-                if(rule.type === 'error' && out[errKey].length) {
+                if(rule.type === 'error' && props[errKey].length) {
                     // skip if other error rules are already failing
                     continue; 
                 }
                 
-                ruleCache.set(cacheKey,[args,pending]);
+                ruleCache.set(cacheKey,[args,[]]);
                 dispatch(actions.asyncValidation(formId,name,false));
-                rule.isValid(...args).then(isValid => {
-                    let message = isValid ? noError : getErrorMessage(rule, args);
-                    ruleCache.set(cacheKey,[args,message]); // fixme: might overwrite a newer error...
+                rule.validate(...args).then(result => {
+                    ruleCache.set(cacheKey,[args,getErrorMessages(result, rule, args)]); // fixme: might overwrite a newer error...
                     dispatch(actions.asyncValidation(formId,name,true));
                 }, () => {
                     ruleCache.delete(cacheKey);
                     dispatch(actions.asyncValidation(formId,name,true));
                 });
             } else {
-                let isValid = rule.isValid(...args);
-                let message = noError;
-                if(!isValid) {
-                    message = getErrorMessage(rule, args);
-                    out[errKey].push(message);
-                }
-                ruleCache.set(cacheKey,[args,message]);
+                let result = rule.validate(...args);
+                let messages = getErrorMessages(result, rule, args);
+                props[errKey].push(...getErrorMessages(result,rule, args));
+                ruleCache.set(cacheKey,[args,messages]);
             }
         }
     }
     
-    return out;
-    
-    // TODO: how to support promises like in textInput.jsx?
-    return rules.map(rule => {
-        let fn, args;
-        if(rule[isDependant]) {
-            let deps = rule.fields.map(f => _.get(formData, f));
-            fn = rule.rule;
-            args = [value, ...deps, ui];
-        } else {
-            fn = rule;
-            args = [value, ui];
-        }
-        let pendingMessage = defaultPendingMessage;
-        if(fn[isAsync]) { // FIXME: what if this was wrapped in optional() ? then we wouldn't know it was async until invoked once -- maybe all rules should be objects with various flags?
-            // also, maybe *all* rules except required() should be optional by default?
-            pendingMessage = fn.message;
-            fn = fn.rule;
-        }
-        let key = [fn, ...args.slice(0, fn.length)]; // FIXME: the slice is to lop off `ui` if it isn't used so that `ui` changes don't bust the cache, but this could be flakey
-        let err = ruleCache.get(key,notFound);
-        // console.log(`GET ERRORS FOR ${formId}.${name}`);
-        if(err === notFound) {
-            err = fn(...args);
-            ruleCache.set(key, err); // TODO: should we cache everything or just promises?
-            if(err instanceof Promise) {
-                dispatch(actions.asyncValidation(formId,name,false));
-                err.then(val => {
-                    // console.log('promise resolved',key,val);
-                    ruleCache.set(key, val);
-                    dispatch(actions.asyncValidation(formId,name,true));
-                }, () => {
-                    // console.log('promise rejected',key);
-                    ruleCache.delete(key);
-                    dispatch(actions.asyncValidation(formId,name,true));
-                });
-            }
-        }
-        if(err instanceof Promise) {
-            return '';
-        } else if(util.isNullish(err) || err === true) {
-            return false;
-        } else if(err === false) {
-            return defaultErrorMessage;
-        }
-        return err;
-    }).filter(x => x);
+    return props;
 }
 
 function mapDispatchToProps(dispatch, formId, name) {
