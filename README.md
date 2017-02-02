@@ -32,8 +32,8 @@ See also: [redux-form meta props](http://redux-form.com/6.4.3/docs/api/Field.md/
 - ~~Rename `dispatchXXX` methods to something like `actions.xxx`?~~
 - ~~Rename `onChange`, `onFocus`, onXXX props to `input.onChange` or `events.xxx`?~~
 - ~~warnings (scheduling conflicts, weak passwords)~~
-- Fix async race condition
-- OceanicForm.props.data: Value did not change. Avoidable re-render!
+- ~~Fix async race condition~~
+- ~~OceanicForm.props.data: Value did not change. Avoidable re-render!~~
 - `form.props.actions.setFocus`
 - `form.props.actions.setValue`
 - `form.props.actions.resetForm`

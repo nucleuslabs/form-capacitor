@@ -12,9 +12,10 @@ const shallowEqual = require('./shallowEqual');
 const actions = require('./actionCreators');
 const {isDependant,isAsync} = require('./specialRules');
 const DeepMap = require('./DeepMap');
+const {emptyObject, emptyArray} = require('./consts');
 
 const defaultValueGetter = (_,p) => p.defaultValue;
-const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], {});
+const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], emptyObject);
 
 const ruleCache = new DeepMap();
 // const notFound = Symbol('NotFound');
@@ -28,13 +29,11 @@ const errTypeToProp = {
     'warning': 'warnings',
 };
 
-window.RULE_CACHE = ruleCache;
-const noErrors = Object.freeze([]);
-
+// window.RULE_CACHE = ruleCache;
 
 function getErrorMessages(result, rule, args) {
     if(result === true) {
-        return noErrors;
+        return emptyArray;
     }
     if(result === false) {
         if(_.isFunction(rule.message)) {
@@ -49,7 +48,7 @@ function getErrorMessages(result, rule, args) {
         // if result is not a boolean, it ought to be an error message or blank
         return util.array(result);
     }
-    return noErrors;
+    return emptyArray;
 }
 
 function getErrors(value, rules, formData, dispatch,formId, name, pendingValidations) {
@@ -121,7 +120,7 @@ function getErrors(value, rules, formData, dispatch,formId, name, pendingValidat
                 continue; 
             }
             
-            ruleCache.set(cacheKey,noErrors);
+            ruleCache.set(cacheKey,emptyArray);
             dispatch(actions.asyncValidation(formId,name,false));
             rule.validate(...args).then(result => {
                 ruleCache.set(cacheKey,getErrorMessages(result, rule, args)); 
@@ -212,7 +211,7 @@ function connectField() {
 
 function selectorFactory(dispatch, factoryOptions) {
     let dispatchSelector = defaultMemoize(mapDispatchToProps);
-    let prevProps = {};
+    let prevProps = emptyObject;
 
     const namePathSelector = createSelector((_, p) => p.name, toPath);
     const stateUiSelector = util.createDeepEqualSelector([stateGetter,namePathSelector], (state,np) => Object.assign({
@@ -224,10 +223,10 @@ function selectorFactory(dispatch, factoryOptions) {
         wasBlurred: false,
         wasChanged: false,
         pendingValidations: 0,
-    }, _.get(state, ['ui', ...np], {})));
-    const dataGetter = createSelector(stateGetter, getOr({},'data'));
+    }, _.get(state, ['ui', ...np], emptyObject)));
+    const dataGetter = createSelector(stateGetter, getOr(emptyObject,'data'));
     const valueSelector = createSelector([dataGetter,namePathSelector, defaultValueGetter], (data,np,dv) => _.get(data, np, dv));
-    const initialSelector = createSelector(stateGetter, getOr({},'initial'));
+    const initialSelector = createSelector(stateGetter, getOr(emptyObject,'initial'));
     const initialValueSelector = createSelector([initialSelector,namePathSelector, defaultValueGetter], (init,np,dv) => _.get(init, np, dv));
     const pendingValidationsSelector = createSelector(stateUiSelector, ui => ui.pendingValidations);
     

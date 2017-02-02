@@ -17,6 +17,7 @@ function custom(validateFn, options) {
         isOptional: true, // don't run validation rule if _.isEqual(value,defaultValue)
         type: 'error', // "error" or "warning"
         compare: util.arrayCompare, // checks if the input args the same as last time and if so, returns the cached/memoized error message
+        // todo: add throttle/debounce options
         ...options,
     }
 }
