@@ -63,18 +63,21 @@ const contextTypes = {
     form: PropTypes.object,
 };
 
-function connectForm({rules}) {
+function connectForm(options) {
     return compose(
         withContext(
             contextTypes,
-            props => ({
-                form: {
-                    id: props.id || ShortId.generate(),
-                    rules: rules ? util.unflatten(rules) : emptyObject,
-                    fields: new Map(),
-                    inputs: new Map(),
-                },
-            })
+            props => {
+                let rules = props.rules || options.rules;
+                return {
+                    form: {
+                        id: props.id || options.id || ShortId.generate(),
+                        rules: rules ? util.unflatten(rules) : emptyObject,
+                        fields: new Map(),
+                        inputs: new Map(),
+                    },
+                }
+            }
         ),
         getContext(contextTypes),
         // connect(mapStateToProps, mapDispatchToProps),
