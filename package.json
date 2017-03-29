@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Form manager for React/Redux",
   "main": "dist/index.js",
   "scripts": {
