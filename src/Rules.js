@@ -46,18 +46,18 @@ const email = custom(value => /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)
     message: `Please enter a valid email address.`,
 });
 
-function min(min, message=(min) => `Please enter a value greater than or equal to ${min}.`) {
-    return custom(val => !isNaN(value) && value >= min, {id:'min',message: message});
+function min(min, message=(value, min) => `Please enter a value greater than or equal to ${min}.`) {
+    return custom(val => !isNaN(value) && value >= min, {id:'min',message: value => message(value, min)});
 }
 
-function max(max, message=(max) => `Please enter a value less than or equal to ${max}.`) {
-    return custom(val => !isNaN(value) && value <= max, {id:'max',message: message});
+function max(max, message=(value, max) => `Please enter a value less than or equal to ${max}.`) {
+    return custom(val => !isNaN(value) && value <= max, {id:'max',message: value => message(value, max)});
 }
 
-function range(min, max, message=(min,max) => `Please enter a value between ${min} and ${max} inclusive.`) {
-    return custom(val => !isNaN(value) && value >= min && value <= max, {id:'range',message: message});
+function range(min, max, message=(value, min, max) => `Please enter a value between ${min} and ${max} inclusive.`) {
+    return custom(val => !isNaN(value) && value >= min && value <= max, {id:'range',message: value => message(value, min, max)});
 }
 
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
 
-module.exports = {required, minLength, maxLength, email, custom, async};
+module.exports = {required, minLength, maxLength, email, custom, async, min, max, range};
