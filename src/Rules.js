@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const util = require('./util');
 const ShortId = require('shortid');
 
@@ -42,12 +41,22 @@ function maxLength(length,message=(value,length) => `Please enter at most ${leng
     return custom(val => val.length <= length, {id:'maxLength',message: value => message(value,length)});
 }
 
-const email = custom(value => /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(value), {
+const email = custom(value => /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i.test(value), {
     id: 'email',
     message: `Please enter a valid email address.`,
 });
 
+function min(min, message=(min) => `Please enter a value greater than or equal to ${min}.`) {
+    return custom(val => !isNaN(value) && value >= min, {id:'min',message: message});
+}
 
+function max(max, message=(max) => `Please enter a value less than or equal to ${max}.`) {
+    return custom(val => !isNaN(value) && value <= max, {id:'max',message: message});
+}
+
+function range(min, max, message=(min,max) => `Please enter a value between ${min} and ${max} inclusive.`) {
+    return custom(val => !isNaN(value) && value >= min && value <= max, {id:'range',message: message});
+}
 
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
 
