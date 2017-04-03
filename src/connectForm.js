@@ -13,6 +13,13 @@ const {emptyObject, emptyArray} = require('./consts');
 
 const stateGetter = (s,p) => _.get(s, [namespace, p.id], emptyObject);
 
+function focusInput(input) {
+    input.focus(); // TODO: check if input is an element, otherwise throw warning if it's a React component
+    if(input.scrollIntoViewIfNeeded) {
+        input.scrollIntoViewIfNeeded(false);
+    }
+}
+
 function mapDispatchToProps(dispatch, form, data) {
     // FIXME: not sure how to get this to memoize properly. Every time data changes we're creating new functions. If I could access the component, I could read the props
     // off of it instead of trying to pass them in...
@@ -39,12 +46,16 @@ function mapDispatchToProps(dispatch, form, data) {
         setFocus(name) {
             let input = form.inputs.get(name);
             if(input) {
-                input.focus();
-                if(input.scrollIntoViewIfNeeded) {
-                    input.scrollIntoViewIfNeeded(false);
-                }
+                focusInput(input);
             } else {
-                console.warn(`Field '${form.id}.${name}' was not found for focusing; did you set <input ref={this.props.focusRef}>?`);
+                setTimeout(() => {
+                    let input = form.inputs.get(name);
+                    if(input) {
+                        focusInput(input);
+                    } else {
+                        console.warn(`Field '${form.id}.${name}' was not found for focusing; did you set <input ref={this.props.focusRef}>?`);
+                    }
+                }, 0);
             }
         }
     };
