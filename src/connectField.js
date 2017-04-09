@@ -151,6 +151,7 @@ function mapDispatchToProps(dispatch, formId, name) {
             onCheck(ev) {
                 dispatch(actions.change(formId, name, ev.target.checked));
             },
+            // TODO: add onCheckList for checkbox arrays
             onFocus() {
                 dispatch(actions.focus(formId, name));
             },
