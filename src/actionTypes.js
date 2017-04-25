@@ -5,3 +5,4 @@ exports.FOCUS = `${namespace}.focus`;
 exports.HOVER = `${namespace}.hover`;
 exports.SUBMIT = `${namespace}.submit`;
 exports.ASYNC_VALIDATION = `${namespace}.asyncValidation`;
+exports.SAVE_STATE = `${namespace}.saveState`;

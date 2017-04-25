@@ -50,6 +50,10 @@ module.exports = function createReducer(data) {
                 state = setIn(path, payload.complete ? pending-1 : pending+1, state);
                 break;
             }
+            case actionTypes.SAVE_STATE:
+                state = setIn([namespace, payload.formId, 'initial'], payload.data, state);
+                delete state[namespace][payload.formId]['ui'];
+                break;
         }
         return state;
     };

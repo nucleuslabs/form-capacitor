@@ -95,6 +95,7 @@ class BootstrapForm extends React.PureComponent {
                         ? <BootstrapCheckbox name="newsletter" defaultValue={true}>Give me the newsletter</BootstrapCheckbox>
                         : null}
                     <button type="submit" className="btn btn-primary">Submit</button>
+
                 </div>
             </form>
         );
@@ -104,6 +105,7 @@ class BootstrapForm extends React.PureComponent {
         ev.preventDefault();
         if(this.props.validate()) {
             console.log(`Submitting ${JSON.stringify(this.props.data, null, 2)}`);
+            this.props.saveState();
         }
     }
 }

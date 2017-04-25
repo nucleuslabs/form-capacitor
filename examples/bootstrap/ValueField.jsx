@@ -1,9 +1,9 @@
 const React = require('react');
 const {PropTypes} = React;
 const util = require('form-capacitor/util');
-const _ = require('lodash');
 const css = require('./ValueField.less');
 const connectField = require('form-capacitor/connectField');
+const classNames = require('classnames');
 
 class StatelessValueField extends React.PureComponent {
 
@@ -28,17 +28,26 @@ class StatelessValueField extends React.PureComponent {
         };
 
         let wrapClassName;
+        let myClassNames = []
         if(rules.length && (ui.wasFocused || ui.formValidated)) {
             if(errors.length === 0) {
-                attrs.className = css.fieldValid;
+                myClassNames.push(css.fieldValid);
                 wrapClassName = css.wrapValid;
             } else {
-                attrs.className = css.fieldError;
+                myClassNames.push(css.fieldError);
                 wrapClassName = css.wrapError;
             }
         }
 
-        let input = React.cloneElement(children, util.mergeAttrs(attrs, children.props));
+        if(this.props.ui.wasChanged){
+            myClassNames.push(css.fieldWasChanged);
+        }
+
+        if(this.props.ui.isDirty){
+            myClassNames.push(css.fieldDirty);
+        }
+
+        let input = React.cloneElement(children, util.mergeAttrs(attrs, children.props, {className: classNames(myClassNames)}));
 
         return (
             <span className={wrapClassName}>

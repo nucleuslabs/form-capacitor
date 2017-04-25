@@ -57,6 +57,9 @@ function mapDispatchToProps(dispatch, form, data) {
                     }
                 }, 0);
             }
+        },
+        saveState(){
+            dispatch(actions.saveState(form.id, data));
         }
     };
 }

@@ -47,3 +47,7 @@ exports.submit = function(formId) {
 exports.asyncValidation = function(formId, name, complete) {
     return fluxStandardAction(actionTypes.ASYNC_VALIDATION, {formId, name, complete});
 };
+
+exports.saveState = function(formId, data) {
+    return fluxStandardAction(actionTypes.SAVE_STATE, {formId, data});
+};
