@@ -15,6 +15,7 @@ class BootstrapForm extends React.PureComponent {
         return (
             <form onSubmit={this.submit}>
                 <div className="bd-example">
+                    {this.props.isDirty?<div>I'm So Dirty!</div>:<div>I'm So Clean!</div>}
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Email address</label>
                         <ValueField name="email">
@@ -95,7 +96,6 @@ class BootstrapForm extends React.PureComponent {
                         ? <BootstrapCheckbox name="newsletter" defaultValue={true}>Give me the newsletter</BootstrapCheckbox>
                         : null}
                     <button type="submit" className="btn btn-primary">Submit</button>
-
                 </div>
             </form>
         );

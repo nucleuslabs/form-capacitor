@@ -114,12 +114,15 @@ function connectForm(options) {
 
 function selectorFactory(dispatch, factoryOptions) {
     const dataSelector = createSelector(stateGetter, state => _.get(state, 'data', emptyObject));
+    const initialSelector = createSelector(stateGetter, state => _.get(state, 'initial', emptyObject));
+    const dirtySelector = createSelector(dataSelector, initialSelector, (d,i) => !shallowEqual(d, i));
     const dispatchSelector = defaultMemoize(mapDispatchToProps);
     let prevProps = {};
     
     return (state, props) => {
         let data = dataSelector(state, props);
         let nextProps = {
+            isDirty: dirtySelector(state, props),
             data,
             ...dispatchSelector(dispatch, props.form, data),
             ...props,
