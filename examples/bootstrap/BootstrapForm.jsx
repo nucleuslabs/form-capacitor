@@ -15,7 +15,7 @@ class BootstrapForm extends React.PureComponent {
         return (
             <form onSubmit={this.submit}>
                 <div className="bd-example">
-                    {this.props.isDirty?<div>I'm So Dirty!</div>:<div>I'm So Clean!</div>}
+                    {this.props.isDirty()?<div>This form is so <b>dirty!</b></div>:<div>This form is so <i>clean!</i></div>}
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Email address</label>
                         <ValueField name="email">
@@ -59,7 +59,7 @@ class BootstrapForm extends React.PureComponent {
                     <div className="form-group">
                         <label htmlFor="exampleSelect2">Example multiple select</label>
     
-                        <ValueField name="multiselect" defaultValue={[2,3]} valueGetter={getMultiVal}>
+                        <ValueField name="multiselect" valueGetter={getMultiVal}>
                             <select multiple className="form-control" id="exampleSelect2">
                                 <option>1</option>
                                 <option>2</option>

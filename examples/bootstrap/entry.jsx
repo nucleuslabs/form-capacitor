@@ -13,7 +13,8 @@ const {FormStoreProvider} = require('form-capacitor');
 const initialData = {
     form1: {
         email: "mpenner@nucleuslabs.com",
-        tweet: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin leo lacus, egestas sed neque ut, sodales sollicitudin tellus. Sed ipsum felis, auctor in velit nec, luctus vulputate nisl."
+        tweet: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin leo lacus, egestas sed neque ut, sodales sollicitudin tellus. Sed ipsum felis, auctor in velit nec, luctus vulputate nisl.",
+        multiselect: ["2","3"]
     }
 };
 

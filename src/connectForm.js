@@ -20,59 +20,6 @@ function focusInput(input) {
     }
 }
 
-function mapDispatchToProps(dispatch, form, data) {
-    // FIXME: not sure how to get this to memoize properly. Every time data changes we're creating new functions. If I could access the component, I could read the props
-    // off of it instead of trying to pass them in...
-    
-    return {
-        validate() { 
-            // FIXME: not sure if this should trigger a submit or not....
-            dispatch(actions.submit(form.id));
-            return Array.from(form.fields.values()).every(f => f.props.errors.length === 0);
-        },
-        setField(name, value) {
-            if(_.isFunction(value)) {
-                let prevValue = _.get(data, name);
-                if(prevValue === undefined) {
-                    let field = form.fields.get(name);
-                    if(field) {
-                        prevValue = field.props.defaultValue;
-                    }
-                }
-                value = value(prevValue);
-            }
-            dispatch(actions.change(form.id, name, value));
-        },
-        setFocus(name) {
-            let input = form.inputs.get(name);
-            if(input) {
-                focusInput(input);
-            } else {
-                setTimeout(() => {
-                    let input = form.inputs.get(name);
-                    if(input) {
-                        focusInput(input);
-                    } else {
-                        console.warn(`Field '${form.id}.${name}' was not found for focusing; did you set <input ref={this.props.focusRef}>?`);
-                    }
-                }, 0);
-            }
-        },
-        saveState(){
-            dispatch(actions.saveState(form.id, data));
-        }
-    };
-}
-
-// function mapStateToProps(state, props) {
-//     const dataSelector = createSelector(stateGetter, state => _.get(state, 'data', emptyObject));
-//
-//     return (state, props) => ({
-//         data: dataSelector(state, props),
-//     });
-// }
-
-
 const contextTypes = {
     form: PropTypes.object,
 };
@@ -99,32 +46,68 @@ function connectForm(options) {
     );
 }
 
-// function memoize(func, equalityCheck) {
-//     let lastArgs = null;
-//     let lastResult = null;
-//     return (...args) => {
-//         if(lastArgs === null || !equalityCheck(args,lastArgs)) {
-//             lastResult = func(...args);
-//             lastArgs = args;
-//         }
-//         return lastResult;
-//     }
-// }
-
 
 function selectorFactory(dispatch, factoryOptions) {
     const dataSelector = createSelector(stateGetter, state => _.get(state, 'data', emptyObject));
     const initialSelector = createSelector(stateGetter, state => _.get(state, 'initial', emptyObject));
-    const dirtySelector = createSelector(dataSelector, initialSelector, (d,i) => !shallowEqual(d, i));
-    const dispatchSelector = defaultMemoize(mapDispatchToProps);
+    const dirtySelector = defaultMemoize((d,i) => !_.isEqual(d,i));
+    const dirtyDirtySelector = createSelector(dataSelector, initialSelector, (d, i) => () => dirtySelector(d,i));
     let prevProps = {};
-    
+
+    //Memoized Methods
+
+    const validate = defaultMemoize((dispatch, form) => () => {
+        dispatch(actions.submit(form.id));
+        return Array.from(form.fields.values()).every(f => f.props.errors.length === 0);
+    });
+
+    const setField = defaultMemoize((dispatch, form) => (name, value, data) => {
+        if(_.isFunction(value)) {
+            let prevValue = _.get(data, name);
+            if(prevValue === undefined) {
+                let field = form.fields.get(name);
+                if(field) {
+                    prevValue = field.props.defaultValue;
+                }
+            }
+            value = value(prevValue);
+        }
+        dispatch(actions.change(form.id, name, value));
+    });
+
+    const setFocus = defaultMemoize((dispatch, form) => name => {
+        let input = form.inputs.get(name);
+        if(input) {
+            focusInput(input);
+        } else {
+            setTimeout(() => {
+                let input = form.inputs.get(name);
+                if(input) {
+                    focusInput(input);
+                } else {
+                    console.warn(`Field '${form.id}.${name}' was not found for focusing; did you set <input ref={this.props.focusRef}>?`);
+                }
+            }, 0);
+        }
+    });
+    const data = Object.assign({}, ...state => _.get(state, 'data', emptyObject));
+    const saveState = defaultMemoize((dispatch, form, data) => () => {
+        dispatch(actions.saveState(form.id, data));
+    });
+
+    //Exposed Form Connect Methods and Props
     return (state, props) => {
         let data = dataSelector(state, props);
+        /*FIXME: Everything is working as expected and re-renders are happening when they should...
+        but setField, saveState and isDirty cause a warning because a different closure is being returned
+        each time a change happens */
         let nextProps = {
-            isDirty: dirtySelector(state, props),
             data,
-            ...dispatchSelector(dispatch, props.form, data),
+            validate: validate(dispatch, props.form),
+            setField: setField(dispatch, props.form, data),
+            setFocus: setFocus(dispatch, props.form),
+            saveState: saveState(dispatch, props.form, data),
+            isDirty: dirtyDirtySelector(state, props),
             ...props,
         };
 
