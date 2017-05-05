@@ -1,1 +1,1 @@
-module.exports = 'form-capacitor';
+module.exports = 'formCapacitor';

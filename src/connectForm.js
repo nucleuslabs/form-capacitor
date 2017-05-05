@@ -11,7 +11,7 @@ const { createSelector,defaultMemoize } = require('reselect');
 const shallowEqual = require('./shallowEqual');
 const {emptyObject, emptyArray} = require('./consts');
 
-const stateGetter = (s,p) => _.get(s, [namespace, p.id], emptyObject);
+const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], emptyObject);
 
 function focusInput(input) {
     input.focus(); // TODO: check if input is an element, otherwise throw warning if it's a React component
