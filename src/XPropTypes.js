@@ -1,4 +1,4 @@
-const {PropTypes} = require('react');
+const PropTypes = require('prop-types');
 
 exports.anyChildren = PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),

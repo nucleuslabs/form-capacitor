@@ -1,5 +1,5 @@
 const React = require('react');
-const {PropTypes} = React;
+const PropTypes = require('prop-types');
 const {connect, connectAdvanced} = require('react-redux');
 const util = require('./util');
 const _ = require('lodash');
