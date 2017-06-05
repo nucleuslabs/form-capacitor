@@ -21,7 +21,7 @@ function is(x, y) {
  * when any key has values which are not strictly equal between the arguments.
  * Returns true when the values of all keys are strictly equal.
  */
-function shallowEqual(objA, objB) {
+export default function shallowEqual(objA, objB) {
     if (is(objA, objB)) {
         return true;
     }
@@ -46,5 +46,3 @@ function shallowEqual(objA, objB) {
 
     return true;
 }
-
-module.exports = shallowEqual;

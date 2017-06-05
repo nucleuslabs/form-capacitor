@@ -1,14 +1,14 @@
-const React = require('react');
+import React from 'react';
 
 if (process.env.NODE_ENV !== 'production') {
     const {whyDidYouUpdate} = require('why-did-you-update');
     whyDidYouUpdate(React)
 }
 
-const ReactDOM = require('react-dom');
-const BootstrapForm = require('./BootstrapForm');
-const OceanicForm = require('./OceanicForm');
-const {FormStoreProvider} = require('form-capacitor');
+import ReactDOM from 'react-dom';
+import BootstrapForm from './BootstrapForm';
+import OceanicForm from './OceanicForm';
+import {FormStoreProvider} from 'form-capacitor';
 
 const initialData = {
     form1: {

@@ -1,4 +1,4 @@
-const actionTypes = require('./actionTypes');
+import actionTypes from './actionTypes';
 
 /**
  * Creates a flux standard action.
@@ -21,33 +21,34 @@ function fluxStandardAction(type, payload, meta) {
     return action;
 }
 
-exports.change = function(formId, name, value) {
+export function change(formId, name, value) {
     return fluxStandardAction(actionTypes.CHANGE, {formId,name,value});
-};
-exports.focus = function(formId, name) {
+}
+
+export function focus(formId, name) {
     return fluxStandardAction(actionTypes.FOCUS, {formId,name,isFocused:true});
-};
+}
 
-exports.blur = function(formId, name) {
+export function blur(formId, name) {
     return fluxStandardAction(actionTypes.FOCUS, {formId,name,isFocused:false});
-};
+}
 
-exports.mouseEnter = function(formId, name) {
+export function mouseEnter(formId, name) {
     return fluxStandardAction(actionTypes.HOVER, {formId,name,isHovering:true});
-};
+}
 
-exports.mouseLeave = function(formId, name) {
+export function mouseLeave(formId, name) {
     return fluxStandardAction(actionTypes.HOVER, {formId,name,isHovering:false});
-};
+}
 
-exports.submit = function(formId) {
+export function submit(formId) {
     return fluxStandardAction(actionTypes.SUBMIT, {formId});
-};
+}
 
-exports.asyncValidation = function(formId, name, complete) {
+export function asyncValidation(formId, name, complete) {
     return fluxStandardAction(actionTypes.ASYNC_VALIDATION, {formId, name, complete});
-};
+}
 
-exports.saveState = function(formId, data) {
+export function saveState(formId, data) {
     return fluxStandardAction(actionTypes.SAVE_STATE, {formId, data});
-};
+}

@@ -1,9 +1,8 @@
-const React = require('react');
-const {FormProvider, Rules, connectForm, dependantRule, asyncRule} = require('form-capacitor');
-const ValueField = require('./ValueField');
-const BootstrapRadio = require('./BootstrapRadio');
-const BootstrapCheckbox = require('./BootstrapCheckbox');
-
+import React from 'react';
+import {FormProvider, Rules, connectForm, dependantRule, asyncRule} from 'form-capacitor';
+import ValueField from './ValueField';
+import BootstrapRadio from './BootstrapRadio';
+import BootstrapCheckbox from './BootstrapCheckbox';
 
 function getMultiVal(ev) {
     return Array.from(ev.target.options).filter(o => o.selected).map(o => o.value);
@@ -172,4 +171,4 @@ const rules = {
 
 // console.log(rules);
 
-module.exports = connectForm({rules})(BootstrapForm);
+export default connectForm({rules})(BootstrapForm);

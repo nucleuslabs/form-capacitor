@@ -1,3 +1,6 @@
 // these are needed so that the memoizers compare === equal
-exports.emptyObject = Object.freeze({});
-exports.emptyArray = Object.freeze([]);
+export const emptyObject = Object.freeze({});
+export const emptyArray = Object.freeze([]);
+
+import * as _self from './consts';
+export default _self;

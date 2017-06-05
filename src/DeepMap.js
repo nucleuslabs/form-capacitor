@@ -1,6 +1,6 @@
 const MAP = Symbol('Entries');
 
-class DeepMap {
+export default class DeepMap {
     constructor() {
         this[MAP] = new WeakMap();
     }
@@ -51,5 +51,3 @@ class DeepMap {
         map.delete(key[end]);
     }
 }
-
-module.exports = DeepMap;

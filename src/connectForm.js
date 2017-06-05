@@ -1,15 +1,15 @@
-const React = require('react');
-const PropTypes = require('prop-types');
-const {connect, connectAdvanced} = require('react-redux');
-const util = require('./util');
-const _ = require('lodash');
-const {compose, mapProps, getContext, withContext, lifecycle} = require('recompose');
-const namespace = require('./namespace');
-const actions = require('./actionCreators');
-const ShortId = require('shortid');
-const { createSelector,defaultMemoize } = require('reselect');
-const shallowEqual = require('./shallowEqual');
-const {emptyObject, emptyArray} = require('./consts');
+import React from 'react';
+import PropTypes from 'prop-types';
+import {connect, connectAdvanced} from 'react-redux';
+import * as util from './util';
+import * as _ from 'lodash';
+import {compose, mapProps, getContext, withContext, lifecycle} from 'recompose';
+import namespace from './namespace';
+import * as actions from './actionCreators';
+import ShortId from 'shortid';
+import { createSelector,defaultMemoize } from 'reselect';
+import shallowEqual from './shallowEqual';
+import {emptyObject, emptyArray} from './consts';
 
 const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], emptyObject);
 
@@ -24,7 +24,7 @@ const contextTypes = {
     form: PropTypes.object,
 };
 
-function connectForm(options) {
+export default function connectForm(options) {
     return compose(
         withContext(
             contextTypes,
@@ -118,5 +118,3 @@ function selectorFactory(dispatch, factoryOptions) {
         return prevProps = nextProps;
     }
 }
-
-module.exports = connectForm;

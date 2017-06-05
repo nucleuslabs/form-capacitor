@@ -17,7 +17,7 @@ const { defaultMemoize, createSelectorCreator } = require('reselect');
  * @param {Object} object Flat object
  * @returns {Object} Unflattened object
  */
-exports.unflatten = function unflatten(object) {
+export function unflatten(object) {
     let result = {};
     for(let key of Object.keys(object)) {
         _.set(result, key, object[key]);
@@ -51,15 +51,15 @@ const _glob = (object, path, defaultValue) => {
  * @return {*} Returns the resolved value.
  * @see https://lodash.com/docs/4.17.4#get
  */
-exports.glob = function glob(object, path, defaultValue) {
+export function glob(object, path, defaultValue) {
     if(!object) {
         console.warn('glob object is falsey');
         return defaultValue;
     }
     return _glob(object, _.toPath(path), defaultValue);
-};
+}
 
-exports.mergeAttrs = function mergeAttrs(merged, ...attrDicts) {
+export function mergeAttrs(merged, ...attrDicts) {
     let eventHandlers = {};
 
     for(let attrs of attrDicts) {
@@ -98,7 +98,7 @@ exports.mergeAttrs = function mergeAttrs(merged, ...attrDicts) {
     });
 
     return merged;
-};
+}
 
 /**
  * Returns true if a value is null, undefined, or NaN.
@@ -107,22 +107,22 @@ exports.mergeAttrs = function mergeAttrs(merged, ...attrDicts) {
  * @returns {boolean} True if a value is null, undefined, or NaN.
  * @see https://github.com/graphql/graphql-js/blob/39744381d5173795d3b245dcb5d86e78bb3638fe/src/jsutils/isNullish.js#L11-L16
  */
-exports.isNullish = function isNullish(value) {
+export function isNullish(value) {
     // eslint-disable-next-line no-self-compare
     return value === null || value === undefined || value !== value;
-};
+}
 
-exports.array = function array(x) {
+export function array(x) {
     if(!x) return [];
     return Array.isArray(x) ? [...x] : [x];
-};
+}
 
-exports.createDeepEqualSelector = createSelectorCreator(
+export const createDeepEqualSelector = createSelectorCreator(
     defaultMemoize,
     _.isEqual
 );
 
-exports.pick = function pick(src, props, dest={}) {
+export function pick(src, props, dest={}) {
     return Object.keys(props).reduce((dest,p) => {
         if(typeof props[p] === 'string') {
             dest[props[p]] = src[p];
@@ -131,14 +131,14 @@ exports.pick = function pick(src, props, dest={}) {
         }
         return dest;
     },dest);
-};
+}
 
-exports.arrayCompare = function arrayCompare(arr1, arr2) {
+export function arrayCompare(arr1, arr2) {
     return arr1.length === arr2.length && arr1.every((v,i) => Object.is(v,arr2[i]));
-};
+}
 
 
-exports.isEmpty = function isEmpty(value) {
+export function isEmpty(value) {
     if(_.isString(value) || _.isArray(value)) {
         return !value.length;
     }
@@ -149,4 +149,4 @@ exports.isEmpty = function isEmpty(value) {
         return !_.size(value);
     }
     return !value;
-};
+}

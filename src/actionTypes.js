@@ -1,8 +1,11 @@
-const namespace = require('./namespace');
+import namespace from './namespace';
 
-exports.CHANGE = `${namespace}.change`;
-exports.FOCUS = `${namespace}.focus`;
-exports.HOVER = `${namespace}.hover`;
-exports.SUBMIT = `${namespace}.submit`;
-exports.ASYNC_VALIDATION = `${namespace}.asyncValidation`;
-exports.SAVE_STATE = `${namespace}.saveState`;
+export const CHANGE = `${namespace}.change`;
+export const FOCUS = `${namespace}.focus`;
+export const HOVER = `${namespace}.hover`;
+export const SUBMIT = `${namespace}.submit`;
+export const ASYNC_VALIDATION = `${namespace}.asyncValidation`;
+export const SAVE_STATE = `${namespace}.saveState`;
+
+import * as _self from './actionTypes';
+export default _self;

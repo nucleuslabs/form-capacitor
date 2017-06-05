@@ -1,11 +1,10 @@
-const path = require('path');
-const srcDir = path.resolve(__dirname,'../../src');
-const {ProvidePlugin} = require('webpack');
-const SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
+import Path from 'path';
+import {ProvidePlugin} from 'webpack';
+import SvgStorePlugin from 'external-svg-sprite-loader/lib/SvgStorePlugin';
+const srcDir = Path.resolve(__dirname,'../../dist/web');
 
-// TODO: move this under examples/.
 
-module.exports = {
+export default {
     context: __dirname,
     entry: './entry',
     output: {
@@ -18,7 +17,7 @@ module.exports = {
         rules: [
             {
                 test: /\.jsx?$/,
-                include: [__dirname,srcDir],
+                include: __dirname,
                 loader: 'babel-loader',
                 options: {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
@@ -27,7 +26,7 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|gif)($|\?)/i,
-                include: [__dirname],
+                include: __dirname,
                 loader: 'url-loader',
                 options: {
                     limit: 1024*2,
@@ -35,12 +34,12 @@ module.exports = {
             },
             {
                 test: /\.svg($|\?)/i,
-                include: [__dirname],
+                include: __dirname,
                 loader: 'external-svg-sprite-loader',
             },
             {
                 test: /\.less$/,
-                include: [__dirname],
+                include: __dirname,
                 use: [
                     'style-loader',
                     {loader: 'css-loader', options: {importLoaders: 2}},

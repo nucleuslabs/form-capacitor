@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const setIn = require('lodash/fp/set');
-const actionTypes = require('./actionTypes');
-const namespace = require('./namespace');
-const toPath = require('lodash/toPath');
+import * as _ from 'lodash';
+import setIn from 'lodash/fp/set';
+import actionTypes from './actionTypes';
+import namespace from './namespace';
+import toPath from 'lodash/toPath';
 
-module.exports = function createReducer(data) {
+export default function createReducer(data) {
     let initialState = {};
     
     if(data) {

@@ -1,17 +1,18 @@
-const React = require('react');
-const PropTypes = require('prop-types');
-const { connect, connectAdvanced } = require('react-redux');
-const util = require('./util');
-const _ = require('lodash');
-const getOr = require('lodash/fp/getOr');
+import React from 'react';
+import PropTypes from 'prop-types';
+import {connect,connectAdvanced} from 'react-redux';
+import * as util from './util';
+import * as _ from 'lodash';
 const {toPath} = _;
-const {compose, mapProps, getContext, toClass, withProps, withPropsOnChange, pure, shouldUpdate} = require('recompose');
-const namespace = require('./namespace');
-const { createSelector, defaultMemoize, createSelectorCreator } = require('reselect');
-const shallowEqual = require('./shallowEqual');
-const actions = require('./actionCreators');
-const DeepMap = require('./DeepMap');
-const {emptyObject, emptyArray} = require('./consts');
+import getOr from 'lodash/fp/getOr';
+import {compose, mapProps, getContext, toClass, withProps, withPropsOnChange, pure, shouldUpdate} from 'recompose';
+import namespace from './namespace';
+import { createSelector, defaultMemoize, createSelectorCreator } from 'reselect';
+import shallowEqual from './shallowEqual';
+
+import * as actions from './actionCreators';
+import DeepMap from './DeepMap';
+import {emptyObject, emptyArray} from './consts';
 
 const defaultValueGetter = (_,p) => p.defaultValue;
 const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], emptyObject);
@@ -171,7 +172,7 @@ function mapDispatchToProps(dispatch, formId, name) {
     };
 }
 
-function connectField() {
+export default function connectField() {
     return compose(
         toClass,
         getContext({form: PropTypes.object}),
@@ -278,6 +279,3 @@ function selectorFactory(dispatch, factoryOptions) {
         return prevProps = nextProps;
     }
 }
-
-
-module.exports = connectField;

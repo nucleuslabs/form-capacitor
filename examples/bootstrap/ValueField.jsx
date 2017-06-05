@@ -1,9 +1,9 @@
-const React = require('react');
-const {PropTypes} = React;
-const util = require('form-capacitor/util');
-const css = require('./ValueField.less');
-const connectField = require('form-capacitor/connectField');
-const classNames = require('classnames');
+import React from 'react';
+import PropTypes from 'prop-types';
+import {util, connectField} from 'form-capacitor';
+import css from './ValueField.less';
+import classNames from 'classnames';
+
 
 class StatelessValueField extends React.PureComponent {
 
@@ -28,7 +28,7 @@ class StatelessValueField extends React.PureComponent {
         };
 
         let wrapClassName;
-        let myClassNames = []
+        let myClassNames = [];
         if(rules.length && (ui.wasFocused || ui.formValidated)) {
             if(errors.length === 0) {
                 myClassNames.push(css.fieldValid);
@@ -132,4 +132,4 @@ ValueField.defaultProps = {
 };
 
 
-module.exports = ValueField;
+export default ValueField;

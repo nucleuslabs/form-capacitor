@@ -1,10 +1,10 @@
-const {Provider} = require('react-redux');
-const {withProps} = require('recompose');
-const {createStore, combineReducers} = require('redux');
-const namespace = require('./namespace');
-const createReducer = require('./createReducer');
+import {Provider} from 'react-redux';
+import {withProps} from 'recompose';
+import {createStore, combineReducers} from 'redux';
+import namespace from './namespace';
+import createReducer from './createReducer';
 
-module.exports = withProps(props => ({
+export default withProps(props => ({
     store: createStore(
         combineReducers({
             [namespace]: createReducer(props.data),
