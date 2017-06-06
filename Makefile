@@ -23,6 +23,11 @@ yarn.lock:: node_modules
 node_modules .deps:
 	mkdir -p $@
 
+patch: .deps/dist
+	npm version patch
+	cp package.json dist/package.json
+	npm publish dist
+	
 publish: .deps/dist
 	yarn version
 	cp package.json dist/package.json
