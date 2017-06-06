@@ -7,8 +7,8 @@ SRC_FILES := $(shell find src -name '*.js')
 # disable default suffixes
 .SUFFIXES:
 
-.deps/dist: $(SRC_FILES) yarn.lock .deps
-	rm -rf dist/*
+.deps/dist: $(SRC_FILES) yarn.lock .deps bundilio.config.js
+#	rm -rf dist/*
 	node --trace-warnings $(BIN)/bundilio .
 	@touch $@
 
