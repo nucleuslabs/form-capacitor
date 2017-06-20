@@ -61,7 +61,7 @@ function selectorFactory(dispatch, factoryOptions) {
         return Array.from(form.fields.values()).every(f => f.props.errors.length === 0);
     });
 
-    const setField = defaultMemoize((dispatch, form) => (name, value, data) => {
+    const setField = defaultMemoize((dispatch, form, data) => (name, value) => {
         if(_.isFunction(value)) {
             let prevValue = _.get(data, name);
             if(prevValue === undefined) {
@@ -90,7 +90,6 @@ function selectorFactory(dispatch, factoryOptions) {
             }, 0);
         }
     });
-    const data = Object.assign({}, ...state => _.get(state, 'data', emptyObject));
     const saveState = defaultMemoize((dispatch, form, data) => () => {
         dispatch(actions.saveState(form.id, data));
     });
