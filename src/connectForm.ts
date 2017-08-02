@@ -1,8 +1,8 @@
 
 
-export default function connectForm(schema) {
+export default function connectForm(schema: any) {
     
-    return WrappedComponent => {
+    return (WrappedComponent: React.ComponentClass) => {
         return WrappedComponent;
     }
 }
