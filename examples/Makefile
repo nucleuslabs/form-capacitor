@@ -1,8 +1,5 @@
-BIN := node_modules/.bin
-SRC_FILES := $(shell find src -name '*.js')
-
 # these are not files
-.PHONY: clean test publish dev
+.PHONY: all clean
 
 # disable default suffixes
 .SUFFIXES:

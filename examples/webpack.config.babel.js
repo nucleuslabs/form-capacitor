@@ -58,9 +58,9 @@ export default {
     },
     devtool: 'cheap-module-eval-source-map',
     plugins: [
-        new ProvidePlugin({
-            React: 'react',
-        }),
-        // new CheckerPlugin(),
+        // new ProvidePlugin({
+        //     React: 'react',
+        // }),
+        new CheckerPlugin(),
     ]
 };

@@ -17,18 +17,18 @@
     ],
     "moduleResolution": "node",
     "declaration": true,
-    "module": "commonjs",
+    "module": "ESNext",
     "types": [
-      "node",
-      "react",
-      "react-dom"
+      "node"
     ],
     "baseUrl": ".",
     "paths": {
       "form-capacitor": [
         ".."
       ]
-    }
+    },
+    "jsx": "React",
+    "allowSyntheticDefaultImports": true
   },
   "files": [
     "src/index.tsx"
