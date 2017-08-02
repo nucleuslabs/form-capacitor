@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.3",
+  "version": "0.2.7",
   "description": "Form manager for React/Redux",
   "browser": "web",
   "main": "node",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-loader": "^7.0.0",
-    "bundilio": "^0.3.2",
+    "bundilio": "^0.3.4",
     "concurrently": "^3.1.0",
     "css-loader": "^0.26.1",
     "external-svg-sprite-loader": "^2.2.0",

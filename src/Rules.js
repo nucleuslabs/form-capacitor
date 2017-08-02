@@ -57,16 +57,16 @@ export function range(min, max, message = (value, min, max) => `Please enter a v
 }
 
 export function digits(message = (value) => `Please enter only digits.`) {
-    return custom(value => /^\d*$/.test(value), message());
+    return custom(value => /^\d+$/.test(value), {id: 'digits', message});
 }
 
 /**
- * @param {bool} negative
+ * @param {boolean} negative
  * @param message
  * @returns {{id, isAsync, message, validate, precondition, dependsOn, isOptional, type, compare}|*}
  */
 export function realNumber(negative = false, message = (value) => `Please enter a valid number.`) {
-    return custom(value => (!negative || value >= 0) && /^-?(?:\d+|\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(value), message());
+    return custom(value => (!negative || value >= 0) && /^-?(?:(?:\d+|\d{1,3}(?:,\d{3})+)?(?:\.\d*)?|\.\d+)$/.test(value), {id: 'realNumber', message});
 }
 
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
