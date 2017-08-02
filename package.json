@@ -1,14 +1,14 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "Form manager for React/Redux",
-  "browser": "web",
-  "main": "node",
+  "main": "src/index.ts",
   "keywords": [
     "form",
     "manager",
     "react",
-    "redux"
+    "redux",
+    "state"
   ],
   "author": "Mark Penner <mpenner@nucleuslabs.com>",
   "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",

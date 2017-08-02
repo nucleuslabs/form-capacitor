@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "form-capacitor": "file:..",
+    "react": "^15.6.1",
+    "react-redux": "^5.0.5",
+    "redux": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/react": "^16.0.0"
+  }
+}

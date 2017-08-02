@@ -1,0 +1,3 @@
+- [JSON Schema](http://json-schema.org/documentation.html)
+- [Understanding JSON Schema](https://spacetelescope.github.io/understanding-json-schema/)
+- [Ajv: Another JSON Schema Validator](https://github.com/epoberezkin/ajv)
