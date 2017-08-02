@@ -6,7 +6,7 @@
 
 #--open
 all: yarn.lock
-	npx webpack-dev-server --hot --inline --colors --port 3123 --content-base src
+	npx webpack-dev-server --hot --inline --colors --port 3123 --content-base src --history-api-fallback /
 
 yarn.lock:: package.json
 	@yarn install --production=false
