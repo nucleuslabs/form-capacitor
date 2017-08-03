@@ -1,4 +1,4 @@
-import {connectForm} from 'form-capacitor';
+import {connectForm, withSchema} from 'form-capacitor';
 
 function SchedulingInstruction() {
     
