@@ -11,8 +11,8 @@ export interface TextBoxProps extends React.InputHTMLAttributes<HTMLInputElement
     // name: string,
 }
 
-export function TextBox({dispatch, name, ...attrs}: TextBoxProps) {
-    return <input type="text" className="form-control" {...attrs}/>
+export function TextBox({dispatch, ...attrs}: TextBoxProps) {
+    return <input type="text" onChange={ev => dispatch(ev.target.value)} className="form-control" {...attrs}/>
 }
 
 export default compose(
@@ -23,7 +23,7 @@ export default compose(
     //     propName: 'onChange',
     //     handler: ({dispatch,name}) => ev => dispatch(name, ev.target.value),
     // }),
-    withHandler('onChange', ({dispatch,name}) => ev => dispatch(name, ev.target.value)),
+    // withHandler('onChange', ({dispatch,name}) => ev => dispatch(name, ev.target.value)),
     withSchema({
         type: "string",
     })
