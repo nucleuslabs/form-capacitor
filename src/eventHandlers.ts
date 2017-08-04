@@ -1,13 +1,14 @@
 import {DispatchFn} from './types/misc';
+import {SyntheticEvent} from 'react';
 
 // export const inputChanged = (dispatch: DispatchFn, name: string) => (ev: React.ChangeEvent<HTMLInputElement>) => dispatch(name, ev.target.value);
 
 export function inputChanged(ev: React.ChangeEvent<HTMLInputElement>) {
-    return ev.target.value;
+    return ev.currentTarget.value;
 }
 
 export function checkboxChanged(ev: React.ChangeEvent<HTMLInputElement>) {
-    return ev.target.checked;
+    return ev.currentTarget.checked;
 }
 
 // FIXME: need to incorporate "name" somehow.....

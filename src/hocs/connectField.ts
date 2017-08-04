@@ -8,7 +8,7 @@ import ActionTypes from '../ActionTypes';
 import getOr from 'lodash/fp/getOr';
 import {toPath} from 'lodash';
 import {contextTypes,getPath,FIELD_PATH} from '../context';
-import withRoot from './mountPoint';
+import mountPoint from './mountPoint';
 import {AnyObject, DispatchFn} from '../types/misc';
 
 export interface ConnectOptions {
@@ -47,10 +47,10 @@ export default function connectField<TProps=AnyObject>({
             };
             
             return () => dispatchProps;
-        }, (stateProps, dispatchProps, {[FIELD_PATH]: _, ...ownProps}) => {
+        }, (stateProps, dispatchProps, {[FIELD_PATH]: _, [nameProp]: _, ...ownProps}) => {
             return {...stateProps, ...dispatchProps, ...ownProps}; 
         }),
-        withRoot(p => p[nameProp]),
+        mountPoint(p => p[nameProp]),
     );
 }
 

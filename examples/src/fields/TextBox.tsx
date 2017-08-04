@@ -11,13 +11,17 @@ import {connectField, withSchema, inputChanged, withHandler} from 'form-capacito
     // name: string,
 // }
 
-type TextBoxProps = React.InputHTMLAttributes<HTMLInputElement>;
-
-export function TextBox({dispatch, ...attrs}) {
-    return <input type="text" onChange={ev => dispatch(ev.target.value)} className="form-control" {...attrs}/>
+export function TextBox(attrs: React.InputHTMLAttributes<HTMLInputElement>) {
+    return <input className="form-control" {...attrs}/>
 }
 
-export default connectField<TextBoxProps>()(TextBox);
+
+export default compose(
+    connectField(), // TODO: bake withHandler into connectField() too?
+    withHandler(),
+)(TextBox);
+
+// export default connectField<TextBoxProps>()(TextBox);
 
 // export default compose(
 //     connectField({

@@ -9,7 +9,7 @@ import ActionTypes from '../ActionTypes';
 
 export type MapFn<T, U> = (input: T) => U;
 
-export type DispatchFn = (name: string, value: any) => void;
+export type DispatchFn = (value: any) => void;
 
 declare global {
     interface Window {
