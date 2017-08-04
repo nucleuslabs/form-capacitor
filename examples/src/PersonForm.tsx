@@ -1,8 +1,8 @@
 import React from 'react';
 import TextBox from './fields/TextBox';
-import {withSchema} from 'form-capacitor';
-import {JsonSchema} from '../../src/types/json-schema';
-import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
+import {mountPoint} from 'form-capacitor';
+// import {JsonSchema} from '../../src/types/json-schema';
+// import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
 
 export interface PersonFormProps {
 
@@ -17,7 +17,7 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
             <div className="form-group">
                 <label className="col-sm-2 control-label">First Name</label>
                 <div className="col-sm-10">
-                    <TextBox name="firstName"/>
+                    <TextBox name="firstName" />
                 </div>
             </div>
             <div className="form-group">
@@ -36,11 +36,7 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
     )
 };
 // export default PersonForm;
-export default compose(
-    connectField({
-
-    }),
-)(PersonForm);
+export default mountPoint()(PersonForm);
 
 
 

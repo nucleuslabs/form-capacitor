@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
+    "noImplicitAny" :false,
     "importHelpers": false,
     "removeComments": false,
     "preserveConstEnums": false,

@@ -1,12 +1,15 @@
-import {withProps, mapProps, getContext, withContext} from 'recompose';
-import {compose, InferableComponentEnhancerWithProps, shallowEqual} from 'recompose';
-import {connect} from 'react-redux';
+import {
+    withProps, mapProps, getContext, withContext, compose, InferableComponentEnhancerWithProps, shallowEqual,
+    ComponentEnhancer
+} from 'recompose';
+import {connect as connectRedux} from 'react-redux';
 import namespace from '../namespace';
 import ActionTypes from '../ActionTypes';
 import getOr from 'lodash/fp/getOr';
-import toPath from 'lodash/toPath';
+import {toPath} from 'lodash';
 import {contextTypes,getPath,FIELD_PATH} from '../context';
-import {bindActionCreators} from 'redux';
+import withRoot from './mountPoint';
+import {AnyObject, DispatchFn} from '../types/misc';
 
 export interface ConnectOptions {
     nameProp?: string,
@@ -14,16 +17,21 @@ export interface ConnectOptions {
     dispatchProp?: string,
 }
 
+export interface ConnectProps {
+    name: string,
+    value: any,
+    dispatch: DispatchFn
+}
 
-export default function connectField({
+export default function connectField<TProps=AnyObject>({
          nameProp = 'name',
          valueProp = 'value',
          dispatchProp = 'dispatch'
-     }: ConnectOptions) {
+     }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
     
     return compose(
         getContext(contextTypes),
-        connect((state, ownProps) => {
+        connectRedux((state, ownProps: TProps) => {
             const path = [namespace,...getPath(ownProps),...toPath(ownProps[nameProp])];
             // console.log('connnnect',path,ownProps[FIELD_PATH]);
             const value = getOr(''/*FIXME: should pull default from schema? or undefined and schema HOC can set it after the fact*/, path, state);
@@ -31,23 +39,18 @@ export default function connectField({
             return {
                 [valueProp]: value
             };
-        }, (dispatch,ownProps) => {
-            const path = [...getPath(ownProps),...toPath(ownProps[nameProp])];
+        }, (dispatch,ownProps: TProps) => {
+            const path: string[] = [...getPath(ownProps),...toPath(ownProps[nameProp])];
            
             const dispatchProps = {
-                [dispatchProp]: value => dispatch({type: ActionTypes.Change, payload: {path, value}}),
+                [dispatchProp]: (value: any) => dispatch({type: ActionTypes.Change, payload: {path, value}}),
             };
             
             return () => dispatchProps;
         }, (stateProps, dispatchProps, {[FIELD_PATH]: _, ...ownProps}) => {
             return {...stateProps, ...dispatchProps, ...ownProps}; 
         }),
-        withContext(contextTypes, ownProps => {
-            // FIXME: this is causing siblings to re-render...
-            const path = [...getPath(ownProps),...toPath(ownProps[nameProp])];
-            return {[FIELD_PATH]: path};
-
-        }),
+        withRoot(p => p[nameProp]),
     );
 }
 

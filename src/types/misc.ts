@@ -17,9 +17,13 @@ declare global {
     }
 }
 
-export interface Action<T={[k:string]:any}> extends ReduxAction {
+export interface AnyObject {
+    [x: string]: any
+}
+
+export interface Action<T=AnyObject> extends ReduxAction {
     type: ActionTypes,
-    payload?: T;
+    payload: T;
     error?: boolean;
 }
 

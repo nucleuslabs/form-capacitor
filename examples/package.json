@@ -1,6 +1,8 @@
 {
+  "name": "form-capacitor-example",
+  "version": "0.0.0",
+  "license": "MIT",
   "dependencies": {
-    "@types/ajv": "^1.0.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.5",
@@ -15,7 +17,9 @@
     "@types/react-router": "^4.0.14",
     "@types/react-router-dom": "^4.0.7",
     "awesome-typescript-loader": "^3.2.2",
-    "url-loader": "^0.5.9",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.24.1",
+    "typescript": "^2.4.2",
     "webpack": "^3.4.1",
     "webpack-dev-server": "^2.6.1"
   }

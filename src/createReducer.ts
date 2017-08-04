@@ -1,8 +1,8 @@
 import ActionTypes from './ActionTypes';
-import {Action} from './types/misc';
+import {Action, AnyObject} from './types/misc';
 import setIn from 'lodash/fp/set';
 
-export default function createReducer(initialState: {[k:string]:any} = {}) {
+export default function createReducer(initialState: AnyObject = {}) {
     return (state = initialState, action: Action) => {
         const {payload} = action;
         switch(action.type) {
