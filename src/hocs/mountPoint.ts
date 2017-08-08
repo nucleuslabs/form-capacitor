@@ -1,4 +1,4 @@
-import {ComponentEnhancer, withContext} from 'recompose';
+import {ComponentEnhancer, withContext as setContext} from 'recompose';
 import {connect} from 'react-redux';
 import {toPath} from 'lodash';
 import {contextTypes, getPath, FIELD_PATH, ContextType} from '../context';
@@ -11,7 +11,7 @@ function getName(props: AnyObject) {
 }
 
 export default function mountPoint<TProps=AnyObject>(mapPropsToName: string|MapFn<TProps, string>=getName) {
-    return withContext<ContextType,TProps>(contextTypes, ownProps => {
+    return setContext<ContextType,TProps>(contextTypes, ownProps => {
         // FIXME: this is causing siblings to re-render...
         return {[FIELD_PATH]: [...getPath(ownProps),...toPath(resolveValue(mapPropsToName,ownProps))]};
     })

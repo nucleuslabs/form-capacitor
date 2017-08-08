@@ -1,4 +1,4 @@
-function memoize(fn) {
+export default function memoize(fn) {
     let lastArgs, lastValue;
     return function memoized(...args) {
         // console.log(args,lastArgs,lastArgs !== undefined && arrayEqual(args, lastArgs));

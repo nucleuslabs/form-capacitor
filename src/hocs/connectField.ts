@@ -1,15 +1,14 @@
-import {
-    withProps, mapProps, getContext, withContext, compose, InferableComponentEnhancerWithProps, shallowEqual,
-    ComponentEnhancer
-} from 'recompose';
+import { compose,ComponentEnhancer} from 'recompose';
 import {connect as connectRedux} from 'react-redux';
 import namespace from '../namespace';
 import ActionTypes from '../ActionTypes';
 import getOr from 'lodash/fp/getOr';
 import {toPath} from 'lodash';
-import {contextTypes,getPath,FIELD_PATH} from '../context';
+import {getPath,FIELD_PATH} from '../context';
 import mountPoint from './mountPoint';
 import {AnyObject, DispatchFn} from '../types/misc';
+import withContext from './withContext';
+import memoize from '../memoize';
 
 export interface ConnectOptions {
     nameProp?: string,
@@ -30,7 +29,7 @@ export default function connectField<TProps=AnyObject>({
      }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
     
     return compose(
-        getContext(contextTypes),
+        withContext(),
         connectRedux((state, ownProps: TProps) => {
             const path = [namespace,...getPath(ownProps),...toPath(ownProps[nameProp])];
             // console.log('connnnect',path,ownProps[FIELD_PATH]);
@@ -39,50 +38,19 @@ export default function connectField<TProps=AnyObject>({
             return {
                 [valueProp]: value
             };
-        }, (dispatch,ownProps: TProps) => {
-            const path: string[] = [...getPath(ownProps),...toPath(ownProps[nameProp])];
-           
-            const dispatchProps = {
-                [dispatchProp]: (value: any) => dispatch({type: ActionTypes.Change, payload: {path, value}}),
-            };
+        }, () => {
+            const getDispatchProps = memoize((dispatch,path,name) => {
+                const fullPath: string[] = [...path,...toPath(name)];
+                
+                return {
+                    [dispatchProp]: (value: any) => dispatch({type: ActionTypes.Change, payload: {path: fullPath, value}}),
+                };
+            });
             
-            return () => dispatchProps;
+            return (dispatch, ownProps: TProps) => getDispatchProps(dispatch, getPath(ownProps), ownProps[nameProp]);
         }, (stateProps, dispatchProps, {[FIELD_PATH]: _, [nameProp]: _, ...ownProps}) => {
             return {...stateProps, ...dispatchProps, ...ownProps}; 
         }),
         mountPoint(p => p[nameProp]),
     );
 }
-
-/**
- * 
- *  console.log('aaa');
-
- const path = [...getPath(ownProps),...toPath(name)];
- const dispatchProps = {
-                [dispatchProp]: value => {
-                    console.log('ccc',value,dispatch);
-                    return dispatch({type: ActionTypes.Change, payload: {path, value}});
-                }
-            };
-
- return dispatch2 => {
-                console.log('bbb',dispatch==dispatch2);
-                return dispatchProps;
-            }
-
-
- const dispatchProps = memoize((dispatch, basePath, name) => {
-                const path = [...basePath,...toPath(name)];
-                return {
-                    [dispatchProp]: value => dispatch({type: ActionTypes.Change, payload: {path, value}})
-                };
-            });
-
-
- console.log('qqqq',nameProp,ownProps);
-
-
- return dispatch => dispatchProps(dispatch, getPath(ownProps), ownProps[nameProp]);
- 
- */
