@@ -1,12 +1,20 @@
-import {mapProps, withProps} from 'recompose';
-import {ChangeEvent, ChangeEventHandler, EventHandler, ReactEventHandler, SyntheticEvent} from 'react';
-import {DispatchFn} from '../types/misc';
-import {inputChanged} from '../eventHandlers';
+import {mapProps, withProps, InferableComponentEnhancerWithProps} from 'recompose';
+import {ReactEventHandler} from 'react';
+import {AnyObject} from '../types/misc';
 
 
-export default function withHandler(propName='onChange', handler: ReactEventHandler<any>=inputChanged) {
+// const withHandler: InferableComponentEnhancerWithProps<TInner, TOutter> = (propName:string, handler: ReactEventHandler<any>) => mapProps(({dispatch, ...other}) => ({
+//     ...other,
+//     [propName]: ev => dispatch(handler(ev)),
+// }));
+//
+// export default withHandler;
+
+export type EventHandler = (event: ReactEventHandler<any>, props: AnyObject) => void;
+
+export default function withHandler(propName: string, handler: EventHandler) {
     return mapProps(({dispatch, ...other}) => ({
         ...other,
-        [propName]: ev => dispatch(handler(ev)),
+        [propName]: ev => dispatch(handler(ev, other)),
     }))
 }

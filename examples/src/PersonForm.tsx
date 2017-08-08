@@ -1,6 +1,9 @@
 import React from 'react';
 import TextBox from './fields/TextBox';
 import {mountPoint} from 'form-capacitor';
+import NumberBox from './fields/NumberBox';
+import DatePicker from './fields/DatePicker';
+import {formatDate} from './util';
 // import {JsonSchema} from '../../src/types/json-schema';
 // import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
 
@@ -29,7 +32,13 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
             <div className="form-group">
                 <label className="col-sm-2 control-label">Age in years</label>
                 <div className="col-sm-10">
-                    <TextBox name="age"/>
+                    <NumberBox name="age"/>
+                </div>
+            </div>
+            <div className="form-group">
+                <label className="col-sm-2 control-label">Birth Date</label>
+                <div className="col-sm-10">
+                    <DatePicker name="birthDate" max={formatDate(new Date())}/>
                 </div>
             </div>
         </div>

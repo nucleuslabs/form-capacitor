@@ -4,3 +4,6 @@
 export function resolveValue<T>(this: any, functionOrValue: ((...args: any[]) => T)|T, ...args: any[]): T {
     return typeof functionOrValue === 'function' ? functionOrValue.call(this, ...args) : functionOrValue;
 }
+
+export const defaultDeserialize = x => x === undefined ? '' : String(x);
+export const defaultSerialize = x => x;

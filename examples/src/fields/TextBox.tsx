@@ -1,6 +1,7 @@
 import React from 'react';
 import {compose} from 'recompose';
-import {connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
+import {withValueDispatch, withSchema, inputChanged, withHandler} from 'form-capacitor';
+import field from '../../../src/hocs/field';
 // import {JsonSchema} from '../../../src/types/json-schema';
 // import {DispatchFn} from '../../../src/types/misc';
 // import withHandler from '../../../src/hocs/withHandler';
@@ -17,10 +18,14 @@ export function TextBox(attrs: TextBoxProps) {
     return <input className="form-control" {...attrs}/>
 }
 
-export default compose(
-    connectField(), // TODO: bake withHandler into connectField() too?
-    withHandler(),
-)(TextBox) as React.ComponentType<TextBoxProps & {name: string}>;
+export default field({
+    eventHandler: inputChanged,
+})(TextBox);
+
+// export default compose(
+//     withValueDispatch(), // TODO: bake withHandler into connectField() too?
+//     withHandler(),
+// )(TextBox) as React.ComponentType<TextBoxProps & {name: string}>;
 
 // export default connectField<TextBoxProps>()(TextBox);
 

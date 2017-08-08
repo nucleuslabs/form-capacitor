@@ -2,18 +2,21 @@ import { compose,ComponentEnhancer} from 'recompose';
 import {connect as connectRedux} from 'react-redux';
 import namespace from '../namespace';
 import ActionTypes from '../ActionTypes';
-import getOr from 'lodash/fp/getOr';
+import {get as getValue} from 'lodash';
 import {toPath} from 'lodash';
 import {getPath,FIELD_PATH} from '../context';
 import mountPoint from './mountPoint';
 import {AnyObject, DispatchFn} from '../types/misc';
 import withContext from './withContext';
 import memoize from '../memoize';
+import {defaultDeserialize,defaultSerialize} from '../util';
 
 export interface ConnectOptions {
     nameProp?: string,
     valueProp?: string,
     dispatchProp?: string,
+    deserializeValue?: (value: any) => any,
+    serializeValue?: (value: any) => any,
 }
 
 export interface ConnectProps {
@@ -22,33 +25,43 @@ export interface ConnectProps {
     dispatch: DispatchFn
 }
 
-export default function connectField<TProps=AnyObject>({
+export default function withValueDispatch<TProps=AnyObject>({
          nameProp = 'name',
          valueProp = 'value',
-         dispatchProp = 'dispatch'
+         dispatchProp = 'dispatch',
+         deserializeValue = defaultDeserialize,
+                                                                serializeValue = defaultSerialize,
      }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
     
     return compose(
         withContext(),
-        connectRedux((state, ownProps: TProps) => {
+        connectRedux((state, ownProps) => {
             const path = [namespace,...getPath(ownProps),...toPath(ownProps[nameProp])];
             // console.log('connnnect',path,ownProps[FIELD_PATH]);
-            const value = getOr(''/*FIXME: should pull default from schema? or undefined and schema HOC can set it after the fact*/, path, state);
+
+            // FIXME: should pull default from schema? or undefined and schema HOC can set it after the fact
+            const value = deserializeValue(getValue(state,path));
+            
+            console.log('value',value,getValue(state,path));
+            
             // console.log('mapStateToProps',path,value);
             return {
                 [valueProp]: value
             };
-        }, () => {
-            const getDispatchProps = memoize((dispatch,path,name) => {
+        }, dispatch => {
+            const getDispatchProps = memoize((path,name) => {
                 const fullPath: string[] = [...path,...toPath(name)];
                 
                 return {
-                    [dispatchProp]: (value: any) => dispatch({type: ActionTypes.Change, payload: {path: fullPath, value}}),
+                    [dispatchProp]: (value) => dispatch({type: ActionTypes.Change, payload: {
+                        path: fullPath, 
+                        value: serializeValue(value),
+                    }}),
                 };
             });
             
-            return (dispatch, ownProps: TProps) => getDispatchProps(dispatch, getPath(ownProps), ownProps[nameProp]);
-        }, (stateProps, dispatchProps, {[FIELD_PATH]: _, [nameProp]: _, ...ownProps}) => {
+            return (_, ownProps: TProps) => getDispatchProps(getPath(ownProps), ownProps[nameProp]);
+        }, (stateProps, dispatchProps, {[FIELD_PATH]: _1, [nameProp]: _2, ...ownProps}: {ownProps: TProps}) => {
             return {...stateProps, ...dispatchProps, ...ownProps}; 
         }),
         mountPoint(p => p[nameProp]),
