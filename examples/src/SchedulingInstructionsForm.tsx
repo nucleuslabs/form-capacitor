@@ -1,24 +1,23 @@
 import React from 'react';
-import {connectForm} from 'form-capacitor';
+import {connectForm, form} from 'form-capacitor';
 import SchedulingInstruction from './SchedulingInstruction';
+import {Title} from './bulma';
 
 
-interface Props extends FormProps {
+interface Props {
     data: {
-        instructions: Array<{
-            id: string,
-        }>
+        instructions: object,
     }
 }
 
-class SchedulingInstructionsForm extends React.PureComponent<Props> {
 
-    
-    render() {
-        const {data} = this.props;
-        const {instructions} = data;
-        
-        return (
+const SchedulingInstructionsForm: React.SFC<Props> = ({data}) => {
+    console.log('data', data);
+    const {instructions} = data;
+
+    return (
+        <div>
+            <Title>Scheduling Instructions</Title>
             <table>
                 <thead>
                     <tr>
@@ -31,20 +30,18 @@ class SchedulingInstructionsForm extends React.PureComponent<Props> {
                     </tr>
                 </thead>
                 <tbody>
-                    {instructions.map((inst, i) => <SchedulingInstruction key={inst.id} data={inst} name={`instructions.${i}`}/>)}
+                    {instructions.map((inst, i) =>
+                        <SchedulingInstruction key={inst.id} data={inst} name={`instructions.${i}`}/>)}
                     <SchedulingInstruction key="*" name={`instructions.${instructions.length}`}/>
                 </tbody>
             </table>
-        )
-    }
-}
+        </div>
+    )
+};
 
-export default withSchema({
-    type: 'object',
-    properties: {
-        instructions: {
-            type: SchedulingInstruction,
-            default: [],
-        }
+export default form({
+    name: 'foobar',
+    deserialize: d => d || {
+        instructions: [],
     }
 })(SchedulingInstructionsForm);

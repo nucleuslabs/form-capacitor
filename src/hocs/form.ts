@@ -36,11 +36,11 @@ export default function form<TProps extends AnyObject=AnyObject>({
                                                 }: {
     name?: string|MapFn<TProps, string>,
     eventName?: string,
-    eventHandler: EventHandler,
+    eventHandler?: EventHandler,
     deserialize?: (formData: any, ownProps: TProps) => any,
     dataProp?: string,
     dispatchProp?: string,
-}): ComponentEnhancer<TProps, TProps & ConnectProps> {
+} = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
 
     // TODO: formName should be random/unique (shortid) by default. This will let you put
     // many copies of the same form on the page without collisions. Name should be derived

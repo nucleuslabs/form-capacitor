@@ -1,4 +1,5 @@
-import {connectForm, withSchema} from 'form-capacitor';
+import React from 'react';
+import {connectForm, withSchema,field} from 'form-capacitor';
 
 function SchedulingInstruction() {
     
@@ -14,14 +15,4 @@ function SchedulingInstruction() {
     )
 }
 
-export default withSchema({
-    type: 'object',
-    properties: {
-        typeId: {type: 'integer'},
-        teamId: {type: 'integer'},
-        disciplineId: {type: 'integer'},
-        clinicianId: {type: 'integer'},
-        prefTime: {type: 'integer'},
-        childRequired: {type: 'string'},
-    }
-})(SchedulingInstruction);
+export default field()(SchedulingInstruction);

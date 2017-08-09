@@ -7,6 +7,7 @@ import {createReducer} from 'form-capacitor';
 import {createStore, combineReducers, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import {compose} from 'recompose';
+import SchedulingInstructionsForm from './SchedulingInstructionsForm';
 
 /**
  * Logs all actions and states after they are dispatched.
@@ -47,10 +48,11 @@ ReactDOM.render(
     <Provider store={store}>
         <BrowserRouter>
             <div className="container">
-                <h3><Link to="/" className="text-muted">form-capacitor</Link></h3>
+                <div><Link to="/">&laquo; form-capacitor</Link></div>
                 <Switch>
                     <Route exact path="/" component={ExamplesNav}/>
                     <Route exact path="/person" render={() => <PersonForm name="person"/>}/>
+                    <Route exact path="/scheduling" component={SchedulingInstructionsForm}/>
                 </Switch>
             </div>
         </BrowserRouter>
