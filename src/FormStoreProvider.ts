@@ -1,16 +1,16 @@
 import {Provider} from 'react-redux';
 import {withProps} from 'recompose';
-import {createStore, combineReducers, Store} from 'redux';
+import {createStore, combineReducers, Store, applyMiddleware} from 'redux';
 import namespace from './namespace';
 import createReducer from './createReducer';
 import {ComponentType} from 'react';
 
-export default withProps(props => ({
+export default withProps(({serialize=true}) => ({
     store: createStore(
         combineReducers({
             [namespace]: createReducer(),
         }),
-        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__({serialize})
     )
 }))(Provider as ComponentType<{ store: Store<any>; }>);
 

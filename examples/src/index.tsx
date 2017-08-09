@@ -3,10 +3,48 @@ import ReactDOM from 'react-dom';
 import ExamplesNav from './ExamplesNav';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import PersonForm from './PersonForm';
-import {FormStoreProvider} from 'form-capacitor';
+import {createReducer} from 'form-capacitor';
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import {Provider} from 'react-redux';
+import {compose} from 'recompose';
+
+/**
+ * Logs all actions and states after they are dispatched.
+ */
+const logger = store => next => action => {
+    console.group(action.type);
+    console.info('dispatching', action);
+    let result = next(action);
+    console.log('next state', store.getState());
+    console.groupEnd(action.type);
+    return result
+};
+
+let middleware = [logger];
+
+const composeEnhancers =
+    typeof window === 'object' &&
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+        window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+            // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+            serialize: true
+        }) : compose;
+
+const enhancer = composeEnhancers(
+    applyMiddleware(...middleware),
+    // other store enhancers if any
+);
+
+const store = createStore(
+    combineReducers({
+        formCapacitor: createReducer(),
+    }),
+    enhancer
+);
+
 
 ReactDOM.render(
-    <FormStoreProvider>
+    <Provider store={store}>
         <BrowserRouter>
             <div className="container">
                 <h3><Link to="/" className="text-muted">form-capacitor</Link></h3>
@@ -16,6 +54,6 @@ ReactDOM.render(
                 </Switch>
             </div>
         </BrowserRouter>
-    </FormStoreProvider>,
+    </Provider>,
     document.getElementById('react-root')
 );

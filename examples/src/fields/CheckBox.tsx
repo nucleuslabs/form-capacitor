@@ -19,14 +19,16 @@ export default field({
         if(value !== undefined) {
             return value;
         }
-        return props.multiple ? [] : false;
+        return props.multiple ? new Set() : false;
     },
     eventHandler(ev, props: CheckBoxProps) {
         if(props.multiple) {
             if(ev.currentTarget.checked) {
-                return [...props.currentValue, props.value];
+                return new Set([...props.currentValue, props.value]);
             }
-            return arrayWithout(props.currentValue, props.value);
+            let copy = new Set(props.currentValue);
+            copy.delete(props.value);
+            return copy;
         } 
         return ev.currentTarget.checked;
     },

@@ -56,7 +56,7 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
             <div className="form-group">
                 <div className="col-sm-2"/>
                 <div className="col-sm-10">
-                    <label><input type="checkbox"/> Is Aboriginal</label>
+                    <label><CheckBox name="isAboriginal"/> Is Aboriginal</label>
                 </div>
             </div>
             <div className="form-group">
