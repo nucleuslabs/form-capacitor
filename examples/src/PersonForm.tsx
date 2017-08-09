@@ -1,6 +1,6 @@
 import React from 'react';
 import TextBox from './fields/TextBox';
-import {mountPoint} from 'form-capacitor';
+import {mountPoint,form} from 'form-capacitor';
 import NumberBox from './fields/NumberBox';
 import DatePicker from './fields/DatePicker';
 import CheckBox from './fields/CheckBox';
@@ -24,10 +24,12 @@ export interface PersonFormProps {
 const pleaseSelect = {value: null, label: "– Please Select –"};
 const primaryLanguages = [pleaseSelect, ...languages];
 
-const PersonForm: React.SFC<PersonFormProps> = props => {
+
+
+const PersonForm: React.SFC<PersonFormProps> = ({onSubmit}) => {
     
     return (
-        <div>
+        <form onSubmit={onSubmit}>
             <Title>Person Form</Title>
             <FieldRow>
                 <FieldLabel normal>Name</FieldLabel>
@@ -70,10 +72,10 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
                 </FieldBody>
             </FieldRow>
             <FieldRow>
-                <FieldLabel/>
+                <FieldLabel>Aboriginal?</FieldLabel>
                 <FieldBody>
                     <Control>
-                        <CheckBoxLabel><CheckBox name="isAboriginal"/> Is Aboriginal</CheckBoxLabel>
+                        <CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>
                     </Control>
                 </FieldBody>
             </FieldRow>
@@ -93,11 +95,16 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
                     <SubmitButton>Submit</SubmitButton>
                 </FieldBody>
             </FieldRow>
-        </div>
+        </form>
     )
 };
 // export default PersonForm;
-export default mountPoint()(PersonForm);
+export default form({
+    eventHandler({data}) {
+        
+        console.log('submit',data);
+    }
+})(PersonForm);
 
 
 

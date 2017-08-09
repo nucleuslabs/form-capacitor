@@ -9,7 +9,7 @@ import mountPoint from './mountPoint';
 import {AnyObject, DispatchFn} from '../types/misc';
 import withContext from './withContext';
 import memoize from '../memoize';
-import {defaultDeserialize,defaultSerialize} from '../util';
+import {defaultDeserializeField,defaultSerialize} from '../util';
 
 export interface ConnectOptions {
     nameProp?: string,
@@ -30,7 +30,7 @@ export default function withValueDispatch<TProps=AnyObject>({
          nameProp = 'name',
          valueProp = 'value',
          dispatchProp = 'dispatch',
-         deserializeValue = defaultDeserialize,
+         deserializeValue = defaultDeserializeField,
          serializeValue = defaultSerialize,
         removeName = true,
      }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {

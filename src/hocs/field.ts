@@ -12,7 +12,7 @@ import memoize from '../memoize';
 import withValueDispatch from './withValueDispatch';
 import {ReactEventHandler} from 'react';
 import withHandler, {EventHandler} from './withHandler';
-import {defaultSerialize,defaultDeserialize} from '../util';
+import {defaultSerialize,defaultDeserializeField} from '../util';
 
 export interface ConnectOptions {
     nameProp?: string,
@@ -41,7 +41,7 @@ export default function field<TProps=AnyObject>({
                                                     valueProp = 'value',
                                                     dispatchProp = 'dispatch',
                                                     eventName = 'onChange',
-                                                    deserializeValue = defaultDeserialize,
+                                                    deserializeValue = defaultDeserializeField,
                                                     serializeValue = defaultSerialize,
                                                     eventHandler,
                                                     removeName = true,
@@ -54,7 +54,7 @@ export default function field<TProps=AnyObject>({
     ];
 
     if (eventHandler) {
-        hocs.push(withHandler({event: eventName, handler: eventHandler});
+        hocs.push(withHandler({event: eventName, handler: eventHandler}));
     }
 
     return compose(...hocs);

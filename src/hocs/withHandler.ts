@@ -19,7 +19,7 @@ export type EventHandler = (event: SyntheticEvent<any>, props: AnyObject) => voi
 //     }))
 // }
 
-export default function withHandler({event = 'onChange', handler, removeDispatch=true, dispatchProp='dispatch'}: {event: string, handler:EventHandler, removeDispatch: boolean, dispatchProp: string}) {
+export default function withHandler({event = 'onChange', handler, removeDispatch=true, dispatchProp='dispatch'}: {event?: string, handler:EventHandler, removeDispatch?: boolean, dispatchProp?: string}) {
     return mapProps(({[dispatchProp]: dispatch, ...other}) => {
         let ret = {
             ...other,
