@@ -12,13 +12,12 @@ interface Props {
 
 
 const SchedulingInstructionsForm: React.SFC<Props> = ({data}) => {
-    console.log('data', data);
     const {instructions} = data;
 
     return (
         <div>
             <Title>Scheduling Instructions</Title>
-            <table>
+            <table className="table is-striped is-narrow is-fullwidth">
                 <thead>
                     <tr>
                         <th>Appointment Type</th>
@@ -30,9 +29,11 @@ const SchedulingInstructionsForm: React.SFC<Props> = ({data}) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {instructions.map((inst, i) =>
-                        <SchedulingInstruction key={inst.id} data={inst} name={`instructions.${i}`}/>)}
-                    <SchedulingInstruction key="*" name={`instructions.${instructions.length}`}/>
+                    {instructions.length 
+                        ? instructions.map((inst, i) =>
+                            <SchedulingInstruction key={inst.id} data={inst} name={`instructions.${i}`}/>) 
+                        : <SchedulingInstruction name="instructions.0"/>
+                    }
                 </tbody>
             </table>
         </div>
@@ -40,7 +41,7 @@ const SchedulingInstructionsForm: React.SFC<Props> = ({data}) => {
 };
 
 export default form({
-    name: 'foobar',
+    name: 'schedulingInstructions',
     deserialize: d => d || {
         instructions: [],
     }

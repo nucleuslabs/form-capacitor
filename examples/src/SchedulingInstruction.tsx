@@ -1,16 +1,18 @@
 import React from 'react';
 import {connectForm, withSchema,field} from 'form-capacitor';
+import {appointmentTypes, teams, disciplines, clinicians, times} from './options';
+import SelectBox from './fields/SelectBox';
+import CheckBox from './fields/CheckBox';
 
 function SchedulingInstruction() {
-    
     return (
         <tr>
-            <td><select name="typeId"/></td>
-            <td><select name="teamId"/></td>
-            <td><select name="disciplineId"/></td>
-            <td><select name="prefClinician"/></td>
-            <td><select name="prefTime"/></td>
-            <td><input type="checkbox" name="childRequired"/></td>
+            <td><SelectBox name="typeId" options={appointmentTypes}/></td>
+            <td><SelectBox name="teamId" options={teams}/></td>
+            <td><SelectBox name="disciplineId" options={disciplines}/></td>
+            <td><SelectBox name="prefClinician" options={clinicians}/></td>
+            <td><SelectBox name="prefTime" options={times}/></td>
+            <td><CheckBox name="childRequired"/></td>
         </tr>
     )
 }

@@ -36,7 +36,7 @@ export default function withValueDispatch<TProps=AnyObject>({
      }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
     
     return compose(
-        withContext(),
+        withContext(), // TODO: rename to withPath... which'll be getContext+mapPropsOnChange. it'll be a getter/setter
         connectRedux((state, ownProps) => {
             const path = [namespace,...getPath(ownProps),...toPath(ownProps[nameProp])];
             // console.log('connnnect',path,ownProps[FIELD_PATH]);
@@ -52,6 +52,7 @@ export default function withValueDispatch<TProps=AnyObject>({
             };
         }, (dispatch: Dispatch<any>, ownProps: TProps) => {
             const fullPath: string[] = [...getPath(ownProps),...toPath(ownProps[nameProp])];
+            console.log(ownProps[FIELD_PATH],fullPath);
             
             return {
                 [dispatchProp]: (value) => dispatch({type: ActionTypes.Change, payload: {
@@ -77,11 +78,14 @@ export default function withValueDispatch<TProps=AnyObject>({
             const {...props} = ownProps;
             delete props[FIELD_PATH];
             if(removeName) {
-                delete props[nameProp];
+                // delete props[nameProp];
             }
             
             return {...stateProps, ...dispatchProps, ...props}; 
         }),
-        mountPoint(p => p[nameProp]),
+        mountPoint(p => {
+            console.log('mountPoint',p, nameProp, p[nameProp]);
+            return p[nameProp];
+        }),
     );
 }

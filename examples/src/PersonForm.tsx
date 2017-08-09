@@ -15,13 +15,13 @@ import {
 
 // import {JsonSchema} from '../../src/types/json-schema';
 // import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
-import languages from './languages';
+import {languages,pleaseSelect} from './options';
 
 export interface PersonFormProps {
 
 }
 
-const pleaseSelect = {value: null, label: "– Please Select –"};
+
 const primaryLanguages = [pleaseSelect, ...languages];
 
 
