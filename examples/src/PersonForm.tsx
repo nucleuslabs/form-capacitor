@@ -4,6 +4,7 @@ import {mountPoint} from 'form-capacitor';
 import NumberBox from './fields/NumberBox';
 import DatePicker from './fields/DatePicker';
 import CheckBox from './fields/CheckBox';
+import RadioButton from './fields/RadioButton';
 import {formatDate} from './util';
 // import {JsonSchema} from '../../src/types/json-schema';
 // import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
@@ -63,8 +64,9 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
                 <label className="col-sm-2 control-label">Gender</label>
                 <div className="col-sm-10">
                     <ul>
-                        <li className="checkbox"><label><input type="radio" name="gender"/> Male</label></li>
-                        <li className="checkbox"><label><input type="radio" name="gender"/> Female</label></li>
+                        <li className="checkbox"><label><RadioButton name="gender" group="sex" value="M"/> Male</label></li>
+                        <li className="checkbox"><label><RadioButton name="gender" group="sex" value="F"/> Female</label></li>
+                        <li className="checkbox"><label><RadioButton name="gender" group="sex" value="O"/> Other</label></li>
                     </ul>
                 </div>
             </div>

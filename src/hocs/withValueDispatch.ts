@@ -17,6 +17,7 @@ export interface ConnectOptions {
     dispatchProp?: string,
     deserializeValue?: (value: any, props: any) => any,
     serializeValue?: (value: any, props: any) => any,
+    removeName?: boolean,
 }
 
 export interface ConnectProps {
@@ -30,7 +31,8 @@ export default function withValueDispatch<TProps=AnyObject>({
          valueProp = 'value',
          dispatchProp = 'dispatch',
          deserializeValue = defaultDeserialize,
-                                                                serializeValue = defaultSerialize,
+         serializeValue = defaultSerialize,
+        removeName = true,
      }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
     
     return compose(
@@ -42,7 +44,7 @@ export default function withValueDispatch<TProps=AnyObject>({
             // FIXME: should pull default from schema? or undefined and schema HOC can set it after the fact
             const value = deserializeValue(getValue(state,path), ownProps);
             
-            // console.log('value',value,getValue(state,path));
+            // console.log(ownProps[nameProp],value,getValue(state,path));
             
             // console.log('mapStateToProps',path,value);
             return {
@@ -71,8 +73,14 @@ export default function withValueDispatch<TProps=AnyObject>({
             // });
             //
             // return (_, ownProps: TProps) => getDispatchProps(getPath(ownProps), ownProps[nameProp]);
-        }, (stateProps, dispatchProps, {[FIELD_PATH]: _1, [nameProp]: _2, ...ownProps}: {ownProps: TProps}) => {
-            return {...stateProps, ...dispatchProps, ...ownProps}; 
+        }, (stateProps, dispatchProps, ownProps: TProps) => {
+            const {...props} = ownProps;
+            delete props[FIELD_PATH];
+            if(removeName) {
+                delete props[nameProp];
+            }
+            
+            return {...stateProps, ...dispatchProps, ...props}; 
         }),
         mountPoint(p => p[nameProp]),
     );

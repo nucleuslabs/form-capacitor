@@ -20,7 +20,7 @@ const logger = store => next => action => {
     return result
 };
 
-let middleware = [logger];
+let middleware = [/*logger*/];
 
 const composeEnhancers =
     typeof window === 'object' &&

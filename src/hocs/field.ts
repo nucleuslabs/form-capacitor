@@ -22,6 +22,12 @@ export interface ConnectOptions {
     eventHandler?: EventHandler,
     deserializeValue?: (value: any) => any,
     serializeValue?: (value: any) => any,
+    /**
+     * Don't pass the `name` property to the wrapped component.
+     * Usually it's not needed in the HTML because it's tracked by form-capacitor,
+     * but it might be useful for debugging or `<input type="radio" />`.
+     */
+    removeName?: boolean,
 }
 
 export interface ConnectProps {
@@ -37,12 +43,13 @@ export default function field<TProps=AnyObject>({
                                                     changeProp = 'onChange',
                                                     deserializeValue = defaultDeserialize,
                                                     serializeValue = defaultSerialize,
-                                                    eventHandler
+                                                    eventHandler,
+                                                    removeName = true,
                                                 }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
 
 
     let hocs = [
-        withValueDispatch({nameProp, valueProp, dispatchProp, deserializeValue, serializeValue}),
+        withValueDispatch({nameProp, valueProp, dispatchProp, deserializeValue, serializeValue, removeName}),
         mountPoint(p => p[nameProp]),
     ];
 
