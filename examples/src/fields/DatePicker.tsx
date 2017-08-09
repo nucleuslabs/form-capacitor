@@ -6,7 +6,7 @@ import {formatDate} from '../util';
 export type DatePickerProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export function DatePicker(attrs: DatePickerProps) {
-    return <input type="datetime-local" className="form-control" {...attrs}/>
+    return <input type="datetime-local" className="input" {...attrs}/>
 }
 
 export default field({

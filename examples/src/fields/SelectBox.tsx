@@ -1,6 +1,7 @@
 import React from 'react';
 import field from '../../../src/hocs/field';
 import {arrayWithout} from '../util';
+import classNames from 'classnames';
 
 
 export interface SelectBoxProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
@@ -10,8 +11,13 @@ export interface SelectBoxProps extends React.SelectHTMLAttributes<HTMLSelectEle
     options: Array<{value: any, label: string}>,
 }
 
-export function SelectBox({options, ...attrs}: SelectBoxProps) {
-    return <select {...attrs}>{options.map((opt,i) => <option key={i} value={i} children={opt.label}/>)}</select>
+export function SelectBox({options, multiple, ...attrs}: SelectBoxProps) {
+    return (
+        <div className={classNames('select',{'is-multiple': multiple})}>
+            <select {...attrs} multiple={multiple}>{options.map((opt,i) => <option key={i} value={i} children={opt.label}/>)}</select>
+        </div>
+       
+    )
 }
 
 export default field({

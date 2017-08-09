@@ -7,6 +7,12 @@ import CheckBox from './fields/CheckBox';
 import RadioButton from './fields/RadioButton';
 import SelectBox from './fields/SelectBox';
 import {formatDate} from './util';
+import {
+    CheckBoxLabel, Control, FieldBody, FieldLabel, FieldRow, Title1, RadioLabel, SubmitButton,
+    Title2, Title
+} from './bulma';
+
+
 // import {JsonSchema} from '../../src/types/json-schema';
 // import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
 import languages from './languages';
@@ -21,64 +27,72 @@ const primaryLanguages = [pleaseSelect, ...languages];
 const PersonForm: React.SFC<PersonFormProps> = props => {
     
     return (
-        <div className="form-horizontal">
-            <h1>Person Form</h1>
-            <div className="form-group">
-                <label className="col-sm-2 control-label">Name</label>
-                <div className="col-sm-10">
+        <div>
+            <Title>Person Form</Title>
+            <FieldRow>
+                <FieldLabel normal>Name</FieldLabel>
+                <FieldBody>
                     <TextBox name="name" />
-                </div>
-            </div>
-            <div className="form-group">
-                <label className="col-sm-2 control-label">Favourite Number</label>
-                <div className="col-sm-10">
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel normal>Favourite Number</FieldLabel>
+                <FieldBody narrow>
                     <NumberBox name="favNumber"/>
-                </div>
-            </div>
-            <div className="form-group">
-                <label className="col-sm-2 control-label">Birth Date</label>
-                <div className="col-sm-10">
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel normal>Birth Date</FieldLabel>
+                <FieldBody narrow>
                     <DatePicker name="birthDate" max={formatDate(new Date())}/>
-                </div>
-            </div>
-            <div className="form-group">
-                <label className="col-sm-2 control-label">Primary Language</label>
-                <div className="col-sm-10">
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel normal>Primary Language</FieldLabel>
+                <FieldBody>
                     <SelectBox name="primaryLanguageId" options={primaryLanguages}/>
-                </div>
-            </div>
-            <div className="form-group">
-                <label className="col-sm-2 control-label">Secondary Languages</label>
-                <div className="col-sm-10">
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel normal>Secondary Languages</FieldLabel>
+                <FieldBody>
                     <SelectBox multiple name="secondaryLanguageIds" options={languages}/>
-                </div>
-            </div>
-            <div className="form-group">
-                <label className="col-sm-2 control-label">Likes</label>
-                <div className="col-sm-10">
-                    <ul>
-                        <li className="checkbox"><label><CheckBox multiple name="likes" value="hockey"/> Hockey</label></li>
-                        <li className="checkbox"><label><CheckBox multiple name="likes" value="soccer"/> Soccer</label></li>
-                        <li className="checkbox"><label><CheckBox multiple name="likes" value="football"/> Football</label></li>
-                    </ul>
-                </div>
-            </div>
-            <div className="form-group">
-                <div className="col-sm-2"/>
-                <div className="col-sm-10">
-                    <label><CheckBox name="isAboriginal"/> Is Aboriginal</label>
-                </div>
-            </div>
-            <div className="form-group">
-                <label className="col-sm-2 control-label">Gender</label>
-                <div className="col-sm-10">
-                    <ul>
-                        <li className="checkbox"><label><RadioButton name="gender" group="sex" value="M"/> Male</label></li>
-                        <li className="checkbox"><label><RadioButton name="gender" group="sex" value="F"/> Female</label></li>
-                        <li className="checkbox"><label><RadioButton name="gender" group="sex" value="O"/> Other</label></li>
-                    </ul>
-                </div>
-            </div>
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel>Likes</FieldLabel>
+                <FieldBody>
+                    <Control>
+                        <CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>
+                        <CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>
+                        <CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>
+                    </Control>
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel/>
+                <FieldBody>
+                    <Control>
+                        <CheckBoxLabel><CheckBox name="isAboriginal"/> Is Aboriginal</CheckBoxLabel>
+                    </Control>
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel>Gender</FieldLabel>
+                <FieldBody>
+                    <Control>
+                        <RadioLabel><RadioButton name="gender" group="sex" value="M"/> Male</RadioLabel>
+                        <RadioLabel><RadioButton name="gender" group="sex" value="F"/> Female</RadioLabel>
+                        <RadioLabel><RadioButton name="gender" group="sex" value="O"/> Other</RadioLabel>
+                    </Control>
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel/>
+                <FieldBody>
+                    <SubmitButton>Submit</SubmitButton>
+                </FieldBody>
+            </FieldRow>
         </div>
     )
 };

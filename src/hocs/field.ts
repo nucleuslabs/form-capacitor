@@ -18,7 +18,7 @@ export interface ConnectOptions {
     nameProp?: string,
     valueProp?: string,
     dispatchProp?: string,
-    changeProp?: string,
+    eventName?: string,
     eventHandler?: EventHandler,
     deserializeValue?: (value: any) => any,
     serializeValue?: (value: any) => any,
@@ -40,7 +40,7 @@ export default function field<TProps=AnyObject>({
                                                     nameProp = 'name',
                                                     valueProp = 'value',
                                                     dispatchProp = 'dispatch',
-                                                    changeProp = 'onChange',
+                                                    eventName = 'onChange',
                                                     deserializeValue = defaultDeserialize,
                                                     serializeValue = defaultSerialize,
                                                     eventHandler,
@@ -54,7 +54,7 @@ export default function field<TProps=AnyObject>({
     ];
 
     if (eventHandler) {
-        hocs.push(withHandler(changeProp, eventHandler));
+        hocs.push(withHandler({event: eventName, handler: eventHandler});
     }
 
     return compose(...hocs);

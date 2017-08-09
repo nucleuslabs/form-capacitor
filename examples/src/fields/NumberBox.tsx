@@ -5,7 +5,11 @@ import field from '../../../src/hocs/field';
 export type NumberBoxProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export function NumberBox(attrs: NumberBoxProps) {
-    return <input type="number" className="form-control" {...attrs}/>
+    return (
+        <div className="control">
+            <input type="number" className="input" {...attrs}/>
+        </div>
+    )
 }
 
 export default field({
