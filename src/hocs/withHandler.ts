@@ -1,5 +1,5 @@
 import {mapProps, withProps, InferableComponentEnhancerWithProps} from 'recompose';
-import {ReactEventHandler} from 'react';
+import {ReactEventHandler, SyntheticEvent} from 'react';
 import {AnyObject} from '../types/misc';
 
 
@@ -10,7 +10,7 @@ import {AnyObject} from '../types/misc';
 //
 // export default withHandler;
 
-export type EventHandler = (event: ReactEventHandler<any>, props: AnyObject) => void;
+export type EventHandler = (event: SyntheticEvent<any>, props: AnyObject) => void;
 
 export default function withHandler(propName: string, handler: EventHandler) {
     return mapProps(({dispatch, ...other}) => ({
