@@ -15,6 +15,8 @@ export interface PersonFormProps {
 
 }
 
+const pleaseSelect = {value: null, label: "– Please Select –"};
+const primaryLanguages = [pleaseSelect, ...languages];
 
 const PersonForm: React.SFC<PersonFormProps> = props => {
     
@@ -42,7 +44,13 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
             <div className="form-group">
                 <label className="col-sm-2 control-label">Primary Language</label>
                 <div className="col-sm-10">
-                    <SelectBox name="primaryLanguageId" options={languages}/>
+                    <SelectBox name="primaryLanguageId" options={primaryLanguages}/>
+                </div>
+            </div>
+            <div className="form-group">
+                <label className="col-sm-2 control-label">Secondary Languages</label>
+                <div className="col-sm-10">
+                    <SelectBox multiple name="secondaryLanguageIds" options={languages}/>
                 </div>
             </div>
             <div className="form-group">

@@ -56,7 +56,7 @@ export default function withValueDispatch<TProps=AnyObject>({
             return {
                 [dispatchProp]: (value) => dispatch({type: ActionTypes.Change, payload: {
                     path: fullPath,
-                    value: serializeValue(value, ownProps),
+                    value: serializeValue(value, ownProps), // FIXME: is `serializeValue` *really* needed? this can be done in the eventHandler/dispatch call
                 }}),
             };
             

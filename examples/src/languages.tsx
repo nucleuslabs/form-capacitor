@@ -1,5 +1,4 @@
 export default [
-    {value: null, label: "– Please Select –"},
     {value: 2, label: "Mandarin"},
     {value: 3, label: "Spanish"},
     {value: 1, label: "English"},
