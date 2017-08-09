@@ -5,6 +5,7 @@ import NumberBox from './fields/NumberBox';
 import DatePicker from './fields/DatePicker';
 import CheckBox from './fields/CheckBox';
 import RadioButton from './fields/RadioButton';
+import SelectBox from './fields/SelectBox';
 import {formatDate} from './util';
 // import {JsonSchema} from '../../src/types/json-schema';
 // import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
@@ -41,7 +42,7 @@ const PersonForm: React.SFC<PersonFormProps> = props => {
             <div className="form-group">
                 <label className="col-sm-2 control-label">Primary Language</label>
                 <div className="col-sm-10">
-                    <select>{languages.map((lang,i) => <option key={i} value={i}>{lang}</option>}</select>
+                    <SelectBox name="primaryLanguageId" options={languages}/>
                 </div>
             </div>
             <div className="form-group">
