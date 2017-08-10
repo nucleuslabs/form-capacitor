@@ -52,7 +52,7 @@ export default field({
         if(multiple) {
             return Array.from(ev.currentTarget.selectedOptions).map(o => o.value);
         } else {
-            return ev.currentTarget.value;
+            return ev.currentTarget.value; // could return ev.currentTarget.selectedIndex if React let us set it this way...
         }
     },
 })(SelectBox);

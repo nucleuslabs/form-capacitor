@@ -40,7 +40,7 @@ export default function withValueDispatch<TProps=AnyObject>({
             const fullPath = [namespace,...ownProps.path];
             // console.log('connnnect',path,ownProps[FIELD_PATH]);
             
-            console.log('conneccctt',ownProps);
+            // console.log('conneccctt',ownProps);
 
             // FIXME: should pull default from schema? or undefined and schema HOC can set it after the fact
             const value = deserializeValue(getValue(state,fullPath), ownProps);

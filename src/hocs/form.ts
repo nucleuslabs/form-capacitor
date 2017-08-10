@@ -54,29 +54,37 @@ export default function form<TProps extends AnyObject=AnyObject>({
             [dataProp]: formData
         };
     };
-    
-    let mapDispatchToProps = {};
-    
-    if(dispatchProp) {
-        mapDispatchToProps = (dispatch: Dispatch<any>, ownProps: TProps) => bindActionCreators({
-            [dispatchProp]: (name, value) => {
-                // const path = [namespace,...getPath(ownProps),...toPath(resolveValue(formName, ownProps)), ...toPath(name)];
+  
+    let mergeProps = (stateProps, {dispatch}, ownProps) => {
+        // console.log('mergeProps',stateProps, ownProps);
+        
+        let merged = {...ownProps, ...stateProps};
+        
+        if(dispatchProp) {
+            merged[dispatchProp] = (name, value) => {
                 if(typeof value === 'function') {
-                    value = value(getValue(ownProps[dataProp], name));
+                    // console.log('currentValue',stateProps[dataProp],getValue(stateProps[dataProp], name));
+                    value = value(getValue(stateProps[dataProp], name));
+                    // console.log('after',value);
+                    // value = 2;
                 }
+
+
                 const fullPath = [...ownProps.path, ...toPath(name)];
-                // console.log('dispatch',ownProps);
-                return {
+                // console.log('setting',fullPath,'to',value);
+                dispatch({
                     type: ActionTypes.Change,
                     payload: {path: fullPath, value}
-                }
-            }
-        }, dispatch)
-    }
+                });
+            };
+        }
+        
+        return merged;
+    };
 
     let hocs = [
         withPath({name: formName}),
-        connectRedux(mapStateToProps, mapDispatchToProps)
+        connectRedux(mapStateToProps, null, mergeProps)
     ];
     
   

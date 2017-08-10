@@ -31,7 +31,7 @@ const SchedulingInstructionsForm: React.SFC<Props> = ({data, addInstruction}) =>
                 <tbody>
                     {instructions.length 
                         ? instructions.map((inst, i) =>
-                            <SchedulingInstruction key={inst.id} data={inst} name={`instructions.${i}`}/>) 
+                            <SchedulingInstruction key={i} data={inst} name={`instructions.${i}`}/>) 
                         : <SchedulingInstruction name="instructions.0"/>
                     }
                 </tbody>
@@ -50,9 +50,9 @@ export default compose(
         dispatchProp: 'dispatch'
     }),
     withHandlers({
-        addInstruction: ({dispatch, data}) => ev => {
+        addInstruction: ({dispatch}) => ev => {
             ev.preventDefault();
-            dispatch('instructions', [...data.instructions, {}]);
+            dispatch('instructions', inst => [...inst, {}]);
         }
     })
 )(SchedulingInstructionsForm);
