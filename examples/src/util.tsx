@@ -23,10 +23,28 @@ export function arrayWithout(array, value) {
 
     for(let i=0; i<array.length; ++i) {
         if(func(array[i],i)) {
-            let copy = [...array];
-            copy.splice(i, 1);
-            return copy;
+            return arraySplice(array, i);
         }
     }
     return array;
+}
+
+
+export function arraySplice(array, start, deleteCount=1, ...items) {
+    let copy = [...array];
+    copy.splice(start, deleteCount, ...items);
+    return copy;
+}
+
+export const mapValues = (obj, func) => {
+    // lifted from https://github.com/acdlite/recompose/blob/72eae6758e73ae2c8d094a33a1b3f09c32a36fff/src/packages/recompose/utils/mapValues.js
+    const result = {}
+    /* eslint-disable no-restricted-syntax */
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            result[key] = func(obj[key], key)
+        }
+    }
+    /* eslint-enable no-restricted-syntax */
+    return result
 }

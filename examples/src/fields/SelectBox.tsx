@@ -37,11 +37,7 @@ export default field({
             }
             return values;
         } else {
-            if (value === undefined) {
-                return '0';
-            }
-            let index = options.findIndex(opt => Object.is(opt.value, value));
-            return index < 0 ? '0' : String(index);
+            return options.findIndex(opt => Object.is(opt.value, value));
         }
     },
     serializeValue: (value, {options, multiple}) => { // FIXME: this can be done in eventHandler...
