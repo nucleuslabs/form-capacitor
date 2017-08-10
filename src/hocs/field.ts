@@ -4,7 +4,7 @@ import namespace from '../namespace';
 import ActionTypes from '../ActionTypes';
 import getOr from 'lodash/fp/getOr';
 import {toPath} from 'lodash';
-import {getPath, FIELD_PATH} from '../context';
+import {getPath, ContextPath} from '../context';
 import mountPoint from './mountPoint';
 import {AnyObject, DispatchFn} from '../types/misc';
 import withContext from './withContext';
@@ -44,13 +44,12 @@ export default function field<TProps=AnyObject>({
                                                     deserializeValue = defaultDeserializeField,
                                                     serializeValue = defaultSerialize,
                                                     eventHandler,
-                                                    removeName = true,
                                                 }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
 
 
     let hocs = [
-        withValueDispatch({nameProp, valueProp, dispatchProp, deserializeValue, serializeValue, removeName}),
-        mountPoint(p => p[nameProp]),
+        withValueDispatch({nameProp, valueProp, dispatchProp, deserializeValue, serializeValue}),
+        // mountPoint(p => p[nameProp]),
     ];
 
     if (eventHandler) {

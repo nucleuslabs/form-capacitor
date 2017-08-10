@@ -14,7 +14,7 @@ import field from '../../../src/hocs/field';
 
 export type TextBoxProps = React.InputHTMLAttributes<HTMLInputElement>;
 
-export function TextBox(attrs: TextBoxProps) {
+export function TextBox({path, name, ...attrs}: TextBoxProps) {
     return (
         <div className="control">
             <input className="input" {...attrs}/>

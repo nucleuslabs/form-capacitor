@@ -11,7 +11,8 @@ export interface SelectBoxProps extends React.SelectHTMLAttributes<HTMLSelectEle
     options: Array<{value: any, label: string}>,
 }
 
-export function SelectBox({options, multiple, ...attrs}: SelectBoxProps) {
+export function SelectBox({options, path, name, multiple, ...attrs}: SelectBoxProps) {
+    // console.log(options,multiple,attrs);
     return (
         <div className={classNames('select',{'is-multiple': multiple})}>
             <select {...attrs} multiple={multiple}>{options.map((opt,i) => <option key={i} value={i} children={opt.label}/>)}</select>

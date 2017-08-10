@@ -1,8 +1,8 @@
 import React from 'react';
 import {connectForm, form} from 'form-capacitor';
 import SchedulingInstruction from './SchedulingInstruction';
-import {Title} from './bulma';
-
+import {Button, Icon, Title} from './bulma';
+import {compose,withHandlers} from 'recompose';
 
 interface Props {
     data: {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 
-const SchedulingInstructionsForm: React.SFC<Props> = ({data}) => {
+const SchedulingInstructionsForm: React.SFC<Props> = ({data, addInstruction}) => {
     const {instructions} = data;
 
     return (
@@ -36,13 +36,23 @@ const SchedulingInstructionsForm: React.SFC<Props> = ({data}) => {
                     }
                 </tbody>
             </table>
+            <Button onClick={addInstruction}><Icon name="plus"/> Add Instruction</Button>
         </div>
     )
 };
 
-export default form({
-    name: 'schedulingInstructions',
-    deserialize: d => d || {
-        instructions: [],
-    }
-})(SchedulingInstructionsForm);
+export default compose(
+    form({
+        name: 'schedulingInstructions',
+        deserialize: d => d || {
+            instructions: [],
+        },
+        dispatchProp: 'dispatch'
+    }),
+    withHandlers({
+        addInstruction: ({dispatch, data}) => ev => {
+            ev.preventDefault();
+            dispatch('instructions', [...data.instructions, {}]);
+        }
+    })
+)(SchedulingInstructionsForm);

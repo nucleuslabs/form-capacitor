@@ -9,7 +9,7 @@ export interface CheckBoxProps extends React.InputHTMLAttributes<HTMLInputElemen
     value?: any,
 }
 
-export function CheckBox({multiple, value, currentValue, name, ...attrs}: CheckBoxProps) {
+export function CheckBox({multiple, value, currentValue, name, path, ...attrs}: CheckBoxProps) {
     return <input type="checkbox" {...attrs}/>
 }
 

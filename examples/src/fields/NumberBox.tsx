@@ -4,7 +4,7 @@ import field from '../../../src/hocs/field';
 
 export type NumberBoxProps = React.InputHTMLAttributes<HTMLInputElement>;
 
-export function NumberBox(attrs: NumberBoxProps) {
+export function NumberBox({path, name, ...attrs}: NumberBoxProps) {
     return (
         <div className="control">
             <input type="number" className="input" {...attrs}/>

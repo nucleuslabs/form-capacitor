@@ -5,7 +5,7 @@ import {formatDate} from '../util';
 
 export type DatePickerProps = React.InputHTMLAttributes<HTMLInputElement>;
 
-export function DatePicker(attrs: DatePickerProps) {
+export function DatePicker({path, name, ...attrs}: DatePickerProps) {
     return <input type="datetime-local" className="input" {...attrs}/>
 }
 
