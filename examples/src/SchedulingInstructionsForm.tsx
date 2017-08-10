@@ -1,7 +1,7 @@
 import React from 'react';
 import {connectForm, form} from 'form-capacitor';
 import SchedulingInstruction from './SchedulingInstruction';
-import {Button, Icon, Title} from './bulma';
+import {Button, Icon, SubmitButton, Title} from './bulma';
 import {compose,withHandlers} from 'recompose';
 
 interface Props {
@@ -11,11 +11,11 @@ interface Props {
 }
 
 
-const SchedulingInstructionsForm: React.SFC<Props> = ({data, addInstruction}) => {
+const SchedulingInstructionsForm: React.SFC<Props> = ({data, addInstruction, onSubmit}) => {
     const {instructions} = data;
 
     return (
-        <div>
+        <form onSubmit={onSubmit}>
             <Title>Scheduling Instructions</Title>
             <table className="table is-striped is-narrow is-fullwidth">
                 <thead>
@@ -37,7 +37,8 @@ const SchedulingInstructionsForm: React.SFC<Props> = ({data, addInstruction}) =>
                 </tbody>
             </table>
             <Button onClick={addInstruction}><Icon name="plus"/> Add Instruction</Button>
-        </div>
+            <SubmitButton><Icon name="floppy-o"/> Save</SubmitButton>
+        </form>
     )
 };
 
@@ -53,6 +54,10 @@ export default compose(
         addInstruction: ({dispatch}) => ev => {
             ev.preventDefault();
             dispatch('instructions', inst => [...inst, {}]);
+        },
+        onSubmit: ({data}) => ev => {
+            ev.preventDefault();
+            console.log('submit',data);
         }
     })
 )(SchedulingInstructionsForm);

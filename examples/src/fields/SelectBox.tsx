@@ -17,7 +17,6 @@ export function SelectBox({options, path, name, multiple, ...attrs}: SelectBoxPr
         <div className={classNames('select',{'is-multiple': multiple})}>
             <select {...attrs} multiple={multiple}>{options.map((opt,i) => <option key={i} value={i} children={opt.label}/>)}</select>
         </div>
-       
     )
 }
 

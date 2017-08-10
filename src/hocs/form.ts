@@ -40,7 +40,7 @@ export default function form<TProps extends AnyObject=AnyObject>({
     eventHandler?: EventHandler,
     deserialize?: (formData: any, ownProps: TProps) => any,
     dataProp?: string,
-    dispatchProp?: string,
+    dispatchProp?: string, // TODO: should we even let the user choose all these prop names? They can always use recompose.renameProps
 } = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
 
     // TODO: formName should be random/unique (shortid) by default. This will let you put
