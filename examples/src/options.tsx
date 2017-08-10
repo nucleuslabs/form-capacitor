@@ -57,10 +57,10 @@ export const clinicians = [
 ];
 
 export const times = [
-    {value: 1, label: "30 minutes"},
-    {value: 2, label: "1 hour"},
-    {value: 3, label: "1.5 hours"},
-    {value: 4, label: "2 hours"},
-    {value: 5, label: "2.5 hours"},
-    {value: 6, label: "3 hours"},
+    {value: 30, label: "30 minutes"},
+    {value: 60, label: "1 hour"},
+    {value: 90, label: "1.5 hours"},
+    {value: 120, label: "2 hours"},
+    {value: 150, label: "2.5 hours"},
+    {value: 180, label: "3 hours"},
 ];

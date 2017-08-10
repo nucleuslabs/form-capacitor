@@ -1,27 +1,35 @@
 import React, {SelectHTMLAttributes} from 'react';
 
-// not sure how to make this work for multi-selects...
-
-export default class SelectByIndex extends React.PureComponent<SelectHTMLAttributes<HTMLSelectElement> & {selectedIndex: number}> {
-    
-    private el: HTMLSelectElement;
+export default class SelectByIndex extends React.PureComponent<SelectHTMLAttributes<HTMLSelectElement> & {selectedIndex: number|number[]}> {
+    private select: HTMLSelectElement;
     
     componentDidMount() {
-        this.el.selectedIndex = this.props.selectedIndex;
+        this.refresh();
     }
     
     componentDidUpdate(prevProps) {
         if(prevProps.selectedIndex !== this.props.selectedIndex) {
-            this.el.selectedIndex = this.props.selectedIndex;    
+            this.refresh();
         }
     }
     
-    ref = n => {
-        this.el = n;
+    refresh() {
+        if(Array.isArray(this.props.selectedIndex)) {
+            let indexes = new Set(this.props.selectedIndex);
+            Array.prototype.forEach.call(this.select.options, (opt,i) => {
+                opt.selected = indexes.has(i);
+            });
+        } else {
+            this.select.selectedIndex = this.props.selectedIndex;
+        }
+    }
+    
+    setRef = n => {
+        this.select = n;
     };
     
     render() {
         const {selectedIndex, ...props} = this.props;
-        return <select {...props} ref={this.ref}/>;
+        return <select {...props} ref={this.setRef}/>;
     }
 }

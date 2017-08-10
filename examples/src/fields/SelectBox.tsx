@@ -2,20 +2,25 @@ import React from 'react';
 import field from '../../../src/hocs/field';
 import {arrayWithout} from '../util';
 import classNames from 'classnames';
+import SelectByIndex from './SelectByIndex';
 
 
-export interface SelectBoxProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export type SelectBoxProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
     multiple?: boolean,
     value: any,
-    name: string,
+    name: string|string[],
     options: Array<{value: any, label: string}>,
+    path: string[],
 }
 
-export function SelectBox({options, path, name, multiple, ...attrs}: SelectBoxProps) {
+export function SelectBox({options, path, value, name, multiple, ...attrs}: SelectBoxProps) {
     // console.log(options,multiple,attrs);
+    
+    const useValue = options.length && (typeof options[0].value === 'string' || typeof options[0].value === 'number');
+    
     return (
         <div className={classNames('select',{'is-multiple': multiple})}>
-            <select {...attrs} multiple={multiple}>{options.map((opt,i) => <option key={i} value={i} children={opt.label}/>)}</select>
+            <SelectByIndex {...attrs} selectedIndex={value} multiple={multiple}>{options.map((opt,i) => <option key={useValue ? opt.value : i} children={opt.label}/>)}</SelectByIndex>
         </div>
     )
 }
@@ -45,13 +50,17 @@ export default field({
         } else {
             return options[value].value;
         }
-        
     };
     eventHandler: (ev,{options,multiple}) => {
         if(multiple) {
-            return Array.from(ev.currentTarget.selectedOptions).map(o => o.value);
+            return Array.prototype.reduce.call(ev.currentTarget.options, (acc,opt,idx) => {
+                if(opt.selected) {
+                    acc.push(idx);
+                }
+                return acc;
+            }, []);
         } else {
-            return ev.currentTarget.value; // could return ev.currentTarget.selectedIndex if React let us set it this way...
+            return ev.currentTarget.selectedIndex; // could return ev.currentTarget.selectedIndex if React let us set it this way...
         }
     },
 })(SelectBox);
