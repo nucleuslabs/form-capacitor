@@ -1,6 +1,7 @@
 export {default as connectForm} from './connectForm';
 export {default as withSchema} from './hocs/withSchema';
 export {default as withValueDispatch} from './hocs/withValueDispatch';
+export {default as withDefault} from './hocs/withDefault';
 export {default as mountPoint} from './hocs/mountPoint';
 export {default as field} from './hocs/field';
 export {default as form} from './hocs/form';

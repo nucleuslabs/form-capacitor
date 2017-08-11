@@ -8,6 +8,7 @@ import {createStore, combineReducers, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import {compose} from 'recompose';
 import SchedulingInstructionsForm from './SchedulingInstructionsForm';
+import DragAndDropForm from './dnd/DragAndDropForm';
 
 /**
  * Logs all actions and states after they are dispatched.
@@ -53,6 +54,7 @@ ReactDOM.render(
                     <Route exact path="/" component={ExamplesNav}/>
                     <Route exact path="/person" render={() => <PersonForm name="person"/>}/>
                     <Route exact path="/scheduling" component={SchedulingInstructionsForm}/>
+                    <Route exact path="/dnd" component={DragAndDropForm}/>
                 </Switch>
             </div>
         </BrowserRouter>

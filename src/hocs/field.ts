@@ -41,7 +41,7 @@ export default function field<TProps=AnyObject>({
                                                     valueProp = 'value',
                                                     dispatchProp = 'dispatch',
                                                     eventName = 'onChange',
-                                                    deserializeValue = defaultDeserializeField,
+                                                    deserializeValue = defaultDeserializeField, // fixme: this default breaks complex inputs. should just return the value as-is
                                                     serializeValue = defaultSerialize,
                                                     eventHandler,
                                                 }: ConnectOptions = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {

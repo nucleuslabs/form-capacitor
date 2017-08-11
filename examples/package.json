@@ -3,8 +3,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "dependencies": {
+    "@types/react-dnd": "^2.0.33",
     "classnames": "^2.2.5",
     "react": "^15.6.1",
+    "react-dnd": "^2.4.0",
+    "react-dnd-html5-backend": "^2.4.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.5",
     "react-router": "^4.1.2",

@@ -12,6 +12,7 @@
     "outDir": "dist",
     "target": "es2017",
     "downlevelIteration": false,
+    "experimentalDecorators": true,
     "lib": [
       "esnext",
       "dom"

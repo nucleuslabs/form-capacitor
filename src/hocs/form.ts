@@ -33,7 +33,7 @@ export default function form<TProps extends AnyObject=AnyObject>({
                                                     eventName = 'onSubmit',
                                                     eventHandler,
                                                     deserialize = defaultDeserializeForm,
-                                                    dispatchProp,
+                                                    dispatchProp = 'dispatch',
                                                 }: {
     name?: string|MapFn<TProps, string>,
     eventName?: string,
