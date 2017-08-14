@@ -61,10 +61,14 @@ export default function form<TProps extends AnyObject=AnyObject>({
         let merged = {...ownProps, ...stateProps};
         
         if(dispatchProp) {
-            merged[dispatchProp] = (name, value) => {
+            merged[dispatchProp] = (name, value) => { // FIXME: the only difference between form and field is that the form takes in the name of a sub-field to mutate...but you can already do that because the entire subtree is already passed to you! just use lodash-fp's set
                 if(typeof value === 'function') {
                     // console.log('currentValue',stateProps[dataProp],getValue(stateProps[dataProp], name));
-                    value = value(getValue(stateProps[dataProp], name));
+                    if(!name || (Array.isArray(name) && !name.length)) {
+                        value = value(stateProps[dataProp]);
+                    } else {
+                        value = value(getValue(stateProps[dataProp], name));
+                    }
                     // console.log('after',value);
                     // value = 2;
                 }

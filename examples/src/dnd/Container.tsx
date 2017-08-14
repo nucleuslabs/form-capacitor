@@ -2,26 +2,21 @@ import React, { Component } from 'react';
 import update from 'react/lib/update';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import Draggable from './Item';
+import Draggable, {default as Item} from './Item';
 import {compose} from 'recompose';
 import {field} from 'form-capacitor';
 
-const Container = ({value}) => {
+const Container = ({value,onDrop}) => {
     return (
         <ul>
-            {value.map((item,i) => (
-                <li key={item.id}>{item.name}{item.children && item.children.length ? <Self name={`${i}.children`}/> : null}</li>
-            ))}
+            {value.map((item,i) => <Item key={item.id} index={i} name={i} onDrop={onDrop}/>)}
         </ul>
     );
 };
 
-
-const Self = compose(
+export default compose(
     DragDropContext(HTML5Backend),
     field({
         deserializeValue: x => x,
     })
 )(Container);
-
-export default Self;
