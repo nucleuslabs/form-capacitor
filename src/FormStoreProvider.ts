@@ -1,8 +1,13 @@
 import defaultStore from './defaultStore';
 import {ContextStore, StoreShape} from './context';
-import React from 'react';
+import React, {ReactElement} from 'react';
 
-export default class FormStoreProvider extends React.PureComponent {
+export interface PropTypes {
+    store?: object,
+    children: ReactElement<any>,
+}
+
+export default class FormStoreProvider extends React.PureComponent<PropTypes> {
 
     static childContextTypes = {
         [ContextStore]: StoreShape,

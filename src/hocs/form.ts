@@ -1,5 +1,5 @@
 import {compose, ComponentEnhancer, mapProps, withProps} from 'recompose';
-import {connect as connectRedux} from 'react-redux';
+// import {connect as connectRedux} from 'react-redux';
 import namespace from '../namespace';
 import ActionTypes from '../ActionTypes';
 import getOr from 'lodash/fp/getOr';
@@ -89,7 +89,7 @@ export default function form<TProps extends AnyObject=AnyObject>({
 
     let hocs = [
         withPath({name: formName}),
-        connectRedux(mapStateToProps, null, mergeProps)
+        // connectRedux(mapStateToProps, null, mergeProps)
     ];
     
   

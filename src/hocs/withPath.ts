@@ -1,5 +1,4 @@
 import {ComponentEnhancer, withContext, getContext, mapProps, compose} from 'recompose';
-import {connect} from 'react-redux';
 import {toPath} from 'lodash';
 import {contextTypes, getPath, ContextPath, ContextType} from '../context';
 import {AnyObject, MapFn} from '../types/misc';

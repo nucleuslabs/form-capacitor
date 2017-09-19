@@ -3,46 +3,9 @@ import ReactDOM from 'react-dom';
 import ExamplesNav from './ExamplesNav';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import PersonForm from './PersonForm';
-import {createReducer,FormStoreProvider} from 'form-capacitor';
-import {createStore, combineReducers, applyMiddleware} from 'redux';
-import {Provider} from 'react-redux';
-import {compose} from 'recompose';
+import {FormStoreProvider} from 'form-capacitor';
 import SchedulingInstructionsForm from './SchedulingInstructionsForm';
 import DragAndDropForm from './dnd/DragAndDropForm';
-
-/**
- * Logs all actions and states after they are dispatched.
- */
-const logger = store => next => action => {
-    console.group(action.type);
-    console.info('dispatching', action);
-    let result = next(action);
-    console.log('next state', store.getState());
-    console.groupEnd(action.type);
-    return result
-};
-
-let middleware = [/*logger*/];
-
-const composeEnhancers =
-    typeof window === 'object' &&
-    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
-        window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-            // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
-            serialize: true
-        }) : compose;
-
-const enhancer = composeEnhancers(
-    applyMiddleware(...middleware),
-    // other store enhancers if any
-);
-
-const store = createStore(
-    combineReducers({
-        formCapacitor: createReducer(),
-    }),
-    enhancer
-);
 
 
 ReactDOM.render(

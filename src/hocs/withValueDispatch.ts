@@ -1,5 +1,5 @@
 import {compose, ComponentEnhancer, withProps} from 'recompose';
-import {connect as connectRedux, Dispatch} from 'react-redux';
+// import {connect as connectRedux, Dispatch} from 'react-redux';
 import namespace from '../namespace';
 import ActionTypes from '../ActionTypes';
 import {get as getValue, set as setValue} from 'lodash';
@@ -41,32 +41,32 @@ export default function withValueDispatch<TProps=AnyObject>({
     
     return compose(
         withPath({nameProp}), 
-        connectRedux((state, ownProps) => {
-            const fullPath = [namespace,...ownProps.path];
-            // console.log('connnnect',path,ownProps[FIELD_PATH]);
-            
-            // console.log('conneccctt',ownProps);
-
-            // FIXME: should pull default from schema? or undefined and schema HOC can set it after the fact
-            // deserializeValue isn't really needed either... can be done with withProps()
-            const value = deserializeValue(getValue(state,fullPath), ownProps);
-            
-            // console.log(ownProps[nameProp],value,getValue(state,path));
-            
-            // console.log('mapStateToProps',path,value);
-            return {
-                [valueProp]: value
-            };
-        }, (dispatch: Dispatch<any>, ownProps: TProps) => {
-            // const fullPath: string[] = [...getPath(ownProps),...toPath(ownProps[nameProp])];
-            // console.log(ownProps[FIELD_PATH],fullPath);
-            
-            return {
-                [dispatchProp]: (value) => dispatch({type: ActionTypes.Change, payload: {
-                    path: ownProps.path,
-                    value: serializeValue(value, ownProps), // FIXME: is `serializeValue` *really* needed? this can be done in the eventHandler/dispatch call
-                }}),
-            };
-        }),
+        // connectRedux((state, ownProps) => {
+        //     const fullPath = [namespace,...ownProps.path];
+        //     // console.log('connnnect',path,ownProps[FIELD_PATH]);
+        //    
+        //     // console.log('conneccctt',ownProps);
+        //
+        //     // FIXME: should pull default from schema? or undefined and schema HOC can set it after the fact
+        //     // deserializeValue isn't really needed either... can be done with withProps()
+        //     const value = deserializeValue(getValue(state,fullPath), ownProps);
+        //    
+        //     // console.log(ownProps[nameProp],value,getValue(state,path));
+        //    
+        //     // console.log('mapStateToProps',path,value);
+        //     return {
+        //         [valueProp]: value
+        //     };
+        // }, (dispatch: Dispatch<any>, ownProps: TProps) => {
+        //     // const fullPath: string[] = [...getPath(ownProps),...toPath(ownProps[nameProp])];
+        //     // console.log(ownProps[FIELD_PATH],fullPath);
+        //    
+        //     return {
+        //         [dispatchProp]: (value) => dispatch({type: ActionTypes.Change, payload: {
+        //             path: ownProps.path,
+        //             value: serializeValue(value, ownProps), // FIXME: is `serializeValue` *really* needed? this can be done in the eventHandler/dispatch call
+        //         }}),
+        //     };
+        // }),
     );
 }
