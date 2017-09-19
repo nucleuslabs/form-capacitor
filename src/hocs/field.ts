@@ -42,6 +42,7 @@ export default function field<TProps=AnyObject>({
                                                     valueProp = 'value',
                                                     setValueProp = 'setValue',
                                                     eventName = 'onChange',
+                                                    pathProp = 'path',
                                                     deserializeValue = defaultDeserializeField, // fixme: this default breaks complex inputs. should just return the value as-is
                                                     serializeValue = defaultSerialize,
                                                     eventHandler,
@@ -49,7 +50,7 @@ export default function field<TProps=AnyObject>({
 
 
     let hocs = [
-        withValue({nameProp, valueProp, setValueProp, deserializeValue, serializeValue}),
+        withValue({nameProp, valueProp, setValueProp, deserializeValue, serializeValue, pathProp}),
         // mountPoint(p => p[nameProp]),
     ];
 

@@ -14,7 +14,7 @@ export type RadioButtonProps<TValue=string> = React.InputHTMLAttributes<HTMLInpu
 };
 
 export function RadioButton({name, path, group, currentValue, value, ...attrs}: RadioButtonProps) {
-    return <input type="radio" {...attrs} name={group || name} checked={value === currentValue} />
+    return <input type="radio" {...attrs} name={group || path.join('.')} checked={value === currentValue} />
 }
 
 export default field({

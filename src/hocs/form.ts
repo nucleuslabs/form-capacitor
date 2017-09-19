@@ -24,7 +24,7 @@ export interface ConnectOptions {
 export interface ConnectProps {
     name: string,
     value: any,
-    dispatch: DispatchFn
+    setField: DispatchFn
 }
 
 export default function form<TProps extends AnyObject=AnyObject>({
@@ -33,14 +33,14 @@ export default function form<TProps extends AnyObject=AnyObject>({
                                                     eventName = 'onSubmit',
                                                     eventHandler,
                                                     deserialize = defaultDeserializeForm,
-                                                    dispatchProp = 'dispatch',
+                                                    setFieldProp = 'setField',
                                                 }: {
     name?: string|MapFn<TProps, string>,
     eventName?: string,
     eventHandler?: EventHandler,
     deserialize?: (formData: any, ownProps: TProps) => any,
     dataProp?: string,
-    dispatchProp?: string, // TODO: should we even let the user choose all these prop names? They can always use recompose.renameProps
+    setFieldProp?: string, // TODO: should we even let the user choose all these prop names? They can always use recompose.renameProps
 } = {}): ComponentEnhancer<TProps, TProps & ConnectProps> {
 
     // TODO: formName should be random/unique (shortid) by default. This will let you put
@@ -48,20 +48,21 @@ export default function form<TProps extends AnyObject=AnyObject>({
     // from component name.
     
     let mapStateToProps = (state, ownProps: TProps) => {
-        const path = [namespace,...getPath(ownProps),...toPath(resolveValue(formName, ownProps))];
+        const path = [...getPath(ownProps),...toPath(resolveValue(formName, ownProps))];
         const formData = deserialize(getValue(state,path), ownProps);
+        console.log('formData',formData);
         return {
             [dataProp]: formData
         };
     };
   
-    let mergeProps = (stateProps, {dispatch}, ownProps) => {
+    let mergeProps = (stateProps, {setField}, ownProps) => {
         // console.log('mergeProps',stateProps, ownProps);
         
         let merged = {...ownProps, ...stateProps};
         
-        if(dispatchProp) {
-            merged[dispatchProp] = (name, value) => { // FIXME: the only difference between form and field is that the form takes in the name of a sub-field to mutate...but you can already do that because the entire subtree is already passed to you! just use lodash-fp's set
+        if(setFieldProp) {
+            merged[setFieldProp] = (name, value) => { // FIXME: the only difference between form and field is that the form takes in the name of a sub-field to mutate...but you can already do that because the entire subtree is already passed to you! just use lodash-fp's set
                 if(typeof value === 'function') {
                     // console.log('currentValue',stateProps[dataProp],getValue(stateProps[dataProp], name));
                     if(!name || (Array.isArray(name) && !name.length)) {
@@ -76,7 +77,7 @@ export default function form<TProps extends AnyObject=AnyObject>({
 
                 const fullPath = [...ownProps.path, ...toPath(name)];
                 // console.log('setting',fullPath,'to',value);
-                dispatch({
+                setField({
                     type: ActionTypes.Change,
                     payload: {path: fullPath, value}
                 });

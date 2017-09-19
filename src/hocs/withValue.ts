@@ -16,6 +16,7 @@ export interface Options {
     store?: object,
     valueProp?: string,
     setValueProp?: string,
+    pathProp?: string,
 }
 
 const withValue = ({
@@ -25,6 +26,7 @@ const withValue = ({
     store, 
     valueProp,
     setValueProp,
+    pathProp,
 }: Options) => (BaseComponent) => {
     const factory = createEagerFactory(BaseComponent);
 
@@ -40,14 +42,23 @@ const withValue = ({
             [ContextStore]: StoreShape,
         };
         
-        constructor(props) {
+        static childContextTypes = {
+            [ContextPath]: PathShape,
+        };
+
+        getChildContext() {
+            return {[ContextPath]: this.path};
+        }
+        
+        constructor(props, context) {
             super(props);
             this.store = (store && resolveValue(store,this.props)) || (storeProp && this.props[storeProp]) || (this.context && this.context[ContextStore]) || defaultStore;
-            const basePath = (this.context && this.context[ContextPath]) || EMPTY_ARRAY;
+            const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
             let componentPath = (name && resolveValue(name,this.props)) || (nameProp && this.props[nameProp]);
             componentPath = componentPath ? toPath(componentPath) : EMPTY_ARRAY;
             // fixme: should we assign a rand name?
             this.path = [...basePath, ...componentPath];
+            // console.log('this.path',this.path);
         }
 
         componentWillMount() {
@@ -71,9 +82,13 @@ const withValue = ({
             };
             if(valueProp) {
                 props[valueProp] = getValue(this.store, this.path);
+                // console.log(this.path,props[valueProp]);
             }
             if(setValueProp) {
                 props[setValueProp] = this.setValue;
+            }
+            if(pathProp) {
+                props[pathProp] = this.path;
             }
             return factory(props);
         }

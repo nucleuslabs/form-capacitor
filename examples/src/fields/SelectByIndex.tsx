@@ -14,13 +14,19 @@ export default class SelectByIndex extends React.PureComponent<SelectHTMLAttribu
     }
     
     refresh() {
-        if(Array.isArray(this.props.selectedIndex)) {
-            let indexes = new Set(this.props.selectedIndex);
-            Array.prototype.forEach.call(this.select.options, (opt,i) => {
-                opt.selected = indexes.has(i);
-            });
+        if(this.props.multiple) {
+            if(this.props.selectedIndex) {
+                let indexes = new Set(this.props.selectedIndex as number[]);
+                Array.prototype.forEach.call(this.select.options, (opt, i) => {
+                    opt.selected = indexes.has(i);
+                });
+            } else {
+                Array.prototype.forEach.call(this.select.options, opt => {
+                    opt.selected = false
+                });
+            }
         } else {
-            this.select.selectedIndex = this.props.selectedIndex;
+            this.select.selectedIndex = this.props.selectedIndex as number;
         }
     }
     

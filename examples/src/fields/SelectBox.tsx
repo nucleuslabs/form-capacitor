@@ -26,20 +26,20 @@ export function SelectBox({options, path, value, name, multiple, ...attrs}: Sele
 }
 
 export default field({
-    deserializeValue: (value, {options, multiple}) => {
-        if(multiple) {
-            let values = [];
-            let set = new Set(value);
-            for(let i=0; i<options.length; ++i) {
-                if(set.has(options[i].value)) {
-                    values.push(i);
-                }
-            }
-            return values;
-        } else {
-            return options.findIndex(opt => Object.is(opt.value, value));
-        }
-    },
+    // deserializeValue: (value, {options, multiple}) => {
+    //     if(multiple) {
+    //         let values = [];
+    //         let set = new Set(value);
+    //         for(let i=0; i<options.length; ++i) {
+    //             if(set.has(options[i].value)) {
+    //                 values.push(i);
+    //             }
+    //         }
+    //         return values;
+    //     } else {
+    //         return options.findIndex(opt => Object.is(opt.value, value));
+    //     }
+    // },
     serializeValue: (value, {options, multiple}) => { // FIXME: this can be done in eventHandler...
         if(multiple) {
             return value.map(i => options[i].value);

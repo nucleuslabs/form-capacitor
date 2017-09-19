@@ -11,11 +11,13 @@ import {
     CheckBoxLabel, Control, FieldBody, FieldLabel, FieldRow, Title1, RadioLabel, SubmitButton,
     Title2, Title
 } from './bulma';
+import field from '../../src/hocs/field';
 
 
 // import {JsonSchema} from '../../src/types/json-schema';
 // import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
 import {languages,pleaseSelect} from './options';
+import {compose, withHandlers} from 'recompose';
 
 export interface PersonFormProps {
 
@@ -83,9 +85,9 @@ const PersonForm: React.SFC<PersonFormProps> = ({onSubmit}) => {
                 <FieldLabel>Gender</FieldLabel>
                 <FieldBody>
                     <Control>
-                        <RadioLabel><RadioButton name="gender" group="sex" value="M"/> Male</RadioLabel>
-                        <RadioLabel><RadioButton name="gender" group="sex" value="F"/> Female</RadioLabel>
-                        <RadioLabel><RadioButton name="gender" group="sex" value="O"/> Other</RadioLabel>
+                        <RadioLabel><RadioButton name="gender" value="M"/> Male</RadioLabel>
+                        <RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>
+                        <RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>
                     </Control>
                 </FieldBody>
             </FieldRow>
@@ -99,12 +101,30 @@ const PersonForm: React.SFC<PersonFormProps> = ({onSubmit}) => {
     )
 };
 // export default PersonForm;
-export default form({
-    eventHandler({data}) {
-        
-        console.log('submit',data);
+
+export default compose(
+    field({
+        eventName: 'onSubmit',
+    }),
+    withHandlers({
+        onSubmit: props => ev => {
+            ev.preventDefault();
+            console.log(stringify(props.value))
+        }
+    })
+)(PersonForm);
+    
+function replacer(key, value) {
+    if(value instanceof Set) {
+        return Array.from(value);
     }
-})(PersonForm);
+    return value;
+}
+
+function stringify(obj) {
+    return JSON.stringify(obj,replacer,2);
+}
+
 
 
 
