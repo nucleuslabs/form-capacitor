@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import ExamplesNav from './ExamplesNav';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import PersonForm from './PersonForm';
-import {createReducer} from 'form-capacitor';
+import {createReducer,FormStoreProvider} from 'form-capacitor';
 import {createStore, combineReducers, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import {compose} from 'recompose';
@@ -46,7 +46,7 @@ const store = createStore(
 
 
 ReactDOM.render(
-    <Provider store={store}>
+    <FormStoreProvider store={{person:{name:"Foo"}}}>
         <BrowserRouter>
             <div className="container">
                 <div><Link to="/">&laquo; form-capacitor</Link></div>
@@ -58,6 +58,6 @@ ReactDOM.render(
                 </Switch>
             </div>
         </BrowserRouter>
-    </Provider>,
+    </FormStoreProvider>,
     document.getElementById('react-root')
 );

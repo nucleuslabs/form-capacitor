@@ -52,7 +52,7 @@ const withValue = ({
         
         constructor(props, context) {
             super(props);
-            this.store = (store && resolveValue(store,this.props)) || (storeProp && this.props[storeProp]) || (this.context && this.context[ContextStore]) || defaultStore;
+            this.store = (store && resolveValue(store,this.props)) || (storeProp && this.props[storeProp]) || (context && context[ContextStore]) || defaultStore;
             const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
             let componentPath = (name && resolveValue(name,this.props)) || (nameProp && this.props[nameProp]);
             componentPath = componentPath ? toPath(componentPath) : EMPTY_ARRAY;

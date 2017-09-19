@@ -1,3 +1,4 @@
 - [JSON Schema](http://json-schema.org/documentation.html)
 - [Understanding JSON Schema](https://spacetelescope.github.io/understanding-json-schema/)
 - [Ajv: Another JSON Schema Validator](https://github.com/epoberezkin/ajv)
+- Split form-capacitor and examples into [workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)
