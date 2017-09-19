@@ -3,9 +3,13 @@ import {EMPTY_ARRAY} from './constants';
 import {ValidationMap} from 'react';
 
 export const ContextPath = 'SECRET_FORM_CAPACITOR_PATH';
+export const ContextStore = 'SECRET_FORM_CAPACITOR_STORE';
+export const StoreShape = PropTypes.object;
+export const PathShape = PropTypes.arrayOf(PropTypes.string);
 
 export const contextTypes = {
-    [ContextPath]: PropTypes.arrayOf(PropTypes.string),
+    [ContextPath]: PathShape,
+    [ContextStore]: StoreShape,
 };
 
 export function getPath(props) {

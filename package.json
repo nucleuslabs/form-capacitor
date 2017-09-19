@@ -5,10 +5,9 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "keywords": [
+    "react",
     "form",
     "manager",
-    "react",
-    "redux",
     "state"
   ],
   "author": "Mark Penner <mpenner@nucleuslabs.com>",
@@ -17,15 +16,11 @@
   "dependencies": {
     "@types/lodash": "^4.14.71",
     "@types/react": "^16.0.0",
-    "@types/react-redux": "^4.4.47",
     "@types/recompose": "^0.23.3",
-    "@types/redux": "^3.6.0",
     "lodash": "^4.17.4",
     "prop-types": "^15.5.10",
-    "react-redux": "^5.0.2",
     "recompose": "^0.21.2",
-    "react": "^15.4.2",
-    "redux": "^3.6.0"
+    "react": "^15.4.2"
   },
   "peerDependencies": {
 

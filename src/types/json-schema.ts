@@ -1,4 +1,4 @@
-interface JsonSchemaType<T> {
+export interface JsonSchemaType<T> {
     type: string,
     enum?: Array<T>,
     title?: string,
@@ -6,7 +6,7 @@ interface JsonSchemaType<T> {
     default?: T,
 }
 
-interface JsonSchemaString extends JsonSchemaType<string> {
+export interface JsonSchemaString extends JsonSchemaType<string> {
     type: "string",
     minLength?: number,
     maxLength?: number,
@@ -14,10 +14,10 @@ interface JsonSchemaString extends JsonSchemaType<string> {
     format?: "date-time" | "email" | "hostname" | "ipv4" | "ipv6" | "uri",
 }
 
-interface JsonSchemaTuple extends Array<JsonSchema> {
+export interface JsonSchemaTuple extends Array<JsonSchema> {
 }
 
-interface JsonSchemaArray extends JsonSchemaType<any[]> {
+export interface JsonSchemaArray extends JsonSchemaType<any[]> {
     type: "array",
     items?: JsonSchema | JsonSchemaTuple,
     additionalItems?: boolean,
@@ -26,11 +26,11 @@ interface JsonSchemaArray extends JsonSchemaType<any[]> {
     uniqueItems?: boolean,
 }
 
-interface JsonSchemaBoolean extends JsonSchemaType<boolean> {
+export interface JsonSchemaBoolean extends JsonSchemaType<boolean> {
     type: "boolean",
 }
 
-interface JsonSchemaNumber extends JsonSchemaType<number> {
+export interface JsonSchemaNumber extends JsonSchemaType<number> {
     type: "integer" | "number",
     multipleOf?: number,
     minimum?: number,
@@ -39,11 +39,11 @@ interface JsonSchemaNumber extends JsonSchemaType<number> {
     exclusiveMaximum?: boolean,
 }
 
-interface JsonSchemaObject extends JsonSchemaType<object>, JsonSchemaDependency {
+export interface JsonSchemaObject extends JsonSchemaType<object>, JsonSchemaDependency {
     type: "object",
 }
 
-interface JsonSchemaDependency {
+export interface JsonSchemaDependency {
     properties?: { [key: string]: JsonSchema },
     additionalProperties?: boolean,
     required?: Array<string>,
@@ -53,7 +53,7 @@ interface JsonSchemaDependency {
     patternProperties?: { [key: string]: JsonSchema },
 }
 
-interface JsonSchemaNull extends JsonSchemaType<null> {
+export interface JsonSchemaNull extends JsonSchemaType<null> {
     type: "null"
 }
 

@@ -13,11 +13,12 @@ import withValueDispatch from './withValueDispatch';
 import {ReactEventHandler} from 'react';
 import withHandler, {EventHandler} from './withHandler';
 import {defaultSerialize,defaultDeserializeField} from '../util';
+import withValue from './withValue';
 
 export interface ConnectOptions {
     nameProp?: string,
     valueProp?: string,
-    dispatchProp?: string,
+    setValueProp?: string,
     eventName?: string,
     eventHandler?: EventHandler,
     deserializeValue?: (value: any) => any,
@@ -39,7 +40,7 @@ export interface ConnectProps {
 export default function field<TProps=AnyObject>({
                                                     nameProp = 'name',
                                                     valueProp = 'value',
-                                                    dispatchProp = 'dispatch',
+                                                    setValueProp = 'setValue',
                                                     eventName = 'onChange',
                                                     deserializeValue = defaultDeserializeField, // fixme: this default breaks complex inputs. should just return the value as-is
                                                     serializeValue = defaultSerialize,
@@ -48,7 +49,7 @@ export default function field<TProps=AnyObject>({
 
 
     let hocs = [
-        withValueDispatch({nameProp, valueProp, dispatchProp, deserializeValue, serializeValue}),
+        withValue({nameProp, valueProp, setValueProp, deserializeValue, serializeValue}),
         // mountPoint(p => p[nameProp]),
     ];
 

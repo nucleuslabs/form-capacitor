@@ -1,5 +1,5 @@
 import React from 'react';
-import {compose} from 'recompose';
+import {compose, withPropsOnChange} from 'recompose';
 import {withValueDispatch, withSchema, inputChanged, withHandler} from 'form-capacitor';
 import field from '../../../src/hocs/field';
 // import {JsonSchema} from '../../../src/types/json-schema';
@@ -22,9 +22,21 @@ export function TextBox({path, name, ...attrs}: TextBoxProps) {
     )
 }
 
-export default field({
-    eventHandler: inputChanged,
-})(TextBox);
+
+export default compose(
+    field({
+        eventHandler: inputChanged,
+    }),
+    withPropsOnChange(['value'], ({value}) => {
+        if(value === undefined) {
+            return {value:''};
+        }
+    })
+)(TextBox);
+
+// export default field({
+//     eventHandler: inputChanged,
+// })(TextBox);
 
 // export default compose(
 //     withValueDispatch(), // TODO: bake withHandler into connectField() too?

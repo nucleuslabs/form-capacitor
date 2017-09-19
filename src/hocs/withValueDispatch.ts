@@ -1,21 +1,23 @@
-import { compose,ComponentEnhancer} from 'recompose';
+import {compose, ComponentEnhancer, withProps} from 'recompose';
 import {connect as connectRedux, Dispatch} from 'react-redux';
 import namespace from '../namespace';
 import ActionTypes from '../ActionTypes';
-import {get as getValue} from 'lodash';
+import {get as getValue, set as setValue} from 'lodash';
 import {toPath} from 'lodash';
-import {getPath,ContextPath} from '../context';
+import {getPath,ContextPath,ContextStore} from '../context';
 import mountPoint from './mountPoint';
 import {AnyObject, DispatchFn} from '../types/misc';
 import withContext from './withContext';
 import memoize from '../memoize';
 import {defaultDeserializeField,defaultSerialize} from '../util';
 import withPath from './withPath';
+import defaultStore from '../defaultStore';
 
 export interface ConnectOptions {
     nameProp?: string,
     valueProp?: string,
     dispatchProp?: string,
+    storeProp?: string,
     deserializeValue?: (value: any, props: any) => any,
     serializeValue?: (value: any, props: any) => any,
 }
@@ -26,6 +28,9 @@ export interface ConnectProps {
     dispatch: DispatchFn
 }
 
+/**
+ * @deprecated Use `withValue`
+ */
 export default function withValueDispatch<TProps=AnyObject>({
          nameProp = 'name',
          valueProp = 'value',
