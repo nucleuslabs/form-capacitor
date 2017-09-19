@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import React from 'react';
 import {createEagerFactory, wrapDisplayName} from 'recompose';
 import PropTypes from 'prop-types';
 import {resolveValue,defaults} from '../util';
@@ -30,7 +30,7 @@ const withValue = ({
 }: Options) => (BaseComponent) => {
     const factory = createEagerFactory(BaseComponent);
 
-    return class extends Component {
+    class NewComponent extends React.PureComponent {
         static displayName = wrapDisplayName(BaseComponent, 'withValue');
         
         private store: object;
@@ -59,16 +59,11 @@ const withValue = ({
             // fixme: should we assign a rand name?
             this.path = [...basePath, ...componentPath];
             // console.log('this.path',this.path);
-        }
-
-        componentWillMount() {
-            this.unsub = pubSub.subscribe(this.path, () => {
-                this.forceUpdate();
-            });
-        }
-        
-        componentWillUnmount() {
-            this.unsub();
+            if(valueProp) {
+                this.state = {
+                    value: getValue(this.store, this.path)
+                }
+            }
         }
         
         setValue = value => {
@@ -81,8 +76,7 @@ const withValue = ({
                 ...this.props,
             };
             if(valueProp) {
-                props[valueProp] = getValue(this.store, this.path);
-                // console.log(this.path,props[valueProp]);
+                props[valueProp] = this.state.value;
             }
             if(setValueProp) {
                 props[setValueProp] = this.setValue;
@@ -92,7 +86,24 @@ const withValue = ({
             }
             return factory(props);
         }
-    };
+    }
+    
+    if(valueProp) {
+        Object.assign(NewComponent.prototype, {
+            componentWillMount() {
+                this.unsub = pubSub.subscribe(this.path, () => {
+                    this.setState({
+                        value: getValue(this.store, this.path)
+                    });
+                });
+            },
+            componentWillUnmount() {
+                this.unsub();
+            }
+        });
+    }
+    
+    return NewComponent;
 };
 
 export default withValue;
