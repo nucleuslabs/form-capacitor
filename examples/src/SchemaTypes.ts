@@ -12,16 +12,39 @@ export function string(options?: Omit<JsonSchemaString,'type'>): JsonSchemaStrin
     }
 }
 
-export function regex(pattern: RegExp): JsonSchemaString {
+export interface RegExpOptions {
+    pattern: string,
+    flags: string,
+}
+
+export function regex(pattern: RegExp|string|RegExpOptions): JsonSchemaString {
     return {
         type: 'string',
-        regexp: String(pattern),
+        regexp: pattern instanceof RegExp ? String(pattern) : pattern,
     }
 }
 
 export function equalTo(jsonPointer: string): JsonSchema {
     return {
         const: {$data: jsonPointer}
+    }
+}
+
+export function anyOf(...schemas: JsonSchema[]): JsonSchema {
+    return {
+        anyOf: schemas,
+    }
+}
+
+export function allOf(...schemas: JsonSchema[]): JsonSchema {
+    return {
+        allOf: schemas,
+    }
+}
+
+export function oneOf(...schemas: JsonSchema[]): JsonSchema {
+    return {
+        oneOf: schemas,
     }
 }
 
@@ -47,7 +70,7 @@ export function tuple(schemas: JsonSchema[], options?: Omit<JsonSchemaArray, 'ty
         items: schemas,
         minItems: schemas.length,
         maxItems: schemas.length,
-        additionalItems: false,
+        // additionalItems: false,
     }
 }
 

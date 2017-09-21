@@ -42,13 +42,13 @@ const SignUpForm: React.SFC<SignUpFormProps> = ({onSubmit}) => {
             <FieldRow>
                 <FieldLabel normal>Password</FieldLabel>
                 <SingleField narrow>
-                    <PasswordBox name="password"/>
+                    <PasswordBox name="password" size={32}/>
                 </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Confirm Password</FieldLabel>
                 <SingleField narrow>
-                    <PasswordBox name="confirmPassword"/>
+                    <PasswordBox name="confirmPassword" size={32}/>
                 </SingleField>
             </FieldRow>
             <FieldRow>
@@ -70,26 +70,26 @@ const SignUpForm: React.SFC<SignUpFormProps> = ({onSubmit}) => {
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Phone 1</FieldLabel>
-                <SingleField>
-                    <TextBox name="phone.0" />
+                <SingleField narrow>
+                    <TextBox name="phone.0" size={16} />
                 </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Phone 2</FieldLabel>
-                <SingleField>
-                    <TextBox name="phone.1" />
+                <SingleField narrow>
+                    <TextBox name="phone.1" size={16} />
                 </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Phone 3</FieldLabel>
-                <SingleField>
-                    <TextBox name="phone.2" />
+                <SingleField narrow>
+                    <TextBox name="phone.2" size={16} />
                 </SingleField>
             </FieldRow>
             <FieldRow>
-                <FieldLabel normal>BC Care Card</FieldLabel>
-                <SingleField>
-                    <TextBox name="careCard" />
+                <FieldLabel normal>Personal Health Number</FieldLabel>
+                <SingleField narrow>
+                    <TextBox name="healthNo" size={10}/>
                 </SingleField>
             </FieldRow>
             <FieldRow>
@@ -122,6 +122,15 @@ export default compose(
                 postal1: Types.regex(/^[a-z][0-9][a-z]$/i),
                 postal2: Types.regex(/^[0-9][a-z][0-9]$/i),
                 phone: Types.arrayOf(Types.string({minLength: 7}), {minItems: 2, uniqueItems: true}),
+                // phone: Types.tuple([
+                //     Types.string({minLength: 7}),
+                //     Types.string({minLength: 7}),
+                //     Types.string({minLength: 7}),
+                // ]),
+                healthNo: Types.anyOf(
+                    Types.string({format: 'BCPHN'}),
+                    Types.string({format: 'ONPHN'}),
+                ),
             },
             if: {
                 properties: {
