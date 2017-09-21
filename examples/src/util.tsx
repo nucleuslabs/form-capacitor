@@ -3,6 +3,9 @@ function pad(n: number) {
 }
 
 export function formatDate(d: Date) {
+    if(!d || Number.isNaN(d.valueOf())) {
+        return '';
+    }
     let date = `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`;
     let time = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
     return `${date}T${time}`

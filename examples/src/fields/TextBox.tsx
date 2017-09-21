@@ -2,6 +2,8 @@ import React from 'react';
 import {compose, withPropsOnChange,pure,toClass} from 'recompose';
 import {withValueDispatch, withSchema, inputChanged, withHandler} from 'form-capacitor';
 import field from '../../../src/hocs/field';
+import * as Types from '../SchemaTypes';
+import withSchema from '../../../src/hocs/withSchema';
 // import {JsonSchema} from '../../../src/types/json-schema';
 // import {DispatchFn} from '../../../src/types/misc';
 // import withHandler from '../../../src/hocs/withHandler';
@@ -26,6 +28,9 @@ export function TextBox({path, name, ...attrs}: TextBoxProps) {
 export default compose(
     field({
         eventHandler: inputChanged,
+    }),
+    withSchema({
+        schema: Types.string()
     }),
     withPropsOnChange(['value'], ({value}) => {
         if(value === undefined) {
