@@ -12,6 +12,18 @@ export function string(options?: Omit<JsonSchemaString,'type'>): JsonSchemaStrin
     }
 }
 
+export function format(format: string|string[]): JsonSchemaString {
+    let schema = {
+        type: 'string',
+    };
+    if(Array.isArray(format)) {
+        schema.anyOf = format.map(format => ({format}));
+    } else {
+        schema.format = format;
+    }
+    return schema;
+}
+
 export interface RegExpOptions {
     pattern: string,
     flags: string,
@@ -55,7 +67,7 @@ export function array(options?: Omit<JsonSchemaArray,'type'>): JsonSchemaArray {
     }
 }
 
-export function arrayOf(schema: JsonSchema, options?: Omit<JsonSchemaArray, 'type'|'items'>): JsonSchemaArray {
+export function arrayOf(schema: JsonSchema | JsonSchemaTuple, options?: Omit<JsonSchemaArray, 'type'|'items'>): JsonSchemaArray {
     return {
         ...options,
         type: 'array',
@@ -63,9 +75,8 @@ export function arrayOf(schema: JsonSchema, options?: Omit<JsonSchemaArray, 'typ
     }
 }
 
-export function tuple(schemas: JsonSchema[], options?: Omit<JsonSchemaArray, 'type'|'items'|'minItems'|'maxItems'|'additionalItems'>): JsonSchemaArray {
+export function tuple(...schemas: JsonSchema[]): JsonSchemaArray {
     return {
-        ...options,
         type: 'array',
         items: schemas,
         minItems: schemas.length,

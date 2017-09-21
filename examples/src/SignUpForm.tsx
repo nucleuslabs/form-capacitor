@@ -127,10 +127,7 @@ export default compose(
                 //     Types.string({minLength: 7}),
                 //     Types.string({minLength: 7}),
                 // ]),
-                healthNo: Types.anyOf(
-                    Types.string({format: 'BCPHN'}),
-                    Types.string({format: 'ONPHN'}),
-                ),
+                healthNo: Types.format(['BCPHN','ONPHN']),
             },
             if: {
                 properties: {

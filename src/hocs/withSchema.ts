@@ -11,11 +11,12 @@ const ajv = new Ajv({
     allErrors: true,
     $data: true,
     formats: {
+        // TODO: how to allow custom formats via withSchema?
         BCPHN: function(phn) {
             // healthnetBC
             // http://www2.gov.bc.ca/assets/gov/health/practitioner-pro/software-development-guidelines/app_d.pdf
             // Test number: 0009123947241
-            let match = phn.match(/^(?:0{3})?9(\d{8})(\d)$/);
+            let match = phn.match(/^0*9(\d{8})(\d)$/);
             if(!match) {
                 return false;
             }
@@ -33,8 +34,9 @@ const ajv = new Ajv({
         ONPHN: function(phn) {
             // OHIP
             // http://www.health.gov.on.ca/english/providers/pub/ohip/tech_specific/pdf/5_13.pdf
+            // https://en.wikipedia.org/wiki/Luhn_algorithm
             // Test number: 9876543217
-            let match = phn.match(/^(?:0{3})?(\d{9})(\d)$/);
+            let match = phn.match(/^([1-9]\d{8})(\d)(?:[A-Z]{2})?$/i);
             if(!match) {
                 return false;
             }
