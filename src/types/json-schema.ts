@@ -1,23 +1,67 @@
-export interface JsonSchemaType<T> {
-    type: string,
+export interface JsonSchema<T=any> {
+    type?: string|string[],
     enum?: Array<T>,
     title?: string,
     description?: string,
-    default?: T,
+    anyOf?: Array<JsonSchema>,
+    oneOf?: Array<JsonSchema>,
+    allOf?: Array<JsonSchema>,
+    not?: JsonSchema,
+    
+    [x: string]: any, // custom keywords
+    
+    // https://github.com/epoberezkin/ajv-keywords#keywords
+    
+    typeof?: "undefined"|"string"|"number"|"object"|"function"|"boolean"|"symbol",
+    instanceof?: "Object"|"Array"|"Function"|"Number"|"String"|"Date"|"RegExp" | "Buffer",
+    range?: [number,number],
+    exclusiveRange?: [number,number],
+    if?: JsonSchema,
+    then?: JsonSchema,
+    else?: JsonSchema,
+    /**
+     * @see https://github.com/epoberezkin/ajv-keywords#switch
+     */
+    switch?: Array<IfThenClause>,
+    patternRequired?: string[],
+    prohibited?: string[],
+    deepProperties?: {[x:string]: JsonSchema},
+    deepRequired?: string[],
+    uniqueItemProperties?: string[],
+    regexp?: string|RegExpOptions,
 }
 
-export interface JsonSchemaString extends JsonSchemaType<string> {
+export interface RegExpOptions {
+    pattern: string,
+    flags: string,
+}
+
+export interface IfThenClause {
+    if?: JsonSchema,
+    then: JsonSchema|boolean,
+    continue?: boolean,
+}
+
+export interface JsonSchemaString extends JsonSchema<string> {
     type: "string",
     minLength?: number,
     maxLength?: number,
     pattern?: string,
-    format?: "date-time" | "email" | "hostname" | "ipv4" | "ipv6" | "uri",
+    /**
+     * @see https://github.com/epoberezkin/ajv#formats
+     */
+    format?: "date" | "time" | "date-time" | "uri" | "url" | "uri-template" | "email" | "hostname" | "ipv4" | "ipv6" | "regex" | "uuid" | "json-pointer" | "relative-json-pointer",
+
+    // https://github.com/epoberezkin/ajv-keywords#formatmaximum--formatminimum-and-formatexclusivemaximum--formatexclusiveminimum
+    formatMaximum?: string,
+    formatMinimum?: string,
+    formatExclusiveMaximum?: boolean,
+    formatExclusiveMinimum?: boolean,
 }
 
 export interface JsonSchemaTuple extends Array<JsonSchema> {
 }
-
-export interface JsonSchemaArray extends JsonSchemaType<any[]> {
+export interface JsonSchemaArray extends JsonSchema<any[]> {
     type: "array",
     items?: JsonSchema | JsonSchemaTuple,
     additionalItems?: boolean,
@@ -26,11 +70,11 @@ export interface JsonSchemaArray extends JsonSchemaType<any[]> {
     uniqueItems?: boolean,
 }
 
-export interface JsonSchemaBoolean extends JsonSchemaType<boolean> {
+export interface JsonSchemaBoolean extends JsonSchema<boolean> {
     type: "boolean",
 }
 
-export interface JsonSchemaNumber extends JsonSchemaType<number> {
+export interface JsonSchemaNumber extends JsonSchema<number> {
     type: "integer" | "number",
     multipleOf?: number,
     minimum?: number,
@@ -39,7 +83,7 @@ export interface JsonSchemaNumber extends JsonSchemaType<number> {
     exclusiveMaximum?: boolean,
 }
 
-export interface JsonSchemaObject extends JsonSchemaType<object>, JsonSchemaDependency {
+export interface JsonSchemaObject extends JsonSchema<object>, JsonSchemaDependency {
     type: "object",
 }
 
@@ -53,14 +97,6 @@ export interface JsonSchemaDependency {
     patternProperties?: { [key: string]: JsonSchema },
 }
 
-export interface JsonSchemaNull extends JsonSchemaType<null> {
+export interface JsonSchemaNull extends JsonSchema<null> {
     type: "null"
 }
-
-export type JsonSchema =
-    JsonSchemaString
-    | JsonSchemaArray
-    | JsonSchemaBoolean
-    | JsonSchemaNumber
-    | JsonSchemaObject
-    | JsonSchemaNull;

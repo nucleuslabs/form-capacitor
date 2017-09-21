@@ -111,17 +111,20 @@ export default compose(
         valueProp: 'value',
     }),
     withSchema({
-        schema: {
-            type: 'object',
-            required: ['name','favNumber','primaryLanguageId'],
+        schema: Types.object({
+            required: ['name','favNumber','primaryLanguageId','gender'],
             properties: {
                 name: Types.string({
                     minLength: 2,
                 }),
-                favNumber: Types.number(),
+                birthDate: Types.date(),
+                favNumber: Types.optional(Types.number()),
                 primaryLanguageId: Types.number(),
+                gender: Types.string({
+                    enum: ['M','F'],
+                })
             }
-        }
+        })
     }),
     withHandlers({
         onSubmit: props => ev => {

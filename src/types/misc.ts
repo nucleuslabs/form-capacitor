@@ -30,3 +30,6 @@ export interface Action<T=AnyObject> extends ReduxAction {
 export interface ErrorAction extends Action<Error> {
     error: true;
 }
+
+export type Diff<T extends string, U extends string> = ({[P in T]: P } & {[P in U]: never } & { [x: string]: never })[T];
+export type Omit<T, K extends keyof T> = {[P in Diff<keyof T, K>]: T[P]};  

@@ -25,7 +25,9 @@ export default compose(
         },
     }),
     withSchema({
-        schema: Types.number()
+        schema: {
+            type: ['number','null'],
+        }
     }),
     withPropsOnChange(['value'], ({value}) => ({
         value: Number.isFinite(value) ? String(value) : '',

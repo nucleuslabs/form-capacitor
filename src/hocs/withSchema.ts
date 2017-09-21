@@ -14,7 +14,7 @@ installAjvKeywords(ajv);
 
 export interface Options<TProps> {
     schema: JsonSchema|MapFn<TProps, JsonSchema>,
-    valueProp: string,
+    valueProp?: string,
 }
 
 export default function withSchema<TProps>(options: Options<TProps>) {

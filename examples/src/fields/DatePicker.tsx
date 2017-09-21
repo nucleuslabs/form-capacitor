@@ -14,11 +14,28 @@ export function DatePicker({path, name, ...attrs}: DatePickerProps) {
 
 export default compose(
     field({
-        eventHandler: ev => new Date(ev.currentTarget.valueAsNumber),
+        eventHandler: ev => {
+            let number = ev.currentTarget.valueAsNumber;
+            if(!Number.isFinite(number)) {
+                return null;
+            }
+            let date = new Date(ev.currentTarget.valueAsNumber);
+            if(!Number.isFinite(date.valueOf())) {
+                return null;
+            }
+            return date;
+        },
     }),
     withSchema({
         schema: {
-            instanceof: 'Date',
+            anyOf: [
+                {
+                    instanceof: 'Date',
+                },
+                {
+                    type: 'null'
+                }
+            ],
         }
     }),
     withPropsOnChange(['value'], ({value}) => ({
