@@ -2,7 +2,7 @@
 import React from 'react';
 import {JsonSchema} from '../types/json-schema';
 import {MapFn} from '../types/misc';
-import {createEagerFactory, wrapDisplayName} from 'recompose';
+import {createEagerFactory, wrapDisplayName, getDisplayName} from 'recompose';
 import {defaults} from '../util';
 import Ajv from 'ajv';
 
@@ -29,12 +29,13 @@ export default function withSchema<TProps>(options: Options<TProps>) {
             static displayName = wrapDisplayName(WrappedComponent, 'withSchema');
 
             componentWillReceiveProps(nextProps) {
-                console.log('withSchema.componentWillReceiveProps');
                 if(nextProps[opt.valueProp] !== this.props[opt.valueProp]) {
                     // TODO: validate against the schema, then push results into store
                     const valid = validate(nextProps[opt.valueProp]);
-                    if(!valid) {
-                        console.info(validate.errors.map(err => `- ${err.message}`).join("\n"));
+                    if(valid) {
+                        console.log(`%c${getDisplayName(WrappedComponent)}%c is %cvalid`,'font-weight:bold','','color: green');
+                    } else {
+                        console.log(`%c${getDisplayName(WrappedComponent)}%c is %cinvalid%c${validate.errors.map(err => `\n- ${err.dataPath ? `${err.dataPath.slice(1)} ` : ''}${err.message}`).join('')}`,'font-weight:bold','','color: red','');
                     }
                 }
             }

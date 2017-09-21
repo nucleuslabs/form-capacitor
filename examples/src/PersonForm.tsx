@@ -20,6 +20,7 @@ import {languages,pleaseSelect} from './options';
 import {compose, withHandlers} from 'recompose';
 import withSchema from '../../src/hocs/withSchema';
 import withValue from '../../src/hocs/withValue';
+import * as Types from './SchemaTypes';
 
 export interface PersonFormProps {
 
@@ -113,6 +114,13 @@ export default compose(
         schema: {
             type: 'object',
             required: ['name','favNumber','primaryLanguageId'],
+            properties: {
+                name: Types.string({
+                    minLength: 2,
+                }),
+                favNumber: Types.number(),
+                primaryLanguageId: Types.number(),
+            }
         }
     }),
     withHandlers({
