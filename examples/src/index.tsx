@@ -6,6 +6,7 @@ import PersonForm from './PersonForm';
 import {FormStoreProvider} from 'form-capacitor';
 import SchedulingInstructionsForm from './SchedulingInstructionsForm';
 import DragAndDropForm from './dnd/DragAndDropForm';
+import SignUpForm from './SignUpForm';
 
 
 ReactDOM.render(
@@ -17,6 +18,7 @@ ReactDOM.render(
                     <Route exact path="/person" render={() => <PersonForm name="person"/>}/>
                     <Route exact path="/scheduling" component={SchedulingInstructionsForm}/>
                     <Route exact path="/dnd" component={DragAndDropForm}/>
+                    <Route exact path="/sign-up" component={SignUpForm}/>
                 </Switch>
             </div>
         </BrowserRouter>,

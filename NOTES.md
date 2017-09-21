@@ -4,3 +4,5 @@
 - Split form-capacitor and examples into [workspaces](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)
 - Use [web](https://stackoverflow.com/a/43834750/65387) [workers](https://github.com/webpack-contrib/worker-loader)
 - Look how AJV is used [here](https://mozilla-services.github.io/react-jsonschema-form/), in particular, the "Validation" tab (rules don't appear to be in the schema??) [answer here](https://github.com/mozilla-services/react-jsonschema-form#custom-validation)
+- The [good JSON schema reference](https://spacetelescope.github.io/understanding-json-schema/reference/type.html)
+- AJV [custom validators](https://epoberezkin.github.io/ajv/custom.html#define-keyword-with-validation-function)

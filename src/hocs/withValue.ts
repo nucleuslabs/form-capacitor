@@ -7,6 +7,7 @@ import defaultStore from '../defaultStore';
 import {get as getValue, toPath} from 'lodash';
 import {EMPTY_ARRAY} from '../constants';
 import pubSub from '../pubSub';
+import ShortId from 'shortid';
 // import Lo from 'lodash';
 
 export interface Options {
@@ -54,7 +55,7 @@ const withValue = ({
             super(props);
             this.store = (store && resolveValue(store,this.props)) || (storeProp && this.props[storeProp]) || (context && context[ContextStore]) || defaultStore;
             const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
-            let componentPath = (name && resolveValue(name,this.props)) || (nameProp && this.props[nameProp]);
+            let componentPath = (name && resolveValue(name,this.props)) || (nameProp && this.props[nameProp]) || ShortId.generate();
             componentPath = componentPath ? toPath(componentPath) : EMPTY_ARRAY;
             // fixme: should we assign a rand name?
             this.path = [...basePath, ...componentPath];
