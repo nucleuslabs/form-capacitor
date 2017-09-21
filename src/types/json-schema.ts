@@ -82,6 +82,11 @@ export interface JsonSchemaNumber extends JsonSchema<number> {
     maximum?: number,
     exclusiveMinimum?: boolean,
     exclusiveMaximum?: boolean,
+    /**
+     * The array is valid if it contains at least one item that is valid according to this schema.
+     * @see https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md#contains
+     */
+    contains?: JsonSchema,
 }
 
 export interface JsonSchemaObject extends JsonSchema<object>, JsonSchemaDependency {

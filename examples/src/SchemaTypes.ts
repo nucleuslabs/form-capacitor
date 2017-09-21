@@ -1,10 +1,53 @@
-import {JsonSchemaNumber, JsonSchemaString, JsonSchema, JsonSchemaObject} from '../../src/types/json-schema';
+import {
+    JsonSchemaNumber, JsonSchemaString, JsonSchema, JsonSchemaObject,
+    JsonSchemaArray, JsonSchemaTuple
+} from '../../src/types/json-schema';
 import {Omit} from '../../src/types/misc';
+import {union} from 'lodash';
 
 export function string(options?: Omit<JsonSchemaString,'type'>): JsonSchemaString {
     return {
         ...options,
         type: 'string',
+    }
+}
+
+export function regex(pattern: RegExp): JsonSchemaString {
+    return {
+        type: 'string',
+        regexp: String(pattern),
+    }
+}
+
+export function equalTo(jsonPointer: string): JsonSchema {
+    return {
+        const: {$data: jsonPointer}
+    }
+}
+
+export function array(options?: Omit<JsonSchemaArray,'type'>): JsonSchemaArray {
+    return {
+        ...options,
+        type: 'array',
+    }
+}
+
+export function arrayOf(schema: JsonSchema, options?: Omit<JsonSchemaArray, 'type'|'items'>): JsonSchemaArray {
+    return {
+        ...options,
+        type: 'array',
+        items: schema,
+    }
+}
+
+export function tuple(schemas: JsonSchema[], options?: Omit<JsonSchemaArray, 'type'|'items'|'minItems'|'maxItems'|'additionalItems'>): JsonSchemaArray {
+    return {
+        ...options,
+        type: 'array',
+        items: schemas,
+        minItems: schemas.length,
+        maxItems: schemas.length,
+        additionalItems: false,
     }
 }
 
@@ -20,6 +63,14 @@ export function object(options?: Omit<JsonSchemaObject,'type'>): JsonSchemaObjec
         ...options,
         type: 'object',
     }
+}
+
+export function requiredObject(options: Omit<JsonSchemaObject,'type'>): JsonSchemaObject {
+    options = {...options, type: 'object'};
+    if(options.properties) {
+        options.required = union(options.required, Object.keys(options.properties));
+    }
+    return options;
 }
 
 export function date(options?: JsonSchema): JsonSchema {

@@ -19,10 +19,16 @@ export const Field = ({children, narrow=false, grouped=false, horizontal=false})
     </div>
 );
 
-export const FieldBody = ({children, narrow=false, horizontal=false}) => (
+export const FieldBody = ({children}) => (
     <div className="field-body">
-        <Field narrow={narrow} horizontal={horizontal}>{children}</Field>
+        {children}
     </div>
+);
+
+export const SingleField = ({children, narrow=false, horizontal=false}) => (
+    <FieldBody>
+        <Field narrow={narrow} horizontal={horizontal}>{children}</Field>
+    </FieldBody>
 );
 
 export const Button = ({children, primary, info, type, success, warning, danger, link, outlined, inverted, loading, ...attrs}) => (

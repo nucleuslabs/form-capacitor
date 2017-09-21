@@ -8,7 +8,7 @@ import RadioButton from './fields/RadioButton';
 import SelectBox from './fields/SelectBox';
 import {formatDate} from './util';
 import {
-    CheckBoxLabel, Control, FieldBody, FieldLabel, FieldRow, Title1, RadioLabel, SubmitButton,
+    CheckBoxLabel, Control, SingleField, FieldLabel, FieldRow, Title1, RadioLabel, SubmitButton,
     Title2, Title
 } from './bulma';
 import field from '../../src/hocs/field';
@@ -38,67 +38,67 @@ const PersonForm: React.SFC<PersonFormProps> = ({onSubmit}) => {
             <Title>Person Form</Title>
             <FieldRow>
                 <FieldLabel normal>Name</FieldLabel>
-                <FieldBody>
+                <SingleField>
                     <TextBox name="name" />
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Favourite Number</FieldLabel>
-                <FieldBody narrow>
+                <SingleField narrow>
                     <NumberBox name="favNumber"/>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Birth Date</FieldLabel>
-                <FieldBody narrow>
+                <SingleField narrow>
                     <DatePicker name="birthDate" max={formatDate(new Date())}/>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Primary Language</FieldLabel>
-                <FieldBody>
+                <SingleField>
                     <SelectBox name="primaryLanguageId" options={primaryLanguages}/>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Secondary Languages</FieldLabel>
-                <FieldBody>
+                <SingleField>
                     <SelectBox multiple name="secondaryLanguageIds" options={languages}/>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel>Likes</FieldLabel>
-                <FieldBody>
+                <SingleField>
                     <Control>
                         <CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>
                         <CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>
                         <CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>
                     </Control>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel>Aboriginal?</FieldLabel>
-                <FieldBody>
+                <SingleField>
                     <Control>
                         <CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>
                     </Control>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel>Gender</FieldLabel>
-                <FieldBody>
+                <SingleField>
                     <Control>
                         <RadioLabel><RadioButton name="gender" value="M"/> Male</RadioLabel>
                         <RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>
                         <RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>
                     </Control>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
             <FieldRow>
                 <FieldLabel/>
-                <FieldBody>
+                <SingleField>
                     <SubmitButton>Submit</SubmitButton>
-                </FieldBody>
+                </SingleField>
             </FieldRow>
         </form>
     )
