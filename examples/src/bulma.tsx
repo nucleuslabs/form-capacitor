@@ -13,15 +13,15 @@ export const FieldLabel = ({children=null,normal=false}) => (
     </div>
 );
 
-export const Field = ({children, narrow=false, grouped=false}) => (
-    <div className={classNames('field',{'is-narrow':narrow,'is-grouped':grouped})}>
+export const Field = ({children, narrow=false, grouped=false, horizontal=false}) => (
+    <div className={classNames('field',{'is-narrow':narrow,'is-grouped':grouped,'is-horizontal':horizontal})}>
         {children}
     </div>
 );
 
-export const FieldBody = ({children, narrow=false}) => (
+export const FieldBody = ({children, narrow=false, horizontal=false}) => (
     <div className="field-body">
-        <Field narrow={narrow}>{children}</Field>
+        <Field narrow={narrow} horizontal={horizontal}>{children}</Field>
     </div>
 );
 

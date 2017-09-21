@@ -17,6 +17,7 @@ import {compose, withHandlers} from 'recompose';
 import withSchema from '../../src/hocs/withSchema';
 import withValue from '../../src/hocs/withValue';
 import * as Types from './SchemaTypes';
+import PasswordBox from './fields/PasswordBox';
 
 export interface SignUpFormProps {
 
@@ -41,13 +42,20 @@ const SignUpForm: React.SFC<SignUpFormProps> = ({onSubmit}) => {
             <FieldRow>
                 <FieldLabel normal>Password</FieldLabel>
                 <FieldBody narrow>
-                    <TextBox name="password"/>
+                    <PasswordBox name="password"/>
                 </FieldBody>
             </FieldRow>
             <FieldRow>
                 <FieldLabel normal>Confirm Password</FieldLabel>
                 <FieldBody narrow>
-                    <TextBox name="confirmPassword"/>
+                    <PasswordBox name="confirmPassword"/>
+                </FieldBody>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel normal>Postal Code</FieldLabel>
+                <FieldBody horizontal>
+                    <TextBox name="postal1" size={3} />
+                    <TextBox name="postal2" size={3} />
                 </FieldBody>
             </FieldRow>
             <FieldRow>
@@ -72,6 +80,7 @@ export default compose(
             properties: {
                 username: Types.string({
                     minLength: 3,
+                    
                 }),
                 password: Types.string({
                     minLength: 6,

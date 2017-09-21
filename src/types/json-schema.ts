@@ -1,5 +1,5 @@
 export interface JsonSchema<T=any> {
-    type?: string|string[],
+    type?: string | string[],
     enum?: Array<T>,
     title?: string,
     description?: string,
@@ -7,15 +7,15 @@ export interface JsonSchema<T=any> {
     oneOf?: Array<JsonSchema>,
     allOf?: Array<JsonSchema>,
     not?: JsonSchema,
-    
+
     [x: string]: any, // custom keywords
-    
+
     // https://github.com/epoberezkin/ajv-keywords#keywords
-    
-    typeof?: "undefined"|"string"|"number"|"object"|"function"|"boolean"|"symbol",
-    instanceof?: "Object"|"Array"|"Function"|"Number"|"String"|"Date"|"RegExp" | "Buffer",
-    range?: [number,number],
-    exclusiveRange?: [number,number],
+
+    typeof?: "undefined" | "string" | "number" | "object" | "function" | "boolean" | "symbol",
+    instanceof?: "Object" | "Array" | "Function" | "Number" | "String" | "Date" | "RegExp" | "Buffer",
+    range?: [number, number],
+    exclusiveRange?: [number, number],
     if?: JsonSchema,
     then?: JsonSchema,
     else?: JsonSchema,
@@ -25,10 +25,10 @@ export interface JsonSchema<T=any> {
     switch?: Array<IfThenClause>,
     patternRequired?: string[],
     prohibited?: string[],
-    deepProperties?: {[x:string]: JsonSchema},
+    deepProperties?: { [x: string]: JsonSchema },
     deepRequired?: string[],
     uniqueItemProperties?: string[],
-    regexp?: string|RegExpOptions,
+    regexp?: string | RegExpOptions,
 }
 
 export interface RegExpOptions {
@@ -38,7 +38,7 @@ export interface RegExpOptions {
 
 export interface IfThenClause {
     if?: JsonSchema,
-    then: JsonSchema|boolean,
+    then: JsonSchema | boolean,
     continue?: boolean,
 }
 
@@ -61,6 +61,7 @@ export interface JsonSchemaString extends JsonSchema<string> {
 
 export interface JsonSchemaTuple extends Array<JsonSchema> {
 }
+
 export interface JsonSchemaArray extends JsonSchema<any[]> {
     type: "array",
     items?: JsonSchema | JsonSchemaTuple,
