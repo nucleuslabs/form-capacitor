@@ -1,10 +1,10 @@
 import React from 'react';
-import {createEagerFactory, wrapDisplayName} from 'recompose';
+import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompose';
 import PropTypes from 'prop-types';
-import {resolveValue,defaults} from '../util';
+import {resolveValue,defaults,setValue} from '../util';
 import {ContextStore, StoreShape, ContextPath, PathShape} from '../context';
 import defaultStore from '../defaultStore';
-import {get as getValue, set as setValue, toPath} from 'lodash';
+import {get as getValue, toPath} from 'lodash';
 import {EMPTY_ARRAY} from '../constants';
 import pubSub from '../pubSub';
 // import Lo from 'lodash';
@@ -67,11 +67,15 @@ const withValue = ({
         }
         
         setValue = value => {
-            setValue(this.store, this.path, value);
-            pubSub.publish(this.path);
+            const oldValue = getValue(this.store, this.path);
+            if(oldValue !== value) {
+                setValue(this.store, this.path, value);
+                pubSub.publish(this.path);
+            }
         };
 
         render() {
+            
             let props = {
                 ...this.props,
             };
@@ -84,6 +88,7 @@ const withValue = ({
             if(pathProp) {
                 props[pathProp] = this.path;
             }
+            // console.log('withValue.render',props.value,BaseComponent.displayName);
             return factory(props);
         }
     }
@@ -99,7 +104,7 @@ const withValue = ({
             },
             componentWillUnmount() {
                 this.unsub();
-            }
+            },
         });
     }
     

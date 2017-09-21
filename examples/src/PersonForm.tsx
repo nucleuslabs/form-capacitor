@@ -18,6 +18,8 @@ import field from '../../src/hocs/field';
 // import {compose, connectField, withSchema, inputChanged, withHandler} from 'form-capacitor';
 import {languages,pleaseSelect} from './options';
 import {compose, withHandlers} from 'recompose';
+import withSchema from '../../src/hocs/withSchema';
+import withValue from '../../src/hocs/withValue';
 
 export interface PersonFormProps {
 
@@ -103,15 +105,22 @@ const PersonForm: React.SFC<PersonFormProps> = ({onSubmit}) => {
 // export default PersonForm;
 
 export default compose(
-    field({
-        eventName: 'onSubmit',
+    withValue({
+        nameProp: 'name',
+        valueProp: 'value',
+    }),
+    withSchema({
+        schema: {
+            type: 'object',
+            required: ['name','favNumber','primaryLanguageId'],
+        }
     }),
     withHandlers({
         onSubmit: props => ev => {
             ev.preventDefault();
             console.log(stringify(props.value))
         }
-    })
+    }),
 )(PersonForm);
     
 function replacer(key, value) {

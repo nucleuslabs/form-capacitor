@@ -1,5 +1,5 @@
 import React from 'react';
-import {compose, withPropsOnChange} from 'recompose';
+import {compose, withPropsOnChange,pure,toClass} from 'recompose';
 import {withValueDispatch, withSchema, inputChanged, withHandler} from 'form-capacitor';
 import field from '../../../src/hocs/field';
 // import {JsonSchema} from '../../../src/types/json-schema';

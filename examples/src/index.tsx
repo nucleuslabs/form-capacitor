@@ -9,7 +9,6 @@ import DragAndDropForm from './dnd/DragAndDropForm';
 
 
 ReactDOM.render(
-    <FormStoreProvider store={{person:{name:"Foo"}}}>
         <BrowserRouter>
             <div className="container">
                 <div><Link to="/">&laquo; form-capacitor</Link></div>
@@ -20,7 +19,6 @@ ReactDOM.render(
                     <Route exact path="/dnd" component={DragAndDropForm}/>
                 </Switch>
             </div>
-        </BrowserRouter>
-    </FormStoreProvider>,
+        </BrowserRouter>,
     document.getElementById('react-root')
 );

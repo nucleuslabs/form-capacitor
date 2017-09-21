@@ -1,7 +1,8 @@
 import React from 'react';
 import field from '../../../src/hocs/field';
 import {inputChanged} from 'form-capacitor';
-import {compose, withPropsOnChange} from 'recompose';
+import {compose, withPropsOnChange,pure} from 'recompose';
+import whyRender from '../whyRender';
 
 
 export type NumberBoxProps = React.InputHTMLAttributes<HTMLInputElement>;
@@ -16,11 +17,12 @@ export function NumberBox({path, name, ...attrs}: NumberBoxProps) {
 
 export default compose(
     field({
-        eventHandler: ev => ev.currentTarget.valueAsNumber,
+        eventHandler: ev => {
+            let value = ev.currentTarget.valueAsNumber;
+            return Number.isNaN(value) ? null : value;
+        },
     }),
-    withPropsOnChange(['value'], ({value}) => {
-        if(value === undefined) {
-            return {value: ''};
-        }
-    })
+    withPropsOnChange(['value'], ({value}) => ({
+        value: Number.isFinite(value) ? String(value) : '',
+    })),
 )(NumberBox);
