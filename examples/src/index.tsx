@@ -20,7 +20,7 @@ ReactDOM.render(
                     <Route exact path="/scheduling" component={SchedulingInstructionsForm}/>
                     <Route exact path="/dnd" component={DragAndDropForm}/>
                     <Route exact path="/sign-up" component={SignUpForm}/>
-                    <Route exact path="/twitter" component={AsyncForm}/>
+                    <Route exact path="/github" component={AsyncForm}/>
                 </Switch>
             </div>
         </BrowserRouter>,

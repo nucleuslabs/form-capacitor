@@ -18,6 +18,7 @@ import withSchema from '../../src/hocs/withSchema';
 import withValue from '../../src/hocs/withValue';
 import * as Types from './SchemaTypes';
 import PasswordBox from './fields/PasswordBox';
+import customFormats from './customFormats';
 
 export interface SignUpFormProps {
 
@@ -141,7 +142,8 @@ export default compose(
                     postal1: Types.regex(/^v[1-4]/i)
                 }
             },
-        })
+        }),
+        formats: customFormats,
     }),
     withHandlers({
         onSubmit: props => ev => {

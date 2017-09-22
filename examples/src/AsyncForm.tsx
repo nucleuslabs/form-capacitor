@@ -19,7 +19,7 @@ import withValue from '../../src/hocs/withValue';
 import * as Types from './SchemaTypes';
 import PasswordBox from './fields/PasswordBox';
 
-export interface TwitterFormProps {
+export interface GithubFormProps {
 
 }
 
@@ -28,11 +28,11 @@ const primaryLanguages = [pleaseSelect, ...languages];
 
 
 
-const TwitterForm: React.SFC<TwitterFormProps> = ({onSubmit}) => {
+const GithubForm: React.SFC<GithubFormProps> = ({onSubmit}) => {
 
     return (
         <form onSubmit={onSubmit}>
-            <Title>Twitter</Title>
+            <Title>Github</Title>
             <FieldRow>
                 <FieldLabel normal>Username</FieldLabel>
                 <SingleField>
@@ -48,7 +48,7 @@ const TwitterForm: React.SFC<TwitterFormProps> = ({onSubmit}) => {
         </form>
     )
 };
-// export default TwitterForm;
+// export default GithubForm;
 
 // https://runkit.com/esp/ajv-asynchronous-validation
 
@@ -62,10 +62,24 @@ export default compose(
             $async: true,
             properties: {
                 username: Types.string({
-                    minLength: 3,
+                    minLength: 4,
+                    if: {
+                        minLength: 4,
+                    },
+                    then: {
+                        format: 'github'
+                    }
                 }),
             },
-        })
+        }),
+        formats: {
+            github: {
+                async: true,
+                validate: username => fetch(`https://api.github.com/users/${encodeURIComponent(username)}`)
+                    .then(res => !res.ok),
+                // validate: async username => true,
+            }
+        }
     }),
     withHandlers({
         onSubmit: props => ev => {
@@ -73,7 +87,7 @@ export default compose(
             console.log(stringify(props.value))
         }
     }),
-)(TwitterForm);
+)(GithubForm);
 
 function replacer(key, value) {
     if(value instanceof Set) {

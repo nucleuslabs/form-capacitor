@@ -4,109 +4,60 @@ import {JsonSchema} from '../types/json-schema';
 import {MapFn} from '../types/misc';
 import {createEagerFactory, wrapDisplayName, getDisplayName} from 'recompose';
 import {defaults} from '../util';
-import Ajv from 'ajv';
+import Ajv, {KeywordDefinition} from 'ajv';
 import installAjvKeywords from 'ajv-keywords';
 
-const ajv = new Ajv({
-    allErrors: true,
-    $data: true,
-    formats: {
-        // TODO: how to allow custom formats via withSchema?
-        BCPHN: function(phn) {
-            // healthnetBC
-            // http://www2.gov.bc.ca/assets/gov/health/practitioner-pro/software-development-guidelines/app_d.pdf
-            // Test number: 0009123947241
-            let match = phn.match(/^0*9(\d{8})(\d)$/);
-            if(!match) {
-                return false;
-            }
-            let digits = match[1];
-            let checkDigit = parseInt(match[2],10);
-            const weights = [2,4,8,5,10,9,7,3];
-            let sum = 0;
-            for(let i=0; i<weights.length; ++i) {
-                let value = parseInt(digits[i],10) * weights[i];
-                sum += value % 11;
-            }
-            let rem = sum % 11;
-            return 11 - rem === checkDigit;
-        },
-        ONPHN: function(phn) {
-            // OHIP
-            // http://www.health.gov.on.ca/english/providers/pub/ohip/tech_specific/pdf/5_13.pdf
-            // https://en.wikipedia.org/wiki/Luhn_algorithm
-            // Test number: 9876543217
-            let match = phn.match(/^([1-9]\d{8})(\d)(?:[A-Z]{2})?$/i);
-            if(!match) {
-                return false;
-            }
-            let digits = match[1];
-            let checkDigit = parseInt(match[2],10);
-          
-            let sum = 0;
-            for(let i=0; i<digits.length; ++i) {
-                let digit = parseInt(digits[i],10);
-                if(i%2 === 0) {
-                    let double = digit * 2;
-                    sum += double >= 10 ? sumOfDigits(double) : double;
-                } else {
-                    sum += digit;
-                }
-            }
-            let rem = sum % 10;
-            return 10 - rem === checkDigit;
-        },
-    }
-});
-installAjvKeywords(ajv);
 
-export interface FormatObj {
-    validate: string|RegExp,
-    compare: (a:string,b:string) => -1|0|1,
-    async: boolean,
+export interface FormatOptions {
+    validate: FormatValidator,
+    compare?: (a:string,b:string) => -1|0|1,
+    async?: boolean,
     type?: "string"|"number"
 }
-export type FormatFunc = (input:string) => boolean;
+export type FormatFunction = (input:string) => boolean|Promise<boolean>; // https://github.com/epoberezkin/ajv/issues/570
 
-export type FormatDef = string|RegExp|FormatFunc|FormatObj;
+export type FormatValidator = string|RegExp|FormatFunction;
+
+export type FormatDefinition = FormatValidator|FormatOptions;
+
 
 export interface FormatMap {
-    [name: string]: FormatDef,
-}
-
-export interface KeywordDef {
-    type?: string|string[],
-    validate?: Function,
-    compile?: Function,
-    macro?: Function,
-    inline?: Function,
-    schema?: false,
-    metaSchema?: JsonSchema,
-    modifying?: true,
-    valid?: boolean,
-    $data?: true,
-    async?: true,
-    errors?: boolean,
+    [name: string]: FormatDefinition,
 }
 
 export interface KeywordMap {
-    [name: string]: KeywordDef,
+    [name: string]: KeywordDefinition,
 }
 
-
-function sumOfDigits(num) {
-    return String(num).split('').map(x => parseInt(x,10)).reduce((a,b) => a + b, 0);
-}
 
 export interface Options<TProps> {
     schema: JsonSchema|MapFn<TProps, JsonSchema>,
     valueProp?: string,
+    formats?: FormatMap,
+    keywords?: KeywordMap,
 }
 
-export default function withSchema<TProps>(options: Options<TProps>, formats?: FormatMap, keywords?: KeywordMap) {
+export default function withSchema<TProps>(options: Options<TProps>): React.ComponentClass<TProps> {
     const opt = defaults({
         valueProp: 'value',
     }, options);
+
+    const ajv = new Ajv({
+        allErrors: true,
+        $data: true,
+    });
+    installAjvKeywords(ajv);
+    
+    if(opt.formats) {
+        for (let k of Object.keys(opt.formats)) {
+            ajv.addFormat(k, opt.formats[k]);
+        }
+    }
+    if(opt.keywords) {
+        for (let k of Object.keys(opt.keywords)) {
+            ajv.addKeyword(k, opt.keywords[k]);
+        }
+    }
     
     const validate = ajv.compile(opt.schema);
     
