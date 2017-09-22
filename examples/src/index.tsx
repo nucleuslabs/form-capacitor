@@ -7,6 +7,7 @@ import {FormStoreProvider} from 'form-capacitor';
 import SchedulingInstructionsForm from './SchedulingInstructionsForm';
 import DragAndDropForm from './dnd/DragAndDropForm';
 import SignUpForm from './SignUpForm';
+import AsyncForm from './AsyncForm';
 
 
 ReactDOM.render(
@@ -19,6 +20,7 @@ ReactDOM.render(
                     <Route exact path="/scheduling" component={SchedulingInstructionsForm}/>
                     <Route exact path="/dnd" component={DragAndDropForm}/>
                     <Route exact path="/sign-up" component={SignUpForm}/>
+                    <Route exact path="/twitter" component={AsyncForm}/>
                 </Switch>
             </div>
         </BrowserRouter>,

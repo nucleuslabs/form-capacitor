@@ -60,6 +60,40 @@ const ajv = new Ajv({
 });
 installAjvKeywords(ajv);
 
+export interface FormatObj {
+    validate: string|RegExp,
+    compare: (a:string,b:string) => -1|0|1,
+    async: boolean,
+    type?: "string"|"number"
+}
+export type FormatFunc = (input:string) => boolean;
+
+export type FormatDef = string|RegExp|FormatFunc|FormatObj;
+
+export interface FormatMap {
+    [name: string]: FormatDef,
+}
+
+export interface KeywordDef {
+    type?: string|string[],
+    validate?: Function,
+    compile?: Function,
+    macro?: Function,
+    inline?: Function,
+    schema?: false,
+    metaSchema?: JsonSchema,
+    modifying?: true,
+    valid?: boolean,
+    $data?: true,
+    async?: true,
+    errors?: boolean,
+}
+
+export interface KeywordMap {
+    [name: string]: KeywordDef,
+}
+
+
 function sumOfDigits(num) {
     return String(num).split('').map(x => parseInt(x,10)).reduce((a,b) => a + b, 0);
 }
@@ -69,7 +103,7 @@ export interface Options<TProps> {
     valueProp?: string,
 }
 
-export default function withSchema<TProps>(options: Options<TProps>) {
+export default function withSchema<TProps>(options: Options<TProps>, formats?: FormatMap, keywords?: KeywordMap) {
     const opt = defaults({
         valueProp: 'value',
     }, options);
@@ -80,17 +114,32 @@ export default function withSchema<TProps>(options: Options<TProps>) {
         const factory = createEagerFactory(WrappedComponent);
         
         console.log(`${getDisplayName(WrappedComponent)} has schema:\n${JSON.stringify(opt.schema,null,2)}`);
-
+        
+        function success() {
+            console.log(`%c${getDisplayName(WrappedComponent)}%c is %cvalid`,'font-weight:bold','','color: green');
+        }
+        
+        function fail(errors) {
+            // console.dir(validate);
+            console.log(`%c${getDisplayName(WrappedComponent)}%c is %cinvalid%c${errors.map(err => `\n- ${err.dataPath ? `${err.dataPath.slice(1)} ` : ''}${err.message}`).join('')}`,'font-weight:bold','','color: red','');
+        }
+        
         function doValidate(value) {
             // TODO: validate against the schema, then push results into store
             // TODO: make this async https://github.com/epoberezkin/ajv#asynchronous-schema-compilation
-            const valid = validate(value);
-            if(valid) {
-                console.log(`%c${getDisplayName(WrappedComponent)}%c is %cvalid`,'font-weight:bold','','color: green');
+            
+            if(validate.$async) {
+                validate(value).then(success,err => {
+                    if(err instanceof Ajv.ValidationError) {
+                        fail(err.errors);
+                    } else {
+                        throw err;
+                    }
+                });
             } else {
-                // console.dir(validate);
-                console.log(`%c${getDisplayName(WrappedComponent)}%c is %cinvalid%c${validate.errors.map(err => `\n- ${err.dataPath ? `${err.dataPath.slice(1)} ` : ''}${err.message}`).join('')}`,'font-weight:bold','','color: red','');
+                validate(value) ? success() : fail(validate.errors);
             }
+    
         }
         
         class WithSchema extends React.Component {
