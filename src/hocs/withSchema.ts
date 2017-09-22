@@ -45,6 +45,7 @@ export default function withSchema<TProps>(options: Options<TProps>): React.Comp
     const ajv = new Ajv({
         allErrors: true,
         $data: true,
+        ownProperties: true,
     });
     installAjvKeywords(ajv);
     

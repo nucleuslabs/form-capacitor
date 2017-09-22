@@ -18,6 +18,7 @@ import withSchema from '../../src/hocs/withSchema';
 import withValue from '../../src/hocs/withValue';
 import * as Types from './SchemaTypes';
 import PasswordBox from './fields/PasswordBox';
+import pmemoize from 'p-memoize';
 
 export interface GithubFormProps {
 
@@ -32,11 +33,17 @@ const GithubForm: React.SFC<GithubFormProps> = ({onSubmit}) => {
 
     return (
         <form onSubmit={onSubmit}>
-            <Title>Github</Title>
+            <Title>Async Validations</Title>
             <FieldRow>
-                <FieldLabel normal>Username</FieldLabel>
+                <FieldLabel normal>Github Username</FieldLabel>
                 <SingleField>
                     <TextBox name="username" />
+                </SingleField>
+            </FieldRow>
+            <FieldRow>
+                <FieldLabel normal>Favourite <a href="https://scrolls.com/" target="_blank">Scroll</a></FieldLabel>
+                <SingleField>
+                    <TextBox name="scroll" />
                 </SingleField>
             </FieldRow>
             <FieldRow>
@@ -51,6 +58,13 @@ const GithubForm: React.SFC<GithubFormProps> = ({onSubmit}) => {
 // export default GithubForm;
 
 // https://runkit.com/esp/ajv-asynchronous-validation
+
+const mem = fn => pmemoize(fn, {maxAge: 1000*60*5});
+
+const githubUsernameAvailable = mem(username => fetch(`https://api.github.com/users/${encodeURIComponent(username)}`).then(res => res.status === 404));
+
+// http://a.scrollsguide.com/docs/
+const scrolls = mem(name => fetch(`http://a.scrollsguide.com/scrolls?name=${encodeURIComponent(name)}`).then(res => res.json()).then(json => json.msg === 'success'));
 
 export default compose(
     withValue({
@@ -70,13 +84,26 @@ export default compose(
                         format: 'github'
                     }
                 }),
+                scroll: Types.string({
+                    minLength: 3,
+                    if: {
+                        minLength: 3,
+                    },
+                    then: {
+                        format: 'scroll'
+                    }
+                }),
             },
         }),
         formats: {
             github: {
                 async: true,
-                validate: username => fetch(`https://api.github.com/users/${encodeURIComponent(username)}`)
-                    .then(res => !res.ok),
+                validate: githubUsernameAvailable,
+                // validate: async username => true,
+            },
+            scroll: {
+                async: true,
+                validate: scrolls,
                 // validate: async username => true,
             }
         }
