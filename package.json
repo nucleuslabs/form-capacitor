@@ -1,32 +1,5 @@
 {
-  "name": "form-capacitor",
-  "version": "0.3.0",
-  "description": "Form manager for React/Redux",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
-  "keywords": [
-    "react",
-    "form",
-    "manager",
-    "state"
-  ],
-  "author": "Mark Penner <mpenner@nucleuslabs.com>",
-  "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",
-  "license": "MIT",
-  "dependencies": {
-    "@types/lodash": "^4.14.71",
-    "@types/react": "^16.0.0",
-    "@types/recompose": "^0.23.3",
-    "ajv": "^5.2.2",
-    "ajv-keywords": "^2.1.0",
-    "lodash": "^4.17.4",
-    "prop-types": "^15.5.10",
-    "react": "^15.4.2",
-    "recompose": "^0.21.2",
-    "shortid": "^2.2.8"
-  },
-  "peerDependencies": {},
-  "devDependencies": {
-    "typescript": "^2.4.2"
-  }
+	"devDependencies": {
+		"lerna": "^2.4.0"
+	}
 }

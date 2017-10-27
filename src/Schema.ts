@@ -1,1 +1,0 @@
-// TODO: a "schema" should be its own object type which forms can reference independently of a UI/React.Component
