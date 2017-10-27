@@ -21,8 +21,14 @@ export default class Schema {
         
     }
     
-    serialize(data) {
-        
+     
+    /**
+     * Coerce data into their proper types, strip out undefined values and additional properties.
+     * 
+     * @param data
+     */
+    sanitize(data) {  // serializ"e or "sanitize"?    
+       
     }
     
     format(data) {
@@ -30,12 +36,21 @@ export default class Schema {
     }
 }
 
+function toArray(str) {
+    return Array.isArray(str) ? str : [str];
+}
+
 function validate(schema, data, options) {
     const {type, ...subschema} = schema;
-    if(!typeValidators[type]) {
-        throw new Error(`type: "${type}" is not supported`);
+    let errors;
+    for(let t of toArray(type)) {
+        if(!typeValidators[t]) {
+            throw new Error(`type: "${t}" is not supported`);
+        }
+        errors = typeValidators[t](subschema, data, options);
+        if(!errors) return;
     }
-    return typeValidators[type](subschema, data, options);
+    return errors;
 }
 
 const typeValidators = {};
