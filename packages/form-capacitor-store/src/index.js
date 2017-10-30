@@ -1,0 +1,1 @@
+export {default as withValue} from './enhancers/withValue';

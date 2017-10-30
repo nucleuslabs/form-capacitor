@@ -2,11 +2,11 @@ import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import PropTypes from 'prop-types';
 import {resolveValue, defaults, setValue} from '../util';
-import {ContextStore, StoreShape, ContextPath, PathShape} from '../context';
+import {ContextStore, StoreShape, ContextPath, PathShape} from '../objects/context';
 import defaultStore from '../objects/store';
 import {get as getValue, toPath} from 'lodash';
-import {EMPTY_ARRAY} from '../constants';
-import pubSub from '../pubSub';
+import {EMPTY_ARRAY,EMPTY_OBJECT} from '../objects/constants';
+import pubSub from '../objects/pubSub';
 import ShortId from 'shortid';
 // import Lo from 'lodash';
 
@@ -18,15 +18,15 @@ const withValue = ({
                        valueProp,
                        setValueProp,
                        pathProp,
-                   }) => (BaseComponent) => {
+                   } = EMPTY_OBJECT) => (BaseComponent) => {
     const factory = createEagerFactory(BaseComponent);
 
     class NewComponent extends React.PureComponent {
         static displayName = wrapDisplayName(BaseComponent, 'withValue');
 
-        private store;
-        private path;
-        private unsub;
+        // private store;
+        // private path;
+        // private unsub;
 
         static contextTypes = {
             [ContextPath]: PathShape,

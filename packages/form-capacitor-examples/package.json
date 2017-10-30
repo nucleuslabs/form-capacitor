@@ -8,7 +8,9 @@
     "form-capacitor-store": "*",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "react-router-dom": "^4.2.2"
+    "react-router-dom": "^4.2.2",
+    "classcat": "^1.0.1",
+    "recompact": "^3.2.0"
   },
   "devDependencies": {
     "form-capacitor-util": "*",

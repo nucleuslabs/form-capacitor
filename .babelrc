@@ -3,7 +3,8 @@
     "transform-object-rest-spread",
     "syntax-jsx",
     "transform-react-jsx",
-    "transform-react-display-name"
+    "transform-react-display-name",
+    "transform-class-properties"
   ],
   "presets": [
     [
@@ -14,5 +15,6 @@
         }
       }
     ]
-  ]
+  ],
+  "compact": false
 }

@@ -1,12 +1,16 @@
 {
   "name": "form-capacitor-store",
   "version": "0.1.0",
+  "main": "src",
   "scripts": {
   
   },
   "dependencies": {
     "recompact": "^3.2.0",
-    "shortid": "^2.2.8"
+    "shortid": "^2.2.8",
+    "react": "^16.0.0",
+    "prop-types": "^15.6.0",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "form-capacitor-util": "*"

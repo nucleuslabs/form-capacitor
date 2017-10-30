@@ -1,8 +1,8 @@
 // inspired by https://github.com/mroderick/PubSubJS/blob/903eb3c45e335ae5bfcda40ae9c5894583869dd8/src/pubsub.js#L168
 
 export default class PubSub {
-    private subscriptions = Object.create(null);
-    private counter = 0;
+    subscriptions = Object.create(null);
+    counter = 0;
 
     subscribe(path, callback) {
         if(Array.isArray(path)) {
