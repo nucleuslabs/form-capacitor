@@ -4,10 +4,15 @@ import {
     Title2, Title
 } from '../bulma';
 import TextBox from '../fields/TextBox';
+import createComponent from '../../createComponent';
+import {withValue} from 'form-capacitor-store';
 
-export default function PersonForm() {
-    
-    return (
+export default createComponent({
+    displayName: "PersonForm",
+    enhancers: [
+        withValue()
+    ],
+    render: () => (
         <form>
             <Title>Person Form</Title>
             <FieldRow>
@@ -18,4 +23,4 @@ export default function PersonForm() {
             </FieldRow>
         </form>
     )
-}
+});

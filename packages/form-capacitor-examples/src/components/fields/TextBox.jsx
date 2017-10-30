@@ -1,6 +1,6 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-store';
-import {mapProps} from 'recompact';
+import {mapProps,omitProps,withProps,withPropsOnChange,defaultProps} from 'recompact';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -13,16 +13,19 @@ export default createComponent({
             nameProp: 'name',
             setValueProp: 'setValue',
         }),
-        mapProps(({setValue,...props}) => ({
-            ...props,
+        withPropsOnChange('setValue', ({setValue}) => ({
             onChange(ev) {
                 setValue(ev.currentTarget.value);
             }
-        }))
+        })),
+        defaultProps({
+            value: '', // prevents uncontrolled -> controlled warning
+        }),
+        omitProps(['path','name','setValue']),
     ],
-    render: ({path, name, ...attrs}) => (
+    render: props => (
         <div className="control">
-            <input className="input" {...attrs}/>
+            <input className="input" {...props}/>
         </div>
     )
 })

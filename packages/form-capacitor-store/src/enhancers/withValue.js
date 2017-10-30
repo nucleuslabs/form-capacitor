@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {resolveValue, defaults, setValue} from '../util';
 import {ContextStore, StoreShape, ContextPath, PathShape} from '../objects/context';
 import defaultStore from '../objects/store';
-import {get as getValue, toPath} from 'lodash';
+import {get as getValue, toPath, unset} from 'lodash';
 import {EMPTY_ARRAY,EMPTY_OBJECT} from '../objects/constants';
 import pubSub from '../objects/pubSub';
 import ShortId from 'shortid';
@@ -18,6 +18,7 @@ const withValue = ({
                        valueProp,
                        setValueProp,
                        pathProp,
+                       clearOnUnmount,
                    } = EMPTY_OBJECT) => (BaseComponent) => {
     const factory = createEagerFactory(BaseComponent);
 
@@ -45,10 +46,12 @@ const withValue = ({
             super(props);
             this.store = (store && resolveValue(store, this.props)) || (storeProp && this.props[storeProp]) || (context && context[ContextStore]) || defaultStore;
             const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
-            let componentPath = (name && resolveValue(name, this.props)) || (nameProp && this.props[nameProp]) || ShortId.generate();
-            componentPath = componentPath ? toPath(componentPath) : EMPTY_ARRAY;
+            const componentName = (name && resolveValue(name, this.props)) || (nameProp && this.props[nameProp]);
+            let componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
             // fixme: should we assign a rand name?
             this.path = [...basePath, ...componentPath];
+            
+            this.clearOnUnmount = clearOnUnmount !== undefined ? clearOnUnmount : !componentName;
             // console.log('this.path',this.path);
             if(valueProp) {
                 this.state = {
@@ -82,21 +85,23 @@ const withValue = ({
             // console.log('withValue.render',props.value,BaseComponent.displayName);
             return factory(props);
         }
-    }
 
-    if(valueProp) {
-        Object.assign(NewComponent.prototype, {
-            componentWillMount() {
-                this.unsub = pubSub.subscribe(this.path, () => {
-                    this.setState({
-                        value: getValue(this.store, this.path)
-                    });
+        componentWillMount() {
+            this.unsub = pubSub.subscribe(this.path, () => {
+                this.setState({
+                    value: getValue(this.store, this.path)
                 });
-            },
-            componentWillUnmount() {
-                this.unsub();
-            },
-        });
+            });
+        }
+        
+        componentWillUnmount() {
+            this.unsub();
+            if(this.clearOnUnmount) {
+                if(unset(this.store, this.path)) {
+                    pubSub.publish(this.path);
+                }
+            }
+        }
     }
 
     return NewComponent;
