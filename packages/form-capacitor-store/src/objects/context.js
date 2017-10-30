@@ -14,3 +14,5 @@ export const contextTypes = {
 export function getPath(props) {
     return props[ContextPath] || EMPTY_ARRAY;
 }
+
+export const DATA_ROOT = 'data';

@@ -2,7 +2,7 @@ import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import PropTypes from 'prop-types';
 import {resolveValue, defaults, setValue} from '../util';
-import {ContextStore, StoreShape, ContextPath, PathShape} from '../objects/context';
+import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT} from '../objects/context';
 import defaultStore from '../objects/store';
 import {get as getValue, toPath, unset} from 'lodash';
 import {EMPTY_ARRAY,EMPTY_OBJECT} from '../objects/constants';
@@ -45,7 +45,7 @@ const withValue = ({
         constructor(props, context) {
             super(props);
             this.store = (store && resolveValue(store, this.props)) || (storeProp && this.props[storeProp]) || (context && context[ContextStore]) || defaultStore;
-            const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
+            const basePath = (context && context[ContextPath]) || [DATA_ROOT];
             const componentName = (name && resolveValue(name, this.props)) || (nameProp && this.props[nameProp]);
             let componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
             // fixme: should we assign a rand name?

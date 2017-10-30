@@ -10,7 +10,7 @@ import {withValue} from 'form-capacitor-store';
 export default createComponent({
     displayName: "PersonForm",
     enhancers: [
-        withValue()
+        withValue() // try with {name: 'person'}
     ],
     render: () => (
         <form>
