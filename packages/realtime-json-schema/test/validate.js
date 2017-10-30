@@ -1,5 +1,5 @@
 import SchemaFactory from '../src/SchemaFactory';
-import dump from '../dump';
+import dump from 'form-capacitor-util/dump';
 
 const factory = new SchemaFactory({
     coerce: true,

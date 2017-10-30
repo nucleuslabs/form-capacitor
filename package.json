@@ -1,5 +1,17 @@
 {
 	"devDependencies": {
-		"lerna": "^2.4.0"
+		"lerna": "^2.4.0",
+		"babel-cli": "^6.26.0",
+		"babel-plugin-transform-object-rest-spread": "^6.26.0",
+		"babel-preset-env": "^1.6.1",
+		"babel-plugin-syntax-jsx": "^6.18.0",
+		"babel-plugin-transform-react-jsx": "^6.24.1",
+		"babel-plugin-transform-react-display-name": "^6.25.0",
+		"@types/react": "^16.0.0",
+		"@types/react-dom": "^15.5.1",
+		"@types/react-router": "^4.0.14",
+		"@types/react-router-dom": "^4.0.7",
+		"webpack": "^3.4.1",
+		"webpack-dev-server": "^2.6.1"
 	}
 }

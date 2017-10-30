@@ -1,0 +1,19 @@
+{
+  "name": "form-capacitor-examples",
+  "version": "0.1.0",
+  "scripts": {
+  
+  },
+  "dependencies": {
+    "form-capacitor-store": "*",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-router-dom": "^4.2.2"
+  },
+  "devDependencies": {
+    "form-capacitor-util": "*",
+    "webpack": "^3.4.1",
+    "webpack-dev-server": "^2.6.1",
+    "babel-loader": "^7.1.2"
+  }
+}

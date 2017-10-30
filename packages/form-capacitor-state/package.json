@@ -1,8 +1,8 @@
 {
-  "name": "realtime-json-schema",
+  "name": "form-capacitor-state",
   "version": "0.1.0",
   "scripts": {
-    "test": "babel-node test/validate.js"
+  
   },
   "devDependencies": {
     "form-capacitor-util": "*"

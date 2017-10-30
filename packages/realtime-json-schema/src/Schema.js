@@ -1,4 +1,4 @@
-import dump from '../dump';
+import dump from '../../form-capacitor-util/dump';
 import ValidationError from './ValidationError';
 import ErrorLevel from './ErrorLevel';
 import ErrorCode from './ErrorCode';
