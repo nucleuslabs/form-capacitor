@@ -6,10 +6,15 @@
   
   },
   "dependencies": {
-    "recompact": "^3.2.0"
+    "recompact": "^3.2.0",
+    "react": "^16.0.0",
+    "prop-types": "^15.6.0",
+    "form-capacitor-store": "*",
+    "form-capacitor-util": "*",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "form-capacitor-util": "*",
-    "form-capacitor-store": "*"
+   
+
   }
 }

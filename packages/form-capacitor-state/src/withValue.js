@@ -1,8 +1,8 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import PropTypes from 'prop-types';
-import {resolveValue, defaults, setValue} from './util';
-import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT} from './context';
+import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
+import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT} from 'form-capacitor-store';
 import {defaultStore, pubSub} from 'form-capacitor-store';
 import {get as getValue, toPath, unset} from 'lodash';
 import {EMPTY_ARRAY,EMPTY_OBJECT} from './constants';
@@ -13,6 +13,7 @@ const withValue = ({
                        name = p => p.name,
                        store,
                        clearOnUnmount,
+                        defaultValue,
     
                         // output props:
                        valueProp,
@@ -38,32 +39,43 @@ const withValue = ({
         };
 
         getChildContext() {
-            return {[ContextPath]: this.path};
+            return {[ContextPath]: this.dataPath};
         }
 
         constructor(props, context) {
             super(props);
             this.store = (store && resolveValue(store, this.props)) || (context && context[ContextStore]) || defaultStore;
-            const basePath = (context && context[ContextPath]) || [DATA_ROOT];
+            const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
             const componentName = name !== undefined ? resolveValue(name, this.props) : undefined;
             let componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
             // fixme: should we assign a rand name?
-            this.path = [...basePath, ...componentPath];
+            
+            this.dataPath = [...basePath, ...componentPath];
+            this.fullPath = [DATA_ROOT, ...this.dataPath];
             
             this.clearOnUnmount = clearOnUnmount !== undefined ? clearOnUnmount : !componentName;
-            // console.log('this.path',this.path);
+            // console.log('this.fullPath',this.fullPath);
+            
+            const currentValue = getValue(this.store, this.fullPath);
+            
             if(valueProp) {
                 this.state = {
-                    value: getValue(this.store, this.path)
+                    value: currentValue
                 }
+            }
+            
+            if(defaultValue !== undefined && currentValue === undefined) {
+                // not entirely sure if we want to support this feature yet
+                setValue(this.store, this.fullPath, defaultValue);
+                pubSub.publish(this.fullPath);
             }
         }
 
         setValue = value => {
-            const oldValue = getValue(this.store, this.path);
+            const oldValue = getValue(this.store, this.fullPath);
             if(oldValue !== value) {
-                setValue(this.store, this.path, value);
-                pubSub.publish(this.path);
+                setValue(this.store, this.fullPath, value);
+                pubSub.publish(this.fullPath);
             }
         };
 
@@ -79,7 +91,7 @@ const withValue = ({
                 props[setValueProp] = this.setValue;
             }
             if(pathProp) {
-                props[pathProp] = this.path;
+                props[pathProp] = this.fullPath;
             }
             // console.log('withValue.render',props.value,BaseComponent.displayName);
             return factory(props);
@@ -87,9 +99,9 @@ const withValue = ({
 
         componentWillMount() {
             if(setValueProp) {
-                this.unsub = pubSub.subscribe(this.path, () => {
+                this.unsub = pubSub.subscribe(this.fullPath, () => {
                     this.setState({
-                        value: getValue(this.store, this.path)
+                        value: getValue(this.store, this.fullPath)
                     });
                 });
             }
@@ -100,8 +112,8 @@ const withValue = ({
                 this.unsub();
             }
             if(this.clearOnUnmount) {
-                if(unset(this.store, this.path)) {
-                    pubSub.publish(this.path);
+                if(unset(this.store, this.fullPath)) {
+                    pubSub.publish(this.fullPath);
                 }
             }
         }

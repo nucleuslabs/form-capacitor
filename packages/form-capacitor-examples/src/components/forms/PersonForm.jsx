@@ -6,11 +6,17 @@ import {
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
+import {dirtyProvider} from 'form-capacitor-dirty';
 
 export default createComponent({
     displayName: "PersonForm",
     enhancers: [
-        withValue() // try with {name: 'person'}
+        withValue({
+            defaultValue: {
+                name: "Mark"
+            }
+        }), // try with {name: 'person'}
+        dirtyProvider(),
     ],
     render: () => (
         <form>
