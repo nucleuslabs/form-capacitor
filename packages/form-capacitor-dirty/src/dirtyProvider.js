@@ -1,6 +1,6 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
-import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT, defaultStore, DIRTY_ROOT, ContextDirty, DirtyShape} from 'form-capacitor-store';
+import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT, defaultStore, DIRTY_ROOT, ContextDirty, DirtyShape, pubSub} from 'form-capacitor-store';
 import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
 import {get as getValue, toPath, unset} from 'lodash';
 
@@ -36,23 +36,40 @@ export default function dirtyProvider(options) {
             constructor(props, context) {
                 super(props);
 
-                const dataPath = getValue(context, ContextPath);
-                if(!dataPath) {
+                this.dataPath = getValue(context, ContextPath);
+                if(!this.dataPath) {
                     throw new Error("`dirtyProvider` must be added after `withValue`; context path was not found")
                 }
                 
-                const fullPath = [DATA_ROOT, ...dataPath];
+                const fullPath = [DATA_ROOT, ...this.dataPath];
 
-                const store = (options.store && resolveValue(options.store, this.props)) || (context && context[ContextStore]) || defaultStore;
+                this.store = (options.store && resolveValue(options.store, this.props)) || (context && context[ContextStore]) || defaultStore;
                 
-                const initialData = getValue(store, fullPath);
+                const initialData = getValue(this.store, fullPath);
 
-                // console.log(JSON.stringify([store,defaultStore,context[ContextStore],[DIRTY_ROOT, ...dataPath], initialData],null,2));
-                setValue(store, [DIRTY_ROOT, ...dataPath], initialData);
+                // console.log(JSON.stringify([store,defaultStore,context[ContextStore],[DIRTY_ROOT, ...this.dataPath], initialData],null,2));
+                setValue(this.store, [DIRTY_ROOT, ...this.dataPath], initialData);
             }
+            
+            resetState = () => {
+                const dataPath = [DATA_ROOT, ...this.dataPath];
+                const currentValue = getValue(this.store, dataPath);
+                const initialValue = getValue(this.store, [DIRTY_ROOT, ...this.dataPath]);
+                
+             
+                if(currentValue !== initialValue) {
+                    setValue(this.store, dataPath, initialValue);
+                    console.log('publish',dataPath);
+                    pubSub.publish(dataPath);
+                }
+            };
 
             render() {
-                return factory();
+                const props = {...this.props};
+                if(options.resetStateProp) {
+                    props[options.resetStateProp] = this.resetState;
+                }
+                return factory(props);
             }
         }
     }

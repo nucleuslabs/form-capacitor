@@ -56,18 +56,21 @@ const withValue = ({
             this.clearOnUnmount = clearOnUnmount !== undefined ? clearOnUnmount : !componentName;
             // console.log('this.fullPath',this.fullPath);
             
-            const currentValue = getValue(this.store, this.fullPath);
+            let currentValue = getValue(this.store, this.fullPath);
+
+            if(defaultValue !== undefined && currentValue === undefined) {
+                // not entirely sure if we want to support this feature yet
+                setValue(this.store, this.fullPath, defaultValue);
+                pubSub.publish(this.fullPath);
+                currentValue = defaultValue;
+            }
+            
+            // console.log('currentValue',currentValue);
             
             if(valueProp) {
                 this.state = {
                     value: currentValue
                 }
-            }
-            
-            if(defaultValue !== undefined && currentValue === undefined) {
-                // not entirely sure if we want to support this feature yet
-                setValue(this.store, this.fullPath, defaultValue);
-                pubSub.publish(this.fullPath);
             }
         }
 
@@ -86,6 +89,8 @@ const withValue = ({
             };
             if(valueProp) {
                 props[valueProp] = this.state.value;
+                // console.log('this.state',this.state);
+                // console.log('props[valueProp]',props[valueProp]);
             }
             if(setValueProp) {
                 props[setValueProp] = this.setValue;
@@ -93,13 +98,14 @@ const withValue = ({
             if(pathProp) {
                 props[pathProp] = this.fullPath;
             }
-            // console.log('withValue.render',props.value,BaseComponent.displayName);
+            // console.log('withValue.render',valueProp,props[valueProp],BaseComponent.displayName);
             return factory(props);
         }
 
         componentWillMount() {
-            if(setValueProp) {
+            if(valueProp) {
                 this.unsub = pubSub.subscribe(this.fullPath, () => {
+                    // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
                     this.setState({
                         value: getValue(this.store, this.fullPath)
                     });
@@ -108,7 +114,7 @@ const withValue = ({
         }
         
         componentWillUnmount() {
-            if(setValueProp) {
+            if(valueProp) {
                 this.unsub();
             }
             if(this.clearOnUnmount) {
