@@ -5,7 +5,7 @@ import {
 } from '../bulma';
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
-import {withValue} from 'form-capacitor-store';
+import {withValue} from 'form-capacitor-state';
 
 export default createComponent({
     displayName: "PersonForm",

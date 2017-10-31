@@ -1,12 +1,11 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import PropTypes from 'prop-types';
-import {resolveValue, defaults, setValue} from '../util';
-import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT} from '../objects/context';
-import defaultStore from '../objects/store';
+import {resolveValue, defaults, setValue} from './util';
+import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT} from './context';
+import {defaultStore, pubSub} from 'form-capacitor-store';
 import {get as getValue, toPath, unset} from 'lodash';
-import {EMPTY_ARRAY,EMPTY_OBJECT} from '../objects/constants';
-import pubSub from '../objects/pubSub';
+import {EMPTY_ARRAY,EMPTY_OBJECT} from './constants';
 import ShortId from 'shortid';
 // import Lo from 'lodash';
 

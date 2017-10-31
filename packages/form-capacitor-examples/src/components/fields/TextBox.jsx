@@ -1,5 +1,5 @@
 import createComponent from '../../createComponent';
-import {withValue} from 'form-capacitor-store';
+import {withValue} from 'form-capacitor-state';
 import {mapProps,omitProps,withProps,withPropsOnChange,defaultProps} from 'recompact';
 // import dump from 'form-capacitor-util/dump';
 

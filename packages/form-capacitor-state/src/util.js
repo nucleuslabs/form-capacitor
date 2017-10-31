@@ -1,7 +1,7 @@
 /**
  * Unwraps a value. If passed a function, evaluates that function with the provided args. Otherwise, returns the value as-is.
  */
-import {EMPTY_OBJECT} from './objects/constants';
+import {EMPTY_OBJECT} from './constants';
 import {clone} from 'lodash';
 
 export function resolveValue(functionOrValue, ...args) {

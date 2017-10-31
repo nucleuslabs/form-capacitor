@@ -1,1 +1,2 @@
-export {default as withValue} from './enhancers/withValue';
+export {default as defaultStore} from './objects/store';
+export {default as pubSub} from './objects/pubSub';
