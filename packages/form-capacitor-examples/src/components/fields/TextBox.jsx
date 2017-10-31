@@ -21,7 +21,7 @@ export default createComponent({
         defaultProps({
             value: '', // prevents uncontrolled -> controlled warning
         }),
-        omitProps(['path','name','setValue']),
+        omitProps(['name','setValue']),
     ],
     render: props => (
         <div className="control">

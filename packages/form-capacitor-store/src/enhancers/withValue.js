@@ -11,14 +11,14 @@ import ShortId from 'shortid';
 // import Lo from 'lodash';
 
 const withValue = ({
-                       nameProp,
-                       name = p => p[nameProp],
-                       storeProp,
+                       name = p => p.name,
                        store,
+                       clearOnUnmount,
+    
+                        // output props:
                        valueProp,
                        setValueProp,
                        pathProp,
-                       clearOnUnmount,
                    } = EMPTY_OBJECT) => (BaseComponent) => {
     const factory = createEagerFactory(BaseComponent);
 
@@ -44,9 +44,9 @@ const withValue = ({
 
         constructor(props, context) {
             super(props);
-            this.store = (store && resolveValue(store, this.props)) || (storeProp && this.props[storeProp]) || (context && context[ContextStore]) || defaultStore;
+            this.store = (store && resolveValue(store, this.props)) || (context && context[ContextStore]) || defaultStore;
             const basePath = (context && context[ContextPath]) || [DATA_ROOT];
-            const componentName = (name && resolveValue(name, this.props)) || (nameProp && this.props[nameProp]);
+            const componentName = name !== undefined ? resolveValue(name, this.props) : undefined;
             let componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
             // fixme: should we assign a rand name?
             this.path = [...basePath, ...componentPath];
@@ -87,15 +87,19 @@ const withValue = ({
         }
 
         componentWillMount() {
-            this.unsub = pubSub.subscribe(this.path, () => {
-                this.setState({
-                    value: getValue(this.store, this.path)
+            if(setValueProp) {
+                this.unsub = pubSub.subscribe(this.path, () => {
+                    this.setState({
+                        value: getValue(this.store, this.path)
+                    });
                 });
-            });
+            }
         }
         
         componentWillUnmount() {
-            this.unsub();
+            if(setValueProp) {
+                this.unsub();
+            }
             if(this.clearOnUnmount) {
                 if(unset(this.store, this.path)) {
                     pubSub.publish(this.path);
