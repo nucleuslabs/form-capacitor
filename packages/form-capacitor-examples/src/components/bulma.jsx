@@ -7,8 +7,8 @@ export const FieldRow = ({children}) => (
     </div>
 );
 
-export const FieldLabel = ({children=null,normal=false}) => (
-    <div className={classNames(['field-label',{'is-normal':normal}])}>
+export const FieldLabel = ({children=null,normal=false,className}) => (
+    <div className={classNames(['field-label',{'is-normal':normal},className])}>
         {children ? <label className="label">{children}</label> : null}
     </div>
 );

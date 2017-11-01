@@ -8,6 +8,7 @@ import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
 import {dirtyProvider} from 'form-capacitor-dirty';
 import {withHandlers} from 'recompact';
+import DirtyLabel from '../fields/DirtyLabel';
 
 export default createComponent({
     displayName: "PersonForm",
@@ -40,7 +41,7 @@ export default createComponent({
                 <form>
                     <Title>Person Form</Title>
                     <FieldRow>
-                        <FieldLabel normal>Name</FieldLabel>
+                        <DirtyLabel normal name="name">Name</DirtyLabel>
                         <SingleField>
                             <TextBox name="name"/>
                         </SingleField>
