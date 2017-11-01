@@ -1,5 +1,5 @@
 // inspired by https://github.com/mroderick/PubSubJS/blob/903eb3c45e335ae5bfcda40ae9c5894583869dd8/src/pubsub.js#L168
-import {toPath, get as getValue, has as hasPath, unset} from 'lodash';
+import {toPath, get as getValue, unset} from 'lodash';
 import {setValue} from 'form-capacitor-util/util';
 
 export default class Store {

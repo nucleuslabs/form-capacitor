@@ -31,6 +31,8 @@ export const SingleField = ({children, narrow=false, horizontal=false}) => (
     </FieldBody>
 );
 
+export const Buttons = props => <div {...props} className="buttons" />;
+
 export const Button = ({children, primary, info, type, success, warning, danger, link, outlined, inverted, loading, ...attrs}) => (
     <button {...attrs} type={type} className={classNames(['button', {
         'is-primary': primary,

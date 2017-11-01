@@ -10,7 +10,8 @@ export default function dirtyProvider(options) {
         // data: undefined,
         // store: undefined,
         resetStateProp: undefined,
-        markCleanProp: undefined,
+        saveStateProp: undefined,
+        saveOnMount: true,
         ...options,
     };
     
@@ -48,8 +49,14 @@ export default function dirtyProvider(options) {
                 // const initialData = pubSub.get([DATA_ROOT, ...this.dataPath]);
 
                 // console.log(JSON.stringify([store,defaultStore,context[ContextStore],[DIRTY_ROOT, ...this.dataPath], initialData],null,2));
-                pubSub.set([DIRTY_ROOT, ...this.dataPath], pubSub.get([DATA_ROOT, ...this.dataPath]));
+                if(options.saveOnMount) {
+                    this.saveState();
+                }
             }
+
+            saveState = () => {
+                pubSub.set([DIRTY_ROOT, ...this.dataPath], pubSub.get([DATA_ROOT, ...this.dataPath]));
+            };
             
             resetState = () => {
                 pubSub.set([DATA_ROOT, ...this.dataPath], pubSub.get([DIRTY_ROOT, ...this.dataPath]));
@@ -59,6 +66,9 @@ export default function dirtyProvider(options) {
                 const props = {...this.props};
                 if(options.resetStateProp) {
                     props[options.resetStateProp] = this.resetState;
+                }
+                if(options.saveStateProp) {
+                    props[options.saveStateProp] = this.saveState;
                 }
                 return factory(props);
             }

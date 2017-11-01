@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     CheckBoxLabel, Control, SingleField, FieldLabel, FieldRow, Title1, RadioLabel, SubmitButton, Button,
-    Title2, Title
+    Title2, Title, Buttons
 } from '../bulma';
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
@@ -19,16 +19,21 @@ export default createComponent({
             valueProp: 'formData'
         }), // try with {name: 'person'}
         dirtyProvider({
-            resetStateProp: 'resetState'
+            resetStateProp: 'resetState',
+            saveStateProp: 'saveState',
         }),
         withHandlers({
             resetState: props => ev => {
                 ev.preventDefault();
                 props.resetState();
-            }
+            },
+            saveState: props => ev => {
+                ev.preventDefault();
+                props.saveState();
+            },
         })
     ],
-    render: ({resetState, formData}) => {
+    render: ({saveState, resetState, formData}) => {
         // console.log('render',formData);
         return (
             <div>
@@ -43,7 +48,10 @@ export default createComponent({
                     <FieldRow>
                         <FieldLabel/>
                         <SingleField>
-                            <Button onClick={resetState}>Reset</Button>
+                            <Buttons>
+                                <Button onClick={saveState} primary>Save</Button>
+                                <Button onClick={resetState}>Reset</Button>
+                            </Buttons>
                         </SingleField>
                     </FieldRow>
                 </form>
