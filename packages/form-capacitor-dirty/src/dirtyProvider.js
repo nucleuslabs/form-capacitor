@@ -8,7 +8,7 @@ export default function dirtyProvider(options) {
     
     options = {
         // data: undefined,
-        store: undefined,
+        // store: undefined,
         resetStateProp: undefined,
         markCleanProp: undefined,
         ...options,
@@ -22,7 +22,7 @@ export default function dirtyProvider(options) {
 
             static contextTypes = {
                 [ContextPath]: PathShape,
-                [ContextStore]: StoreShape,
+                // [ContextStore]: StoreShape,
             };
 
             // static childContextTypes = {
@@ -41,27 +41,18 @@ export default function dirtyProvider(options) {
                     throw new Error("`dirtyProvider` must be added after `withValue`; context path was not found")
                 }
                 
-                const fullPath = [DATA_ROOT, ...this.dataPath];
+                // const fullPath = [DATA_ROOT, ...this.dataPath];
 
-                this.store = (options.store && resolveValue(options.store, this.props)) || (context && context[ContextStore]) || defaultStore;
+              
                 
-                const initialData = getValue(this.store, fullPath);
+                // const initialData = pubSub.get([DATA_ROOT, ...this.dataPath]);
 
                 // console.log(JSON.stringify([store,defaultStore,context[ContextStore],[DIRTY_ROOT, ...this.dataPath], initialData],null,2));
-                setValue(this.store, [DIRTY_ROOT, ...this.dataPath], initialData);
+                pubSub.set([DIRTY_ROOT, ...this.dataPath], pubSub.get([DATA_ROOT, ...this.dataPath]));
             }
             
             resetState = () => {
-                const dataPath = [DATA_ROOT, ...this.dataPath];
-                const currentValue = getValue(this.store, dataPath);
-                const initialValue = getValue(this.store, [DIRTY_ROOT, ...this.dataPath]);
-                
-             
-                if(currentValue !== initialValue) {
-                    setValue(this.store, dataPath, initialValue);
-                    console.log('publish',dataPath);
-                    pubSub.publish(dataPath);
-                }
+                pubSub.set([DATA_ROOT, ...this.dataPath], pubSub.get([DIRTY_ROOT, ...this.dataPath]));
             };
 
             render() {

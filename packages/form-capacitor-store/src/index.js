@@ -1,3 +1,3 @@
-export {default as defaultStore} from './objects/store';
+// export {default as defaultStore} from './objects/store';
 export {default as pubSub} from './objects/pubSub';
 export * from './objects/context';

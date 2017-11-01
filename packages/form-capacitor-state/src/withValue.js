@@ -11,7 +11,7 @@ import ShortId from 'shortid';
 
 const withValue = ({
                        name = p => p.name,
-                       store,
+                   
                        clearOnUnmount,
                         defaultValue,
     
@@ -31,7 +31,7 @@ const withValue = ({
 
         static contextTypes = {
             [ContextPath]: PathShape,
-            [ContextStore]: StoreShape,
+     
         };
 
         static childContextTypes = {
@@ -44,7 +44,7 @@ const withValue = ({
 
         constructor(props, context) {
             super(props);
-            this.store = (store && resolveValue(store, this.props)) || (context && context[ContextStore]) || defaultStore;
+           
             const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
             const componentName = name !== undefined ? resolveValue(name, this.props) : undefined;
             let componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
@@ -56,12 +56,11 @@ const withValue = ({
             this.clearOnUnmount = clearOnUnmount !== undefined ? clearOnUnmount : !componentName;
             // console.log('this.fullPath',this.fullPath);
             
-            let currentValue = getValue(this.store, this.fullPath);
+            let currentValue = pubSub.get(this.fullPath);
 
             if(defaultValue !== undefined && currentValue === undefined) {
                 // not entirely sure if we want to support this feature yet
-                setValue(this.store, this.fullPath, defaultValue);
-                pubSub.publish(this.fullPath);
+                pubSub.set(this.fullPath, defaultValue);
                 currentValue = defaultValue;
             }
             
@@ -75,11 +74,7 @@ const withValue = ({
         }
 
         setValue = value => {
-            const oldValue = getValue(this.store, this.fullPath);
-            if(oldValue !== value) {
-                setValue(this.store, this.fullPath, value);
-                pubSub.publish(this.fullPath);
-            }
+            pubSub.set(this.fullPath, value);
         };
 
         render() {
@@ -104,11 +99,10 @@ const withValue = ({
 
         componentWillMount() {
             if(valueProp) {
-                this.unsub = pubSub.subscribe(this.fullPath, () => {
+                this.unsub = pubSub.subscribe(this.fullPath, value => {
                     // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
-                    this.setState({
-                        value: getValue(this.store, this.fullPath)
-                    });
+                    // console.log('change',this.fullPath);
+                    this.setState({value });
                 });
             }
         }
@@ -118,9 +112,7 @@ const withValue = ({
                 this.unsub();
             }
             if(this.clearOnUnmount) {
-                if(unset(this.store, this.fullPath)) {
-                    pubSub.publish(this.fullPath);
-                }
+                pubSub.unset(this.fullPath);
             }
         }
     }

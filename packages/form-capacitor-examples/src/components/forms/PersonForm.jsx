@@ -29,7 +29,7 @@ export default createComponent({
         })
     ],
     render: ({resetState, formData}) => {
-        console.log('render',formData);
+        // console.log('render',formData);
         return (
             <div>
                 <form>
