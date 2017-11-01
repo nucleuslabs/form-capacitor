@@ -28,11 +28,8 @@ export default function withDirty(options) {
                 super(props);
 
                 const basePath = (context && context[ContextPath]) || [];
-                const componentName = options.name !== undefined ? resolveValue(options.name, this.props) : undefined;
-                
-                // console.log(componentName);
-                
-                let componentPath = componentName ? toPath(componentName) : undefined;
+                const componentName = resolveValue(options.name, this.props);
+                let componentPath = toPath(componentName);
                 // fixme: should we assign a rand name?
 
                 this.dataPath = [...basePath, ...componentPath];
@@ -54,7 +51,10 @@ export default function withDirty(options) {
             
 
             render() {
-                console.log('RENDERRR');
+                // console.log('dirtyrender',
+                //     pubSub.get([DATA_ROOT, ...this.dataPath]),
+                //     pubSub.get([DIRTY_ROOT, ...this.dataPath])
+                // );
                 const props = {
                     ...this.props,
                     [options.isDirtyProp]: !Object.is(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([DIRTY_ROOT, ...this.dataPath]))

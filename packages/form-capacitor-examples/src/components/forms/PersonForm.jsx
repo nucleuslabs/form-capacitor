@@ -9,13 +9,15 @@ import {withValue} from 'form-capacitor-state';
 import {dirtyProvider} from 'form-capacitor-dirty';
 import {withHandlers} from 'recompact';
 import DirtyLabel from '../fields/DirtyLabel';
+import NumberBox from '../fields/NumberBox';
 
 export default createComponent({
     displayName: "PersonForm",
     enhancers: [
         withValue({
             defaultValue: {
-                name: "Mark"
+                name: "Mark",
+                favNum: null
             },
             valueProp: 'formData'
         }), // try with {name: 'person'}
@@ -47,6 +49,12 @@ export default createComponent({
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
+                        <DirtyLabel normal name="favNum">Favourite Number</DirtyLabel>
+                        <SingleField narrow>
+                            <NumberBox name="favNum"/>
+                        </SingleField>
+                    </FieldRow>
+                    <FieldRow>
                         <FieldLabel/>
                         <SingleField>
                             <Buttons>
@@ -56,11 +64,11 @@ export default createComponent({
                         </SingleField>
                     </FieldRow>
                 </form>
-                <pre>
-                <code>
-                    {JSON.stringify(formData, null, 2)}
-                </code>
-            </pre>
+                <pre style={{marginTop: '10px'}}>
+                    <code>
+                        {JSON.stringify(formData, null, 2)}
+                    </code>
+                </pre>
             </div>
         )
     }
