@@ -1,17 +1,16 @@
 {
   "name": "form-capacitor-examples",
   "version": "0.1.0",
-  "scripts": {
-  
-  },
+  "scripts": {},
   "dependencies": {
-    "form-capacitor-state": "*",
+    "classcat": "^1.0.1",
     "form-capacitor-dirty": "*",
+    "form-capacitor-state": "*",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-router-dom": "^4.2.2",
-    "classcat": "^1.0.1",
-    "recompact": "^3.2.0"
+    "recompact": "^3.2.0",
+    "recompose": "^0.26.0"
   },
   "devDependencies": {
     "form-capacitor-util": "*",

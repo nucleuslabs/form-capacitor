@@ -12,6 +12,10 @@ import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
 import {formatDate} from '../../util';
 import DatePicker from '../fields/DatePicker';
+import {languages, pleaseSelect} from '../../options';
+import SelectBox from '../fields/SelectBox';
+
+const primaryLanguages = [pleaseSelect, ...languages];
 
 export default createComponent({
     displayName: "PersonForm",
@@ -20,7 +24,8 @@ export default createComponent({
             defaultValue: {
                 name: "Mark",
                 favNum: null,
-                birthDate: "1987-12-21"
+                birthDate: "1987-12-21",
+                primaryLanguageId: null,
             },
             valueProp: 'formData'
         }), // try with {name: 'person'}
@@ -68,6 +73,12 @@ export default createComponent({
                         <DirtyLabel normal for="birthDate">Birth Date</DirtyLabel>
                         <SingleField narrow>
                             <DatePicker name="birthDate" max={formatDate(new Date())}/>
+                        </SingleField>
+                    </FieldRow>
+                    <FieldRow>
+                        <DirtyLabel normal for="primaryLanguageId">Primary Language</DirtyLabel>
+                        <SingleField narrow>
+                            <SelectBox name="primaryLanguageId" options={primaryLanguages}/>
                         </SingleField>
                     </FieldRow>
 
