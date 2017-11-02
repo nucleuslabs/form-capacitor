@@ -10,7 +10,6 @@ export default createComponent({
     enhancers: [
         withValue({
             valueProp: 'value',
-            nameProp: 'name',
             setValueProp: 'setValue',
         }),
         withPropsOnChange('setValue', ({setValue}) => ({

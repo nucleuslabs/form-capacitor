@@ -7,9 +7,11 @@ import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
 import {dirtyProvider} from 'form-capacitor-dirty';
-import {withHandlers} from 'recompact';
+import {withHandlers,withState} from 'recompact';
 import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
+import {formatDate} from '../../util';
+import DatePicker from '../fields/DatePicker';
 
 export default createComponent({
     displayName: "PersonForm",
@@ -17,7 +19,8 @@ export default createComponent({
         withValue({
             defaultValue: {
                 name: "Mark",
-                favNum: null
+                favNum: null,
+                birthDate: "1987-12-21"
             },
             valueProp: 'formData'
         }), // try with {name: 'person'}
@@ -25,6 +28,7 @@ export default createComponent({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
+        withState('saving','setSaving',false),
         withHandlers({
             resetState: props => ev => {
                 ev.preventDefault();
@@ -32,11 +36,16 @@ export default createComponent({
             },
             saveState: props => ev => {
                 ev.preventDefault();
-                props.saveState();
+                props.setSaving(true);
+                setTimeout(() => { // simualte ajax save
+                    props.saveState();
+                    props.setSaving(false);
+                }, 750);
+                
             },
         })
     ],
-    render: ({saveState, resetState, formData}) => {
+    render: ({saveState, resetState, formData, saving}) => {
         // console.log('render',formData);
         return (
             <div>
@@ -51,14 +60,21 @@ export default createComponent({
                     <FieldRow>
                         <DirtyLabel normal name="favNum">Favourite Number</DirtyLabel>
                         <SingleField narrow>
-                            <NumberBox name="favNum"/>
+                            <NumberBox name="favNum" style={{width: '8em'}}/>
                         </SingleField>
                     </FieldRow>
+                    <FieldRow>
+                        <DirtyLabel normal name="birthDate">Birth Date</DirtyLabel>
+                        <SingleField narrow>
+                            <DatePicker name="birthDate" max={formatDate(new Date())}/>
+                        </SingleField>
+                    </FieldRow>
+                    
                     <FieldRow>
                         <FieldLabel/>
                         <SingleField>
                             <Buttons>
-                                <Button onClick={saveState} primary>Save</Button>
+                                <Button onClick={saveState} primary disabled={saving}>Save</Button>
                                 <Button onClick={resetState}>Reset</Button>
                             </Buttons>
                         </SingleField>

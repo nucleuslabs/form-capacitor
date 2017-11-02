@@ -1,5 +1,5 @@
 // inspired by https://github.com/mroderick/PubSubJS/blob/903eb3c45e335ae5bfcda40ae9c5894583869dd8/src/pubsub.js#L168
-import {toPath, get as getValue, unset, debounce} from 'lodash';
+import {toPath, get as getValue, unset} from 'lodash';
 import {setValue} from 'form-capacitor-util/util';
 
 export default class Store {
@@ -7,21 +7,16 @@ export default class Store {
         this.subscriptions = Object.create(null);
         this.data = Object.create(null);
         this.counter = 0;
-        
-        // debounce calls to _fireSubscriptions so that we can aggregate
-        // consecutive calls to set() and unset()
-        // may want to use a setImmediate polyfill (https://github.com/YuzuJS/setImmediate)
-        // instead of Lodash's debounce() which depends on setTimeout
-        // and as such is subject to a ~10ms delay
-        this._fireSubscriptions = debounce(() => {
-            for(let v of Object.values(this.subscriptions)) {
-                let newValue = getValue(this.data, v[0]);
-                if(!Object.is(v[2],newValue)) {
-                    v[2] = newValue;
-                    v[1](newValue,v[2]);
-                }
+    }
+
+    _fireSubscriptions() {
+        for(let v of Object.values(this.subscriptions)) {
+            let newValue = getValue(this.data, v[0]);
+            if(!Object.is(v[2],newValue)) {
+                v[2] = newValue;
+                v[1](newValue,v[2]);
             }
-        });
+        }
     }
 
     subscribe(path, callback) {
