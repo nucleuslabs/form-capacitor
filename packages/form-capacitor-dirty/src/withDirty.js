@@ -34,7 +34,7 @@ export default function withDirty(options) {
 
                 this.dataPath = [...basePath, ...componentPath];
                 
-                console.log(this.dataPath.join('.'));
+                // console.log(this.dataPath.join('.'));
             }
 
             componentWillMount() {

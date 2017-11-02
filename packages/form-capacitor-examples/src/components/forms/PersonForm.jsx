@@ -40,7 +40,7 @@ export default createComponent({
                 props.setSaving(true);
                 const formData = props.formData;
                 setTimeout(() => { // simualte ajax save
-                    props.saveState(formData);
+                    props.saveState(formData); // store what we actually saved instead of the current state in case the user modified the form while we were saving
                     props.setSaving(false);
                 }, 750);
             },

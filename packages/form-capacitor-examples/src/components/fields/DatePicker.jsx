@@ -17,18 +17,18 @@ export default createComponent({
         }),
         withPropsOnChange('setValue', ({setValue}) => ({
             onChange(ev) {
-                return setValue(ev.currentTarget.value);
+                return setValue(ev.currentTarget.value || null);
             }
         })),
         // withPropsOnChange('value',({value}) => ({value: value ? formatDate(value) : ''})),
-        defaultProps({
-            value: '', // prevents uncontrolled -> controlled warning
-        }),
+        // defaultProps({
+        //     value: '', // prevents uncontrolled -> controlled warning
+        // }),
         omitProps(['name','setValue']),
     ],
-    render: ({className,path,...props}) => (
+    render: ({className,path,value,...props}) => (
         <div className={cc(['control',className])}>
-            <input id={path.join('.')} type="date" className="input" {...props}/>
+            <input id={path.join('.')} type="date" className="input" value={value || ''} {...props}/>
         </div>
     )
 })
