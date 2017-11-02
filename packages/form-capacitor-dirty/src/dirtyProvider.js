@@ -11,6 +11,7 @@ export default function dirtyProvider(options) {
         // store: undefined,
         resetStateProp: undefined,
         saveStateProp: undefined,
+        // getStateProp: undefined,
         saveOnMount: true,
         ...options,
     };
@@ -53,9 +54,11 @@ export default function dirtyProvider(options) {
                     this.saveState();
                 }
             }
-
-            saveState = () => {
-                pubSub.set([DIRTY_ROOT, ...this.dataPath], pubSub.get([DATA_ROOT, ...this.dataPath]));
+            
+            // getState = () => pubSub.get([DIRTY_ROOT, ...this.dataPath]);
+            
+            saveState = state => {
+                pubSub.set([DIRTY_ROOT, ...this.dataPath], state !== undefined ? state : pubSub.get([DATA_ROOT, ...this.dataPath]));
             };
             
             resetState = () => {
@@ -70,6 +73,9 @@ export default function dirtyProvider(options) {
                 if(options.saveStateProp) {
                     props[options.saveStateProp] = this.saveState;
                 }
+                // if(options.getStateProp) {
+                //     props[options.getStateProp] = this.getState;
+                // }
                 return factory(props);
             }
         }

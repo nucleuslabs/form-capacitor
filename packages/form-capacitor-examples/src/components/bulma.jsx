@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classcat';
+import cc from 'classcat';
 
 export const FieldRow = ({children}) => (
     <div className="field is-horizontal">
@@ -7,14 +7,14 @@ export const FieldRow = ({children}) => (
     </div>
 );
 
-export const FieldLabel = ({children=null,normal=false,className}) => (
-    <div className={classNames(['field-label',{'is-normal':normal},className])}>
-        {children ? <label className="label">{children}</label> : null}
+export const FieldLabel = ({children=null,normal=false,className,htmlFor}) => (
+    <div className={cc(['field-label',{'is-normal':normal},className])}>
+        {children ? <label className="label" htmlFor={htmlFor}>{children}</label> : null}
     </div>
 );
 
 export const Field = ({children, narrow=false, grouped=false, horizontal=false}) => (
-    <div className={classNames(['field',{'is-narrow':narrow,'is-grouped':grouped,'is-horizontal':horizontal}])}>
+    <div className={cc(['field',{'is-narrow':narrow,'is-grouped':grouped,'is-horizontal':horizontal}])}>
         {children}
     </div>
 );
@@ -33,8 +33,8 @@ export const SingleField = ({children, narrow=false, horizontal=false}) => (
 
 export const Buttons = props => <div {...props} className="buttons" />;
 
-export const Button = ({children, primary, info, type, success, warning, danger, link, outlined, inverted, loading, ...attrs}) => (
-    <button {...attrs} type={type} className={classNames(['button', {
+export const Button = ({children, primary, info, type, success, warning, danger, link, outlined, inverted, loading, className, ...attrs}) => (
+    <button {...attrs} type={type} className={cc(['button', {
         'is-primary': primary,
         'is-info': info,
         'is-success': success,
@@ -44,7 +44,7 @@ export const Button = ({children, primary, info, type, success, warning, danger,
         'is-outlined': outlined,
         'is-inverted': inverted,
         'is-loading': loading,
-    }])}>
+    }, className])}>
         {children}
     </button>
 );
@@ -90,7 +90,7 @@ export const Title3 = ({children}) => (
 
 export const Icon = ({name, small, medium, large}) => (
     <span className="icon">
-        <i className={[classNames('fa', `fa-${name}`, {
+        <i className={[cc('fa', `fa-${name}`, {
             'is-small': small,
             'is-medium': medium,
             'is-large': large,

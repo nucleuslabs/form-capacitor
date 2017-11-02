@@ -7,7 +7,7 @@ import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
 import {dirtyProvider} from 'form-capacitor-dirty';
-import {withHandlers,withState} from 'recompact';
+import {withHandlers, withState} from 'recompact';
 import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
 import {formatDate} from '../../util';
@@ -28,7 +28,7 @@ export default createComponent({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
-        withState('saving','setSaving',false),
+        withState('saving', 'setSaving', false),
         withHandlers({
             resetState: props => ev => {
                 ev.preventDefault();
@@ -37,11 +37,11 @@ export default createComponent({
             saveState: props => ev => {
                 ev.preventDefault();
                 props.setSaving(true);
+                const formData = props.formData;
                 setTimeout(() => { // simualte ajax save
-                    props.saveState();
+                    props.saveState(formData);
                     props.setSaving(false);
                 }, 750);
-                
             },
         })
     ],
@@ -52,29 +52,29 @@ export default createComponent({
                 <form>
                     <Title>Person Form</Title>
                     <FieldRow>
-                        <DirtyLabel normal name="name">Name</DirtyLabel>
+                        <DirtyLabel normal for="name">Name</DirtyLabel>
                         <SingleField>
                             <TextBox name="name"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
-                        <DirtyLabel normal name="favNum">Favourite Number</DirtyLabel>
+                        <DirtyLabel normal for="favNum">Favourite Number</DirtyLabel>
                         <SingleField narrow>
-                            <NumberBox name="favNum" style={{width: '8em'}}/>
+                            <NumberBox name="favNum" />
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
-                        <DirtyLabel normal name="birthDate">Birth Date</DirtyLabel>
+                        <DirtyLabel normal for="birthDate">Birth Date</DirtyLabel>
                         <SingleField narrow>
                             <DatePicker name="birthDate" max={formatDate(new Date())}/>
                         </SingleField>
                     </FieldRow>
-                    
+
                     <FieldRow>
                         <FieldLabel/>
                         <SingleField>
                             <Buttons>
-                                <Button onClick={saveState} primary disabled={saving}>Save</Button>
+                                <Button onClick={saveState} primary disabled={saving} className={{'is-loading': saving}}>Save</Button>
                                 <Button onClick={resetState}>Reset</Button>
                             </Buttons>
                         </SingleField>

@@ -1,7 +1,8 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
 import {mapProps,omitProps,withProps,withPropsOnChange,defaultProps} from 'recompact';
-import {formatDate} from '../../util';
+// import {formatDate} from '../../util';
+import cc from 'classcat';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -12,6 +13,7 @@ export default createComponent({
         withValue({
             valueProp: 'value',
             setValueProp: 'setValue',
+            pathProp: 'path'
         }),
         withPropsOnChange('setValue', ({setValue}) => ({
             onChange(ev) {
@@ -24,9 +26,9 @@ export default createComponent({
         }),
         omitProps(['name','setValue']),
     ],
-    render: props => (
-        <div className="control">
-            <input type="date" className="input" {...props}/>
+    render: ({className,path,...props}) => (
+        <div className={cc(['control',className])}>
+            <input id={path.join('.')} type="date" className="input" {...props}/>
         </div>
     )
 })

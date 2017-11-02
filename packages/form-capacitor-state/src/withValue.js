@@ -91,7 +91,7 @@ const withValue = ({
                 props[setValueProp] = this.setValue;
             }
             if(pathProp) {
-                props[pathProp] = this.fullPath;
+                props[pathProp] = this.dataPath;
             }
             // console.log('withValue.render',valueProp,props[valueProp],BaseComponent.displayName);
             return factory(props);

@@ -1,7 +1,10 @@
 import createComponent from '../../createComponent';
 import {withDirty} from 'form-capacitor-dirty';
-import {mapProps,omitProps,withProps,withPropsOnChange,defaultProps} from 'recompact';
+import {withPath} from 'form-capacitor-state';
+import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
 import {FieldLabel} from '../bulma';
+import {toPath} from 'lodash';
+import PropTypes from 'prop-types';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -9,9 +12,19 @@ import {FieldLabel} from '../bulma';
 export default createComponent({
     displayName: 'DirtyLabel',
     enhancers: [
-        withDirty(),
+        withDirty({
+            name: p => p.for
+        }),
+        withPath()
     ],
-    render: ({isDirty, ...props}) => (
-        <FieldLabel {...props} className={{'is-dirty':isDirty}}/>
-    )
+    propTypes: {
+        for: PropTypes.string.isRequired,
+        children: PropTypes.node,
+    },
+    render: ({isDirty, path, ...props}) => {
+        props.htmlFor = [...path, ...toPath(props.for)].join('.');
+        delete props.for;
+        return <FieldLabel {...props} className={{'is-dirty': isDirty}}/>
+    }
+        
 })
