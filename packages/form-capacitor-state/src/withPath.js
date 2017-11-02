@@ -1,9 +1,9 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
-import {ContextPath, PathShape} from 'form-capacitor-store';
+import {CTX_KEY_PATH, CTX_VAL_PATH} from 'form-capacitor-store';
 
 
-export default function withPath(options) {
+export default function withPath(options) { // todo: rename getPath?
 
     options = {
         pathProp: 'path',
@@ -17,13 +17,13 @@ export default function withPath(options) {
             static displayName = wrapDisplayName(BaseComponent, 'withPath');
 
             static contextTypes = {
-                [ContextPath]: PathShape,
+                [CTX_KEY_PATH]: CTX_VAL_PATH,
             };
             
             render() {
                 return factory({
                     ...this.props,
-                    [options.pathProp]: this.context[ContextPath],
+                    [options.pathProp]: this.context[CTX_KEY_PATH],
                 });
             }
         }

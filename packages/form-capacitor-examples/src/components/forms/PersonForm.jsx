@@ -6,7 +6,7 @@ import {
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {dirtyProvider} from 'form-capacitor-dirty';
+import {dirtyProvider,withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompact';
 import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
@@ -28,6 +28,7 @@ export default createComponent({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
+        withDirty({name:null}), // FIXME: it's weird to have to pass `null` here
         withState('saving', 'setSaving', false),
         withHandlers({
             resetState: props => ev => {
@@ -45,7 +46,7 @@ export default createComponent({
             },
         })
     ],
-    render: ({saveState, resetState, formData, saving}) => {
+    render: ({saveState, resetState, formData, saving, isDirty}) => {
         // console.log('render',formData);
         return (
             <div>
@@ -75,7 +76,7 @@ export default createComponent({
                         <SingleField>
                             <Buttons>
                                 <Button onClick={saveState} primary disabled={saving} className={{'is-loading': saving}}>Save</Button>
-                                <Button onClick={resetState}>Reset</Button>
+                                <Button onClick={resetState} disabled={!isDirty}>Reset</Button>
                             </Buttons>
                         </SingleField>
                     </FieldRow>

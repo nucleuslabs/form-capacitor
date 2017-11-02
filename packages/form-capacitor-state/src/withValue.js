@@ -2,20 +2,20 @@ import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import PropTypes from 'prop-types';
 import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
-import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT} from 'form-capacitor-store';
+import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT} from 'form-capacitor-store';
 import {defaultStore, pubSub} from 'form-capacitor-store';
 import {get as getValue, toPath, unset} from 'lodash';
-import {EMPTY_ARRAY,EMPTY_OBJECT} from './constants';
+import {EMPTY_ARRAY, EMPTY_OBJECT} from './constants';
 import ShortId from 'shortid';
 // import Lo from 'lodash';
 
 const withValue = ({
                        name = p => p.name,
-                   
+
                        clearOnUnmount,
-                        defaultValue,
-    
-                        // output props:
+                       defaultValue,
+
+                       // output props:
                        valueProp,
                        setValueProp,
                        pathProp,
@@ -25,37 +25,32 @@ const withValue = ({
     class NewComponent extends React.PureComponent {
         static displayName = wrapDisplayName(BaseComponent, 'withValue');
 
-        // private store;
-        // private path;
-        // private unsub;
-
         static contextTypes = {
-            [ContextPath]: PathShape,
-     
+            [CTX_KEY_PATH]: CTX_VAL_PATH,
         };
 
         static childContextTypes = {
-            [ContextPath]: PathShape,
+            [CTX_KEY_PATH]: CTX_VAL_PATH,
         };
 
         getChildContext() {
-            return {[ContextPath]: this.dataPath};
+            return {[CTX_KEY_PATH]: this.dataPath};
         }
 
         constructor(props, context) {
             super(props);
-           
-            const basePath = (context && context[ContextPath]) || EMPTY_ARRAY;
-            const componentName = name !== undefined ? resolveValue(name, this.props) : undefined;
-            let componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
+
+            const basePath = (context && context[CTX_KEY_PATH]) || EMPTY_ARRAY;
+            const componentName = resolveValue(name, this.props);
+            const componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
             // fixme: should we assign a rand name?
-            
+
             this.dataPath = [...basePath, ...componentPath];
             this.fullPath = [DATA_ROOT, ...this.dataPath];
-            
+
             this.clearOnUnmount = clearOnUnmount !== undefined ? clearOnUnmount : !componentName;
             // console.log('this.fullPath',this.fullPath);
-            
+
             let currentValue = pubSub.get(this.fullPath);
 
             if(defaultValue !== undefined && currentValue === undefined) {
@@ -63,9 +58,9 @@ const withValue = ({
                 pubSub.set(this.fullPath, defaultValue);
                 currentValue = defaultValue;
             }
-            
+
             // console.log('currentValue',currentValue);
-            
+
             if(valueProp) {
                 this.state = {
                     value: currentValue
@@ -102,11 +97,11 @@ const withValue = ({
                 this.unsub = pubSub.subscribe(this.fullPath, value => {
                     // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
                     // console.log('change',this.fullPath);
-                    this.setState({value });
+                    this.setState({value});
                 });
             }
         }
-        
+
         componentWillUnmount() {
             if(valueProp) {
                 this.unsub();

@@ -1,8 +1,8 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
-import {ContextStore, StoreShape, ContextPath, PathShape, DATA_ROOT, defaultStore, DIRTY_ROOT, ContextDirty, DirtyShape, pubSub} from 'form-capacitor-store';
-import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
-import {get as getValue, toPath, unset} from 'lodash';
+import {CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, INIT_ROOT, pubSub} from 'form-capacitor-store';
+import {resolveValue} from 'form-capacitor-util/util';
+import {toPath} from 'lodash';
 
 export default function withDirty(options) {
 
@@ -19,7 +19,7 @@ export default function withDirty(options) {
             static displayName = wrapDisplayName(BaseComponent, 'withDirty');
 
             static contextTypes = {
-                [ContextPath]: PathShape,
+                [CTX_KEY_PATH]: CTX_VAL_PATH,
                 // [ContextStore]: StoreShape,
             };
 
@@ -27,19 +27,21 @@ export default function withDirty(options) {
             constructor(props, context) {
                 super(props);
 
-                const basePath = (context && context[ContextPath]) || [];
+                const basePath = (context && context[CTX_KEY_PATH]) || [];
                 const componentName = resolveValue(options.name, this.props);
                 let componentPath = toPath(componentName);
                 // fixme: should we assign a rand name?
 
                 this.dataPath = [...basePath, ...componentPath];
+                
+                console.log(this.dataPath.join('.'));
             }
 
             componentWillMount() {
                 const forceUpdate = () => this.forceUpdate();
                 this.unsubs = [
                     pubSub.subscribe([DATA_ROOT, ...this.dataPath], forceUpdate),
-                    pubSub.subscribe([DIRTY_ROOT, ...this.dataPath], forceUpdate),
+                    pubSub.subscribe([INIT_ROOT, ...this.dataPath], forceUpdate),
                 ];
             }
 
@@ -48,16 +50,15 @@ export default function withDirty(options) {
                     unsub();
                 }
             }
-            
 
             render() {
                 // console.log('dirtyrender',
                 //     pubSub.get([DATA_ROOT, ...this.dataPath]),
-                //     pubSub.get([DIRTY_ROOT, ...this.dataPath])
+                //     pubSub.get([INIT_ROOT, ...this.dataPath])
                 // );
                 const props = {
                     ...this.props,
-                    [options.isDirtyProp]: !Object.is(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([DIRTY_ROOT, ...this.dataPath]))
+                    [options.isDirtyProp]: !Object.is(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([INIT_ROOT, ...this.dataPath]))
                 };
                 return factory(props);
             }
