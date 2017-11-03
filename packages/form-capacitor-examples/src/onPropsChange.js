@@ -17,7 +17,7 @@ const onPropsChange = (shouldMapOrKeys, handler) => BaseComponent => {
     class PropsOnChange extends PureComponent {
         componentWillReceiveProps(nextProps) {
             if(shouldFire(this.props, nextProps)) {
-                handler(nextProps);
+                handler(nextProps, this.props);
             }
         }
 

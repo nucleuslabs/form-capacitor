@@ -18,6 +18,7 @@ const withPropsOnChange = (shouldMapOrKeys, propsMapper) => BaseComponent => {
         computedProps = propsMapper(this.props, this.props);
 
         componentWillReceiveProps(nextProps) {
+            console.log('yoyoyyo',this.props,nextProps);
             if(shouldMap(this.props, nextProps)) {
                 this.computedProps = propsMapper(nextProps, this.props);
             }

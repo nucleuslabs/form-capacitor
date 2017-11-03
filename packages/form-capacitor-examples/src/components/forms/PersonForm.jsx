@@ -14,6 +14,7 @@ import {formatDate} from '../../util';
 import DatePicker from '../fields/DatePicker';
 import {languages, pleaseSelect} from '../../options';
 import SelectBox from '../fields/SelectBox';
+import JsonCode from '../JsonCode';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -92,11 +93,11 @@ export default createComponent({
                         </SingleField>
                     </FieldRow>
                 </form>
-                <pre style={{marginTop: '10px'}}>
-                    <code>
+                <div style={{marginTop: '10px'}}>
+                    <JsonCode>
                         {JSON.stringify(formData, null, 2)}
-                    </code>
-                </pre>
+                    </JsonCode>
+                </div>
             </div>
         )
     }

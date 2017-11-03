@@ -97,3 +97,11 @@ export const Icon = ({name, small, medium, large}) => (
         })]}/>
     </span>
 );
+
+export const Code = ({children}) => (
+    <pre>
+        <code>
+            {children}
+        </code>
+    </pre>
+);

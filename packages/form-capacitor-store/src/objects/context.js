@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import {EMPTY_ARRAY} from '../../../form-capacitor-state/src/constants';
 
-export const CTX_KEY_PATH = 'SECRET_FORM_CAPACITOR_PATH';
+export const CTX_KEY_PATH = '__FC_PATH__';
 // export const ContextStore = 'SECRET_FORM_CAPACITOR_STORE';
 // export const ContextDirty = 'SECRET_FORM_CAPACITOR_DIRTY';
 // export const StoreShape = PropTypes.object;
