@@ -23,7 +23,7 @@ export default class ErrorBoundary extends React.PureComponent {
                 <div>
                     <Title3>Something went wrong.</Title3>
                     <Code>
-                        {this.state.error ? String(this.state.error) : null}
+                        {String(this.state.error)}
                         {this.state.errorInfo.componentStack}
                     </Code>
                 </div>
@@ -33,3 +33,7 @@ export default class ErrorBoundary extends React.PureComponent {
         return this.props.children;
     }
 }
+
+// <code>{this.state.error.stack}</code>
+// <hr style={{margin: '2px 0'}}/>
+// <code>{this.state.errorInfo.componentStack.replace(/^\s*\r?\n/, '')}</code>

@@ -13,11 +13,11 @@ import onPropsChange from '../../onPropsChange';
 function findIndex({options, value, multiple}) {
     // console.log('value',value);
     return multiple
-        ? value.reduce((acc, val) => {
+        ? (value ? value.reduce((acc, val) => {
             const idx = options.findIndex(opt => opt.value === val);
             if(idx >= 0) acc.push(idx);
             return acc;
-        }, [])
+        }, []) :[])
         : options.findIndex(opt => opt.value === value);
 }
 
@@ -69,7 +69,7 @@ export default createComponent({
     render: ({className, path, multiple, options, useValueAsKey, ...props}) => {
         return (
             <div className={cc(['select', {'is-multiple': multiple}, className])}>
-                <SelectByIndex id={path.join('.')} className="input" {...props}>
+                <SelectByIndex id={path.join('.')} className="input" {...props} multiple={multiple}>
                     {options.map(({value, label, ...opt}, i) =>
                         <option {...opt} key={useValueAsKey ? value : i} children={label}/>)}
                 </SelectByIndex>

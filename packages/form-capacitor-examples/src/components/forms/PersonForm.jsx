@@ -27,6 +27,7 @@ export default createComponent({
                 favNum: null,
                 birthDate: "1987-12-21",
                 primaryLanguageId: null,
+                secondaryLanguageIds: [12,3],
             },
             valueProp: 'formData'
         }), // try with {name: 'person'}
@@ -80,6 +81,12 @@ export default createComponent({
                         <DirtyLabel normal for="primaryLanguageId">Primary Language</DirtyLabel>
                         <SingleField narrow>
                             <SelectBox name="primaryLanguageId" options={primaryLanguages}/>
+                        </SingleField>
+                    </FieldRow>
+                    <FieldRow>
+                        <DirtyLabel normal for="secondaryLanguageIds">Secondary Language(s)</DirtyLabel>
+                        <SingleField>
+                            <SelectBox multiple name="secondaryLanguageIds" options={languages} size={6}/>
                         </SingleField>
                     </FieldRow>
 
