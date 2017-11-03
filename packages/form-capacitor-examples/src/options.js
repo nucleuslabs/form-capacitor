@@ -12,7 +12,7 @@ export const languages = [
     {value: 9, label: "Japanese"},
     {value: 10, label: "Punjabi"},
     {value: 11, label: "German"},
-    // {value: 1, label: "English2"},
+    {value: 1, label: "English2"},
 ];
 
 export const appointmentTypes = [

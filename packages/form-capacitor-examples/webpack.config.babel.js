@@ -9,6 +9,7 @@ export default {
         filename: 'bundle.js',
         publicPath: '/',
         pathinfo: true,
+        crossOriginLoading: 'anonymous'
     },
     module: {
         rules: [
@@ -55,11 +56,17 @@ export default {
         //     new TsConfigPathsPlugin(/* { tsconfig, compiler } */)
         // ],
     },
-    devtool: 'cheap-module-eval-source-map',
+    devtool: 'cheap-module-source-map',
     plugins: [
         new ProvidePlugin({
             React: 'react',
         }),
         // new CheckerPlugin(),
-    ]
+    ],
+    devServer: {
+        historyApiFallback: true,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+        }
+    },
 };
