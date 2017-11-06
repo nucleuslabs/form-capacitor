@@ -51,6 +51,7 @@ export default createComponent({
                 props.resetState();
             },
             saveState: props => ev => {
+                // console.log('hit');
                 ev.preventDefault();
                 props.setSaving(true);
                 const formData = props.formData;
@@ -62,10 +63,9 @@ export default createComponent({
         })
     ],
     render: ({saveState, resetState, formData, saving, isDirty}) => {
-        // console.log('render',formData);
         return (
             <div>
-                <form>
+                <form onSubmit={saveState}>
                     <Title>Person Form</Title>
                     <FieldRow>
                         <DirtyLabel normal for="name">Name</DirtyLabel>
@@ -130,7 +130,7 @@ export default createComponent({
                         <FieldLabel/>
                         <SingleField>
                             <Buttons>
-                                <Button onClick={saveState} primary disabled={saving} className={{'is-loading': saving}}>Save</Button>
+                                <SubmitButton primary disabled={saving} className={{'is-loading': saving}}>Save</SubmitButton>
                                 <Button onClick={resetState} disabled={!isDirty}>Reset</Button>
                             </Buttons>
                         </SingleField>

@@ -49,8 +49,8 @@ export const Button = ({children, primary, info, type, success, warning, danger,
     </button>
 );
 
-export const SubmitButton = ({children}) => (
-    <Button type="submit" primary children={children}/>
+export const SubmitButton = props => (
+    <Button type="submit" primary {...props}/>
 );
 
 export const Control = ({children}) => (
@@ -88,15 +88,17 @@ export const Title3 = ({children}) => (
     <H level={3}>{children}</H>
 );
 
-export const Icon = ({name, small, medium, large}) => (
-    <span className="icon">
-        <i className={[cc('fa', `fa-${name}`, {
+export const Icon = ({name, small, medium, large}) => {
+    return (
+        <span className="icon">
+        <i className={cc(['fa', `fa-${name}`, {
             'is-small': small,
-            'is-medium': medium,
-            'is-large': large,
-        })]}/>
+            'is-medium fa-lg': medium,
+            'is-large fa-2x': large,
+        }])}/>
     </span>
-);
+    )
+};
 
 export const Code = ({children}) => (
     <pre>

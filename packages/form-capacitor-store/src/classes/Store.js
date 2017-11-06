@@ -45,6 +45,9 @@ export default class Store {
     set(path, value, omitKey) {
         path = toPath(path);
         let oldValue = getValue(this.data, path);
+        if(typeof value === 'function') {
+            value = value(oldValue);
+        }
         if(Object.is(oldValue, value)) return;
         setValue(this.data, path, value);
         this._fireSubscriptions(omitKey);
