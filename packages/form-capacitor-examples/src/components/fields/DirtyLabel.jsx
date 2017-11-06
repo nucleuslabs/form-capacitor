@@ -22,7 +22,9 @@ export default createComponent({
         children: PropTypes.node,
     },
     render: ({isDirty, path, ...props}) => {
-        props.htmlFor = [...path, ...toPath(props.for)].join('.');
+        if(props.htmlFor === undefined) {
+            props.htmlFor = [...path, ...toPath(props.for)].join('.');
+        }
         delete props.for;
         return <FieldLabel {...props} className={{'is-dirty': isDirty}}/>
     }

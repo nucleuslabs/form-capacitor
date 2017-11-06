@@ -15,6 +15,7 @@ import DatePicker from '../fields/DatePicker';
 import {languages, pleaseSelect} from '../../options';
 import SelectBox from '../fields/SelectBox';
 import JsonCode from '../JsonCode';
+import CheckBox from '../fields/CheckBox';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -28,6 +29,7 @@ export default createComponent({
                 birthDate: "1987-12-21",
                 primaryLanguageId: null,
                 secondaryLanguageIds: [12,3],
+                isAboriginal: false,
             },
             valueProp: 'formData'
         }), // try with {name: 'person'}
@@ -89,7 +91,25 @@ export default createComponent({
                             <SelectBox multiple name="secondaryLanguageIds" options={languages} size={6}/>
                         </SingleField>
                     </FieldRow>
-
+                    <FieldRow>
+                        <DirtyLabel for="isAboriginal">Aboriginal?</DirtyLabel>
+                        <SingleField>
+                            <Control>
+                                <CheckBoxLabel><CheckBox name="isAboriginal" /> Aboriginal</CheckBoxLabel>
+                            </Control>
+                        </SingleField>
+                    </FieldRow>
+                    <FieldRow>
+                        <DirtyLabel for="likes" htmlFor={false}>Likes</DirtyLabel>
+                        <SingleField>
+                            <Control>
+                                <CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>
+                                <CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>
+                                <CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>
+                            </Control>
+                        </SingleField>
+                    </FieldRow>
+                    
                     <FieldRow>
                         <FieldLabel/>
                         <SingleField>

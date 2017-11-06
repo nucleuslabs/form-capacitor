@@ -1,5 +1,5 @@
 // https://github.com/acdlite/recompose/blob/8c4ac2e4a4cd8d60c8db9bc4cd73f0ce044fd9ca/src/packages/recompose/withPropsOnChange.js
-import {createFactory, PureComponent} from 'react'
+import {createFactory, Component} from 'react'
 import {pick} from 'lodash'
 import {shallowEqual, setDisplayName, wrapDisplayName} from 'recompact';
 
@@ -14,7 +14,7 @@ const onPropsChange = (shouldMapOrKeys, handler) => BaseComponent => {
                     pick(nextProps, shouldMapOrKeys)
                 );
 
-    class PropsOnChange extends PureComponent {
+    class PropsOnChange extends Component {
         componentWillReceiveProps(nextProps) {
             if(shouldFire(this.props, nextProps)) {
                 handler(nextProps, this.props);
