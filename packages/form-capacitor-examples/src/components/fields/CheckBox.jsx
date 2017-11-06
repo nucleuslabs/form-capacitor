@@ -11,7 +11,6 @@ import className from '../../className';
 import {arraySplice} from '../../util';
 // console.log(withValue);
 
-
 export default createComponent({
     displayName: 'CheckBox',
     enhancers: [
@@ -49,6 +48,12 @@ export default createComponent({
         omitProps(['name','setChecked']),
         className(),
     ],
+    propTypes: {
+        multiple: PropTypes.bool,
+        value: PropTypes.any,
+        id: PropTypes.string,
+        className: PropTypes.any,
+    },
     render: ({id, path, multiple, value, ...props}) => {
         if(!id) {
             if(multiple) {

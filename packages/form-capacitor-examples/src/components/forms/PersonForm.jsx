@@ -17,6 +17,7 @@ import SelectBox from '../fields/SelectBox';
 import JsonCode from '../JsonCode';
 import CheckBox from '../fields/CheckBox';
 import {isEqual} from 'lodash';
+import RadioButton from '../fields/RadioButton';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -31,6 +32,7 @@ export default createComponent({
                 primaryLanguageId: null,
                 secondaryLanguageIds: [12,3],
                 isAboriginal: false,
+                // gender: 'M'
             },
             valueProp: 'formData'
         }), // try with {name: 'person'}
@@ -110,6 +112,16 @@ export default createComponent({
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>
+                            </Control>
+                        </SingleField>
+                    </FieldRow>
+                    <FieldRow>
+                        <DirtyLabel for="gender" htmlFor={false}>Gender</DirtyLabel>
+                        <SingleField>
+                            <Control>
+                                <RadioLabel><RadioButton name="gender" value="M"/> Male</RadioLabel>
+                                <RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>
+                                <RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>
                             </Control>
                         </SingleField>
                     </FieldRow>
