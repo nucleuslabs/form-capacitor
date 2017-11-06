@@ -19,6 +19,7 @@ const withValue = ({
                        valueProp,
                        setValueProp,
                        pathProp,
+                       selfUpdate = true,
                    } = EMPTY_OBJECT) => (BaseComponent) => {
     const factory = createEagerFactory(BaseComponent);
 
@@ -69,7 +70,7 @@ const withValue = ({
         }
 
         setValue = value => {
-            pubSub.set(this.fullPath, value);
+            pubSub.set(this.fullPath, value, selfUpdate && this.unsub ? this.unsub.key : null);
         };
 
         render() {

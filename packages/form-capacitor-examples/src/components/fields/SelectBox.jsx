@@ -27,7 +27,8 @@ export default createComponent({
         withValue({
             valueProp: 'value',
             setValueProp: 'setValue',
-            pathProp: 'path'
+            pathProp: 'path',
+            selfUpdate: false,
         }),
         withState('selectedIndex', 'setSelectedIndex', findIndex),
         withHandlers({
@@ -39,7 +40,6 @@ export default createComponent({
                         }
                         return acc;
                     }, []);
-
                     setSelectedIndex(indices);
                     setValue(indices.map(i => options[i].value));
                 } else {
@@ -50,10 +50,10 @@ export default createComponent({
             }
         }),
         onPropsChange('value', (props,prevProps) => {
-            if(props.selectedIndex === prevProps.selectedIndex) {
+            // if(props.selectedIndex === prevProps.selectedIndex) {
                 // if the `value` changed but the `selectedIndex` didn't, then this was an external change -- update the index
                 props.setSelectedIndex(findIndex(props));
-            }
+            // }
         }),
         omitProps(['name', 'value', 'setValue', 'setSelectedIndex']),
     ],

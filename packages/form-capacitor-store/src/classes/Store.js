@@ -9,8 +9,9 @@ export default class Store {
         this.counter = 0;
     }
 
-    _fireSubscriptions() {
-        for(let v of Object.values(this.subscriptions)) {
+    _fireSubscriptions(omitKey) {
+        for(let [k,v] of Object.entries(this.subscriptions)) {
+            if(k === omitKey) continue;
             let newValue = getValue(this.data, v[0]);
             if(!Object.is(v[2],newValue)) {
                 v[2] = newValue;
@@ -24,9 +25,11 @@ export default class Store {
         let key = this.counter++;
         this.subscriptions[key] = [path,callback,getValue(this.data,path)];
 
-        return () => {
+        const unsub = () => {
             delete this.subscriptions[key];
-        }
+        };
+        unsub.key = key;
+        return unsub;
     }
     
     get(path) {
@@ -39,12 +42,12 @@ export default class Store {
         }
     }
 
-    set(path, value) {
+    set(path, value, omitKey) {
         path = toPath(path);
         let oldValue = getValue(this.data, path);
         if(Object.is(oldValue, value)) return;
         setValue(this.data, path, value);
-        this._fireSubscriptions();
+        this._fireSubscriptions(omitKey);
     }
     
     toJSON() {
