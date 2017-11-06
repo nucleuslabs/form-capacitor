@@ -7,8 +7,9 @@ import {toPath} from 'lodash';
 export default function withDirty(options) {
 
     options = {
-        name: p => p.name,
+        path: p => p.name,
         isDirtyProp: 'isDirty',
+        compare: Object.is,
         ...options,
     };
 
@@ -28,8 +29,8 @@ export default function withDirty(options) {
                 super(props);
 
                 const basePath = (context && context[CTX_KEY_PATH]) || [];
-                const componentName = resolveValue(options.name, this.props);
-                let componentPath = toPath(componentName);
+                const componentName = resolveValue(options.path, this.props);
+                let componentPath = componentName ? toPath(componentName) : [];
                 // fixme: should we assign a rand name?
 
                 this.dataPath = [...basePath, ...componentPath];
@@ -58,7 +59,7 @@ export default function withDirty(options) {
                 // );
                 const props = {
                     ...this.props,
-                    [options.isDirtyProp]: !Object.is(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([INIT_ROOT, ...this.dataPath]))
+                    [options.isDirtyProp]: !options.compare(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([INIT_ROOT, ...this.dataPath]))
                 };
                 return factory(props);
             }

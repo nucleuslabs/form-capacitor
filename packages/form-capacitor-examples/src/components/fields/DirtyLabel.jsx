@@ -13,7 +13,7 @@ export default createComponent({
     displayName: 'DirtyLabel',
     enhancers: [
         withDirty({
-            name: p => p.for
+            path: p => p.for
         }),
         withPath()
     ],
@@ -24,6 +24,8 @@ export default createComponent({
     render: ({isDirty, path, ...props}) => {
         if(props.htmlFor === undefined) {
             props.htmlFor = [...path, ...toPath(props.for)].join('.');
+        } else if(!props.htmlFor) {
+            delete props.htmlFor;
         }
         delete props.for;
         return <FieldLabel {...props} className={{'is-dirty': isDirty}}/>

@@ -16,6 +16,7 @@ import {languages, pleaseSelect} from '../../options';
 import SelectBox from '../fields/SelectBox';
 import JsonCode from '../JsonCode';
 import CheckBox from '../fields/CheckBox';
+import {isEqual} from 'lodash';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -37,7 +38,10 @@ export default createComponent({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
-        withDirty({name:null}), // FIXME: it's weird to have to pass `null` here
+        withDirty({
+            path: null, // FIXME: it's weird to have to pass `null` here
+            compare: isEqual,
+        }), 
         withState('saving', 'setSaving', false),
         withHandlers({
             resetState: props => ev => {
