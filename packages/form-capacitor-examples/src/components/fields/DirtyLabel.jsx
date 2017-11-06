@@ -30,5 +30,4 @@ export default createComponent({
         delete props.for;
         return <FieldLabel {...props} className={{'is-dirty': isDirty}}/>
     }
-        
 })

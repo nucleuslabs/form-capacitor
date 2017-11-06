@@ -1,7 +1,7 @@
 import React from 'react';
 import {Code, Title2, Title3} from './bulma';
 
-export default class ErrorBoundary extends React.PureComponent {
+export default class ErrorBoundary extends React.Component { // making this "Pure" breaks React-Router
     constructor(props) {
         super(props);
         this.state = { error: null, errorInfo: null };
