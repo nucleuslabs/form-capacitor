@@ -5,7 +5,7 @@ import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, default
 import {get as getValue, toPath, unset, set as setValue,omit,pick} from 'lodash';
 import Ajv, {KeywordDefinition} from 'ajv';
 import installAjvKeywords from 'ajv-keywords'; // todo: asynchronously import() these libs so they can be disabled if necessary or loaded in later
-import installAjvErrors from 'ajv-errors';
+// import installAjvErrors from 'ajv-errors';
 // import installAjvAsync from 'ajv-async';
 import ShortId from 'shortid';
 
@@ -35,7 +35,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
     });
     // installAjvAsync(ajv);
     installAjvKeywords(ajv);
-    installAjvErrors(ajv);
+    // installAjvErrors(ajv); // causes "Ajv option jsonPointers changed to true"
 
     if(options.formats) {
         for (let k of Object.keys(options.formats)) {

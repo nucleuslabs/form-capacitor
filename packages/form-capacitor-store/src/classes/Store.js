@@ -2,27 +2,27 @@
 import {toPath, get as getValue, unset} from 'lodash';
 import {setValue} from 'form-capacitor-util/util';
 import shortid from 'shortid';
+import debounce from '../fast-debounce';
 
 export default class Store {
     constructor() {
         this.subscriptions = Object.create(null);
         this.data = Object.create(null);
         // this.counter = 0;
-    }
-
-    _fireSubscriptions(omitKey) {
-        // console.log('fire');
-        for(let [k,v] of Object.entries(this.subscriptions)) {
-            if(k === omitKey) {
-                // console.log('omit',omitKey);
-                continue;
+        
+        this._fireSubscriptions = debounce(omitKey => {
+            for(let [k,v] of Object.entries(this.subscriptions)) {
+                if(k === omitKey) {
+                    // console.log('omit',omitKey);
+                    continue;
+                }
+                let newValue = getValue(this.data, v[0]);
+                if(!Object.is(v[2],newValue)) {
+                    v[2] = newValue;
+                    v[1](newValue,v[2]);
+                }
             }
-            let newValue = getValue(this.data, v[0]);
-            if(!Object.is(v[2],newValue)) {
-                v[2] = newValue;
-                v[1](newValue,v[2]);
-            }
-        }
+        });
     }
 
     subscribe(path, callback) {
