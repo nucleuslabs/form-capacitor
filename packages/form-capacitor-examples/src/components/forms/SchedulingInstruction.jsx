@@ -18,13 +18,13 @@ export default createComponent({
     render: ({remove}) => {
         return (
             <tr>
-                <td className="vert-center">{remove ? <a href="" onClick={remove}><Icon name="trash" medium/></a> : null}</td>
                 <td className="vert-center"><SelectBox name="typeId" options={appointmentTypes}/></td>
                 <td className="vert-center"><SelectBox name="teamId" options={teams}/></td>
                 <td className="vert-center"><SelectBox name="disciplineId" options={disciplines}/></td>
                 <td className="vert-center"><SelectBox name="prefClinicianId" options={clinicians}/></td>
                 <td className="vert-center"><SelectBox name="prefTime" options={times}/></td>
                 <td className="vert-center"><CheckBox name="childRequired"/></td>
+                <td className="vert-center">{remove ? <a href="" onClick={remove}><Icon name="trash" medium/></a> : null}</td>
             </tr>
         )
     }

@@ -12,14 +12,13 @@ export default class Store {
         
         this._fireSubscriptions = debounce(omitKey => {
             for(let [k,v] of Object.entries(this.subscriptions)) {
-                if(k === omitKey) {
-                    // console.log('omit',omitKey);
-                    continue;
-                }
                 let newValue = getValue(this.data, v[0]);
                 if(!Object.is(v[2],newValue)) {
+                    // console.log(v[0].join('.'),`${JSON.stringify(v[2])} -> ${JSON.stringify(newValue)}`);
                     v[2] = newValue;
-                    v[1](newValue,v[2]);
+                    if(k !== omitKey) {
+                        v[1](newValue, v[2]);
+                    }
                 }
             }
         });

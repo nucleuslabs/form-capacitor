@@ -75,13 +75,13 @@ export default createComponent({
                     <table className="table is-striped is-narrow is-fullwidth">
                         <thead>
                             <tr>
-                                <th/>
                                 <th>Appointment Type</th>
                                 <th>Team</th>
                                 <th>Discipline</th>
                                 <th>Pref. Clinician</th>
                                 <th>Pref. Time</th>
                                 <th>Child Req'd?</th>
+                                <th/>
                             </tr>
                         </thead>
                         <tbody>
