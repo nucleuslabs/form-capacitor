@@ -2,6 +2,8 @@ import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
 import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
 import cc from 'classcat';
+import {withErrors} from 'form-capacitor-schema';
+import {WarningIcon} from '../bulma';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -9,6 +11,7 @@ import cc from 'classcat';
 export default createComponent({
     displayName: 'NumberBox',
     enhancers: [
+        withErrors(),
         withValue({
             valueProp: 'value',
             setValueProp: 'setValue',
@@ -25,9 +28,12 @@ export default createComponent({
         }),
         omitProps(['name', 'setValue']),
     ],
-    render: ({className,path,...props}) => (
-        <div className={cc(['control',className])}>
-            <input id={path.join('.')} className="input" type="number" min={Number.MIN_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} {...props}/>
-        </div>
-    )
+    render: ({className, path, errors, ...props}) => {
+        const hasErrors = errors && errors.length;
+        return (
+            <div className={cc(['control', className, {'is-danger': hasErrors}])}>
+                <input id={path.join('.')} className={cc(['input',{'is-danger':hasErrors}])} type="number" min={Number.MIN_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} {...props}/>
+            </div>
+        )
+    }
 })

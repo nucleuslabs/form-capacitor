@@ -1,6 +1,6 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual, getDisplayName} from 'recompact';
-import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT} from 'form-capacitor-store';
+import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT, CTX_KEY_SCHEMA_ID, CTX_VAL_SCHEMA_ID} from 'form-capacitor-store';
 // import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
 import {get as getValue, toPath, unset, set as setValue,omit,pick} from 'lodash';
 import Ajv, {KeywordDefinition} from 'ajv';
@@ -19,7 +19,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
         // path: undefined,
         schema: {},
         // path: undefined,
-        schemaId: '$id',
+        schemaId: undefined,
         ...options,
     };
 
@@ -53,7 +53,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
     return BaseComponent => {
         const factory = createEagerFactory(BaseComponent);
 
-        // console.log(`${getDisplayName(BaseComponent)} has schema:\n${JSON.stringify(options.schema,null,2)}`);
+        console.log(`${getDisplayName(BaseComponent)} has schema:\n${JSON.stringify(options.schema,null,2)}`);
 
         function success() {
             console.log(`%c${getDisplayName(BaseComponent)}%c is %cvalid`,'font-weight:bold','','color: green');
@@ -72,6 +72,14 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                 // [ContextStore]: StoreShape,
             };
 
+            static childContextTypes = {
+                [CTX_KEY_SCHEMA_ID]: CTX_VAL_SCHEMA_ID,
+            };
+            
+            getChildContext() {
+                return {[CTX_KEY_SCHEMA_ID]: this.schemaId};
+            }
+            
 
             _validate(value) {
                 // TODO: validate against the schema, then push results into store
@@ -92,7 +100,10 @@ export default function withSchema(options) { // altname: dirtyRoot ??
 
                                 // console.log(err);
                                 // setValue(errors,dataPath, pick(err,['message','keyword']));
-                                setValue(errors,dataPath, err);
+                                
+                                let fieldErrors = getValue(errors, dataPath);
+                                fieldErrors = fieldErrors ? [...fieldErrors, err] : [err];
+                                setValue(errors,dataPath, fieldErrors);
                           
                                 // console.log(fullPath,err.message);
                             }
@@ -115,21 +126,21 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                     throw new Error("`withSchema` must be added after `withValue`; context path was not found")
                 }
                 
-                let id;
+                // console.log(options);
                 if(options.id) {
-                    id = options.id;
+                    this.schemaId = options.id;
                 } else if(options.schemaId === '$id') {
-                    id = options.schema.$id;
+                    this.schemaId = options.schema.$id;
                 } else if(options.schemaId === 'id') {
-                    id = options.schema.id;
+                    this.schemaId = options.schema.id;
                 } else {
-                    id = options.schema.$id || options.schema.id;
+                    this.schemaId = options.schema.$id || options.schema.id || ShortId.generate();
                 }
-                if(!id) {
-                    id = ShortId.generate();
+                if(!this.schemaId) {
+                    throw new Error("Missing `schemaId`");
                 }
                 
-                this.errorPath = [ERROR_ROOT,id,...dataPath];
+                this.errorPath = [ERROR_ROOT,this.schemaId,...dataPath];
             }
 
             componentWillMount() {

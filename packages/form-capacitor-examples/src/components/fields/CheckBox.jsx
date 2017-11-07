@@ -64,6 +64,7 @@ export default createComponent({
                 id = path.join('.');
             }
         }
+        // console.log('rneder checkbox');
         return (
             <input id={id} type="checkbox" {...props}/>
         )

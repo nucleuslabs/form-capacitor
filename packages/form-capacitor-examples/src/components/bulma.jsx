@@ -107,3 +107,9 @@ export const Code = ({children}) => (
         </code>
     </pre>
 );
+
+export const WarningIcon = () => (
+    <span className="icon is-small is-right">
+        <i className="fa fa-warning"/>
+    </span>
+);

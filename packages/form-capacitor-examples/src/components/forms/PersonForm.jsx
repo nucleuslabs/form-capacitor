@@ -29,7 +29,7 @@ export default createComponent({
         withValue({
             defaultValue: {
                 name: "Mark",
-                favNum: null,
+                favNumber: null,
                 birthDate: "1987-12-21",
                 primaryLanguageId: null,
                 secondaryLanguageIds: [12, 3],
@@ -48,13 +48,17 @@ export default createComponent({
         }),
         withSchema({
             schema: Sch.object({
-                required: ['name', 'favNum', 'primaryLanguageId', 'gender'],
+                required: ['name', 'favNumber', 'primaryLanguageId', 'gender'],
                 properties: {
                     name: Sch.string({
                         minLength: 2,
                     }),
                     birthDate: Sch.format('date'),
-                    favNumber: Sch.optional(Sch.number()),
+                    favNumber: Sch.optional(Sch.number({
+                        minimum: 1,
+                        maximum: 100,
+                        // exclusiveMaximum: true,
+                    })),
                     primaryLanguageId: Sch.number(),
                     gender: Sch.string({
                         enum: ['M', 'F'],
@@ -93,9 +97,9 @@ export default createComponent({
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
-                        <DirtyLabel normal for="favNum">Favourite Number</DirtyLabel>
+                        <DirtyLabel normal for="favNumber">Favourite Number</DirtyLabel>
                         <SingleField narrow>
-                            <NumberBox name="favNum"/>
+                            <NumberBox name="favNumber"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
