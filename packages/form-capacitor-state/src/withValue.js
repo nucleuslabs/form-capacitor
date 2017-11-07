@@ -23,7 +23,7 @@ const withValue = ({
                    } = EMPTY_OBJECT) => (BaseComponent) => {
     const factory = createEagerFactory(BaseComponent);
 
-    class NewComponent extends React.PureComponent {
+    class NewComponent extends React.Component {
         static displayName = wrapDisplayName(BaseComponent, 'withValue');
 
         static contextTypes = {
@@ -70,7 +70,8 @@ const withValue = ({
         }
 
         setValue = value => {
-            pubSub.set(this.fullPath, value, selfUpdate && this.unsub ? this.unsub.key : null);
+            // console.log(selfUpdate);
+            pubSub.set(this.fullPath, value, !selfUpdate && this.unsub ? this.unsub.key : null);
         };
 
         render() {

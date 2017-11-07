@@ -1,17 +1,22 @@
 // inspired by https://github.com/mroderick/PubSubJS/blob/903eb3c45e335ae5bfcda40ae9c5894583869dd8/src/pubsub.js#L168
 import {toPath, get as getValue, unset} from 'lodash';
 import {setValue} from 'form-capacitor-util/util';
+import shortid from 'shortid';
 
 export default class Store {
     constructor() {
         this.subscriptions = Object.create(null);
         this.data = Object.create(null);
-        this.counter = 0;
+        // this.counter = 0;
     }
 
     _fireSubscriptions(omitKey) {
+        // console.log('fire');
         for(let [k,v] of Object.entries(this.subscriptions)) {
-            if(k === omitKey) continue;
+            if(k === omitKey) {
+                // console.log('omit',omitKey);
+                continue;
+            }
             let newValue = getValue(this.data, v[0]);
             if(!Object.is(v[2],newValue)) {
                 v[2] = newValue;
@@ -22,7 +27,7 @@ export default class Store {
 
     subscribe(path, callback) {
         path = toPath(path);
-        let key = this.counter++;
+        let key = shortid();
         this.subscriptions[key] = [path,callback,getValue(this.data,path)];
 
         const unsub = () => {

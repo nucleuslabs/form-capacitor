@@ -6,7 +6,7 @@ import {
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {dirtyProvider,withDirty} from 'form-capacitor-dirty';
+import {dirtyProvider, withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompact';
 import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
@@ -18,6 +18,8 @@ import JsonCode from '../JsonCode';
 import CheckBox from '../fields/CheckBox';
 import {isEqual} from 'lodash';
 import RadioButton from '../fields/RadioButton';
+import {withSchema} from 'form-capacitor-schema';
+import * as Sch from '../../SchemaTypes';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -30,7 +32,7 @@ export default createComponent({
                 favNum: null,
                 birthDate: "1987-12-21",
                 primaryLanguageId: null,
-                secondaryLanguageIds: [12,3],
+                secondaryLanguageIds: [12, 3],
                 isAboriginal: false,
                 // gender: 'M'
             },
@@ -43,7 +45,24 @@ export default createComponent({
         withDirty({
             path: null, // FIXME: it's weird to have to pass `null` here
             compare: isEqual,
-        }), 
+        }),
+        withSchema({
+            schema: Sch.object({
+                required: ['name', 'favNum', 'primaryLanguageId', 'gender'],
+                properties: {
+                    name: Sch.string({
+                        minLength: 2,
+                    }),
+                    birthDate: Sch.format('date'),
+                    favNumber: Sch.optional(Sch.number()),
+                    primaryLanguageId: Sch.number(),
+                    gender: Sch.string({
+                        enum: ['M', 'F'],
+                    })
+                }
+            }),
+            valueProp: 'formData'
+        }),
         withState('saving', 'setSaving', false),
         withHandlers({
             resetState: props => ev => {
@@ -76,7 +95,7 @@ export default createComponent({
                     <FieldRow>
                         <DirtyLabel normal for="favNum">Favourite Number</DirtyLabel>
                         <SingleField narrow>
-                            <NumberBox name="favNum" />
+                            <NumberBox name="favNum"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
@@ -101,7 +120,7 @@ export default createComponent({
                         <DirtyLabel for="isAboriginal">Aboriginal?</DirtyLabel>
                         <SingleField>
                             <Control>
-                                <CheckBoxLabel><CheckBox name="isAboriginal" /> Aboriginal</CheckBoxLabel>
+                                <CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>
                             </Control>
                         </SingleField>
                     </FieldRow>
@@ -125,7 +144,7 @@ export default createComponent({
                             </Control>
                         </SingleField>
                     </FieldRow>
-                    
+
                     <FieldRow>
                         <FieldLabel/>
                         <SingleField>

@@ -1,6 +1,6 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {mapProps,omitProps,withProps,withPropsOnChange,defaultProps} from 'recompact';
+import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
 import cc from 'classcat';
 // import dump from 'form-capacitor-util/dump';
 
@@ -22,11 +22,15 @@ export default createComponent({
         defaultProps({
             value: '', // prevents uncontrolled -> controlled warning
         }),
-        omitProps(['name','setValue']),
+        omitProps(['name', 'setValue']),
     ],
-    render: ({className,path,...props}) => (
-        <div className={cc(['control',className])}>
-            <input id={path.join('.')} className="input" {...props}/>
-        </div>
-    )
+    render: ({className, path, ...props}) => {
+        // console.log(props.value);
+        return (
+
+            <div className={cc(['control', className])}>
+                <input id={path.join('.')} className="input" {...props}/>
+            </div>
+        )
+    }
 })

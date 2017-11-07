@@ -1,5 +1,5 @@
 import Path from 'path';
-import {ProvidePlugin} from 'webpack';
+import {ProvidePlugin,IgnorePlugin} from 'webpack';
 
 export default {
     context: `${__dirname}/src`,
@@ -65,6 +65,7 @@ export default {
         new ProvidePlugin({
             React: 'react',
         }),
+        new IgnorePlugin(/regenerator|nodent/, /ajv-async/), // https://github.com/epoberezkin/ajv-async#using-in-browser
         // new CheckerPlugin(),
     ],
     devServer: {

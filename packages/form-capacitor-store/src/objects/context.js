@@ -24,3 +24,5 @@ export const DATA_ROOT = 'data';
  * @type {string}
  */
 export const INIT_ROOT = 'init';
+
+export const ERROR_ROOT = 'errors';

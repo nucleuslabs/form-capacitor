@@ -6,6 +6,7 @@
     "classcat": "^1.0.1",
     "form-capacitor-dirty": "*",
     "form-capacitor-state": "*",
+    "form-capacitor-schema": "*",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-router-dom": "^4.2.2",
