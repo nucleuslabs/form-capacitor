@@ -101,8 +101,12 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                                 // console.log(err);
                                 // setValue(errors,dataPath, pick(err,['message','keyword']));
                                 
+                                let errObj = pick(err,['message','keyword','params']);
+                                errObj.value = pubSub.get([DATA_ROOT, ...this.rootPath, ...dataPath]);
+                                // console.log("PAAATH",[DATA_ROOT, ...this.rootPath, ...dataPath]);
+                                
                                 let fieldErrors = getValue(errors, dataPath);
-                                fieldErrors = fieldErrors ? [...fieldErrors, err] : [err];
+                                fieldErrors = fieldErrors ? [...fieldErrors, errObj] : [errObj];
                                 setValue(errors,dataPath, fieldErrors);
                           
                                 // console.log(fullPath,err.message);
@@ -120,9 +124,9 @@ export default function withSchema(options) { // altname: dirtyRoot ??
             constructor(props, context) {
                 super(props, context);
 
-                const dataPath = getValue(context, CTX_KEY_PATH);
+                this.rootPath = getValue(context, CTX_KEY_PATH);
                 
-                if(!dataPath) {
+                if(!this.rootPath) {
                     throw new Error("`withSchema` must be added after `withValue`; context path was not found")
                 }
                 
@@ -140,7 +144,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                     throw new Error("Missing `schemaId`");
                 }
                 
-                this.errorPath = [ERROR_ROOT,this.schemaId,...dataPath];
+                this.errorPath = [ERROR_ROOT,this.schemaId,...this.rootPath];
             }
 
             componentWillMount() {

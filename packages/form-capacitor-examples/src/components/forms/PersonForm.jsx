@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     CheckBoxLabel, Control, SingleField, FieldLabel, FieldRow, Title1, RadioLabel, SubmitButton, Button,
-    Title2, Title, Buttons
+    Title2, Title, Buttons, FieldBody
 } from '../bulma';
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
@@ -21,6 +21,7 @@ import RadioButton from '../fields/RadioButton';
 import {withSchema} from 'form-capacitor-schema';
 import * as Sch from '../../SchemaTypes';
 import ErrorContainer from '../fields/ErrorContainer';
+import FieldErrors from '../fields/FieldErrors';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -102,30 +103,35 @@ export default createComponent({
                         <DirtyLabel normal for="name">Name</DirtyLabel>
                         <SingleField>
                             <TextBox name="name"/>
+                            <FieldErrors for="name"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
                         <DirtyLabel normal for="favNumber">Favourite Number</DirtyLabel>
                         <SingleField narrow>
                             <NumberBox name="favNumber"/>
+                            <FieldErrors for="favNumber" message="Must be between 1 and 100"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
                         <DirtyLabel normal for="birthDate">Birth Date</DirtyLabel>
                         <SingleField narrow>
                             <DatePicker name="birthDate" max={formatDate(new Date())}/>
+                            <FieldErrors for="birthDate"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
                         <DirtyLabel normal for="primaryLanguageId">Primary Language</DirtyLabel>
                         <SingleField narrow>
                             <SelectBox name="primaryLanguageId" options={primaryLanguages}/>
+                            <FieldErrors for="primaryLanguageId"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
                         <DirtyLabel normal for="secondaryLanguageIds">Secondary Language(s)</DirtyLabel>
                         <SingleField>
                             <SelectBox multiple name="secondaryLanguageIds" options={languages} size={6}/>
+                            <FieldErrors for="secondaryLanguageIds"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
@@ -134,6 +140,7 @@ export default createComponent({
                             <ErrorContainer for="isAboriginal">
                                 <CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>
                             </ErrorContainer>
+                            <FieldErrors for="isAboriginal"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
@@ -144,6 +151,7 @@ export default createComponent({
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>
                             </ErrorContainer>
+                            <FieldErrors for="likes"/>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
@@ -154,6 +162,7 @@ export default createComponent({
                                 <RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>
                                 <RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>
                             </ErrorContainer>
+                            <FieldErrors for="gender"/>
                         </SingleField>
                     </FieldRow>
 
