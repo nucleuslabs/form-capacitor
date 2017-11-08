@@ -53,16 +53,16 @@ export default function withSchema(options) { // altname: dirtyRoot ??
     return BaseComponent => {
         const factory = createEagerFactory(BaseComponent);
 
-        console.log(`${getDisplayName(BaseComponent)} has schema:\n${JSON.stringify(options.schema,null,2)}`);
+        console.log(`%c${getDisplayName(BaseComponent)} has schema:\n${JSON.stringify(options.schema,null,2)}`, 'color:blue');
 
-        function success() {
-            console.log(`%c${getDisplayName(BaseComponent)}%c is %cvalid`,'font-weight:bold','','color: green');
-        }
-
-        function fail(errors) {
-            // console.dir(validate);
-            console.log(`%c${getDisplayName(BaseComponent)}%c is %cinvalid%c${errors.map(err => `\n- ${err.dataPath ? `${err.dataPath.slice(1)} ` : ''}${err.message}`).join('')}`,'font-weight:bold','','color: red','');
-        }
+        // function success() {
+        //     console.log(`%c${getDisplayName(BaseComponent)}%c is %cvalid`,'font-weight:bold','','color: green');
+        // }
+        //
+        // function fail(errors) {
+        //     // console.dir(validate);
+        //     console.log(`%c${getDisplayName(BaseComponent)}%c is %cinvalid%c${errors.map(err => `\n- ${err.dataPath ? `${err.dataPath.slice(1)} ` : ''}${err.message}`).join('')}`,'font-weight:bold','','color: red','');
+        // }
 
         return class extends React.Component {
             static displayName = wrapDisplayName(BaseComponent, 'withSchema');
@@ -87,7 +87,9 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                 // console.log('validating',value);
 
                 validatePromise.then(validate => {
-                    validate(value).then(success,errResult => {
+                    validate(value).then(() => {
+                        pubSub.unset(this.errorPath);
+                    },errResult => {
                         if(errResult instanceof Ajv.ValidationError) {
                             // fail(err.errors);
                             // console.log(JSON.stringify(errResult.errors,null,2));

@@ -3,29 +3,26 @@ import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import {CTX_KEY_PATH, CTX_VAL_PATH} from 'form-capacitor-store';
 
 
-export default function withPath(options) { // todo: rename getPath?
-
-    options = {
-        pathProp: 'path',
-        ...options,
-    };
+export default function withPath(propName = 'path') { // todo: rename getPath?
 
     return BaseComponent => {
-        const factory = createEagerFactory(BaseComponent);
-
-        return class extends React.PureComponent {
-            static displayName = wrapDisplayName(BaseComponent, 'withPath');
-
+        class WithPath extends React.Component {
             static contextTypes = {
                 [CTX_KEY_PATH]: CTX_VAL_PATH,
             };
-            
+
             render() {
-                return factory({
+                return React.createElement(BaseComponent, {
                     ...this.props,
-                    [options.pathProp]: this.context[CTX_KEY_PATH],
+                    [propName]: this.context[CTX_KEY_PATH],
                 });
             }
+        };
+
+        if(process.env.NODE_ENV !== 'production') {
+            WithPath.displayName = wrapDisplayName(BaseComponent, 'withPath');
         }
+
+        return WithPath;
     }
 };
