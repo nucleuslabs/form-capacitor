@@ -1,120 +1,100 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
-import PropTypes from 'prop-types';
-import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
-import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT} from 'form-capacitor-store';
-import {defaultStore, pubSub} from 'form-capacitor-store';
-import {get as getValue, toPath, unset} from 'lodash';
-import {EMPTY_ARRAY, EMPTY_OBJECT} from './constants';
-import ShortId from 'shortid';
-// import Lo from 'lodash';
+import {CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, store} from 'form-capacitor-store';
+import {resolveValue} from '../../form-capacitor-util/util';
 
-const withValue = ({
-                       name = p => p.name,
 
-                       clearOnUnmount,
-                       defaultValue,
+export default function withValue(options) {
 
-                       // output props:
-                       valueProp,
-                       setValueProp,
-                       pathProp,
-                       selfUpdate = true,
-                   } = EMPTY_OBJECT) => (BaseComponent) => {
-    const factory = createEagerFactory(BaseComponent);
+    options = {
+        path: p => p.path,
+        clearOnUnmount: false,
+        defaultValue: undefined,
+        selfUpdate: true,
+        
+        // output props:
+        valueProp: undefined,
+        setValueProp: undefined,
+        // pathProp: undefined,
+        
+        ...options,
+    };
 
-    class NewComponent extends React.Component {
-        static displayName = wrapDisplayName(BaseComponent, 'withValue');
+    
+    return BaseComponent => {
+        class WithValue extends React.Component {
 
-        static contextTypes = {
-            [CTX_KEY_PATH]: CTX_VAL_PATH,
-        };
+            constructor(props) {
+                super(props);
+                const path = resolveValue(options.path, props);
+                if(!path) {
+                    throw new Error("Missing `path`");
+                }
+                this.fullPath = [DATA_ROOT, ...path];
 
-        static childContextTypes = {
-            [CTX_KEY_PATH]: CTX_VAL_PATH,
-        };
+                let currentValue = store.get(this.fullPath);
 
-        getChildContext() {
-            return {[CTX_KEY_PATH]: this.dataPath};
-        }
+                if(options.defaultValue !== undefined && currentValue === undefined) {
+                    // not entirely sure if we want to support this feature yet
+                    store.set(this.fullPath, options.defaultValue);
+                    currentValue = options.defaultValue;
+                }
 
-        constructor(props, context) {
-            super(props);
+                // console.log('currentValue',currentValue);
 
-            const basePath = (context && context[CTX_KEY_PATH]) || EMPTY_ARRAY;
-            const componentName = resolveValue(name, this.props);
-            const componentPath = componentName ? toPath(componentName) : [ShortId.generate()];
-            // fixme: should we assign a rand name?
-
-            this.dataPath = [...basePath, ...componentPath];
-            this.fullPath = [DATA_ROOT, ...this.dataPath];
-
-            this.clearOnUnmount = clearOnUnmount !== undefined ? clearOnUnmount : !componentName;
-            // console.log('this.fullPath',this.fullPath);
-
-            let currentValue = pubSub.get(this.fullPath);
-
-            if(defaultValue !== undefined && currentValue === undefined) {
-                // not entirely sure if we want to support this feature yet
-                pubSub.set(this.fullPath, defaultValue);
-                currentValue = defaultValue;
-            }
-
-            // console.log('currentValue',currentValue);
-
-            if(valueProp) {
-                this.state = {
-                    value: currentValue
+                if(options.valueProp) {
+                    this.state = {
+                        value: currentValue
+                    }
                 }
             }
-        }
 
-        setValue = value => {
-            // console.log(selfUpdate);
-            pubSub.set(this.fullPath, value, !selfUpdate && this.unsub ? this.unsub.key : null);
+            setValue = value => {
+                // console.log(selfUpdate);
+                store.set(this.fullPath, value, !options.selfUpdate && this.unsub ? this.unsub.key : null);
+            };
+
+            componentWillMount() {
+                if(options.valueProp) {
+                    this.unsub = store.subscribe(this.fullPath, value => {
+                        // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
+                        // console.log('change',this.fullPath);
+                        this.setState({value});
+                    });
+                }
+            }
+
+            componentWillUnmount() {
+                if(options.valueProp) {
+                    this.unsub();
+                }
+                if(options.clearOnUnmount) {
+                    store.unset(this.fullPath);
+                }
+            }
+            
+            render() {
+                let props = {
+                    ...this.props,
+                };
+                if(options.valueProp) {
+                    props[options.valueProp] = this.state.value;
+                    // console.log('this.state',this.state);
+                    // console.log('props[valueProp]',props[valueProp]);
+                }
+                if(options.setValueProp) {
+                    props[options.setValueProp] = this.setValue;
+                }
+             
+                
+                return React.createElement(BaseComponent, props);
+            }
         };
 
-        render() {
-
-            let props = {
-                ...this.props,
-            };
-            if(valueProp) {
-                props[valueProp] = this.state.value;
-                // console.log('this.state',this.state);
-                // console.log('props[valueProp]',props[valueProp]);
-            }
-            if(setValueProp) {
-                props[setValueProp] = this.setValue;
-            }
-            if(pathProp) {
-                props[pathProp] = this.dataPath;
-            }
-            // console.log('withValue.render',valueProp,props[valueProp],BaseComponent.displayName);
-            return factory(props);
+        if(process.env.NODE_ENV !== 'production') {
+            WithValue.displayName = wrapDisplayName(BaseComponent, 'withValue');
         }
 
-        componentWillMount() {
-            if(valueProp) {
-                this.unsub = pubSub.subscribe(this.fullPath, value => {
-                    // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
-                    // console.log('change',this.fullPath);
-                    this.setState({value});
-                });
-            }
-        }
-
-        componentWillUnmount() {
-            if(valueProp) {
-                this.unsub();
-            }
-            if(this.clearOnUnmount) {
-                pubSub.unset(this.fullPath);
-            }
-        }
+        return WithValue;
     }
-
-    return NewComponent;
 };
-
-export default withValue;

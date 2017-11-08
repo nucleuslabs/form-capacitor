@@ -1,11 +1,22 @@
 import {compose} from 'recompact';
 
 export default function createComponent({render, enhancers, displayName, propTypes, defaultProps}) {
-    if(enhancers && enhancers.length) {
-        if(enhancers.length > 1) {
-            render = compose(...enhancers)(render);
+    
+    if(!render) {
+        render = p => p.children;
+    }
+    
+    if(enhancers) {
+        if(Array.isArray(enhancers)) {
+            if(enhancers.length) {
+                if(enhancers.length > 1) {
+                    render = compose(...enhancers)(render);        
+                } else{
+                    render = enhancers[0](render);        
+                }
+            }
         } else {
-            render = enhancers[0](render);
+            render = enhancers(render);
         }
     }
 

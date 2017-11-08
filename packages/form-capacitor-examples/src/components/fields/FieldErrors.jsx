@@ -4,13 +4,13 @@ import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
 import PropTypes from 'prop-types';
 import stringLength from 'string-length';
+import {withPath} from '../../../../form-capacitor-state/src';
 
 export default createComponent({
     displayName: 'FieldErrors',
     enhancers: [
-        withErrors({
-            path: p => p.for,
-        }),
+        withPath(),
+        withErrors(),
     ],
     propTypes: {
         message: PropTypes.node,

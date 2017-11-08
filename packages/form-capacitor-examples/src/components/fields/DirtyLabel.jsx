@@ -28,6 +28,6 @@ export default createComponent({
             delete props.htmlFor;
         }
         delete props.for;
-        return <FieldLabel {...props} className={{'is-dirty': isDirty}}/>
+        return <FieldLabel normal {...props} className={{'is-dirty': isDirty}}/>
     }
 })

@@ -3,8 +3,13 @@ import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import {CTX_KEY_PATH, CTX_VAL_PATH} from 'form-capacitor-store';
 import {resolveValue} from 'form-capacitor-util/util';
 
-
-export default function mountPoint({add,expose}) { 
+/**
+ * 
+ * @param {string|function} options.add
+ * @param {boolean|string|function} options.expose
+ * @returns {function(*=)}
+ */
+export default function mountPoint(options) { // TODO: rename mount()?
     
     return BaseComponent => {
         return class extends React.PureComponent {
@@ -26,11 +31,12 @@ export default function mountPoint({add,expose}) {
                 super(props, context);
                 
                 const currentPath = (context && context[CTX_KEY_PATH]) || [];
-                this.path = resolvePath(currentPath, resolveValue(add,this.props));
+                this.path = resolvePath(currentPath, resolveValue(options.add,this.props));
             }
 
             render() {
                 let props;
+                let expose = resolveValue(options.expose, this.props);
                 if(expose) {
                     if(expose === true) expose = 'path';
                     props = {

@@ -14,7 +14,7 @@ import {resolveValue} from '../../form-capacitor-util/util';
 export default function withErrors(options) { // altname: dirtyRoot ??
 
     options = {
-        path: p => p.name,
+        path: p => p.path,
         schemaId: undefined,
         errorsProp: 'errors',
         ...options,
@@ -22,7 +22,6 @@ export default function withErrors(options) { // altname: dirtyRoot ??
 
 
     return BaseComponent => {
-        const factory = createEagerFactory(BaseComponent);
 
         // console.log(`${getDisplayName(BaseComponent)} has schema:\n${JSON.stringify(options.schema,null,2)}`);
 
@@ -30,7 +29,7 @@ export default function withErrors(options) { // altname: dirtyRoot ??
             static displayName = wrapDisplayName(BaseComponent, 'withErrors');
 
             static contextTypes = {
-                [CTX_KEY_PATH]: CTX_VAL_PATH,
+                // [CTX_KEY_PATH]: CTX_VAL_PATH,
                 [CTX_KEY_SCHEMA_ID]: CTX_VAL_SCHEMA_ID,
                 // [ContextStore]: StoreShape,
             };
@@ -44,11 +43,18 @@ export default function withErrors(options) { // altname: dirtyRoot ??
                     throw new Error('Schema not found');
                 }
                 
-                const basePath = context[CTX_KEY_PATH] || [];
-                const componentName = resolveValue(options.path, this.props);
-                let componentPath = componentName ? toPath(componentName) : [];
+                // const basePath = context[CTX_KEY_PATH] || [];
+                // const componentName = resolveValue(options.path, this.props);
+                // let componentPath = componentName ? toPath(componentName) : [];
+                const path = resolveValue(options.path, this.props);
+                
+                // console.log(options,this.props);
+                
+                if(!path) {
+                    throw new Error("Missing `path`");
+                }
 
-                this.fullPath = [ERROR_ROOT, schemaId, ...basePath, ...componentPath];
+                this.fullPath = [ERROR_ROOT, schemaId, ...path];
 
                 // console.log(this.fullPath);
                 
@@ -72,11 +78,10 @@ export default function withErrors(options) { // altname: dirtyRoot ??
 
 
             render() {
-                const props = {
+                return React.createElement(BaseComponent, {
                     ...this.props,
                     [options.errorsProp]: this.state.errors,
-                };
-                return factory(props);
+                })
             }
         }
     }

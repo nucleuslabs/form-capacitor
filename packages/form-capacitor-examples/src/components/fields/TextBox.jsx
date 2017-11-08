@@ -1,5 +1,5 @@
 import createComponent from '../../createComponent';
-import {withValue} from 'form-capacitor-state';
+import {withValue, mountPoint, withPath} from 'form-capacitor-state';
 import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
@@ -11,11 +11,12 @@ import {WarningIcon} from '../bulma';
 export default createComponent({
     displayName: 'TextBox',
     enhancers: [
+        // mountPoint({add: p => p.name, expose: true}),
+        withPath(),
         withErrors(),
         withValue({
             valueProp: 'value',
             setValueProp: 'setValue',
-            pathProp: 'path'
         }),
         withPropsOnChange('setValue', ({setValue}) => ({
             onChange(ev) {

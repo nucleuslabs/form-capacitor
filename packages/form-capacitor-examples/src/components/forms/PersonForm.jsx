@@ -5,7 +5,7 @@ import {
 } from '../bulma';
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
-import {withValue} from 'form-capacitor-state';
+import {mountPoint, withValue} from 'form-capacitor-state';
 import {dirtyProvider, withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompact';
 import DirtyLabel from '../fields/DirtyLabel';
@@ -22,12 +22,14 @@ import {withSchema} from 'form-capacitor-schema';
 import * as Sch from '../../SchemaTypes';
 import ErrorContainer from '../fields/ErrorContainer';
 import FieldErrors from '../fields/FieldErrors';
-
+import Mount from '../Mount';
+import shortid from 'shortid';
 const primaryLanguages = [pleaseSelect, ...languages];
 
 export default createComponent({
     displayName: "PersonForm",
     enhancers: [
+        mountPoint({add: p => p.name || shortid(), expose: true}),
         withValue({
             defaultValue: {
                 name: "Mark",
@@ -100,71 +102,73 @@ export default createComponent({
                 <form onSubmit={saveState}>
                     <Title>Person Form</Title>
                     <FieldRow>
-                        <DirtyLabel normal for="name">Name</DirtyLabel>
-                        <SingleField>
-                            <TextBox name="name"/>
-                            <FieldErrors for="name"/>
-                        </SingleField>
+                        <Mount path="name">
+                            <DirtyLabel>Name</DirtyLabel>
+                            <SingleField>
+                                <TextBox/>
+                                <FieldErrors/>
+                            </SingleField>
+                        </Mount>
                     </FieldRow>
-                    <FieldRow>
-                        <DirtyLabel normal for="favNumber">Favourite Number</DirtyLabel>
-                        <SingleField narrow>
-                            <NumberBox name="favNumber"/>
-                            <FieldErrors for="favNumber" message="Must be between 1 and 100"/>
-                        </SingleField>
-                    </FieldRow>
-                    <FieldRow>
-                        <DirtyLabel normal for="birthDate">Birth Date</DirtyLabel>
-                        <SingleField narrow>
-                            <DatePicker name="birthDate" max={formatDate(new Date())}/>
-                            <FieldErrors for="birthDate"/>
-                        </SingleField>
-                    </FieldRow>
-                    <FieldRow>
-                        <DirtyLabel normal for="primaryLanguageId">Primary Language</DirtyLabel>
-                        <SingleField narrow>
-                            <SelectBox name="primaryLanguageId" options={primaryLanguages}/>
-                            <FieldErrors for="primaryLanguageId"/>
-                        </SingleField>
-                    </FieldRow>
-                    <FieldRow>
-                        <DirtyLabel normal for="secondaryLanguageIds">Secondary Language(s)</DirtyLabel>
-                        <SingleField>
-                            <SelectBox multiple name="secondaryLanguageIds" options={languages} size={6}/>
-                            <FieldErrors for="secondaryLanguageIds"/>
-                        </SingleField>
-                    </FieldRow>
-                    <FieldRow>
-                        <DirtyLabel normal for="isAboriginal">Aboriginal?</DirtyLabel>
-                        <SingleField>
-                            <ErrorContainer for="isAboriginal">
-                                <CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>
-                            </ErrorContainer>
-                            <FieldErrors for="isAboriginal"/>
-                        </SingleField>
-                    </FieldRow>
-                    <FieldRow>
-                        <DirtyLabel normal for="likes" htmlFor={false}>Likes</DirtyLabel>
-                        <SingleField>
-                            <ErrorContainer for="likes">
-                                <CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>
-                                <CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>
-                                <CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>
-                            </ErrorContainer>
-                            <FieldErrors for="likes"/>
-                        </SingleField>
-                    </FieldRow>
-                    <FieldRow>
-                        <DirtyLabel normal for="gender" htmlFor={false}>Gender</DirtyLabel>
-                        <SingleField>
-                            <ErrorContainer for="gender">
-                                <RadioLabel><RadioButton name="gender" value="M"/> Male</RadioLabel>
-                                <RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>
-                                <RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>
-                            </ErrorContainer>
-                            <FieldErrors for="gender"/>
-                        </SingleField>
-                    </FieldRow>
+                    {/*<FieldRow>*/}
+                        {/*<DirtyLabel normal for="favNumber">Favourite Number</DirtyLabel>*/}
+                        {/*<SingleField narrow>*/}
+                            {/*<NumberBox name="favNumber"/>*/}
+                            {/*<FieldErrors for="favNumber" message="Must be between 1 and 100"/>*/}
+                        {/*</SingleField>*/}
+                    {/*</FieldRow>*/}
+                    {/*<FieldRow>*/}
+                        {/*<DirtyLabel normal for="birthDate">Birth Date</DirtyLabel>*/}
+                        {/*<SingleField narrow>*/}
+                            {/*<DatePicker name="birthDate" max={formatDate(new Date())}/>*/}
+                            {/*<FieldErrors for="birthDate"/>*/}
+                        {/*</SingleField>*/}
+                    {/*</FieldRow>*/}
+                    {/*<FieldRow>*/}
+                        {/*<DirtyLabel normal for="primaryLanguageId">Primary Language</DirtyLabel>*/}
+                        {/*<SingleField narrow>*/}
+                            {/*<SelectBox name="primaryLanguageId" options={primaryLanguages}/>*/}
+                            {/*<FieldErrors for="primaryLanguageId"/>*/}
+                        {/*</SingleField>*/}
+                    {/*</FieldRow>*/}
+                    {/*<FieldRow>*/}
+                        {/*<DirtyLabel normal for="secondaryLanguageIds">Secondary Language(s)</DirtyLabel>*/}
+                        {/*<SingleField>*/}
+                            {/*<SelectBox multiple name="secondaryLanguageIds" options={languages} size={6}/>*/}
+                            {/*<FieldErrors for="secondaryLanguageIds"/>*/}
+                        {/*</SingleField>*/}
+                    {/*</FieldRow>*/}
+                    {/*<FieldRow>*/}
+                        {/*<DirtyLabel normal for="isAboriginal">Aboriginal?</DirtyLabel>*/}
+                        {/*<SingleField>*/}
+                            {/*<ErrorContainer for="isAboriginal">*/}
+                                {/*<CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>*/}
+                            {/*</ErrorContainer>*/}
+                            {/*<FieldErrors for="isAboriginal"/>*/}
+                        {/*</SingleField>*/}
+                    {/*</FieldRow>*/}
+                    {/*<FieldRow>*/}
+                        {/*<DirtyLabel normal for="likes" htmlFor={false}>Likes</DirtyLabel>*/}
+                        {/*<SingleField>*/}
+                            {/*<ErrorContainer for="likes">*/}
+                                {/*<CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>*/}
+                                {/*<CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>*/}
+                                {/*<CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>*/}
+                            {/*</ErrorContainer>*/}
+                            {/*<FieldErrors for="likes"/>*/}
+                        {/*</SingleField>*/}
+                    {/*</FieldRow>*/}
+                    {/*<FieldRow>*/}
+                        {/*<DirtyLabel normal for="gender" htmlFor={false}>Gender</DirtyLabel>*/}
+                        {/*<SingleField>*/}
+                            {/*<ErrorContainer for="gender">*/}
+                                {/*<RadioLabel><RadioButton name="gender" value="M"/> Male</RadioLabel>*/}
+                                {/*<RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>*/}
+                                {/*<RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>*/}
+                            {/*</ErrorContainer>*/}
+                            {/*<FieldErrors for="gender"/>*/}
+                        {/*</SingleField>*/}
+                    {/*</FieldRow>*/}
 
                     <FieldRow>
                         <FieldLabel/>
