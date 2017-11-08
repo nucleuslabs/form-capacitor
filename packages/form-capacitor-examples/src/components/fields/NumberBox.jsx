@@ -31,7 +31,7 @@ export default createComponent({
     render: ({className, path, errors, ...props}) => {
         const hasErrors = errors && errors.length;
         return (
-            <div className={cc(['control', className, {'is-danger': hasErrors}])}>
+            <div className={cc(['control', className])}>
                 <input id={path.join('.')} className={cc(['input',{'is-danger':hasErrors}])} type="number" min={Number.MIN_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} {...props}/>
             </div>
         )

@@ -20,6 +20,7 @@ import {isEqual} from 'lodash';
 import RadioButton from '../fields/RadioButton';
 import {withSchema} from 'form-capacitor-schema';
 import * as Sch from '../../SchemaTypes';
+import ErrorContainer from '../fields/ErrorContainer';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -48,7 +49,7 @@ export default createComponent({
         }),
         withSchema({
             schema: Sch.object({
-                required: ['name', 'favNumber', 'primaryLanguageId', 'gender'],
+                required: ['name', 'favNumber', 'primaryLanguageId', 'gender','likes'],
                 properties: {
                     name: Sch.string({
                         minLength: 2,
@@ -59,10 +60,17 @@ export default createComponent({
                         maximum: 100,
                         // exclusiveMaximum: true,
                     })),
+                    likes: Sch.array({
+                        items: Sch.string(),
+                        minItems: 2,
+                    }),
                     primaryLanguageId: Sch.number(),
                     gender: Sch.string({
                         enum: ['M', 'F'],
-                    })
+                    }),
+                    isAboriginal: {
+                        const: true
+                    }
                 }
             }),
             valueProp: 'formData'
@@ -121,31 +129,31 @@ export default createComponent({
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
-                        <DirtyLabel for="isAboriginal">Aboriginal?</DirtyLabel>
+                        <DirtyLabel normal for="isAboriginal">Aboriginal?</DirtyLabel>
                         <SingleField>
-                            <Control>
+                            <ErrorContainer for="isAboriginal">
                                 <CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>
-                            </Control>
+                            </ErrorContainer>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
-                        <DirtyLabel for="likes" htmlFor={false}>Likes</DirtyLabel>
+                        <DirtyLabel normal for="likes" htmlFor={false}>Likes</DirtyLabel>
                         <SingleField>
-                            <Control>
+                            <ErrorContainer for="likes">
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>
                                 <CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>
-                            </Control>
+                            </ErrorContainer>
                         </SingleField>
                     </FieldRow>
                     <FieldRow>
-                        <DirtyLabel for="gender" htmlFor={false}>Gender</DirtyLabel>
+                        <DirtyLabel normal for="gender" htmlFor={false}>Gender</DirtyLabel>
                         <SingleField>
-                            <Control>
+                            <ErrorContainer for="gender">
                                 <RadioLabel><RadioButton name="gender" value="M"/> Male</RadioLabel>
                                 <RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>
                                 <RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>
-                            </Control>
+                            </ErrorContainer>
                         </SingleField>
                     </FieldRow>
 
