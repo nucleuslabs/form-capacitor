@@ -66,7 +66,7 @@ export default createComponent({
                 saveState(); // <-- clear the dirtyness because we've just loaded fresh data from the db
                 
                 // TODO: some kind of form loading state...
-            }, 250); // <-- loading form data from database
+            }, 1000); // <-- loading form data from database
         }),
      
         withDirty({

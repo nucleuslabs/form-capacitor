@@ -22,17 +22,30 @@ function findIndex({options, value, multiple}) {
             const idx = options.findIndex(opt => opt.value === val);
             if(idx >= 0) acc.push(idx);
             return acc;
-        }, []) :[])
+        }, []) : [])
         : options.findIndex(opt => opt.value === value);
 }
 
-
+const INTERNAL_UPDATE = '__internal_selectbox_update__';
 
 export default createComponent({
     displayName: 'SelectBox',
     enhancers: [
-        field(),
-        withState('selectedIndex', 'setSelectedIndex', findIndex),
+        mountPoint({
+            add: p => p.name,
+            mount: p => !!p.name,
+            expose: true,
+        }),
+        withErrors(),
+        withState('selectedIndex', 'setSelectedIndex', -1),
+        withValue({
+            onChange(value, oldValue, context) {
+                if(context !== INTERNAL_UPDATE) {
+                    this.props.setSelectedIndex(findIndex({...this.props, value}));
+                }
+            },
+            setValueProp: 'setValue',
+        }),
         withHandlers({
             onChange: ({setValue, multiple, options, setSelectedIndex}) => ev => {
                 if(multiple) {
@@ -43,31 +56,13 @@ export default createComponent({
                         return acc;
                     }, []);
                     setSelectedIndex(indices);
-                    setValue(indices.map(i => options[i].value));
+                    setValue(indices.map(i => options[i].value, INTERNAL_UPDATE));
                 } else {
                     const index = ev.currentTarget.selectedIndex;
                     setSelectedIndex(index);
-                    setValue(options[index].value);
+                    setValue(options[index].value, INTERNAL_UPDATE);
                 }
             }
-        }),
-        onPropsChange('value', (props,prevProps) => {
-            // console.log('pachooo');
-
-            // todo: if value isn't found in selectbox, maybe we should render it as an additional option and disable it?
-            if(props.multiple) {
-                let values;
-                // noinspection CommaExpressionJS
-                if(props.selectedIndex.length !== props.value.length || (values = new Set(props.value),props.selectedIndex.some(si => si < 0 || si > props.options.length || !values.has(props.options[si].value)))) {
-                    props.setSelectedIndex(findIndex(props));
-                }
-            } else {
-                if(props.selectedIndex < 0 || props.selectedIndex >= props.options.length || props.options[props.selectedIndex].value !== props.value) {
-                    props.setSelectedIndex(findIndex(props));
-                }
-            }
-      
-            // }
         }),
         omitProps(['name', 'value', 'setValue', 'setSelectedIndex']),
     ],
@@ -86,7 +81,7 @@ export default createComponent({
         // console.log(props.selectedIndex);
         return (
             <div className={cc(['control', className])}>
-                <span className={cc(['select', {'is-multiple': multiple,'is-danger':hasErrors}])}>
+                <span className={cc(['select', {'is-multiple': multiple, 'is-danger': hasErrors}])}>
                     <SelectByIndex id={path.join('.')} className={cc(['input'])} {...props} multiple={multiple}>
                         {options.map(({value, label, ...opt}, i) =>
                             <option {...opt} key={useValueAsKey ? value : i} children={label}/>)}

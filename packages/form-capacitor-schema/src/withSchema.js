@@ -53,7 +53,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
     return BaseComponent => {
         const factory = createEagerFactory(BaseComponent);
 
-        console.log(`%c${getDisplayName(BaseComponent)} has schema:\n${JSON.stringify(options.schema,null,2)}`, 'color:blue');
+        // console.log(`%c${getDisplayName(BaseComponent)} has schema:\n${JSON.stringify(options.schema,null,2)}`, 'color:blue');
 
         // function success() {
         //     console.log(`%c${getDisplayName(BaseComponent)}%c is %cvalid`,'font-weight:bold','','color: green');

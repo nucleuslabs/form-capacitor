@@ -6,20 +6,23 @@ import {withErrors} from '../../form-capacitor-schema/src';
 export default function field(options) {
     options = {
         withErrors: true,
-        onChange: undefined,
         defaultValue: null,
+        onChange: undefined,
+        valueProp: 'value',
+        setValueProp: 'setValue',
+        nameProp: 'name',
         ...options
     };
     
     let enhancers = [
         mountPoint({
-            add: p => p.name,
-            mount: p => !!p.name,
+            add: p => p[options.nameProp],
+            mount: p => !!p[options.nameProp],
             expose: true,
         }),
         withValue({
-            valueProp: 'value',
-            setValueProp: 'setValue',
+            valueProp: options.valueProp,
+            setValueProp: options.setValueProp,
         }),
         defaultProps({
             value: options.defaultValue,
@@ -33,7 +36,7 @@ export default function field(options) {
     if(options.onChange) {
         enhancers.push(withHandlers({
             onChange: options.onChange,
-        }), omitProps(['name','setValue']));
+        }), omitProps([options.nameProp,options.setValueProp]));
     }
     
     return compose(...enhancers);

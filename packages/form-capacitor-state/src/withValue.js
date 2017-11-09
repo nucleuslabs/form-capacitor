@@ -15,6 +15,7 @@ export default function withValue(options) {
         // output props:
         valueProp: undefined,
         setValueProp: undefined,
+        onChange: undefined,
         // pathProp: undefined,
         
         ...options,
@@ -48,11 +49,15 @@ export default function withValue(options) {
                 }
 
                 // console.log('currentValue',currentValue);
-
+                
                 if(options.valueProp) {
                     this.state = {
                         value: currentValue
                     }
+                }
+
+                if(options.onChange) {
+                    options.onChange.call(this, currentValue, undefined, '@@INIT'); // let's be cool like redux
                 }
             }
 
@@ -66,17 +71,22 @@ export default function withValue(options) {
             };
 
             componentWillMount() {
-                if(options.valueProp) {
-                    this.unsub = store.subscribe(this.fullPath, value => {
+                if(options.valueProp || options.onChange) {
+                    this.unsub = store.subscribe(this.fullPath, (value,oldValue,context) => {
                         // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
                         // console.log('change',this.fullPath);
-                        this.setState({value});
+                        if(options.valueProp) {
+                            this.setState({value});
+                        } 
+                        if(options.onChange) {
+                            options.onChange.call(this, value, oldValue, context);
+                        }
                     });
                 }
             }
 
             componentWillUnmount() {
-                if(options.valueProp) {
+                if(options.valueProp || options.onChange) {
                     this.unsub();
                 }
                 if(resolveValue(options.clearOnUnmount,this.props)) {

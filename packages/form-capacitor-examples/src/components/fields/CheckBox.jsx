@@ -10,23 +10,19 @@ import onPropsChange from '../../onPropsChange';
 import className from '../../className';
 import {arraySplice} from '../../util';
 import {withPath} from '../../../../form-capacitor-state/src';
+import field from '../../field';
 // console.log(withValue);
 
 export default createComponent({
     displayName: 'CheckBox',
     enhancers: [
-        withPath(),
-        withValue({
+        field({
             valueProp: 'checked',
             setValueProp: 'setChecked',
-            // pathProp: 'path'
-        }),
-        // withState('selectedIndex', 'setSelectedIndex', findIndex),
-        withHandlers({
             onChange: ({setChecked, checked, multiple, value}) => ev => {
                 if(multiple) {
                     if(ev.currentTarget.checked) {
-                        setChecked(checked ? [...checked,value] : [value]);    
+                        setChecked(checked ? [...checked,value] : [value]);
                     } else if(checked) {
                         let idx = checked.indexOf(value);
                         if(idx >= 0) {
@@ -36,18 +32,8 @@ export default createComponent({
                 } else {
                     setChecked(ev.currentTarget.checked);
                 }
-            }
+            },
         }),
-        withPropsOnChange(['checked','multiple','value'],({checked,multiple,value}) => ({
-            checked: checked ? (multiple ? checked.includes(value) : !!checked) : false,
-        })),
-        // onPropsChange('value', (props,prevProps) => {
-        //     if(props.selectedIndex === prevProps.selectedIndex) {
-        //         // if the `value` changed but the `selectedIndex` didn't, then this was an external change -- update the index
-        //         props.setSelectedIndex(findIndex(props));
-        //     }
-        // }),
-        omitProps(['name','setChecked']),
         className(),
     ],
     propTypes: {
@@ -56,7 +42,7 @@ export default createComponent({
         id: PropTypes.string,
         className: PropTypes.any,
     },
-    render: ({id, path, multiple, value, ...props}) => {
+    render: ({id, path, multiple, checked, value, ...props}) => {
         if(!id) {
             if(multiple) {
                 if(typeof value === 'string' || typeof value === 'number') {
@@ -66,9 +52,18 @@ export default createComponent({
                 id = path.join('.');
             }
         }
+        if(checked) {
+            if(multiple) {
+                checked = checked.includes(value);
+            } else {
+                checked = true;
+            }
+        } else {
+            checked = false;
+        }
         // console.log('rneder checkbox');
         return (
-            <input id={id} type="checkbox" {...props}/>
+            <input id={id} {...props} type="checkbox" checked={checked} />
         )
     }
 })

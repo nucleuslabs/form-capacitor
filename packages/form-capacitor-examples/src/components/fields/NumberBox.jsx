@@ -14,17 +14,22 @@ export default createComponent({
     displayName: 'NumberBox',
     enhancers: field({
         onChange: ({setValue}) => ev => {
-            const value = ev.currentTarget.valueAsNumber;
-            if(Number.isFinite(value)) {
-                // fixme: this can impede your typing
-                // try typing "-1" and then press backspace to delete the "1"
-                // you can't because it puts the numberbox into a bad state; "-" isn't a valid number
-                setValue(value);
+            if(ev.currentTarget.value === '') {
+                setValue(null)
+            } else {
+                const value = parseFloat(ev.currentTarget.value);
+                if(Number.isFinite(value)) {
+                    // fixme: this can impede your typing
+                    // try typing "-1" and then press backspace to delete the "1"
+                    // you can't because it puts the numberbox into a bad state; "-" isn't a valid number
+                    setValue(value);
+                }
             }
         },
         // defaultValue: null,
     }),
     render: ({className, path, errors, value, ...props}) => {
+        // console.log('rendder');
         const hasErrors = errors && errors.length;
         value = Number.isFinite(value) ? String(value) : '';
         return (
