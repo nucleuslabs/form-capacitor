@@ -39,15 +39,19 @@ export default function withErrors(options) { // altname: dirtyRoot ??
 
                 const schemaId = options.schemaId || context[CTX_KEY_SCHEMA_ID];
                 
-                if(!schemaId) {
-                    throw new Error('Schema not found');
-                }
-                
+         
                 // const basePath = context[CTX_KEY_PATH] || [];
                 // const componentName = resolveValue(options.path, this.props);
                 // let componentPath = componentName ? toPath(componentName) : [];
                 const path = resolveValue(options.path, this.props);
-                
+
+                if(!schemaId) {
+                    // fixme: can this be made more efficient by bypassing this HOC if there's no schema?
+                    console.warn(`Schema not found for ${path ? path.join('.') : BaseComponent.displayName || 'unnamed field'}`);
+                    return;
+                }
+
+
                 // console.log(options,this.props);
                 
                 if(!path) {
@@ -65,23 +69,31 @@ export default function withErrors(options) { // altname: dirtyRoot ??
             }
 
             componentWillMount() {
-                this.unsub = pubSub.subscribe(this.fullPath, errors => {
-                    // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
-                    // console.log('change',this.fullPath);
-                    this.setState({errors});
-                });
+                if(this.fullPath) {
+                    this.unsub = pubSub.subscribe(this.fullPath, errors => {
+                        // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
+                        // console.log('change',this.fullPath);
+                        this.setState({errors});
+                    });
+                }
             }
 
             componentWillUnmount() {
-                this.unsub();
+                this.unsub && this.unsub();
             }
 
 
             render() {
-                return React.createElement(BaseComponent, {
-                    ...this.props,
-                    [options.errorsProp]: this.state.errors,
-                })
+                let props;
+                if(this.fullPath) {
+                    props = {
+                        ...this.props,
+                        [options.errorsProp]: this.state.errors,
+                    };
+                } else {
+                    props = this.props;
+                }
+                return React.createElement(BaseComponent, props)
             }
         }
     }

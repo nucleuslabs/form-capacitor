@@ -24,6 +24,8 @@ function findIndex({options, value, multiple}) {
         : options.findIndex(opt => opt.value === value);
 }
 
+
+
 export default createComponent({
     displayName: 'SelectBox',
     enhancers: [
@@ -55,9 +57,20 @@ export default createComponent({
         }),
         onPropsChange('value', (props,prevProps) => {
             // console.log('pachooo');
-            if(props.selectedIndex < 0 || props.selectedIndex >= props.options.length || props.options[props.selectedIndex].value !== props.value) {
-                props.setSelectedIndex(findIndex(props)); // todo: if value isn't found in selectbox, maybe we should render it as an additional option and disable it?
+
+            // todo: if value isn't found in selectbox, maybe we should render it as an additional option and disable it?
+            if(props.multiple) {
+                let values;
+                // noinspection CommaExpressionJS
+                if(props.selectedIndex.length !== props.value.length || (values = new Set(props.value),props.selectedIndex.some(si => si < 0 || si > props.options.length || !values.has(props.options[si].value)))) {
+                    props.setSelectedIndex(findIndex(props));
+                }
+            } else {
+                if(props.selectedIndex < 0 || props.selectedIndex >= props.options.length || props.options[props.selectedIndex].value !== props.value) {
+                    props.setSelectedIndex(findIndex(props));
+                }
             }
+      
             // }
         }),
         omitProps(['name', 'value', 'setValue', 'setSelectedIndex']),
@@ -66,7 +79,8 @@ export default createComponent({
         options: PropTypes.arrayOf(PropTypes.shape({
             value: PropTypes.any,
             label: PropTypes.string,
-        })).isRequired
+        })).isRequired,
+        useValueAsKey: PropTypes.bool,
     },
     defaultProps: {
         useValueAsKey: false,

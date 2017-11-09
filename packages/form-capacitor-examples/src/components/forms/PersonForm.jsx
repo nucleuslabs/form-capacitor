@@ -137,13 +137,15 @@ export default createComponent({
                         </SingleField>
                         </Mount>
                     </FieldRow>
-                    {/*<FieldRow>*/}
-                        {/*<DirtyLabel normal for="secondaryLanguageIds">Secondary Language(s)</DirtyLabel>*/}
-                        {/*<SingleField>*/}
-                            {/*<SelectBox multiple name="secondaryLanguageIds" options={languages} size={6}/>*/}
-                            {/*<FieldErrors for="secondaryLanguageIds"/>*/}
-                        {/*</SingleField>*/}
-                    {/*</FieldRow>*/}
+                    <FieldRow>
+                        <Mount path="secondaryLanguageIds">
+                        <DirtyLabel>Secondary Language(s)</DirtyLabel>
+                        <SingleField>
+                            <SelectBox multiple options={languages} size={6}/>
+                            <FieldErrors/>
+                        </SingleField>
+                        </Mount>
+                    </FieldRow>
                     {/*<FieldRow>*/}
                         {/*<DirtyLabel normal for="isAboriginal">Aboriginal?</DirtyLabel>*/}
                         {/*<SingleField>*/}
