@@ -5,35 +5,32 @@ import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
 import {WarningIcon} from '../bulma';
 import {withPath} from '../../../../form-capacitor-state/src';
+import field from '../../field';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
 
 export default createComponent({
     displayName: 'NumberBox',
-    enhancers: [
-        withPath(),
-        withErrors(),
-        withValue({
-            valueProp: 'value',
-            setValueProp: 'setValue',
-        }),
-        withPropsOnChange('setValue', ({setValue}) => ({
-            onChange(ev) {
-                const value = ev.currentTarget.valueAsNumber;
-                setValue(Number.isFinite(value) ? value : null);
+    enhancers: field({
+        onChange: ({setValue}) => ev => {
+            const value = ev.currentTarget.valueAsNumber;
+            if(Number.isFinite(value)) {
+                // fixme: this can impede your typing
+                // try typing "-1" and then press backspace to delete the "1"
+                // you can't because it puts the numberbox into a bad state; "-" isn't a valid number
+                setValue(value);
             }
-        })),
-        withPropsOnChange('value', ({value}) => {
-            return {value: Number.isFinite(value) ? String(value) : ''};
-        }),
-        omitProps(['name', 'setValue']),
-    ],
-    render: ({className, path, errors, ...props}) => {
+            // setValue(Number.isFinite(value) ? value : null);
+        },
+        defaultValue: null,
+    }),
+    render: ({className, path, errors, value, ...props}) => {
         const hasErrors = errors && errors.length;
+        value = Number.isFinite(value) ? String(value) : '';
         return (
             <div className={cc(['control', className])}>
-                <input id={path.join('.')} className={cc(['input',{'is-danger':hasErrors}])} type="number" min={Number.MIN_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} {...props}/>
+                <input id={path.join('.')} className={cc(['input',{'is-danger':hasErrors}])} type="number" value={value} {...props}/>
             </div>
         )
     }

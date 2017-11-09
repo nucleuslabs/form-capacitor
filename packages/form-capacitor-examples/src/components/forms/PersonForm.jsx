@@ -32,7 +32,7 @@ export default createComponent({
         mountPoint({add: p => p.name || shortid(), expose: true}),
         withValue({
             defaultValue: {
-                name: "Mark",
+                // name: "Mark",
                 favNumber: null,
                 birthDate: "1987-12-21",
                 primaryLanguageId: 11,

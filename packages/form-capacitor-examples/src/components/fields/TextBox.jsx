@@ -4,6 +4,7 @@ import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'r
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
 import {WarningIcon} from '../bulma';
+import field from '../../field';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -12,21 +13,12 @@ export default createComponent({
     displayName: 'TextBox',
     enhancers: [
         // mountPoint({add: p => p.name, expose: true}),
-        withPath(),
-        withErrors(),
-        withValue({
-            valueProp: 'value',
-            setValueProp: 'setValue',
-        }),
-        withPropsOnChange('setValue', ({setValue}) => ({
-            onChange(ev) {
+        field({
+            onChange: ({setValue}) => ev => {
                 setValue(ev.currentTarget.value);
-            }
-        })),
-        defaultProps({
-            value: '', // prevents uncontrolled -> controlled warning
+            },
+            defaultValue: ''  // prevents uncontrolled -> controlled warning
         }),
-        omitProps(['name', 'setValue']),
     ],
     render: ({className, path, errors, ...props}) => {
         // console.log(props.value);
