@@ -9,15 +9,17 @@ import onPropsChange from '../../onPropsChange';
 // import dump from 'form-capacitor-util/dump';
 import className from '../../className';
 import {arraySplice} from '../../util';
+import {withPath} from '../../../../form-capacitor-state/src';
 // console.log(withValue);
 
 export default createComponent({
     displayName: 'CheckBox',
     enhancers: [
+        withPath(),
         withValue({
             valueProp: 'checked',
             setValueProp: 'setChecked',
-            pathProp: 'path'
+            // pathProp: 'path'
         }),
         // withState('selectedIndex', 'setSelectedIndex', findIndex),
         withHandlers({

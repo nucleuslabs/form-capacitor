@@ -2,13 +2,13 @@ import createComponent from '../../createComponent';
 import {mapProps, omitProps, withProps, defaultProps, withState, withHandlers, withPropsOnChange} from 'recompact';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
+import {withPath} from '../../../../form-capacitor-state/src';
 
 export default createComponent({
     displayName: 'ErrorContainer',
     enhancers: [
-        withErrors({
-            path: p => p.for,
-        }),
+        withPath(),
+        withErrors(),
     ],
     propTypes: {
    

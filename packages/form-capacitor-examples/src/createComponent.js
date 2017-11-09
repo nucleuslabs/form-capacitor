@@ -3,7 +3,7 @@ import {compose} from 'recompact';
 export default function createComponent({render, enhancers, displayName, propTypes, defaultProps}) {
     
     if(!render) {
-        render = p => p.children;
+        render = p => p.children || null;
     }
     
     if(enhancers) {

@@ -2,15 +2,17 @@ import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
 import {mapProps, omitProps, withProps, defaultProps, withState, withHandlers, withPropsOnChange} from 'recompact';
 import className from '../../className';
+import {withPath} from '../../../../form-capacitor-state/src';
 
 
 export default createComponent({
     displayName: 'RadioButton',
     enhancers: [
+        withPath(),
         withValue({
             valueProp: 'checked',
             setValueProp: 'setChecked',
-            pathProp: 'path'
+            // pathProp: 'path'
         }),
         withHandlers({
             onChange: ({setChecked, value}) => ev => {

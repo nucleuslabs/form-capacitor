@@ -130,53 +130,59 @@ export default createComponent({
                     </FieldRow>
                     <FieldRow>
                         <Mount path="primaryLanguageId">
-                        <DirtyLabel >Primary Language</DirtyLabel>
-                        <SingleField narrow>
-                            <SelectBox options={primaryLanguages}/>
-                            <FieldErrors/>
-                        </SingleField>
+                            <DirtyLabel>Primary Language</DirtyLabel>
+                            <SingleField narrow>
+                                <SelectBox options={primaryLanguages}/>
+                                <FieldErrors/>
+                            </SingleField>
                         </Mount>
                     </FieldRow>
                     <FieldRow>
                         <Mount path="secondaryLanguageIds">
-                        <DirtyLabel>Secondary Language(s)</DirtyLabel>
-                        <SingleField>
-                            <SelectBox multiple options={languages} size={6}/>
-                            <FieldErrors/>
-                        </SingleField>
+                            <DirtyLabel>Secondary Language(s)</DirtyLabel>
+                            <SingleField>
+                                <SelectBox multiple options={languages} size={6}/>
+                                <FieldErrors/>
+                            </SingleField>
                         </Mount>
                     </FieldRow>
-                    {/*<FieldRow>*/}
-                        {/*<DirtyLabel normal for="isAboriginal">Aboriginal?</DirtyLabel>*/}
-                        {/*<SingleField>*/}
-                            {/*<ErrorContainer for="isAboriginal">*/}
-                                {/*<CheckBoxLabel><CheckBox name="isAboriginal"/> Aboriginal</CheckBoxLabel>*/}
-                            {/*</ErrorContainer>*/}
-                            {/*<FieldErrors for="isAboriginal"/>*/}
-                        {/*</SingleField>*/}
-                    {/*</FieldRow>*/}
-                    {/*<FieldRow>*/}
-                        {/*<DirtyLabel normal for="likes" htmlFor={false}>Likes</DirtyLabel>*/}
-                        {/*<SingleField>*/}
-                            {/*<ErrorContainer for="likes">*/}
-                                {/*<CheckBoxLabel><CheckBox multiple name="likes" value="hockey"/> Hockey</CheckBoxLabel>*/}
-                                {/*<CheckBoxLabel><CheckBox multiple name="likes" value="soccer"/> Soccer</CheckBoxLabel>*/}
-                                {/*<CheckBoxLabel><CheckBox multiple name="likes" value="football"/> Football</CheckBoxLabel>*/}
-                            {/*</ErrorContainer>*/}
-                            {/*<FieldErrors for="likes"/>*/}
-                        {/*</SingleField>*/}
-                    {/*</FieldRow>*/}
-                    {/*<FieldRow>*/}
-                        {/*<DirtyLabel normal for="gender" htmlFor={false}>Gender</DirtyLabel>*/}
-                        {/*<SingleField>*/}
-                            {/*<ErrorContainer for="gender">*/}
-                                {/*<RadioLabel><RadioButton name="gender" value="M"/> Male</RadioLabel>*/}
-                                {/*<RadioLabel><RadioButton name="gender" value="F"/> Female</RadioLabel>*/}
-                                {/*<RadioLabel><RadioButton name="gender" value="O"/> Other</RadioLabel>*/}
-                            {/*</ErrorContainer>*/}
-                            {/*<FieldErrors for="gender"/>*/}
-                        {/*</SingleField>*/}
-                    {/*</FieldRow>*/}
+                    <FieldRow>
+                        <Mount path="isAboriginal">
+                            <DirtyLabel>Aboriginal?</DirtyLabel>
+                            <SingleField>
+                                <ErrorContainer>
+                                    <CheckBoxLabel><CheckBox/> Aboriginal</CheckBoxLabel>
+                                </ErrorContainer>
+                                <FieldErrors/>
+                            </SingleField>
+                        </Mount>
+                    </FieldRow>
+                    <FieldRow>
+                        <Mount path="likes">
+                            <DirtyLabel htmlFor={false}>Likes</DirtyLabel>
+                            <SingleField>
+                                <ErrorContainer>
+                                    <CheckBoxLabel><CheckBox multiple value="hockey"/> Hockey</CheckBoxLabel>
+                                    <CheckBoxLabel><CheckBox multiple value="soccer"/> Soccer</CheckBoxLabel>
+                                    <CheckBoxLabel><CheckBox multiple value="football"/> Football</CheckBoxLabel>
+                                </ErrorContainer>
+                                <FieldErrors/>
+                            </SingleField>
+                        </Mount>
+                    </FieldRow>
+                    <FieldRow>
+                        <Mount path="gender">
+                            <DirtyLabel htmlFor={false}>Gender</DirtyLabel>
+                            <SingleField>
+                                <ErrorContainer>
+                                    <RadioLabel><RadioButton value="M"/> Male</RadioLabel>
+                                    <RadioLabel><RadioButton value="F"/> Female</RadioLabel>
+                                    <RadioLabel><RadioButton value="O"/> Other</RadioLabel>
+                                </ErrorContainer>
+                                <FieldErrors/>
+                            </SingleField>
+                        </Mount>
+                    </FieldRow>
 
                     <FieldRow>
                         <FieldLabel/>
