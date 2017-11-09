@@ -31,22 +31,8 @@ const INTERNAL_UPDATE = '__internal_selectbox_update__';
 export default createComponent({
     displayName: 'SelectBox',
     enhancers: [
-        mountPoint({
-            add: p => p.name,
-            mount: p => !!p.name,
-            expose: true,
-        }),
-        withErrors(),
         withState('selectedIndex', 'setSelectedIndex', -1),
-        withValue({
-            onChange(value, oldValue, context) {
-                if(context !== INTERNAL_UPDATE) {
-                    this.props.setSelectedIndex(findIndex({...this.props, value}));
-                }
-            },
-            setValueProp: 'setValue',
-        }),
-        withHandlers({
+        field({
             onChange: ({setValue, multiple, options, setSelectedIndex}) => ev => {
                 if(multiple) {
                     const indices = Array.prototype.reduce.call(ev.currentTarget.options, (acc, opt, idx) => {
@@ -62,9 +48,15 @@ export default createComponent({
                     setSelectedIndex(index);
                     setValue(options[index].value, INTERNAL_UPDATE);
                 }
-            }
+            },
+            valueChange(value, oldValue, context) {
+                if(context !== INTERNAL_UPDATE) {
+                    this.props.setSelectedIndex(findIndex({...this.props, value}));
+                }
+            },
+            valueProp: false,
+            omitProps: ['setSelectedIndex'],
         }),
-        omitProps(['name', 'value', 'setValue', 'setSelectedIndex']),
     ],
     propTypes: {
         options: PropTypes.arrayOf(PropTypes.shape({
