@@ -36,6 +36,10 @@ export default function withValue(options) {
 
                 if(options.defaultValue !== undefined && currentValue === undefined) {
                     // not entirely sure if we want to support this feature yet
+                    // fixme: i don't think we do because if, for example, we use a <DirtyLabel>
+                    // before the input, then the input is going to change the value as soon
+                    // as its mounted, causing the DirtyLabel to re-render and possibly flash.
+                    // we want to encourage people to set the default values up front, at the form level
                     store.set(this.fullPath, options.defaultValue);
                     currentValue = options.defaultValue;
                 }
@@ -72,7 +76,7 @@ export default function withValue(options) {
                 if(options.valueProp) {
                     this.unsub();
                 }
-                if(options.clearOnUnmount) {
+                if(resolveValue(options.clearOnUnmount,this.props)) {
                     store.unset(this.fullPath);
                 }
             }

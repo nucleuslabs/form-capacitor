@@ -21,9 +21,8 @@ export default createComponent({
                 // you can't because it puts the numberbox into a bad state; "-" isn't a valid number
                 setValue(value);
             }
-            // setValue(Number.isFinite(value) ? value : null);
         },
-        defaultValue: null,
+        // defaultValue: null,
     }),
     render: ({className, path, errors, value, ...props}) => {
         const hasErrors = errors && errors.length;
