@@ -49,9 +49,13 @@ export default function withValue(options) {
                 }
             }
 
-            setValue = value => {
+            setValue = (value,context) => {
                 // console.log(selfUpdate);
-                store.set(this.fullPath, value, !options.selfUpdate && this.unsub ? this.unsub.key : null);
+                // console.log('setting',this.fullPath.join('.'),value,'was',this.state.value);
+                // let skipUpdate = !options.selfUpdate && this.unsub;
+
+                // this.setState({value});
+                store.set(this.fullPath, value, context);
             };
 
             componentWillMount() {

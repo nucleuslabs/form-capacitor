@@ -4,6 +4,7 @@ import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'r
 // import {formatDate} from '../../util';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
+import {withPath} from '../../../../form-capacitor-state/src';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -11,11 +12,11 @@ import {withErrors} from 'form-capacitor-schema';
 export default createComponent({
     displayName: 'DatePicker',
     enhancers: [
+        withPath(),
         withErrors(),
         withValue({
             valueProp: 'value',
             setValueProp: 'setValue',
-            pathProp: 'path'
         }),
         withPropsOnChange('setValue', ({setValue}) => ({
             onChange(ev) {

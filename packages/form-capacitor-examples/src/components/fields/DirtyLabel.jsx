@@ -18,7 +18,7 @@ export default createComponent({
         withPath()
     ],
     propTypes: {
-        for: PropTypes.string.isRequired,
+        for: PropTypes.string,
         children: PropTypes.node,
     },
     render: ({isDirty, path, ...props}) => {

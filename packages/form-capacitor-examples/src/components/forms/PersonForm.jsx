@@ -35,7 +35,7 @@ export default createComponent({
                 name: "Mark",
                 favNumber: null,
                 birthDate: "1987-12-21",
-                primaryLanguageId: null,
+                primaryLanguageId: 11,
                 secondaryLanguageIds: [12, 3],
                 isAboriginal: false,
                 // gender: 'M'
@@ -110,27 +110,33 @@ export default createComponent({
                             </SingleField>
                         </Mount>
                     </FieldRow>
-                    {/*<FieldRow>*/}
-                        {/*<DirtyLabel normal for="favNumber">Favourite Number</DirtyLabel>*/}
-                        {/*<SingleField narrow>*/}
-                            {/*<NumberBox name="favNumber"/>*/}
-                            {/*<FieldErrors for="favNumber" message="Must be between 1 and 100"/>*/}
-                        {/*</SingleField>*/}
-                    {/*</FieldRow>*/}
-                    {/*<FieldRow>*/}
-                        {/*<DirtyLabel normal for="birthDate">Birth Date</DirtyLabel>*/}
-                        {/*<SingleField narrow>*/}
-                            {/*<DatePicker name="birthDate" max={formatDate(new Date())}/>*/}
-                            {/*<FieldErrors for="birthDate"/>*/}
-                        {/*</SingleField>*/}
-                    {/*</FieldRow>*/}
-                    {/*<FieldRow>*/}
-                        {/*<DirtyLabel normal for="primaryLanguageId">Primary Language</DirtyLabel>*/}
-                        {/*<SingleField narrow>*/}
-                            {/*<SelectBox name="primaryLanguageId" options={primaryLanguages}/>*/}
-                            {/*<FieldErrors for="primaryLanguageId"/>*/}
-                        {/*</SingleField>*/}
-                    {/*</FieldRow>*/}
+                    <FieldRow>
+                        <Mount path="favNumber">
+                            <DirtyLabel>Favourite Number</DirtyLabel>
+                            <SingleField narrow>
+                                <NumberBox/>
+                                <FieldErrors message="Must be between 1 and 100"/>
+                            </SingleField>
+                        </Mount>
+                    </FieldRow>
+                    <FieldRow>
+                        <Mount path="birthDate">
+                            <DirtyLabel>Birth Date</DirtyLabel>
+                            <SingleField narrow>
+                                <DatePicker max={formatDate(new Date())}/>
+                                <FieldErrors/>
+                            </SingleField>
+                        </Mount>
+                    </FieldRow>
+                    <FieldRow>
+                        <Mount path="primaryLanguageId">
+                        <DirtyLabel >Primary Language</DirtyLabel>
+                        <SingleField narrow>
+                            <SelectBox options={primaryLanguages}/>
+                            <FieldErrors/>
+                        </SingleField>
+                        </Mount>
+                    </FieldRow>
                     {/*<FieldRow>*/}
                         {/*<DirtyLabel normal for="secondaryLanguageIds">Secondary Language(s)</DirtyLabel>*/}
                         {/*<SingleField>*/}

@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import onPropsChange from '../../onPropsChange';
 import {withErrors} from '../../../../form-capacitor-schema/src';
 import {WarningIcon} from '../bulma';
+import {withPath} from '../../../../form-capacitor-state/src';
 // import withPropsOnChange from '../../withPropsOnChange';
 // import dump from 'form-capacitor-util/dump';
 
@@ -26,11 +27,11 @@ function findIndex({options, value, multiple}) {
 export default createComponent({
     displayName: 'SelectBox',
     enhancers: [
+        withPath(),
         withErrors(),
         withValue({
             valueProp: 'value',
             setValueProp: 'setValue',
-            pathProp: 'path',
             selfUpdate: false,
         }),
         withState('selectedIndex', 'setSelectedIndex', findIndex),
@@ -53,10 +54,10 @@ export default createComponent({
             }
         }),
         onPropsChange('value', (props,prevProps) => {
-            // if(props.selectedIndex === prevProps.selectedIndex) {
-                // if the `value` changed but the `selectedIndex` didn't, then this was an external change -- update the index
-            // console.log('boop');
+            // console.log('pachooo');
+            if(props.selectedIndex < 0 || props.selectedIndex >= props.options.length || props.options[props.selectedIndex].value !== props.value) {
                 props.setSelectedIndex(findIndex(props)); // todo: if value isn't found in selectbox, maybe we should render it as an additional option and disable it?
+            }
             // }
         }),
         omitProps(['name', 'value', 'setValue', 'setSelectedIndex']),

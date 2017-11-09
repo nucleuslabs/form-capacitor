@@ -114,7 +114,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                                 // console.log(fullPath,err.message);
                             }
                             
-                            console.log('%c'+JSON.stringify(errors,null,2),'color:red');
+                            // console.log('%c'+JSON.stringify(errors,null,2),'color:red');
                             pubSub.set(this.errorPath, errors);
                         } else {
                             throw errResult;

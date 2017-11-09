@@ -10,15 +10,13 @@ export default class Store {
         this.data = Object.create(null);
         // this.counter = 0;
         
-        this._fireSubscriptions = debounce(omitKey => {
+        this._fireSubscriptions = debounce(context => {
             for(let [k,v] of Object.entries(this.subscriptions)) {
                 let newValue = getValue(this.data, v[0]);
                 if(!Object.is(v[2],newValue)) {
-                    // console.log(v[0].join('.'),`${JSON.stringify(v[2])} -> ${JSON.stringify(newValue)}`);
+                    // console.log(v[0].join('.'),`${JSON.stringify(v[2])} -> ${JSON.stringify(newValue)}`,k,omitKey);
                     v[2] = newValue;
-                    if(k !== omitKey) {
-                        v[1](newValue, v[2]);
-                    }
+                    v[1](newValue, v[2], context);
                 }
             }
         });
@@ -46,7 +44,7 @@ export default class Store {
         }
     }
 
-    set(path, value, omitKey) {
+    set(path, value, context) {
         path = toPath(path);
         let oldValue = getValue(this.data, path);
         if(typeof value === 'function') {
@@ -54,7 +52,7 @@ export default class Store {
         }
         if(Object.is(oldValue, value)) return;
         setValue(this.data, path, value);
-        this._fireSubscriptions(omitKey);
+        this._fireSubscriptions(context);
     }
     
     toJSON() {
