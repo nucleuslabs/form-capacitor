@@ -10,7 +10,7 @@ export default function withValue(options) {
         path: p => p.path,
         clearOnUnmount: false,
         defaultValue: undefined,
-        selfUpdate: true,
+        // selfUpdate: true,
         
         // output props:
         valueProp: undefined,

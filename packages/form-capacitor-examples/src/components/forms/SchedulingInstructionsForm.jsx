@@ -5,7 +5,7 @@ import {
 } from '../bulma';
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
-import {withValue} from 'form-capacitor-state';
+import {withValue,mountPoint} from 'form-capacitor-state';
 import {dirtyProvider,withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompact';
 import DirtyLabel from '../fields/DirtyLabel';
@@ -19,12 +19,19 @@ import CheckBox from '../fields/CheckBox';
 import {isEqual} from 'lodash';
 import RadioButton from '../fields/RadioButton';
 import SchedulingInstruction from './SchedulingInstruction';
+import shortid from 'shortid';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
 export default createComponent({
     displayName: "SchedulingInstructionsForm",
     enhancers: [
+        mountPoint({
+            add: p => {
+                return p.name || shortid();
+            }, 
+            expose: true
+        }),
         withValue({
             defaultValue: {
                 instructions: [{}],

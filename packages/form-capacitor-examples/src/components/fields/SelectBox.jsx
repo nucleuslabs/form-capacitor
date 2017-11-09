@@ -8,6 +8,7 @@ import onPropsChange from '../../onPropsChange';
 import {withErrors} from '../../../../form-capacitor-schema/src';
 import {WarningIcon} from '../bulma';
 import {withPath} from '../../../../form-capacitor-state/src';
+import mountPoint from '../../../../form-capacitor-state/src/mountPoint';
 // import withPropsOnChange from '../../withPropsOnChange';
 // import dump from 'form-capacitor-util/dump';
 
@@ -29,12 +30,16 @@ function findIndex({options, value, multiple}) {
 export default createComponent({
     displayName: 'SelectBox',
     enhancers: [
-        withPath(),
+        mountPoint({
+            add: p => p.name,
+            mount: p => !!p.name, 
+            expose: true,
+        }),
         withErrors(),
         withValue({
             valueProp: 'value',
             setValueProp: 'setValue',
-            selfUpdate: false,
+            // selfUpdate: false,
         }),
         withState('selectedIndex', 'setSelectedIndex', findIndex),
         withHandlers({

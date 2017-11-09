@@ -1,7 +1,7 @@
 import React from 'react';
 import {Icon} from '../bulma';
 import createComponent from '../../createComponent';
-import {withValue} from 'form-capacitor-state';
+import {withValue,mountPoint} from 'form-capacitor-state';
 import {withHandlers, withState} from 'recompact';
 import SelectBox from '../fields/SelectBox';
 import CheckBox from '../fields/CheckBox';
@@ -13,7 +13,8 @@ import {appointmentTypes, teams, disciplines, clinicians, times} from '../../opt
 export default createComponent({
     displayName: "SchedulingInstructionsForm",
     enhancers: [
-        withValue(), 
+        mountPoint({add: p => p.name}),
+        // withValue(), 
     ],
     render: ({remove}) => {
         return (
