@@ -24,6 +24,7 @@ import ErrorContainer from '../fields/ErrorContainer';
 import FieldErrors from '../fields/FieldErrors';
 import Mount from '../Mount';
 import shortid from 'shortid';
+import onMount from '../../onMount';
 const primaryLanguages = [pleaseSelect, ...languages];
 
 export default createComponent({
@@ -31,21 +32,43 @@ export default createComponent({
     enhancers: [
         mountPoint({add: p => p.name || shortid(), expose: true}),
         withValue({
-            defaultValue: {
-                // name: "Mark",
-                favNumber: null,
-                birthDate: "1987-12-21",
-                primaryLanguageId: 11,
-                secondaryLanguageIds: [12, 3],
-                isAboriginal: false,
-                // gender: 'M'
-            },
+            // defaultValue: {
+            //     // name: "Mark",
+            //     favNumber: null,
+            //     birthDate: "1987-12-21",
+            //     primaryLanguageId: 11,
+            //     secondaryLanguageIds: [12, 3],
+            //     isAboriginal: false,
+            //     // gender: 'M'
+            // },
+            setValueProp: 'setValue',
             valueProp: 'formData'
         }), // try with {name: 'person'}
+
+        
         dirtyProvider({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
+
+        onMount(({setValue,saveState}) => {
+            // console.log('AAA');
+            setTimeout(() => {
+                setValue({
+                    name: "Mark",
+                    favNumber: null,
+                    birthDate: "1987-12-21",
+                    primaryLanguageId: 11,
+                    secondaryLanguageIds: [12, 3],
+                    isAboriginal: false,
+                    // gender: 'M'
+                });
+                saveState(); // <-- clear the dirtyness because we've just loaded fresh data from the db
+                
+                // TODO: some kind of form loading state...
+            }, 250); // <-- loading form data from database
+        }),
+     
         withDirty({
             path: null, // FIXME: it's weird to have to pass `null` here
             compare: isEqual,
@@ -195,9 +218,9 @@ export default createComponent({
                     </FieldRow>
                 </form>
                 <div style={{marginTop: '10px'}}>
-                    <JsonCode>
+                    {formData !== undefined ? <JsonCode>
                         {JSON.stringify(formData, null, 2)}
-                    </JsonCode>
+                    </JsonCode> : <em>No form data</em>}
                 </div>
             </div>
         )

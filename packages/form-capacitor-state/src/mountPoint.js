@@ -48,13 +48,15 @@ export default function mountPoint(options) { // TODO: rename mount()?
                 if(this.pathProp === true) this.pathProp = 'path';
             }
 
-            shouldComponentUpdate(nextProps, nextState) {
-                // is this going to cause problems...?
-                // I did this because changing any of the options after the component is mounted
-                // is not supported
-                // it seems to work just fine and stops a lot of calls to render()
-                return false;
-            }
+            // shouldComponentUpdate(nextProps, nextState) {
+            //     // is this going to cause problems...?
+            //     // I did this because changing any of the options after the component is mounted
+            //     // is not supported
+            //     // it seems to work just fine and stops a lot of calls to render()
+            //     // nevermind...it's preventing the DirtyLabels from re-rendering... weird.
+            //     // maybe because withDirty() uses forceRender?
+            //     return false;
+            // }
             
             render() {
                 // console.log('renddderrr');

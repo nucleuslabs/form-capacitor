@@ -40,6 +40,9 @@ export default function withValue(options) {
                     // before the input, then the input is going to change the value as soon
                     // as its mounted, causing the DirtyLabel to re-render and possibly flash.
                     // we want to encourage people to set the default values up front, at the form level
+                    // ...however, it is a convenient way to set the form data too
+                    // but even so, maybe we should disable it so users can load the form data
+                    // via ajax instead and then call setValue() ??
                     store.set(this.fullPath, options.defaultValue);
                     currentValue = options.defaultValue;
                 }

@@ -50,7 +50,13 @@ export default function dirtyProvider(options) { // altname: dirtyRoot ??
                 // const initialData = pubSub.get([DATA_ROOT, ...this.dataPath]);
 
                 // console.log(JSON.stringify([store,defaultStore,context[ContextStore],[DIRTY_ROOT, ...this.dataPath], initialData],null,2));
-                if(options.saveOnMount) {
+                // if(options.saveOnMount) {
+                //    
+                // }
+            }
+            
+            componentDidMount() {
+                if(resolveValue(options.saveOnMount)) {
                     this.saveState();
                 }
             }

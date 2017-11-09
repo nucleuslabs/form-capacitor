@@ -57,6 +57,7 @@ export default function withDirty(options) {
                 //     pubSub.get([DATA_ROOT, ...this.dataPath]),
                 //     pubSub.get([INIT_ROOT, ...this.dataPath])
                 // );
+                // console.log('dirtyrender',this.dataPath.join('.'),!options.compare(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([INIT_ROOT, ...this.dataPath])));
                 const props = {
                     ...this.props,
                     [options.isDirtyProp]: !options.compare(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([INIT_ROOT, ...this.dataPath]))
