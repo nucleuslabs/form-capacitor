@@ -1,6 +1,6 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
+import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps,withState} from 'recompact';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
 import {WarningIcon} from '../bulma';
@@ -10,31 +10,34 @@ import field from '../../field';
 
 // console.log(withValue);
 
+const INTERNAL_UPDATE = '__numberbox_internal_change__';
+
 export default createComponent({
     displayName: 'NumberBox',
-    enhancers: field({
-        onChange: ({setValue}) => ev => {
-            if(ev.currentTarget.value === '') {
-                setValue(null)
-            } else {
-                const value = parseFloat(ev.currentTarget.value);
-                if(Number.isFinite(value)) {
-                    // fixme: this can impede your typing
-                    // try typing "-1" and then press backspace to delete the "1"
-                    // you can't because it puts the numberbox into a bad state; "-" isn't a valid number
-                    setValue(value);
+    enhancers: [
+        withState('value', 'setText', ''),
+        field({
+            valueProp: false,
+            setValueProp: 'setNumber',
+            onChange: ({setText, setNumber}) => ev => {
+                const value = ev.currentTarget.value;
+                setText(value);
+                setNumber(value === '' ? null : parseFloat(value), INTERNAL_UPDATE);
+            },
+            valueChange(value, oldValue, context) {
+                if(context !== INTERNAL_UPDATE) {
+                    this.props.setText(value == null ? '' : String(value));
                 }
-            }
-        },
-        // defaultValue: null,
-    }),
-    render: ({className, path, errors, value, ...props}) => {
+            },
+            omitProps: ['setText'],
+        }),
+    ],
+    render: ({className, path, errors, ...props}) => {
         // console.log('rendder');
         const hasErrors = errors && errors.length;
-        value = Number.isFinite(value) ? String(value) : '';
         return (
             <div className={cc(['control', className])}>
-                <input id={path.join('.')} className={cc(['input',{'is-danger':hasErrors}])} type="number" value={value} {...props}/>
+                <input id={path.join('.')} className={cc(['input',{'is-danger':hasErrors}])} type="number" {...props}/>
             </div>
         )
     }
