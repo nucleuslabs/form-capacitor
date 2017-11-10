@@ -44,17 +44,8 @@ export default function mountPoint(options) { // TODO: rename mount()?
                 const currentPath = (context && context[CTX_KEY_PATH]) || EMPTY_ARRAY;
                 this.path = resolvePath(currentPath, resolveValue(options.add,this.props));
                 this.setContext = !!resolveValue(options.mount, this.props);
-                let pathProp = resolveValue(options.expose, this.props);
-                if(pathProp === true) pathProp = 'path';
-                
-                if(pathProp) {
-                    this.childProps = {
-                        ...this.props,
-                        [pathProp]: this.path,
-                    }
-                } else {
-                    this.childProps = this.props;
-                }
+                this.pathProp = resolveValue(options.expose, this.props);
+                if(this.pathProp === true) this.pathProp = 'path';
             }
 
             // shouldComponentUpdate(nextProps, nextState) {
@@ -68,7 +59,16 @@ export default function mountPoint(options) { // TODO: rename mount()?
             // }
             
             render() {
-                return React.createElement(BaseComponent, this.childProps);
+                let props;
+                if(this.pathProp) {
+                    props = {
+                        ...this.props,
+                        [this.pathProp]: this.path,
+                    }
+                } else {
+                    props = this.props;
+                }
+                return React.createElement(BaseComponent, props);
             }
         }
 
