@@ -14,7 +14,8 @@
     "recompact": "^3.2.0",
     "recompose": "^0.26.0",
     "string-length": "^2.0.0",
-    "shortid": "^2.2.8"
+    "shortid": "^2.2.8",
+    "why-did-you-update": "^0.0.8"
   },
   "devDependencies": {
     "form-capacitor-util": "*",
