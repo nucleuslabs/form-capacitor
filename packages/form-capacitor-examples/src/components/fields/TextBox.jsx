@@ -1,6 +1,6 @@
 import createComponent from '../../createComponent';
 import {withValue, mountPoint, withPath} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
+import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompose';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
 import {WarningIcon} from '../bulma';

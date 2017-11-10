@@ -1,6 +1,6 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, defaultProps, withState, withHandlers} from 'recompact';
+import {mapProps, omitProps, withProps, defaultProps, withState, withHandlers} from 'recompose';
 import cc from 'classcat';
 import SelectByIndex from '../SelectByIndex';
 import PropTypes from 'prop-types';
@@ -31,7 +31,7 @@ const INTERNAL_UPDATE = '__internal_selectbox_update__';
 export default createComponent({
     displayName: 'SelectBox',
     enhancers: [
-        withState('selectedIndex', 'setSelectedIndex', -1),
+        // withState('selectedIndex', 'setSelectedIndex', -1),
         field({
             onChange: ({setValue, multiple, options, setSelectedIndex}) => ev => {
                 if(multiple) {
@@ -48,6 +48,11 @@ export default createComponent({
                     setSelectedIndex(index);
                     setValue(options[index].value, INTERNAL_UPDATE);
                 }
+            },
+            withState: {
+                valueProp: 'selectedIndex',
+                setProp: 'setSelectedIndex',
+                initial: -1,
             },
             valueChange(value, oldValue, context) {
                 if(context !== INTERNAL_UPDATE) {
@@ -70,7 +75,6 @@ export default createComponent({
     },
     render: ({className, path, multiple, options, useValueAsKey, errors, ...props}) => {
         const hasErrors = errors && errors.length;
-        // console.log(props.selectedIndex);
         return (
             <div className={cc(['control', className])}>
                 <span className={cc(['select', {'is-multiple': multiple, 'is-danger': hasErrors}])}>

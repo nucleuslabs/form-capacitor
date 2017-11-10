@@ -1,8 +1,9 @@
-import {compose, withHandlers, omitProps, defaultProps} from 'recompact';
+import {compose, withHandlers, defaultProps, withState} from 'recompose';
 import mountPoint from '../../form-capacitor-state/src/mountPoint';
 import {withValue} from '../../form-capacitor-state/src';
 import {withErrors} from '../../form-capacitor-schema/src';
 import {EMPTY_ARRAY} from '../../form-capacitor-state/src/constants';
+import omitProps from './omitProps';
 
 // field super-hoc. includes most common options to rig up your fields.
 export default function field(options) {
@@ -15,6 +16,7 @@ export default function field(options) {
         setValueProp: 'setValue',
         nameProp: 'name',
         omitProps: EMPTY_ARRAY,
+        withState: undefined,
         ...options
     };
 
@@ -24,12 +26,18 @@ export default function field(options) {
             mount: p => !!p[options.nameProp],
             expose: true,
         }),
-        withValue({
-            valueProp: options.valueProp,
-            setValueProp: options.setValueProp,
-            onChange: options.valueChange,
-        })
     ];
+    
+    if(options.withState) {
+        const states = Array.isArray(options.withState) ? options.withState : [options.withState];
+        enhancers.push(...states.map(opt => withState(opt.valueProp, opt.setProp, opt.initial)));
+    }
+    
+    enhancers.push(withValue({
+        valueProp: options.valueProp,
+        setValueProp: options.setValueProp,
+        onChange: options.valueChange,
+    }));
     
     if(options.valueProp && options.defaultValue !== undefined) {
         enhancers.push(defaultProps({

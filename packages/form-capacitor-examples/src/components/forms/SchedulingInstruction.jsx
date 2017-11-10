@@ -2,7 +2,7 @@ import React from 'react';
 import {Icon} from '../bulma';
 import createComponent from '../../createComponent';
 import {withValue,mountPoint} from 'form-capacitor-state';
-import {withHandlers, withState} from 'recompact';
+import {withHandlers, withState} from 'recompose';
 import SelectBox from '../fields/SelectBox';
 import CheckBox from '../fields/CheckBox';
 import {isEqual} from 'lodash';

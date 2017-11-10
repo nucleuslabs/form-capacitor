@@ -1,8 +1,9 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, defaultProps, withState, withHandlers, withPropsOnChange} from 'recompact';
+import {withHandlers} from 'recompose';
 import className from '../../className';
 import {withPath} from '../../../../form-capacitor-state/src';
+import omitProps from '../../omitProps';
 
 
 export default createComponent({

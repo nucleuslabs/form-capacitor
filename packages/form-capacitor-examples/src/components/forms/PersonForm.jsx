@@ -7,7 +7,7 @@ import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {mountPoint, withValue} from 'form-capacitor-state';
 import {dirtyProvider, withDirty} from 'form-capacitor-dirty';
-import {withHandlers, withState} from 'recompact';
+import {withHandlers, withState} from 'recompose';
 import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
 import {formatDate} from '../../util';
@@ -56,7 +56,7 @@ export default createComponent({
             setTimeout(() => {
                 setValue({
                     name: "Mark",
-                    favNumber: null,
+                    favNumber: 7,
                     birthDate: "1987-12-21",
                     primaryLanguageId: 11,
                     secondaryLanguageIds: [12, 3],

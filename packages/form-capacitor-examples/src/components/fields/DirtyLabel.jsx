@@ -1,7 +1,7 @@
 import createComponent from '../../createComponent';
 import {withDirty} from 'form-capacitor-dirty';
 import {withPath} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
+import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompose';
 import {FieldLabel} from '../bulma';
 import {toPath} from 'lodash';
 import PropTypes from 'prop-types';
@@ -22,6 +22,7 @@ export default createComponent({
         children: PropTypes.node,
     },
     render: ({isDirty, path, ...props}) => {
+        // console.log("im so dirty");
         if(props.htmlFor === undefined) {
             props.htmlFor = [...path, ...toPath(props.for)].join('.');
         } else if(!props.htmlFor) {

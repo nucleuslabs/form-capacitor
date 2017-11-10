@@ -12,10 +12,10 @@ import SchedulingInstructionsForm from './components/forms/SchedulingInstruction
 // import DragAndDropForm from './dnd/DragAndDropForm';
 // import SignUpForm from './SignUpForm';
 // import AsyncForm from './AsyncForm';
-import whyDidYouUpdate from 'why-did-you-update';
 
-whyDidYouUpdate(React);
 
+
+// import whyDidYouUpdate from 'why-did-you-update';whyDidYouUpdate(React);
 
 ReactDOM.render(
     <BrowserRouter>

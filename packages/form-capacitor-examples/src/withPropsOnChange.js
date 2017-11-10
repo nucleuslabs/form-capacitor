@@ -1,7 +1,7 @@
 // https://github.com/acdlite/recompose/blob/8c4ac2e4a4cd8d60c8db9bc4cd73f0ce044fd9ca/src/packages/recompose/withPropsOnChange.js
 import {createFactory, Component} from 'react'
 import {pick} from 'lodash'
-import {shallowEqual, setDisplayName, wrapDisplayName} from 'recompact';
+import {shallowEqual, setDisplayName, wrapDisplayName} from 'recompose';
 
 const withPropsOnChange = (shouldMapOrKeys, propsMapper) => BaseComponent => {
     const factory = createFactory(BaseComponent);

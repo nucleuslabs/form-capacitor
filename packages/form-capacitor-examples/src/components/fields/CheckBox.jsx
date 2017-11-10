@@ -1,6 +1,6 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, defaultProps, withState, withHandlers, withPropsOnChange} from 'recompact';
+import {mapProps, omitProps, withProps, defaultProps, withState, withHandlers, withPropsOnChange} from 'recompose';
 import cc from 'classcat';
 import SelectByIndex from '../SelectByIndex';
 import PropTypes from 'prop-types';

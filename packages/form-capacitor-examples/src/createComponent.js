@@ -1,4 +1,4 @@
-import {compose} from 'recompact';
+import {compose} from 'recompose';
 
 export default function createComponent({render, enhancers, displayName, propTypes, defaultProps}) {
     

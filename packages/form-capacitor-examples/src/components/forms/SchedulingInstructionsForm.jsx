@@ -7,7 +7,7 @@ import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {withValue,mountPoint} from 'form-capacitor-state';
 import {dirtyProvider,withDirty} from 'form-capacitor-dirty';
-import {withHandlers, withState} from 'recompact';
+import {withHandlers, withState} from 'recompose';
 import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
 import {arraySplice, formatDate} from '../../util';

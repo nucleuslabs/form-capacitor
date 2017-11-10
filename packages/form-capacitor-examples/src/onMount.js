@@ -1,5 +1,5 @@
 import {Component, createElement} from 'react'
-import {wrapDisplayName} from 'recompact';
+import {wrapDisplayName} from 'recompose';
 
 export default function onMount(callback) {
     return BaseComponent => {

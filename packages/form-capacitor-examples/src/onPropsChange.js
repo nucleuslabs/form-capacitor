@@ -2,7 +2,7 @@
 // see also https://www.npmjs.com/package/@hocs/with-callback-on-change
 import {createElement, Component} from 'react'
 import {pick} from 'lodash'
-import {shallowEqual, setDisplayName, wrapDisplayName} from 'recompact';
+import {shallowEqual, setDisplayName, wrapDisplayName} from 'recompose';
 
 const onPropsChange = (shouldMapOrKeys, handler) => BaseComponent => {
     const shouldFire =

@@ -1,5 +1,5 @@
 import cc from 'classcat';
-import {withPropsOnChange, withProps} from 'recompose'; // https://github.com/neoziro/recompact/issues/91
+import {withPropsOnChange, withProps} from 'recompose'; // https://github.com/neoziro/recompose/issues/91
 
 export default function className(cssClass) {
     if(typeof cssClass === 'function') {

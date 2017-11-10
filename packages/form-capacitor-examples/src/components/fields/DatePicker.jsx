@@ -1,10 +1,11 @@
 import createComponent from '../../createComponent';
 import {withValue} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompact';
+import {withPropsOnChange} from 'recompose';
 // import {formatDate} from '../../util';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
 import {withPath} from '../../../../form-capacitor-state/src';
+import omitProps from '../../omitProps';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
