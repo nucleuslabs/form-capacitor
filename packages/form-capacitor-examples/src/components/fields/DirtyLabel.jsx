@@ -1,10 +1,11 @@
 import createComponent from '../../createComponent';
 import {withDirty} from 'form-capacitor-dirty';
 import {withPath} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompose';
+import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps, pure} from 'recompose';
 import {FieldLabel} from '../bulma';
 import {toPath} from 'lodash';
 import PropTypes from 'prop-types';
+import withLog from '../../withLog';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -15,7 +16,9 @@ export default createComponent({
         withDirty({
             path: p => p.for
         }),
-        withPath()
+        withPath(),
+        // withLog('xxx'),
+      
     ],
     propTypes: {
         for: PropTypes.string,

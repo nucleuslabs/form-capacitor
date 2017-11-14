@@ -22,7 +22,7 @@ export default function mountPoint(options) { // TODO: rename mount()?
     };
     
     return BaseComponent => {
-        class Mount extends React.Component {
+        class Mount extends React.PureComponent {
             static displayName = wrapDisplayName(BaseComponent, 'mountPoint');
 
             static contextTypes = {
@@ -55,10 +55,16 @@ export default function mountPoint(options) { // TODO: rename mount()?
             //     // it seems to work just fine and stops a lot of calls to render()
             //     // nevermind...it's preventing the DirtyLabels from re-rendering... weird.
             //     // maybe because withDirty() uses forceRender?
-            //     return false;
+            //    
+            //     if(this.path.join('.') === 'person.name' && this.props.children!==nextProps.children) {
+            //         console.log(shallowEqual(this.props,nextProps));
+            //         // console.log(this.props.children);
+            //     }
+            //     return true;
             // }
             
             render() {
+                // console.log('rennnderrrr',this.path);
                 let props;
                 if(this.pathProp) {
                     props = {

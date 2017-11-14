@@ -2,7 +2,7 @@ import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
 import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub} from 'form-capacitor-store';
 import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
-import {get as getValue, toPath, unset} from 'lodash';
+import {get as getValue, toPath, unset, clone} from 'lodash';
 
 export default function dirtyProvider(options) { // altname: dirtyRoot ??
     
@@ -64,11 +64,11 @@ export default function dirtyProvider(options) { // altname: dirtyRoot ??
             // getState = () => pubSub.get([DIRTY_ROOT, ...this.dataPath]);
             
             saveState = state => {
-                pubSub.set([INIT_ROOT, ...this.dataPath], state !== undefined ? state : pubSub.get([DATA_ROOT, ...this.dataPath]));
+                pubSub.set([INIT_ROOT, ...this.dataPath], clone(state !== undefined ? state : pubSub.get([DATA_ROOT, ...this.dataPath])));
             };
             
             resetState = () => {
-                pubSub.set([DATA_ROOT, ...this.dataPath], pubSub.get([INIT_ROOT, ...this.dataPath]));
+                pubSub.set([DATA_ROOT, ...this.dataPath], clone(pubSub.get([INIT_ROOT, ...this.dataPath])));
             };
 
             render() {

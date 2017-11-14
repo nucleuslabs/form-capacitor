@@ -28,14 +28,14 @@ export function defaults(target=Object.create(null), ...sources) {
 }
 
 /**
- * Sets a value at the given path. Mutates every object along the way.
+ * Sets a value at the given path. Clones every object along the way so that reference equality checks fail.
  */
 export function setValue(obj, path, value) {
     const end = path.length - 1;
     for(let i=0; i<end; ++i) {
         const key = path[i];
         if(obj[key]) {
-            obj[key] = clone(obj[key]);
+            obj[key] = clone(obj[key]); // FIXME: !!!!!!!!! cloning all the way up the tree is causing EVERYTHING to rerender
         } else if(/^(0|[1-9][0-9]*)$/.test(path[i+1])) {
             obj[key] = new Array(parseInt(path[i+1])+1);
         } else {

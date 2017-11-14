@@ -1,6 +1,6 @@
 import createComponent from '../../createComponent';
 import {withValue, mountPoint, withPath} from 'form-capacitor-state';
-import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps} from 'recompose';
+import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps,pure} from 'recompose';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
 import {WarningIcon} from '../bulma';
@@ -19,9 +19,10 @@ export default createComponent({
             },
             defaultValue: ''  // prevents uncontrolled -> controlled warning
         }),
+        // pure,
     ],
     render: ({className, path, errors, ...props}) => {
-        // console.log(props.value);
+        // console.log('render textbox',props.value);
         const hasErrors = errors && errors.length;
         return (
 

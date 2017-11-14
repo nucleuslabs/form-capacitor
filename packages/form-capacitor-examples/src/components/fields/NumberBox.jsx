@@ -6,6 +6,7 @@ import {withErrors} from 'form-capacitor-schema';
 import {WarningIcon} from '../bulma';
 import {withPath} from '../../../../form-capacitor-state/src';
 import field from '../../field';
+import withLog from '../../withLog';
 // import dump from 'form-capacitor-util/dump';
 
 // console.log(withValue);
@@ -38,7 +39,7 @@ export default createComponent({
         }),
     ],
     render: ({className, path, errors, ...props}) => {
-        // console.log('rendder');
+        // console.log('rendder NumbewrBox');
         const hasErrors = errors && errors.length;
         return (
             <div className={cc(['control', className])}>

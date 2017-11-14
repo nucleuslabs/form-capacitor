@@ -5,6 +5,10 @@ export default function createComponent({render, enhancers, displayName, propTyp
     if(!render) {
         render = p => p.children || null;
     }
+
+    if(process.env.NODE_ENV !== 'production' && displayName) {
+        render.displayName = `${displayName}.render`;
+    }
     
     if(enhancers) {
         if(Array.isArray(enhancers)) {

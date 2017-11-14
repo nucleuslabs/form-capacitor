@@ -1,5 +1,5 @@
 import React from 'react';
-import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
+import {wrapDisplayName, shallowEqual} from 'recompact';
 import {CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, INIT_ROOT, pubSub} from 'form-capacitor-store';
 import {resolveValue} from 'form-capacitor-util/util';
 import {toPath} from 'lodash';
@@ -14,8 +14,6 @@ export default function withDirty(options) {
     };
 
     return BaseComponent => {
-        const factory = createEagerFactory(BaseComponent);
-
         return class extends React.PureComponent {
             static displayName = wrapDisplayName(BaseComponent, 'withDirty');
 
@@ -62,7 +60,7 @@ export default function withDirty(options) {
                     ...this.props,
                     [options.isDirtyProp]: !options.compare(pubSub.get([DATA_ROOT, ...this.dataPath]), pubSub.get([INIT_ROOT, ...this.dataPath]))
                 };
-                return factory(props);
+                return React.createElement(BaseComponent, props);
             }
         }
     }

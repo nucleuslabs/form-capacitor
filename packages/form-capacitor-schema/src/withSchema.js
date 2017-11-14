@@ -161,7 +161,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
             
             componentWillReceiveProps(nextProps) {
                 if(nextProps[options.valueProp] !== this.props[options.valueProp]) {
-                    this._validate(nextProps[options.valueProp]);
+                    this._validate(nextProps[options.valueProp]); // fixme: should we read from valueProp or directly from the store..?
                 }
             }
 
