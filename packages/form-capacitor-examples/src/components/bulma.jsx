@@ -59,12 +59,12 @@ export const Control = ({children}) => (
     </div>
 );
 
-export const RadioLabel = ({children}) => (
-    <label className="radio">{children}</label>
+export const RadioLabel = ({children, disabled}) => (
+    <label className="radio" disabled={disabled}>{children}</label>
 );
 
-export const CheckBoxLabel = ({children}) => (
-    <label className="checkbox">{children}</label>
+export const CheckBoxLabel = ({children, disabled}) => (
+    <label className="checkbox" disabled={disabled}>{children}</label>
 );
 
 export const Title = ({children}) => (

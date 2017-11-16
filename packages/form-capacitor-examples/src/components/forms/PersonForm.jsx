@@ -50,11 +50,12 @@ export default createComponent({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
-
-        onMount(({setValue,saveState}) => {
+        withState('loading','setLoading',false),
+        onMount(({setValue,saveState,setLoading}) => {
             // console.log('AAA');
+            setLoading(true);
             setTimeout(() => {
-                setValue({
+                const formData = {
                     name: "Mark",
                     favNumber: 7,
                     birthDate: "1987-12-21",
@@ -62,11 +63,11 @@ export default createComponent({
                     secondaryLanguageIds: [12, 3],
                     isAboriginal: false,
                     // gender: 'M'
-                });
-                saveState(); // <-- clear the dirtyness because we've just loaded fresh data from the db
-                
-                // TODO: some kind of form loading state...
-            }, 1000); // <-- loading form data from database
+                };
+                setValue(formData);
+                saveState(formData); // <-- clear the dirtyness because we've just loaded fresh data from the db
+                setLoading(false);    
+            }, 250); // <-- loading form data from database
         }),
      
         withDirty({
@@ -119,7 +120,7 @@ export default createComponent({
             },
         })
     ],
-    render: ({saveState, resetState, formData, saving, isDirty}) => {
+    render: ({saveState, resetState, formData, saving, isDirty, loading}) => {
         return (
             <div>
                 <form onSubmit={saveState}>
@@ -128,7 +129,7 @@ export default createComponent({
                         <Mount path="name">
                             <DirtyLabel>Name</DirtyLabel>
                             <SingleField>
-                                <TextBox/>
+                                <TextBox disabled={loading}/>
                                 <FieldErrors/>
                             </SingleField>
                         </Mount>
@@ -137,7 +138,7 @@ export default createComponent({
                         <Mount path="favNumber">
                             <DirtyLabel>Favourite Number</DirtyLabel>
                             <SingleField narrow>
-                                <NumberBox/>
+                                <NumberBox disabled={loading}/>
                                 <FieldErrors message="Must be between 1 and 100"/>
                             </SingleField>
                         </Mount>
@@ -146,7 +147,7 @@ export default createComponent({
                         <Mount path="birthDate">
                             <DirtyLabel>Birth Date</DirtyLabel>
                             <SingleField narrow>
-                                <DatePicker max={formatDate(new Date())}/>
+                                <DatePicker max={formatDate(new Date())} disabled={loading}/>
                                 <FieldErrors/>
                             </SingleField>
                         </Mount>
@@ -155,7 +156,7 @@ export default createComponent({
                         <Mount path="primaryLanguageId">
                             <DirtyLabel>Primary Language</DirtyLabel>
                             <SingleField narrow>
-                                <SelectBox options={primaryLanguages}/>
+                                <SelectBox options={primaryLanguages} disabled={loading}/>
                                 <FieldErrors/>
                             </SingleField>
                         </Mount>
@@ -164,7 +165,7 @@ export default createComponent({
                         <Mount path="secondaryLanguageIds">
                             <DirtyLabel>Secondary Language(s)</DirtyLabel>
                             <SingleField>
-                                <SelectBox multiple options={languages} size={6}/>
+                                <SelectBox multiple options={languages} size={6} disabled={loading}/>
                                 <FieldErrors/>
                             </SingleField>
                         </Mount>
@@ -174,7 +175,7 @@ export default createComponent({
                             <DirtyLabel>Aboriginal?</DirtyLabel>
                             <SingleField>
                                 <ErrorContainer>
-                                    <CheckBoxLabel><CheckBox/> Aboriginal</CheckBoxLabel>
+                                    <CheckBoxLabel disabled={loading}><CheckBox disabled={loading}/> Aboriginal</CheckBoxLabel>
                                 </ErrorContainer>
                                 <FieldErrors/>
                             </SingleField>
@@ -185,9 +186,9 @@ export default createComponent({
                             <DirtyLabel htmlFor={false}>Likes</DirtyLabel>
                             <SingleField>
                                 <ErrorContainer>
-                                    <CheckBoxLabel><CheckBox multiple value="hockey"/> Hockey</CheckBoxLabel>
-                                    <CheckBoxLabel><CheckBox multiple value="soccer"/> Soccer</CheckBoxLabel>
-                                    <CheckBoxLabel><CheckBox multiple value="football"/> Football</CheckBoxLabel>
+                                    <CheckBoxLabel disabled={loading}><CheckBox multiple disabled={loading} value="hockey"/> Hockey</CheckBoxLabel>
+                                    <CheckBoxLabel disabled={loading}><CheckBox multiple disabled={loading} value="soccer"/> Soccer</CheckBoxLabel>
+                                    <CheckBoxLabel disabled={loading}><CheckBox multiple disabled={loading} value="football"/> Football</CheckBoxLabel>
                                 </ErrorContainer>
                                 <FieldErrors/>
                             </SingleField>
@@ -198,9 +199,9 @@ export default createComponent({
                             <DirtyLabel htmlFor={false}>Gender</DirtyLabel>
                             <SingleField>
                                 <ErrorContainer>
-                                    <RadioLabel><RadioButton value="M"/> Male</RadioLabel>
-                                    <RadioLabel><RadioButton value="F"/> Female</RadioLabel>
-                                    <RadioLabel><RadioButton value="O"/> Other</RadioLabel>
+                                    <RadioLabel disabled={loading}><RadioButton disabled={loading} value="M"/> Male</RadioLabel>
+                                    <RadioLabel disabled={loading}><RadioButton disabled={loading} value="F"/> Female</RadioLabel>
+                                    <RadioLabel disabled={loading}><RadioButton disabled={loading} value="O"/> Other</RadioLabel>
                                 </ErrorContainer>
                                 <FieldErrors/>
                             </SingleField>
@@ -211,8 +212,8 @@ export default createComponent({
                         <FieldLabel/>
                         <SingleField>
                             <Buttons>
-                                <SubmitButton primary disabled={saving} className={{'is-loading': saving}}>Save</SubmitButton>
-                                <Button onClick={resetState} disabled={!isDirty}>Reset</Button>
+                                <SubmitButton primary disabled={saving||loading} className={{'is-loading': saving}}>Save</SubmitButton>
+                                <Button onClick={resetState} disabled={!isDirty || loading}>Reset</Button>
                             </Buttons>
                         </SingleField>
                     </FieldRow>
