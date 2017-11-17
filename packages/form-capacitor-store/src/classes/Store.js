@@ -23,11 +23,13 @@ export default class Store {
             let it = this.subscriptions;
             // console.log(it);
             
-            console.log('------------------- fire',path.join('.'));
+            // console.log('------------------- fire',path.join('.'));
+            
+            // const start = performance.now();
 
             const fire = (subtree,path) =>{
                 
-                console.log('running',path.join('.'));
+                // console.log('running',path.join('.'));
 
                 if(subtree[SUB]) {
                     let currentValue = path.length === 0 ? this.data : getValue(this.data, path);
@@ -93,7 +95,7 @@ export default class Store {
             }
     
             
-            
+            // console.log(performance.now()-start);
             
             // let start = performance.now();
             // for(let [k,v] of Object.entries(this.subscriptions)) {
@@ -115,7 +117,7 @@ export default class Store {
         let subKey = shortid();
 
         let subPath = [...path,SUB,subKey];
-        let subTuple = [callback,getValue(this.data,path)];
+        let subTuple = [callback,getValue(this.data,path)]; // <--- fixme: do we need to store the value here or can we store it once per node??
         setValueMut(this.subscriptions, subPath, subTuple);
 
 
