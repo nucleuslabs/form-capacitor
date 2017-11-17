@@ -107,7 +107,6 @@ export default function withValue(options) {
                     props[options.setValueProp] = this.setValue;
                 }
              
-                
                 return React.createElement(BaseComponent, props);
             }
         };

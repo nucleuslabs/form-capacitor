@@ -20,6 +20,7 @@ import {isEqual} from 'lodash';
 import RadioButton from '../fields/RadioButton';
 import SchedulingInstruction from './SchedulingInstruction';
 import shortid from 'shortid';
+import onMount from '../../onMount';
 
 const primaryLanguages = [pleaseSelect, ...languages];
 
@@ -33,9 +34,6 @@ export default createComponent({
             expose: true
         }),
         withValue({
-            defaultValue: {
-                instructions: [{}],
-            },
             valueProp: 'formData',
             setValueProp: 'setData',
         }), // try with {name: 'person'}
@@ -43,8 +41,14 @@ export default createComponent({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
+        onMount(({setData,saveState}) => {
+            setData({
+                instructions: [{}],
+            });
+            saveState();
+        }),
         withDirty({
-            path: null, // FIXME: it's weird to have to pass `null` here
+            // path: null, // FIXME: it's weird to have to pass `null` here
             compare: isEqual,
         }),
         withState('saving', 'setSaving', false),
@@ -92,7 +96,7 @@ export default createComponent({
                             </tr>
                         </thead>
                         <tbody>
-                            {formData.instructions.length
+                            {formData && formData.instructions && formData.instructions.length
                                 ? formData.instructions.map((inst, i) =>
                                     <SchedulingInstruction key={i} data={inst} name={`instructions.${i}`} remove={deleteInstruction(i)}/>)
                                 : <tr><td colSpan={7} className="has-text-centered">No instructions.</td></tr>
@@ -107,9 +111,9 @@ export default createComponent({
                     </Buttons>
                 </form>
                 <div style={{marginTop: '10px'}}>
-                    <JsonCode>
+                    {formData !== undefined ? <JsonCode>
                         {JSON.stringify(formData, null, 2)}
-                    </JsonCode>
+                    </JsonCode> : <em>No form data</em>}
                 </div>
             </div>
         )

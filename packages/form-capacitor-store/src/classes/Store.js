@@ -12,73 +12,40 @@ export default class Store {
     constructor() {
         this.subscriptions = Object.create(null);
         this.data = Object.create(null);
-        // this.counter = 0;
-
-
-
         
         this._fireSubscriptions = (path,context) => {
-            // console.log('firrreee',path,context);
-            
+            // console.log('fire',path.join('.'));
+  
             let it = this.subscriptions;
-            // console.log(it);
-            
-            // console.log('------------------- fire',path.join('.'));
-            
-            // const start = performance.now();
 
+            // console.log('------------------- fire',path.join('.'));
             const fire = (subtree,path) =>{
                 
                 // console.log('running',path.join('.'));
 
                 if(subtree[SUB]) {
                     let currentValue = path.length === 0 ? this.data : getValue(this.data, path);
-
-                    // console.log("SUBBSS")
+                    
                     for(let sub of Object.values(subtree[SUB])) {
                         if(!Object.is(currentValue, sub[1])) {
-                            // console.log("FIRE ZE MISSILES!!!");
                             sub[0](currentValue, sub[1], context);
                             sub[1] = currentValue;
                         }
                     }
                 }
-            }
+            };
             
             for(let i=0;;) {
-              
-                
-                // console.log(path.slice(0,i).join('.'),currentValue,'|||',it);
-                
-                // console.log(it);
                 
                 fire(it, path.slice(0, i));
                 
-                // if(it[SUB]) {
-                //     let currentValue = i === 0 ? this.data : getValue(this.data, path.slice(0, i));
-                //    
-                //     // console.log("SUBBSS")
-                //     for(let sub of Object.values(it[SUB])) {
-                //         if(!Object.is(currentValue, sub[1])) {
-                //             // console.log("FIRE ZE MISSILES!!!");
-                //             sub[0](currentValue, sub[1], context);
-                //             sub[1] = currentValue;
-                //         }
-                //     }
-                // }
-
-                // ;
-                // console.log('next it',it,path[i]);
-              
-                // if(++i === path.length) break;
                 if(i === path.length) break;
                 it = it[path[i]];
                 if(!it) break;
                 ++i;
             }
 
-            // console.log('this is the end:',it,Object.keys(it));
-            //
+  
             if(it) {
                 
                 const recurse = (tree,path) => {
@@ -93,21 +60,6 @@ export default class Store {
                 
                 recurse(it,path);
             }
-    
-            
-            // console.log(performance.now()-start);
-            
-            // let start = performance.now();
-            // for(let [k,v] of Object.entries(this.subscriptions)) {
-            //     let newValue = getValue(this.data, v[0]);
-            //     if(!Object.is(v[2],newValue)) {
-            //         // console.log(v[0].join('.'),`${JSON.stringify(v[2])} -> ${JSON.stringify(newValue)}`);
-            //         v[1](newValue, v[2], context);
-            //         v[2] = newValue;
-            //     }
-            // }
-            // const elapsed = performance.now() - start;
-            // console.log('fire subs took',elapsed);
         };
     }
 
@@ -154,7 +106,6 @@ export default class Store {
     }
 
     toJSON() {
-        // TODO: strip undefined values?
         return this.data;
     }
 }
