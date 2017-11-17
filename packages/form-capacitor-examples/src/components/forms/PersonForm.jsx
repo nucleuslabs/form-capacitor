@@ -66,7 +66,7 @@ export default createComponent({
                 };
                 setValue(formData);
                 saveState(formData); // <-- clear the dirtyness because we've just loaded fresh data from the db
-                setLoading(false);    
+                setLoading(false); // <-- should we maybe make a "loading" provider that automatically feeds this into all sub-inputs?   
             }, 250); // <-- loading form data from database
         }),
      
