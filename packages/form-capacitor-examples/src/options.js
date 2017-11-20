@@ -48,17 +48,19 @@ export const disciplines = [
 ];
 
 export const clinicians = [
+    {value: null, label: "(None Preferred)"},
+    {value: 7, label: "Allan Quick"},
+    {value: 6, label: "Jennifer Clark"},
     {value: 1, label: "Laura Neal"},
+    {value: 4, label: "Lawrence Nelson"},
+    {value: 8, label: "Ramon Lewis"},
     {value: 2, label: "Richard Barksdale"},
     {value: 3, label: "Stanley Crawford"},
-    {value: 4, label: "Lawrence Nelson"},
     {value: 5, label: "Walter Dill"},
-    {value: 6, label: "Jennifer Clark"},
-    {value: 7, label: "Allan Quick"},
-    {value: 8, label: "Ramon Lewis"},
 ];
 
 export const times = [
+    {value: null, label: "(None)"},
     {value: 30, label: "30 minutes"},
     {value: 60, label: "1 hour"},
     {value: 90, label: "1.5 hours"},

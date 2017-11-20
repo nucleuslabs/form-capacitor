@@ -17,13 +17,17 @@ import field from '../../field';
 
 function findIndex({options, value, multiple}) {
     // console.log('value',value);
-    return multiple
-        ? (value ? value.reduce((acc, val) => {
-            const idx = options.findIndex(opt => opt.value === val);
-            if(idx >= 0) acc.push(idx);
-            return acc;
-        }, []) : [])
-        : options.findIndex(opt => opt.value === value);
+    if(multiple) {
+        return value
+            ? value.reduce((acc, val) => {
+                const idx = options.findIndex(opt => opt.value === val);
+                if(idx >= 0) acc.push(idx);
+                return acc;
+            }, [])
+            : [];
+    }
+
+    return options.findIndex(opt => opt.value === value);
 }
 
 const INTERNAL_UPDATE = '__internal_selectbox_update__';

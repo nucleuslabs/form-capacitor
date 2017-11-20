@@ -34,16 +34,22 @@ export function setValue(obj, path, value) {
     const end = path.length - 1;
     for(let i=0; i<end; ++i) {
         const key = path[i];
+        const path1 = path[i+1];
         if(obj[key]) {
-            obj[key] = clone(obj[key]); // FIXME: !!!!!!!!! cloning all the way up the tree is causing EVERYTHING to rerender
-        } else if(/^(0|[1-9][0-9]*)$/.test(path[i+1])) {
-            obj[key] = new Array(parseInt(path[i+1])+1);
+            obj[key] = clone(obj[key]); // FIXME: cloning all the way up the tree is causing some things to rerender, maybe.
+        } else if(isInt(path1)) {
+            obj[key] = new Array(parseInt(path1,10)+1);
         } else {
             obj[key] = Object.create(null);
         }
         obj = obj[key];
     }
     obj[path[end]] = value;
+}
+
+function isInt(obj) {
+    return (typeof obj === 'string' && /^(0|[1-9][0-9]*)$/.test(obj)) 
+        || (Number.isFinite(obj) && Number.trunc(obj) === obj);
 }
 
 export function setValueMut(obj, path, value) {
@@ -53,8 +59,8 @@ export function setValueMut(obj, path, value) {
         const path1 = path[i+1];
         if(obj[key]) {
             // nada. no clone. mutate dat shit.
-        } else if(Number.isFinite(path1) || (typeof path1 === 'string' && /^(0|[1-9][0-9]*)$/.test(path1))) {
-            obj[key] = new Array(parseInt(path1)+1);
+        } else if(isInt(path1)) {
+            obj[key] = new Array(parseInt(path1,10)+1);
         } else {
             obj[key] = Object.create(null);
         }

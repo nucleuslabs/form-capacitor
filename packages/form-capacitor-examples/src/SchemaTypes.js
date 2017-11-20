@@ -58,7 +58,7 @@ export function array(options) {
     }
 }
 
-export function arrayOf(schema) {
+export function arrayOf(schema, options) {
     return {
         ...options,
         type: 'array',
@@ -82,6 +82,28 @@ export function number(options) {
         type: 'number',
     }
 }
+
+export function int(options) {
+    return {
+        ...options,
+        type: 'integer',
+    }
+}
+
+export function id(options) {
+    return int({
+        minimum: 1,
+        ...options,
+    })
+}
+
+export function bool(options) {
+    return {
+        ...options,
+        type: 'boolean',
+    }
+}
+
 
 export function object(options) {
     return {
@@ -108,9 +130,7 @@ export function date(options) {
 export function optional(schema) {
     return {
         anyOf: [
-            {
-                type: 'null',
-            },
+            {type: 'null'},
             schema
         ]
     }

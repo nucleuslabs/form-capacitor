@@ -5,8 +5,8 @@ import {
 } from '../bulma';
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
-import {withValue,mountPoint} from 'form-capacitor-state';
-import {dirtyProvider,withDirty} from 'form-capacitor-dirty';
+import {withValue, mountPoint} from 'form-capacitor-state';
+import {dirtyProvider, withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompose';
 import DirtyLabel from '../fields/DirtyLabel';
 import NumberBox from '../fields/NumberBox';
@@ -21,8 +21,23 @@ import RadioButton from '../fields/RadioButton';
 import SchedulingInstruction from './SchedulingInstruction';
 import shortid from 'shortid';
 import onMount from '../../onMount';
+import * as Sch from '../../SchemaTypes';
+import {withSchema} from '../../../../form-capacitor-schema/src';
+import FieldErrors from '../fields/FieldErrors';
 
 const primaryLanguages = [pleaseSelect, ...languages];
+
+function Instruction(defaults) {
+    return {
+        typeId: null,
+        teamId: null,
+        disciplineId: null,
+        prefClinicianId: null,
+        prefTime: null,
+        childRequired: false,
+        ...defaults,
+    }
+}
 
 export default createComponent({
     displayName: "SchedulingInstructionsForm",
@@ -30,7 +45,7 @@ export default createComponent({
         mountPoint({
             add: p => {
                 return p.name || shortid();
-            }, 
+            },
             expose: true
         }),
         withValue({
@@ -41,15 +56,34 @@ export default createComponent({
             resetStateProp: 'resetState',
             saveStateProp: 'saveState',
         }),
-        onMount(({setData,saveState}) => {
+        onMount(({setData, saveState}) => {
             setData({
-                instructions: [{}],
+                instructions: [Instruction()],
             });
             saveState();
         }),
         withDirty({
             // path: null, // FIXME: it's weird to have to pass `null` here
             compare: isEqual,
+        }),
+        withSchema({
+            schema: Sch.object({
+                required: ['instructions'],
+                properties: {
+                    instructions: Sch.arrayOf(Sch.object({
+                        required: ['typeId', 'teamId', 'disciplineId'],
+                        properties: {
+                            typeId: Sch.id(),
+                            teamId: Sch.id(),
+                            disciplineId: Sch.id(),
+                            prefClinicianId: Sch.optional(Sch.id()),
+                            prefTime: Sch.optional(Sch.int()),
+                            childRequired: Sch.bool(),
+                        }
+                    }))
+                }
+            }),
+            valueProp: 'formData'
         }),
         withState('saving', 'setSaving', false),
         withHandlers({
@@ -67,13 +101,15 @@ export default createComponent({
                     props.setSaving(false);
                 }, 750);
             },
-            deleteInstruction: ({formData,setData}) => idx => ev => {
+            deleteInstruction: ({formData, setData}) => idx => ev => {
                 ev.preventDefault();
                 setData({...formData, instructions: arraySplice(formData.instructions, idx)});
             },
-            addInstruction: ({formData,setData}) => ev => {
+            addInstruction: ({formData, setData}) => ev => {
                 ev.preventDefault();
-                setData({...formData, instructions: [...formData.instructions, {}]});
+                setData({
+                    ...formData, instructions: [...formData.instructions, Instruction()]
+                });
             }
         })
     ],
@@ -99,10 +135,14 @@ export default createComponent({
                             {formData && formData.instructions && formData.instructions.length
                                 ? formData.instructions.map((inst, i) =>
                                     <SchedulingInstruction key={i} data={inst} name={`instructions.${i}`} remove={deleteInstruction(i)}/>)
-                                : <tr><td colSpan={7} className="has-text-centered">No instructions.</td></tr>
+                                : <tr>
+                                    <td colSpan={7} className="has-text-centered">No instructions.</td>
+                                </tr>
                             }
                         </tbody>
                     </table>
+
+                    <FieldErrors/>
 
                     <Buttons>
                         <Button onClick={addInstruction} info>Add</Button>

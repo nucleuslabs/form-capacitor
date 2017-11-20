@@ -2,63 +2,58 @@
 import {toPath, unset} from 'lodash';
 import {setValue,setValueMut,getValue} from 'form-capacitor-util/util';
 import shortid from 'shortid';
-import debounce from '../fast-debounce';
+// import debounce from '../fast-debounce';
 
 const SUB = Symbol('subscriptions');
-
-
 
 export default class Store {
     constructor() {
         this.subscriptions = Object.create(null);
         this.data = Object.create(null);
-        
-        this._fireSubscriptions = (path,context) => {
-            // console.log('fire',path.join('.'));
-  
-            let it = this.subscriptions;
+    }
+    
+    _fireSubscriptions(path,context) {
+        // console.log('fire',path.join('.'));
 
-            // console.log('------------------- fire',path.join('.'));
-            const runSubsAtPath = (subtree,path) =>{
-                
-                // console.log('running',path.join('.'));
+        let it = this.subscriptions;
 
-                if(subtree[SUB]) {
-                    let currentValue = getValue(this.data, path);
-                    
-                    for(let sub of Object.values(subtree[SUB])) {
-                        if(!Object.is(currentValue, sub[1])) {
-                            sub[0](currentValue, sub[1], context);
-                            sub[1] = currentValue;
-                        }
-                    }
+        // console.log('------------------- fire',path.join('.'));
+
+        for(let i=0;;) {
+            this._runPath(it, path.slice(0, i), context);
+            if(i === path.length) break;
+            it = it[path[i]];
+            if(!it) break;
+            ++i;
+        }
+
+
+        if(it) {
+            this._runSubTree(it,path,context);
+        }
+    }
+    
+    _runSubTree(tree,path,context) {
+        for(let [key, subtree] of Object.entries(tree)) {
+
+            let p = [...path, key];
+            this._runPath(subtree, p, context);
+            this._runSubTree(subtree, p, context); // <-- fixme: this should be breadth-first not depth-first
+
+        }
+    }
+
+    _runPath(subtree,path,context) {
+        if(subtree[SUB]) {
+            let currentValue = getValue(this.data, path);
+
+            for(let sub of Object.values(subtree[SUB])) {
+                if(!Object.is(currentValue, sub[1])) {
+                    sub[0](currentValue, sub[1], context);
+                    sub[1] = currentValue;
                 }
-            };
-            
-            for(let i=0;;) {
-                runSubsAtPath(it, path.slice(0, i));
-                if(i === path.length) break;
-                it = it[path[i]];
-                if(!it) break;
-                ++i;
             }
-
-  
-            if(it) {
-                
-                const recurse = (tree,path) => {
-                    for(let [key, subtree] of Object.entries(tree)) {
-
-                        let p = [...path, key];
-                        runSubsAtPath(subtree, p);
-                        recurse(subtree, p); // <-- fixme: this should be breadth-first not depth-first
-                        
-                    }
-                };
-                
-                recurse(it,path);
-            }
-        };
+        }
     }
 
     subscribe(path, callback) {
@@ -75,11 +70,10 @@ export default class Store {
 
         // this.subscriptions[subKey] = [path,callback,getValue(this.data,path)];
 
-        const unsub = () => {
+        // unsub.key = subKey;
+        return () => {
             unset(this.subscriptions, subPath);
         };
-        // unsub.key = subKey;
-        return unsub;
     }
 
     get(path) {

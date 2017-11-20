@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import ExamplesNav from './components/ExamplesNav';
 import PersonForm from './components/forms/PersonForm';
-import PersonForm2 from './components/forms/PersonForm2';
 import ErrorBoundary from './components/ErrorBoundary';
 import SchedulingInstructionsForm from './components/forms/SchedulingInstructionsForm';
 // import PersonForm from './PersonForm';
