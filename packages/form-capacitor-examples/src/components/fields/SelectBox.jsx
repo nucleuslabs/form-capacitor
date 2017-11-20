@@ -37,7 +37,8 @@ export default createComponent({
     enhancers: [
         // withState('selectedIndex', 'setSelectedIndex', -1),
         field({
-            onChange: ({setValue, multiple, options, setSelectedIndex}) => ev => {
+            onChange: ({setValue, multiple, options, setSelectedIndex, setHasOption}) => ev => {
+                setHasOption(true);
                 if(multiple) {
                     const indices = Array.prototype.reduce.call(ev.currentTarget.options, (acc, opt, idx) => {
                         if(opt.selected) {
@@ -53,18 +54,33 @@ export default createComponent({
                     setValue(options[index].value, INTERNAL_UPDATE);
                 }
             },
-            withState: {
-                valueProp: 'selectedIndex',
-                setProp: 'setSelectedIndex',
-                initial: -1,
-            },
+            withState: [
+                {
+                    valueProp: 'selectedIndex',
+                    setProp: 'setSelectedIndex',
+                    initial: -1,
+                },
+                {
+                    valueProp: 'hasOption',
+                    setProp: 'setHasOption',
+                    initial: true,
+                }
+            ],
             valueChange(value, oldValue, context) {
                 if(context !== INTERNAL_UPDATE) {
-                    this.props.setSelectedIndex(findIndex({...this.props, value}));
-                }
+                    let index = findIndex({...this.props, value});
+                    if(this.props.multiple) {
+                        this.props.setSelectedIndex(index);
+                    } else {
+                        let hasOption = index >= 0 || value == null;
+                        // console.log(hasOption,index);
+                        this.props.setHasOption(hasOption);
+                        this.props.setSelectedIndex(hasOption ? index : this.props.options.length);
+                    }
+                } 
             },
-            valueProp: false,
-            omitProps: ['setSelectedIndex'],
+            // valueProp: 'value',
+            omitProps: ['setSelectedIndex','setHasOption'],
         }),
     ],
     propTypes: {
@@ -77,14 +93,16 @@ export default createComponent({
     defaultProps: {
         useValueAsKey: false,
     },
-    render: ({className, path, multiple, options, useValueAsKey, errors, ...props}) => {
+    render: ({className, path, multiple, options, value, useValueAsKey, errors, hasOption, ...props}) => {
         const hasErrors = errors && errors.length;
+        // console.log('value',value);
         return (
             <div className={cc(['control', className])}>
-                <span className={cc(['select', {'is-multiple': multiple, 'is-danger': hasErrors}])}>
+                <span className={cc(['select', {'is-multiple': multiple, 'is-danger': hasErrors, 'is-warning':!hasOption}])}>
                     <SelectByIndex id={path.join('.')} className={cc(['input'])} {...props} multiple={multiple}>
                         {options.map(({value, label, ...opt}, i) =>
                             <option {...opt} key={useValueAsKey ? value : i} children={label}/>)}
+                        {hasOption ? null : <option children={value}/>}
                     </SelectByIndex>
                  
                 </span>

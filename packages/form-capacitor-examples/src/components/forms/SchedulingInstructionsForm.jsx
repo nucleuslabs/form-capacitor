@@ -1,23 +1,15 @@
 import React from 'react';
 import {
-    CheckBoxLabel, Control, SingleField, FieldLabel, FieldRow, Title1, RadioLabel, SubmitButton, Button,
-    Title2, Title, Buttons
+   SubmitButton, Button,
+    Title, Buttons
 } from '../bulma';
-import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
 import {withValue, mountPoint} from 'form-capacitor-state';
 import {dirtyProvider, withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompose';
-import DirtyLabel from '../fields/DirtyLabel';
-import NumberBox from '../fields/NumberBox';
 import {arraySplice, formatDate} from '../../util';
-import DatePicker from '../fields/DatePicker';
-import {languages, pleaseSelect} from '../../options';
-import SelectBox from '../fields/SelectBox';
 import JsonCode from '../JsonCode';
-import CheckBox from '../fields/CheckBox';
 import {isEqual} from 'lodash';
-import RadioButton from '../fields/RadioButton';
 import SchedulingInstruction from './SchedulingInstruction';
 import shortid from 'shortid';
 import onMount from '../../onMount';
@@ -25,14 +17,13 @@ import * as Sch from '../../SchemaTypes';
 import {withSchema} from '../../../../form-capacitor-schema/src';
 import FieldErrors from '../fields/FieldErrors';
 
-const primaryLanguages = [pleaseSelect, ...languages];
 
 function Instruction(defaults) {
     return {
         typeId: null,
         teamId: null,
         disciplineId: null,
-        prefClinicianId: null,
+        prefClinicianId: 999,
         prefTime: null,
         childRequired: false,
         ...defaults,
