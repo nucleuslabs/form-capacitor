@@ -1,6 +1,6 @@
 // inspired by https://github.com/mroderick/PubSubJS/blob/903eb3c45e335ae5bfcda40ae9c5894583869dd8/src/pubsub.js#L168
-import {toPath, get as getValue, unset} from 'lodash';
-import {setValue,setValueMut} from 'form-capacitor-util/util';
+import {toPath, unset} from 'lodash';
+import {setValue,setValueMut,getValue} from 'form-capacitor-util/util';
 import shortid from 'shortid';
 import debounce from '../fast-debounce';
 
@@ -19,12 +19,12 @@ export default class Store {
             let it = this.subscriptions;
 
             // console.log('------------------- fire',path.join('.'));
-            const fire = (subtree,path) =>{
+            const runSubsAtPath = (subtree,path) =>{
                 
                 // console.log('running',path.join('.'));
 
                 if(subtree[SUB]) {
-                    let currentValue = path.length === 0 ? this.data : getValue(this.data, path);
+                    let currentValue = getValue(this.data, path);
                     
                     for(let sub of Object.values(subtree[SUB])) {
                         if(!Object.is(currentValue, sub[1])) {
@@ -36,9 +36,7 @@ export default class Store {
             };
             
             for(let i=0;;) {
-                
-                fire(it, path.slice(0, i));
-                
+                runSubsAtPath(it, path.slice(0, i));
                 if(i === path.length) break;
                 it = it[path[i]];
                 if(!it) break;
@@ -52,7 +50,7 @@ export default class Store {
                     for(let [key, subtree] of Object.entries(tree)) {
 
                         let p = [...path, key];
-                        fire(subtree, p);
+                        runSubsAtPath(subtree, p);
                         recurse(subtree, p); // <-- fixme: this should be breadth-first not depth-first
                         
                     }

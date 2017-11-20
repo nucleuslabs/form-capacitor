@@ -28,3 +28,5 @@ export const DATA_ROOT = 'data';
 export const INIT_ROOT = 'init';
 
 export const ERROR_ROOT = 'errors';
+
+// TODO: move this junk into form-capacitor-state. This is all React-specific, but form-capacitor-store needn't any dependency on React.

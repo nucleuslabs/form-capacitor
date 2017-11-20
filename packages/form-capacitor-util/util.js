@@ -62,3 +62,14 @@ export function setValueMut(obj, path, value) {
     }
     obj[path[end]] = value;
 }
+
+export function getValue(obj, path, def) {
+    let ret = obj;
+    
+    for(let key of path) {
+        if(!Object.hasOwnProperty.call(ret,key)) return def;
+        ret = ret[key];
+    }
+    
+    return ret;
+}
