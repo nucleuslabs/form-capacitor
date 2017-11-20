@@ -43,7 +43,12 @@ export default createComponent({
         id: PropTypes.string,
         className: PropTypes.any,
     },
-    render: ({id, path, multiple, checked, value, ...props}) => {
+    defaultProps: {
+        component: function CheckBox(props) {
+            return <input type="checkbox" {...props}/>
+        }
+    },
+    render: ({id, path, multiple, checked, value, component, ...props}) => {
         if(!id) {
             if(multiple) {
                 if(typeof value === 'string' || typeof value === 'number') {
@@ -63,8 +68,6 @@ export default createComponent({
             checked = false;
         }
         // console.log('rneder checkbox');
-        return (
-            <Switch id={id} {...props} checked={checked} />
-        )
+        return React.createElement(component, {id,...props,checked});
     }
 })

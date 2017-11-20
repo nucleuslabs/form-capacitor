@@ -4,7 +4,7 @@ import createComponent from '../../createComponent';
 import {withValue,mountPoint} from 'form-capacitor-state';
 import {withHandlers, withState} from 'recompose';
 import SelectBox from '../fields/SelectBox';
-import CheckBox from '../fields/CheckBox';
+import Switch from '../fields/Switch';
 import {isEqual} from 'lodash';
 
 import {appointmentTypes, teams, disciplines, clinicians, times} from '../../options';
@@ -25,7 +25,7 @@ export default createComponent({
                 <td className="vert-center"><SelectBox name="disciplineId" options={disciplines}/></td>
                 <td className="vert-center"><SelectBox name="prefClinicianId" options={clinicians}/></td>
                 <td className="vert-center"><SelectBox name="prefTime" options={times}/></td>
-                <td className="vert-center"><VCenter><CheckBox name="childRequired" on="Yes" off="No"/></VCenter></td>
+                <td className="vert-center"><VCenter><Switch name="childRequired" on="Yes" off="No"/></VCenter></td>
                 <td className="vert-center">{remove ? <a href="" onClick={remove}><Icon name="trash" medium/></a> : null}</td>
             </tr>
         )
