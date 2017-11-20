@@ -1,11 +1,14 @@
 import Path from 'path';
 import {ProvidePlugin,IgnorePlugin} from 'webpack';
 
+
+const src = `${__dirname}/src`;
+
 export default {
-    context: `${__dirname}/src`,
-    entry: `${__dirname}/src/index.jsx`,
+    context: src,
+    entry: `${src}/index.jsx`,
     output: {
-        path: `${__dirname}/src/public`,
+        path: `${src}/public`,
         filename: 'bundle.js',
         publicPath: '/',
         pathinfo: true,
@@ -38,6 +41,15 @@ export default {
                     limit: 1024 * 2,
                 }
             },
+            {
+                test: /\.less$/,
+                include: src,
+                use: [
+                    'style-loader',
+                    {loader: 'css-loader', options: {modules: true}},
+                    {loader: 'less-loader', options: {strictMath: true, strictUnits: true}},
+                ]
+            }
             // {
             //     test: /\.less$/,
             //     include: __dirname,

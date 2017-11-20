@@ -23,7 +23,7 @@ function Instruction(defaults) {
         typeId: null,
         teamId: null,
         disciplineId: null,
-        prefClinicianId: 999,
+        prefClinicianId: null,
         prefTime: null,
         childRequired: false,
         ...defaults,

@@ -11,6 +11,7 @@ import className from '../../className';
 import {arraySplice} from '../../util';
 import {withPath} from '../../../../form-capacitor-state/src';
 import field from '../../field';
+import Switch from '../Switch';
 // console.log(withValue);
 
 export default createComponent({
@@ -63,7 +64,7 @@ export default createComponent({
         }
         // console.log('rneder checkbox');
         return (
-            <input id={id} {...props} type="checkbox" checked={checked} />
+            <Switch id={id} {...props} checked={checked} />
         )
     }
 })
