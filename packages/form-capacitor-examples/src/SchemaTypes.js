@@ -127,11 +127,12 @@ export function date(options) {
     }
 }
 
-export function optional(schema) {
+export function optional(schema, options) {
     return {
+        ...options,
         anyOf: [
             {type: 'null'},
             schema
-        ]
+        ],
     }
 }

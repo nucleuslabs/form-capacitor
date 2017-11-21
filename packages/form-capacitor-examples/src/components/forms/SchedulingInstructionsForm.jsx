@@ -16,6 +16,7 @@ import onMount from '../../onMount';
 import * as Sch from '../../SchemaTypes';
 import {withSchema} from '../../../../form-capacitor-schema/src';
 import FieldErrors from '../fields/FieldErrors';
+import FormErrors from '../fields/FormErrors';
 
 
 function Instruction(defaults) {
@@ -61,17 +62,24 @@ export default createComponent({
             schema: Sch.object({
                 required: ['instructions'],
                 properties: {
-                    instructions: Sch.arrayOf(Sch.object({
-                        required: ['typeId', 'teamId', 'disciplineId'],
-                        properties: {
-                            typeId: Sch.id(),
-                            teamId: Sch.id(),
-                            disciplineId: Sch.id(),
-                            prefClinicianId: Sch.optional(Sch.id()),
-                            prefTime: Sch.optional(Sch.int()),
-                            childRequired: Sch.bool(),
+                    instructions: Sch.arrayOf(
+                        Sch.object({
+                            title: "Instruction",
+                            required: ['typeId', 'teamId', 'disciplineId'],
+                            properties: {
+                                typeId: Sch.id({title: "Appointment Type"}),
+                                teamId: Sch.id({title: "Team"}),
+                                disciplineId: Sch.id({title: "Discipline"}),
+                                prefClinicianId: Sch.optional(Sch.id(),{title: "Pref. Clinician"}),
+                                prefTime: Sch.optional(Sch.int(),{title: "Pref. Time"}),
+                                childRequired: Sch.bool({title: "Child Req'd"}),
+                            }
+                        }),
+                        {
+                            title: "Instructions",
+                            minItems: 3,
                         }
-                    }))
+                    )
                 }
             }),
             valueProp: 'formData'
@@ -133,7 +141,7 @@ export default createComponent({
                         </tbody>
                     </table>
 
-                    <FieldErrors/>
+                    <FormErrors/>
 
                     <Buttons>
                         <Button onClick={addInstruction} info>Add</Button>

@@ -1,13 +1,15 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual, getDisplayName} from 'recompact';
-import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT, CTX_KEY_SCHEMA_ID, CTX_VAL_SCHEMA_ID} from 'form-capacitor-store';
+import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT, CTX_KEY_SCHEMA_ID, CTX_VAL_SCHEMA_ID, ERR} from 'form-capacitor-store';
 // import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
-import {get as getValue, toPath, unset, set as setValue,omit,pick} from 'lodash';
+import { toPath, unset, omit,pick} from 'lodash';
 import Ajv, {KeywordDefinition} from 'ajv';
 import installAjvKeywords from 'ajv-keywords'; // todo: asynchronously import() these libs so they can be disabled if necessary or loaded in later
 // import installAjvErrors from 'ajv-errors';
 // import installAjvAsync from 'ajv-async';
 import ShortId from 'shortid';
+import {setValueMut,setValue,getValue} from '../../form-capacitor-util/util';
+import {EMPTY_ARRAY} from '../../form-capacitor-state/src/constants';
 
 function loadSchema(uri) {
     return fetch(uri).then(res => res.json());
@@ -92,30 +94,40 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                     },errResult => {
                         if(errResult instanceof Ajv.ValidationError) {
                             // fail(err.errors);
+                            // console.log(ajv.getSchema());
                             // console.log(JSON.stringify(errResult.errors,null,2));
                             
                             let errors = Object.create(null);
                             
                             for(let err of errResult.errors) {
-                                const dataPath = err.dataPath ? toPath(err.dataPath.slice(1)) : [];
+                                const dataPath = err.dataPath ? toPath(err.dataPath.slice(1)) : EMPTY_ARRAY;
+                                const errPath = [...dataPath, ERR];
                                 // const fullPath = [...this.errorPath, ...dataPath];
 
                                 // console.log(err);
                                 // setValue(errors,dataPath, pick(err,['message','keyword']));
                                 
                                 let errObj = pick(err,['message','keyword','params']);
+                                // console.log('err',err,schemaPathToArray(err.schemaPath));
                                 errObj.value = pubSub.get([DATA_ROOT, ...this.rootPath, ...dataPath]);
+                                // const schemaPath = schemaPathToArray(err.schemaPath);
+                                // console.log(schemaPath);
+                                // errObj.schema = getValue(options.schema,schemaPath);
+                                // errObj.title = getValue(options.schema,[...schemaPath.slice(0,-1),'title']);
                                 // console.log("PAAATH",[DATA_ROOT, ...this.rootPath, ...dataPath]);
                                 
-                                let fieldErrors = getValue(errors, dataPath);
+                                let fieldErrors = getValue(errors, errPath);
                                 fieldErrors = fieldErrors ? [...fieldErrors, errObj] : [errObj];
-                                setValue(errors,dataPath, fieldErrors);
+                                setValueMut(errors,errPath, fieldErrors);
+                                // console.log('setttin ze errros',[...dataPath,ERR]);
                           
                                 // console.log(fullPath,err.message);
                             }
                             
                             // console.log('%c'+JSON.stringify(errors,null,2),'color:red');
+                            // console.log('setting',this.errorPath,errors);
                             pubSub.set(this.errorPath, errors);
+                            // console.log('getting',pubSub.get(this.errorPath));
                         } else {
                             throw errResult;
                         }
@@ -126,7 +138,8 @@ export default function withSchema(options) { // altname: dirtyRoot ??
             constructor(props, context) {
                 super(props, context);
 
-                this.rootPath = getValue(context, CTX_KEY_PATH);
+                this.rootPath = getValue(context, [CTX_KEY_PATH]);
+                // console.log(context,CTX_KEY_PATH);
                 
                 if(!this.rootPath) {
                     throw new Error("`withSchema` must be added after `withValue`; context path was not found")
@@ -171,4 +184,9 @@ export default function withSchema(options) { // altname: dirtyRoot ??
             }
         }
     }
+}
+
+function schemaPathToArray(path) {
+    if(!path) return [];
+    return path.slice(2).split('/');
 }

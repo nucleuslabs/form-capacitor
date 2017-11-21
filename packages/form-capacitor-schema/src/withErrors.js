@@ -1,6 +1,6 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual, getDisplayName} from 'recompact';
-import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT, CTX_KEY_SCHEMA_ID, CTX_VAL_SCHEMA_ID} from 'form-capacitor-store';
+import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT, CTX_KEY_SCHEMA_ID, CTX_VAL_SCHEMA_ID, ERR} from 'form-capacitor-store';
 // import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
 import {get as getValue, toPath, unset, set as setValue,omit,pick} from 'lodash';
 import Ajv, {KeywordDefinition} from 'ajv';
@@ -9,6 +9,7 @@ import installAjvKeywords from 'ajv-keywords'; // todo: asynchronously import() 
 // import installAjvAsync from 'ajv-async';
 import ShortId from 'shortid';
 import {resolveValue} from '../../form-capacitor-util/util';
+import {EMPTY_ARRAY} from '../../form-capacitor-state/src/constants';
 
 
 export default function withErrors(options) { // altname: dirtyRoot ??
@@ -17,6 +18,7 @@ export default function withErrors(options) { // altname: dirtyRoot ??
         path: p => p.path,
         schemaId: undefined,
         errorsProp: 'errors',
+        includeChildren: false,
         ...options,
     };
 
@@ -59,6 +61,7 @@ export default function withErrors(options) { // altname: dirtyRoot ??
                 }
 
                 this.fullPath = [ERROR_ROOT, schemaId, ...path];
+                // console.log(this.fullPath);
 
                 // console.log(this.fullPath);
                 
@@ -70,10 +73,20 @@ export default function withErrors(options) { // altname: dirtyRoot ??
 
             componentWillMount() {
                 if(this.fullPath) {
-                    this.unsub = pubSub.subscribe(this.fullPath, errors => {
+                    this.unsub = pubSub.subscribe(this.fullPath, obj => {
+                        // console.log('got errors',errors);
                         // console.log(BaseComponent.displayName,'got change',getValue(this.store, this.fullPath));
                         // console.log('change',this.fullPath);
-                        this.setState({errors});
+                        
+                        if(options.includeChildren) {
+                            this.setState({
+                                errors: obj
+                            });
+                        } else {
+                            this.setState({
+                                errors: obj && obj[ERR] && obj[ERR].length ? obj[ERR] : EMPTY_ARRAY
+                            });
+                        }
                     });
                 }
             }

@@ -62,7 +62,7 @@ export default class Store {
         let subKey = shortid();
 
         let subPath = [...path,SUB,subKey];
-        let subTuple = [callback,getValue(this.data,path)]; // <--- fixme: do we need to store the value here or can we store it once per node??
+        let subTuple = [callback,getValue(this.data,path)]; // <--- fixme: do we need to store the value here or can we store it once per node?? or maybe not at all now that we're just iterating the proper nodes
         setValueMut(this.subscriptions, subPath, subTuple);
 
 
