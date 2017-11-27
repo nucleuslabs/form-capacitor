@@ -1,7 +1,7 @@
 import React from 'react';
 import {Icon} from '../bulma';
 import createComponent from '../../createComponent';
-import {withValue,mountPoint} from 'form-capacitor-state';
+import {withValue,mount} from 'form-capacitor-state';
 import {withHandlers, withState} from 'recompose';
 import SelectBox from '../fields/SelectBox';
 import Switch from '../fields/Switch';
@@ -14,7 +14,7 @@ import VCenter from '../VCenter';
 export default createComponent({
     displayName: "SchedulingInstructionsForm",
     enhancers: [
-        mountPoint({add: p => p.name}),
+        mount({add: p => p.name}),
         // withValue(), 
     ],
     render: ({remove}) => {

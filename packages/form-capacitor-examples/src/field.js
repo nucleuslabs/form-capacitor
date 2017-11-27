@@ -1,5 +1,5 @@
 import {compose, withHandlers, defaultProps, withState} from 'recompose';
-import mountPoint from '../../form-capacitor-state/src/mountPoint';
+import mount from '../../form-capacitor-state/src/mount';
 import {withValue} from '../../form-capacitor-state/src';
 import {withErrors} from '../../form-capacitor-schema/src';
 import {EMPTY_ARRAY} from '../../form-capacitor-state/src/constants';
@@ -21,7 +21,7 @@ export default function field(options) {
     };
 
     let enhancers = [
-        mountPoint({
+        mount({
             add: p => p[options.nameProp],
             mount: p => !!p[options.nameProp],
             expose: true,

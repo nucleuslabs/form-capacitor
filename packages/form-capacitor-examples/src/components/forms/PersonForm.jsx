@@ -5,7 +5,7 @@ import {
 } from '../bulma';
 import TextBox from '../fields/TextBox';
 import createComponent from '../../createComponent';
-import {mountPoint, withValue} from 'form-capacitor-state';
+import {mount, withValue} from 'form-capacitor-state';
 import {dirtyProvider, withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompose';
 import DirtyLabel from '../fields/DirtyLabel';
@@ -30,7 +30,7 @@ const primaryLanguages = [pleaseSelect, ...languages];
 export default createComponent({
     displayName: "PersonForm",
     enhancers: [
-        mountPoint({add: p => p.name || shortid(), expose: true}),
+        mount({add: p => p.name || shortid(), expose: true}),
         withValue({
             // defaultValue: {
             //     // name: "Mark",

@@ -1,5 +1,5 @@
 import createComponent from '../../createComponent';
-import {withValue, mountPoint, withPath} from 'form-capacitor-state';
+import {withValue, mount, withPath} from 'form-capacitor-state';
 import {mapProps, omitProps, withProps, withPropsOnChange, defaultProps,pure} from 'recompose';
 import cc from 'classcat';
 import {withErrors} from 'form-capacitor-schema';
@@ -12,7 +12,7 @@ import field from '../../field';
 export default createComponent({
     displayName: 'TextBox',
     enhancers: [
-        // mountPoint({add: p => p.name, expose: true}),
+        // mount({add: p => p.name, expose: true}),
         field({
             onChange: ({setValue}) => ev => {
                 setValue(ev.currentTarget.value);

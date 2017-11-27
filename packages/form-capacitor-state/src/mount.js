@@ -11,7 +11,7 @@ import {EMPTY_ARRAY, EMPTY_OBJECT} from './constants';
  * @param {boolean} options.mount Add path to child context
  * @returns {function(*=)}
  */
-export default function mountPoint(options) { // TODO: rename mount()?
+export default function mount(options) { // TODO: rename mount()?
     
     // TODO: rename these options something more clear...
     options = {
@@ -23,7 +23,7 @@ export default function mountPoint(options) { // TODO: rename mount()?
     
     return BaseComponent => {
         class Mount extends React.PureComponent {
-            static displayName = wrapDisplayName(BaseComponent, 'mountPoint');
+            static displayName = wrapDisplayName(BaseComponent, 'mount');
 
             static contextTypes = {
                 [CTX_KEY_PATH]: CTX_VAL_PATH,

@@ -8,7 +8,7 @@ import onPropsChange from '../../onPropsChange';
 import {withErrors} from '../../../../form-capacitor-schema/src';
 import {WarningIcon} from '../bulma';
 import {withPath} from '../../../../form-capacitor-state/src';
-import mountPoint from '../../../../form-capacitor-state/src/mountPoint';
+import mount from '../../../../form-capacitor-state/src/mount';
 import field from '../../field';
 // import withPropsOnChange from '../../withPropsOnChange';
 // import dump from 'form-capacitor-util/dump';

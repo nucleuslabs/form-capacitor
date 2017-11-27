@@ -4,7 +4,7 @@ import {
     Title, Buttons
 } from '../bulma';
 import createComponent from '../../createComponent';
-import {withValue, mountPoint} from 'form-capacitor-state';
+import {withValue, mount} from 'form-capacitor-state';
 import {dirtyProvider, withDirty} from 'form-capacitor-dirty';
 import {withHandlers, withState} from 'recompose';
 import {arraySplice, formatDate} from '../../util';
@@ -34,7 +34,7 @@ function Instruction(defaults) {
 export default createComponent({
     displayName: "SchedulingInstructionsForm",
     enhancers: [
-        mountPoint({
+        mount({
             add: p => {
                 return p.name || shortid();
             },

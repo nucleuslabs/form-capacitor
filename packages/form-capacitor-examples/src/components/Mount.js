@@ -1,9 +1,9 @@
 import createComponent from '../createComponent';
-import {mountPoint} from 'form-capacitor-state';
+import {mount} from 'form-capacitor-state';
 
 export default createComponent({
    displayName: 'Mount',
-   enhancers: mountPoint({
+   enhancers: mount({
        add: p => p.path,
        expose: p => p.expose === undefined || p.expose,
    })
