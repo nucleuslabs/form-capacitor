@@ -70,6 +70,10 @@ export function setValueMut(obj, path, value) {
 }
 
 export function getValue(obj, path, def) {
+    if(!obj) return def;
+    if(!Array.isArray(path)) {
+        throw new Error("`path` must be an array");
+    }
     let ret = obj;
     
     for(let key of path) {

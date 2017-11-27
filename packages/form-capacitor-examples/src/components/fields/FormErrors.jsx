@@ -5,7 +5,8 @@ import {withErrors} from 'form-capacitor-schema';
 import PropTypes from 'prop-types';
 import stringLength from 'string-length';
 import {withPath} from '../../../../form-capacitor-state/src';
-import {ERR} from '../../../../form-capacitor-store/src';
+import {ERR,SCHEMA} from '../../../../form-capacitor-store/src';
+import {getValue} from 'form-capacitor-util/util';
 
 export default createComponent({
     displayName: 'FormErrors',
@@ -20,18 +21,14 @@ export default createComponent({
     },
     render: ({errors}) => {
         if(!errors) return null;
+        
 
-        // console.log("FORM ERRORS",errors);
-
-        return <div className="help is-danger content">{formatErrors(errors, [])}</div>
+        return <div className="help is-danger content">{formatErrors(errors, errors[SCHEMA])}</div>
     }
 })
 
-function formatErrors(obj, path) {
-
+function formatErrors(obj, schema) {
     const subFields = Object.entries(obj);
-
-    // console.log('obj',obj);
 
     return (
         <ul>
@@ -42,10 +39,27 @@ function formatErrors(obj, path) {
                 )
             }) : null}
             {subFields.length ? subFields.map(([key, sf]) => {
+                let title,subschema;
+                if(schema) {
+                    switch(schema.type) {
+                        case 'object':
+                            subschema = getValue(schema,['properties',key]);
+                            title = getValue(subschema,['title']);
+                            break;
+                        case 'array':
+                            subschema = getValue(schema,['items']);
+                            title = `${getValue(subschema,['title'], key)} #${parseInt(key,10)+1}`;
+                            break;
+                        default:
+                            console.debug(schema,key);
+                            break;
+                    }
+                }
+                
                 return (
                     <li key={key}>
-                        <strong>{key}</strong>
-                        {formatErrors(sf, [...path, key])}
+                        <strong>{title || key}</strong>
+                        {formatErrors(sf, subschema)}
                     </li>
                 )
             }) : null}

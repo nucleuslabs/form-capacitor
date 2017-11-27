@@ -1,6 +1,6 @@
 import React from 'react';
 import {createEagerFactory, wrapDisplayName, shallowEqual, getDisplayName} from 'recompact';
-import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT, CTX_KEY_SCHEMA_ID, CTX_VAL_SCHEMA_ID, ERR} from 'form-capacitor-store';
+import {ContextStore, StoreShape, CTX_KEY_PATH, CTX_VAL_PATH, DATA_ROOT, defaultStore, INIT_ROOT, ContextDirty, DirtyShape, pubSub, ERROR_ROOT, CTX_KEY_SCHEMA_ID, CTX_VAL_SCHEMA_ID, ERR, SCHEMA} from 'form-capacitor-store';
 // import {resolveValue, defaults, setValue} from 'form-capacitor-util/util';
 import { toPath, unset, omit,pick} from 'lodash';
 import Ajv, {KeywordDefinition} from 'ajv';
@@ -50,7 +50,8 @@ export default function withSchema(options) { // altname: dirtyRoot ??
         }
     }
 
-    const validatePromise = ajv.compileAsync({...options.schema, $async: true});
+    const fullSchema = {...options.schema, $async: true};
+    const validatePromise = ajv.compileAsync(fullSchema);
 
     return BaseComponent => {
         const factory = createEagerFactory(BaseComponent);
@@ -97,7 +98,12 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                             // console.log(ajv.getSchema());
                             // console.log(JSON.stringify(errResult.errors,null,2));
                             
-                            let errors = Object.create(null);
+                            let schema = getValue(ajv, ['_refs','','schema']) || fullSchema; // <-- not sure how to get current/compiled schema; https://stackoverflow.com/q/47519242/65387
+                            let errors = {
+                                [SCHEMA]: schema,
+                            };
+                            // console.log(ajv);
+                            // debugger;
                             
                             for(let err of errResult.errors) {
                                 const dataPath = err.dataPath ? toPath(err.dataPath.slice(1)) : EMPTY_ARRAY;
