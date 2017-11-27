@@ -1,4 +1,7 @@
 {
   "name": "form-capacitor-util",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "dependencies": {
+    "react": "^16.1.1"
+  }
 }

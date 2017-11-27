@@ -1,7 +1,8 @@
-import React, {createFactory} from 'react';
-import {createEagerFactory, wrapDisplayName, shallowEqual} from 'recompact';
+import React from 'react';
+import {wrapDisplayName} from 'recompact';
 import {CTX_KEY_PATH, CTX_VAL_PATH} from 'form-capacitor-store';
 import {resolveValue} from 'form-capacitor-util/util';
+import {shouldComponentUpdate} from 'form-capacitor-util/shallowEqualWithoutReactElements';
 import {EMPTY_ARRAY, EMPTY_OBJECT} from './constants';
 
 /**
@@ -22,7 +23,7 @@ export default function mount(options) { // TODO: rename mount()?
     };
     
     return BaseComponent => {
-        class Mount extends React.PureComponent {
+        class Mount extends React.Component {
             static displayName = wrapDisplayName(BaseComponent, 'mount');
 
             static contextTypes = {
@@ -48,6 +49,8 @@ export default function mount(options) { // TODO: rename mount()?
                 if(this.pathProp === true) this.pathProp = 'path';
             }
 
+            shouldComponentUpdate = shouldComponentUpdate;
+            
             // shouldComponentUpdate(nextProps, nextState) {
             //     // is this going to cause problems...?
             //     // I did this because changing any of the options after the component is mounted

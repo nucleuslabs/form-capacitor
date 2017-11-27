@@ -23,12 +23,12 @@ export default createComponent({
     ],
     render: ({className, path, errors, ...props}) => {
         // console.log('render textbox',props.value);
-        const hasErrors = errors && errors.length;
+        const hasErrors = !!(errors && errors.length);
         return (
 
             <div className={cc(['control', className,{'has-icons-right':hasErrors}])}>
                 <input id={path.join('.')} className={cc(['input',{'is-danger':hasErrors}])} {...props}/>
-                {hasErrors && <WarningIcon/>}
+                {hasErrors ? <WarningIcon/> : null}
             </div>
         )
     }
