@@ -33,6 +33,7 @@ export default function withSchema(options) { // altname: dirtyRoot ??
         jsonPointers: false,
         schemaId: undefined,
         async: true,
+        verbose: true,
         loadSchema,
     });
     // installAjvAsync(ajv);
@@ -99,6 +100,9 @@ export default function withSchema(options) { // altname: dirtyRoot ??
                             // console.log(JSON.stringify(errResult.errors,null,2));
                             
                             let schema = getValue(ajv, ['_refs','','schema']) || fullSchema; // <-- not sure how to get current/compiled schema; https://stackoverflow.com/q/47519242/65387
+                                // https://stackoverflow.com/a/47527398/65387
+                            
+                            // get the schema with the error: https://stackoverflow.com/a/47557065/65387
                             let errors = {
                                 [SCHEMA]: schema,
                             };
