@@ -1,0 +1,158 @@
+GraphQL only specifies types. We want to specify
+- types
+- pattern/format
+- conditionals
+- formatters
+- default values
+- severity
+- meta-data
+	- name
+	- description
+	- helpText
+- error message
+
+Inspiration:
+- http://graphql.org/learn/schema/
+	- http://graphql.org/graphql-js/type/#graphqlscalartype
+- https://www.typescriptlang.org/
+- https://flow.org/
+- http://json-schema.org/
+	- http://json-schema.org/examples.html
+	- https://www.jsonschemavalidator.net/
+	- https://spacetelescope.github.io/understanding-json-schema/
+- https://pegjs.org/online
+- https://www.json.org/
+
+GraphQL:
+
+	type Character {
+	  name: String!
+	  appearsIn: [Episode]!
+	}
+	
+	query DroidById($id: ID!) {
+	  droid(id: $id) {
+	    name
+	  }
+	}	
+
+PegJS:
+	
+	value
+	  = false
+	  / null
+	  / true
+	  / object
+	  / array
+	  / number
+	  / string
+
+
+	object
+	  = begin_object
+	    members:(
+	      head:member
+	      tail:(value_separator m:member { return m; })*
+	      {
+	        var result = {};
+	
+	        [head].concat(tail).forEach(function(element) {
+	          result[element.name] = element.value;
+	        });
+	
+	        return result;
+	      }
+	    )?
+	    end_object
+	    { return members !== null ? members: {}; }
+	    
+TypeScript:
+
+	interface LabelledValue {
+	    label: string;
+	}
+	
+	type custCreditTuple = [string, Customer, number];
+	
+	enum Color {Red, Green, Blue}
+	
+	any
+	
+	type Shape = Square | Rectangle;
+	
+	// intersection types
+	
+	type Human = Person & Serializable & Loggable
+	
+	
+Our DSL:
+    
+Each file represents a schema for a single form. We need to export a "default" as the root of the form. In PegJS, 
+the first rule is the startRule. In JS, we use "export default". In GraphQL, there is no start -- each schema defines
+many types. I'm thinking we use a keyword to designate one of the rules as the entrypoint? Like "schema".
+
+	schema Foo = {
+		
+	}
+
+Exports a schema named "Foo"
+
+	schema = {
+	
+	}
+	
+Exports this as the root schema..? This way we can optionally have multiple schemas in one file.
+
+	schema = {
+		firstName: string
+		lastName: string
+		age: number
+		isMarried: boolean
+	}
+
+Basic types (per json.org): string, number, object, array, true, false, null
+
+A "type" is one of the basic types.
+A "rule" is a type + pattern/format + error message + severity
+A "property" (or "field"?) has a rule + name + default value + [formatter?]
+
+Can properties given types, or only rules? A type is kind of like a rule with no arguments...
+
+	rule PhoneNumber($country: string = "CA") {
+		type: string
+		pattern: [0-9-()]+
+		message: "Invalid phone number"
+	}
+
+(How to support arguments? Should we?)
+
+	schema = { # schema is an object
+		homePhone <
+			rule: PhoneNumberCA | PhoneNumberUS
+			name: "Home Phone"
+			description: "The telephone number we can reach you at home"
+			helpText: "Should be formatted like \"(888) 888-8888\" or \"+1 (888) 888-8888 ext. 1234\""
+			required: true # property must be present
+		>
+	}
+	
+	schema = < # schema consists of a single field
+		rule: BirthDate
+		name: "Date of Birth"
+		description: "The date you were born"
+	>
+	
+	schema = [ FirstName, LastName] # the entire schema is a fixed-length tuple like https://blogs.msdn.microsoft.com/typescript/2018/01/17/announcing-typescript-2-7-rc/#fixed-length-tuples
+	
+	schema = "foo" | "bar" | 7 # schema must be one of these literals -- but don't these need to be 'fields' so we can do the error message properly?
+	
+	rule MinLength($length: number) {
+		type: string
+		message: "Must be at least ${length} characters"
+		# We can't put the actual code this here... I guess this will act like graphql's "scalar" and you'll have to fill
+		# in the logic on the backend...?
+	}
+	
+	field FirstName = < # should the keyword be "field" or just "type"? The <> already denote this is a 'field' type
+		rule: MinLength(2)
+	>
