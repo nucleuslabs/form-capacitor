@@ -20,6 +20,7 @@ Inspiration:
 	- http://json-schema.org/examples.html
 	- https://www.jsonschemavalidator.net/
 	- https://spacetelescope.github.io/understanding-json-schema/
+	- https://github.com/epoberezkin/ajv-errors
 - https://pegjs.org/online
 - https://www.json.org/
 
@@ -126,7 +127,7 @@ Can properties given types, or only rules? A type is kind of like a rule with no
 
 (How to support arguments? Should we?)
 
-	schema = { # schema is an object
+	schema = { # schema is an object <--- bad: 1. schema has to be a field, not a type. 2. how do we define rules on the object itself, like min/max properties?
 		homePhone <
 			rule: PhoneNumberCA | PhoneNumberUS
 			name: "Home Phone"
@@ -153,6 +154,42 @@ Can properties given types, or only rules? A type is kind of like a rule with no
 		# in the logic on the backend...?
 	}
 	
-	field FirstName = < # should the keyword be "field" or just "type"? The <> already denote this is a 'field' type
+	field FirstName = < # should the keyword be "field" or just "type"? The <> already denote this is a 'field' type -- I guess that depends on if schemas can be types or must be fields
 		rule: MinLength(2)
 	>
+
+In Form Capacitor 2, everything is a "field". An entire form is just a complex field. A "DateTime" must consist of two sub-fields: "Date and Time". A "Scheduling Instruction" (see examles) is a complex field with several subfields. Therefore the schema root should also be a field, and we should not allow objects, or union types at the root (above examples should be invalid).
+
+But if everything is a field, and each field has its own name and error message, are we not doubling-down on the errors?
+
+	schema <
+		name: "Scheduling Instructions",
+		message: "The form is invalid",
+		rule: <
+			type: { # the type has to be a type. in this case it's an object, and we are defining it inline
+				instructions: <
+					# how *do* we define this as an array..!?!
+					# it should be an array of Instructions, but Instruction is not a type, it's a field
+					type: []
+				>
+			}
+		>
+	>
+
+TypeScript and GraphQL differ in how they document arrays. In GraphQL `[Int]` is an arbitrary-length array.
+In TypeScript `[number]` is a tuple with 1 element, which is a number, and `number[]` is an array of numbers. They
+also allow `Array<number>` (see https://www.typescriptlang.org/docs/handbook/basic-types.html#array). I think we
+should only allow one syntax. And `(number | string)[]`. I think we should go with the last one, since we want to
+save angle brackets for "fields".
+
+Operators:
+
+	|    or
+	&    and
+	^    -xor-[oneOf] (one or the other but not both -- can *sort of* translate to JsonSchema via OneOf?? -- what is a^b^c? Is that "one of" a, b, or c but not two or more? Or... (a^b)^c?
+							which would mean if a and b are the same truthiness then c must be true, but if they differ then a^b is true, so c must be false... so
+							a^b^c^d^... is basically like checking if an odd number are truthy
+							but maybe ^ *shouldn't* be a binary operator in our language and if you want it to be, you can add parens!!
+							ergo, a^b^c means "one of" and (a^b)^c acts like traditional xor. So... ^ is just the "one of" operator then.
+							
+Our DSL should *require* parens when mixing operators so that order of operations is never a concern!!
