@@ -1,11 +1,11 @@
 {
   "plugins": [
-    "@babel/plugin-proposal-object-rest-spread",
-    "@babel/plugin-syntax-jsx",
-    "@babel/plugin-transform-react-jsx",
-    "@babel/plugin-transform-react-display-name",
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-function-bind"
+    "transform-object-rest-spread",
+    "syntax-jsx",
+    "transform-react-jsx",
+    "transform-react-display-name",
+    "transform-class-properties",
+    "transform-function-bind"
   ],
   "presets": [
     [
@@ -21,9 +21,7 @@
   "env": {
     "development": {
       "plugins": [
-        "react-hot-loader/babel",
-        "@babel/plugin-transform-react-jsx-self",
-        "@babel/plugin-transform-react-jsx-source"
+        "react-hot-loader/babel"
       ]
     }
   }
