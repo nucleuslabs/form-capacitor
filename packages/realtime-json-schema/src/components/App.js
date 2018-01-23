@@ -1,7 +1,5 @@
-import {Fragment} from 'react';
 import styled from 'styled-components';
-import Editor from './Editor';
-import Monaco from './Monaco';
+import MonacoEditor from './MonacoEditor';
 
 const Grid = styled.div`
     display: grid;
@@ -18,7 +16,7 @@ export default function App() {
     return (
         <Grid>
             <div>
-                <Monaco/>
+                <MonacoEditor/>
             </div>
             <div>b</div>
         </Grid>
