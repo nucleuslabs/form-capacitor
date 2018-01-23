@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@timkendrick/monaco-editor@^0.0.7":
+  version "0.0.7"
+  resolved "http://code.nucleuslabs.com:4873/@timkendrick%2fmonaco-editor/-/monaco-editor-0.0.7.tgz#3b8b5017da89c7ba3548dc69febbf1e9094d2210"
+
 abbrev@1:
   version "1.1.1"
   resolved "http://code.nucleuslabs.com:4873/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -2895,6 +2899,10 @@ mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.1, mkdirp@~0.5.0:
   resolved "http://code.nucleuslabs.com:4873/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
+
+monaco-editor@^0.10.1:
+  version "0.10.1"
+  resolved "http://code.nucleuslabs.com:4873/monaco-editor/-/monaco-editor-0.10.1.tgz#8c96c4f15b6b5258bf92cbde93cad8a7e3007e14"
 
 ms@2.0.0:
   version "2.0.0"
