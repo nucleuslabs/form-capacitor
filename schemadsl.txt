@@ -397,3 +397,63 @@ Braces: ({[<
 [ array
 ( schema
 < extends
+
+TODO: syntax for optional.... https://stackoverflow.com/a/37166319/65387
+	https://www.typescriptlang.org/docs/handbook/interfaces.html#optional-properties
+	
+i.e. we'll put a ? after the property name
+
+and ? before the type makes it a nullable type (maybe.... | null works just as easily)
+
+==============================================================================
+
+schema SchedulingInstructions (
+	name "Scheduling Instructions"
+	default {
+        instructions: []
+        specialNote: ""
+    }
+    type {
+        instructions (
+            name "Instructions"
+            type array<
+                minLength 1
+                items {
+                    typeId (
+                        name "Appointment Type"
+                        type Id<
+                            message "Invalid Appointment Type" # Syntax for {..name} and {minimum} and {maximum}?
+                        >
+                    )
+                    teamId (
+                        name "Team"
+                        type Id
+                    )
+                    disciplineId (
+                        name "Discipline"
+                        type Id
+                    )
+                    prefClinicianId? (
+                        name "Pref. Clinician"
+                        type Id | null
+                    )
+                    prefTime? (
+                        name "Pref. Time"
+                        type (null | 30 | 60 | 90 | 120 | 150 | 180)<
+                            message "Invalid time"
+                        >
+                    )
+                }
+            >
+        )
+    }
+)
+
+type Id = number<
+	minimum: 1
+	maximum: 4294967295
+	message "Invalid option"
+>
+
+type OptId = Id | null
+
