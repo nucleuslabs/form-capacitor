@@ -1,0 +1,30 @@
+{
+  "plugins": [
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-syntax-jsx",
+    "@babel/plugin-transform-react-jsx",
+    "@babel/plugin-transform-react-display-name",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-function-bind"
+  ],
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "browsers": "last 2 chrome versions"
+        }
+      }
+    ]
+  ],
+  "compact": false,
+  "env": {
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel",
+        "@babel/plugin-transform-react-jsx-self",
+        "@babel/plugin-transform-react-jsx-source"
+      ]
+    }
+  }
+}

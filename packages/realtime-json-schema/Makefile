@@ -1,4 +1,4 @@
 .SUFFIXES:
 
 all:
-	npx webpack-dev-server
+	NODE_ENV=development npx webpack-dev-server

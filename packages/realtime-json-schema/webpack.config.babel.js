@@ -1,12 +1,14 @@
 // import Path from 'path';
 import {ProvidePlugin,IgnorePlugin} from 'webpack';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 const src = `${__dirname}/src`;
 
 export default {
     context: `${__dirname}/src`,
-    entry: `${__dirname}/src/index.js`,
+    entry: [
+        'react-hot-loader/patch',
+        `${__dirname}/src/index.js`
+    ],
     output: {
         path: `${__dirname}/src/public`,
         filename: 'bundle.js',
@@ -37,15 +39,6 @@ export default {
                     limit: 1024 * 2,
                     noquotes: true,
                 }
-            },
-            {
-                test: /\.less$/,
-                include: src,
-                use: [
-                    'style-loader',
-                    {loader: 'css-loader', options: {modules: true}},
-                    {loader: 'less-loader', options: {strictMath: true, strictUnits: true}},
-                ]
             }
         ]
     },
@@ -59,7 +52,6 @@ export default {
         new ProvidePlugin({
             React: 'react',
         }),
-        new ExtractTextPlugin('style.css'),
     ],
     devServer: {
         host: '0.0.0.0',
