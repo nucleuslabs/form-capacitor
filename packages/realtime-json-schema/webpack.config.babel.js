@@ -1,13 +1,13 @@
 // import Path from 'path';
-import {ProvidePlugin,IgnorePlugin} from 'webpack';
+import {ProvidePlugin,IgnorePlugin,NamedModulesPlugin,HotModuleReplacementPlugin} from 'webpack';
 
 const src = `${__dirname}/src`;
 
 export default {
     context: `${__dirname}/src`,
     entry: [
-        'react-hot-loader/patch',
-        `${__dirname}/src/index.js`
+        // 'react-hot-loader/patch',
+        `${__dirname}/src/index.js`,
     ],
     output: {
         path: `${__dirname}/src/public`,
@@ -52,6 +52,8 @@ export default {
         new ProvidePlugin({
             React: 'react',
         }),
+        new NamedModulesPlugin,
+        // new HotModuleReplacementPlugin,
     ],
     devServer: {
         host: '0.0.0.0',
