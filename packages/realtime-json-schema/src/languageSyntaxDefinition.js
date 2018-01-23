@@ -13,6 +13,18 @@ export default {
         'true',
         'false',
         'null',
+        
+        'minimum',
+        'maximum',
+        'minLength',
+        'maxLength',
+        'message',
+
+        'string',
+        'number',
+        'object',
+        'array',
+        'boolean'
     ],
 
     builtins: [
@@ -56,7 +68,7 @@ export default {
 
             // delimiters and operators
             [/[{}()\[\]<>]/, '@brackets'],
-            [/[;,.]/, 'delimiter'],
+            [/[,]/, 'delimiter'],
             [/@symbols/, { cases: {'@operators': 'operator',
                     '@default': '' }}],
 
@@ -77,16 +89,16 @@ export default {
 
         whitespace: [
             [/[ \t\r\n]+/, 'white'],
-            [/\/\*/,       'comment', '@comment' ],
-            [/\/\/.*$/,    'comment'],
+            // [/\/\*/,       'comment', '@comment' ],
+            [/#.*$/,    'comment'],
         ],
 
         comment: [
-            [/[^\/*]+/, 'comment' ],
+            // [/[^\/*]+/, 'comment' ],
             // [/\/\*/, 'comment', '@push' ],    // nested comment not allowed :-(
-            [/\/\*/,    'comment.invalid' ],
-            ["\\*/",    'comment', '@pop'  ],
-            [/[\/*]/,   'comment' ]
+            // [/\/\*/,    'comment.invalid' ],
+            // ["\\*/",    'comment', '@pop'  ],
+            // [/[\/*]/,   'comment' ]
         ],
 
         string: [
