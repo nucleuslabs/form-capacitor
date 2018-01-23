@@ -39,6 +39,10 @@ export default {
                     limit: 1024 * 2,
                     noquotes: true,
                 }
+            },
+            {
+                test: /\.pegjs$/,
+                loader: 'pegjs-loader',
             }
         ]
     },
@@ -55,6 +59,9 @@ export default {
         new NamedModulesPlugin,
         // new HotModuleReplacementPlugin,
     ],
+    resolveLoader: {
+        modules: ['node_modules', `${__dirname}/loaders`],
+    },
     devServer: {
         host: '0.0.0.0',
         disableHostCheck: true,

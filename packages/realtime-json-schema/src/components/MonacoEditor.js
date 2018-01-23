@@ -12,34 +12,44 @@ const Container = styled.div`
 
 const languageId = 'jsonSchemaDSL';
 monaco.languages.register({id: languageId});
-monaco.languages.setMonarchTokensProvider(languageId,languageDef);
+monaco.languages.setMonarchTokensProvider(languageId, languageDef);
 
 // https://microsoft.github.io/monaco-editor/monarch.html
 
 export default class MonacoEditor extends React.Component {
-    
+
     componentDidMount() {
+        const value = localStorage.getItem('editorValue');
         this.editor = monaco.editor.create(this.el, {
-            value: localStorage.getItem('editorValue'),
+            value,
             minimap: {
                 enabled: false
             },
             language: languageId,
             folding: false
         });
+        if(this.props.onChange) {
+            // FIXME: we shouldn't call the onChange event immediately but...screw it.
+            this.props.onChange.call(this.editor, {value});
+        }
         this.editor.onDidChangeModelContent(ev => {
-           localStorage.setItem('editorValue',this.editor.getValue());
+            const value = this.editor.getValue();
+            localStorage.setItem('editorValue', value);
+            if(this.props.onChange) {
+                this.props.onChange.call(this.editor, {...ev, value});
+            }
         });
         this.unsubResize = window::addEventListener('optimizedResize', () => {
             this.editor.layout();
         })
     }
-    
+
     componentWillUnmount() {
         this.unsubResize();
+        this.editor.dispose();
     }
-    
+
     render() {
-        return <Container innerRef={n=>this.el = n}/>
+        return <Container innerRef={n => this.el = n}/>
     }
 }
