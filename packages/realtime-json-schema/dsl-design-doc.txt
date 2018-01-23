@@ -24,6 +24,9 @@ Inspiration:
 - https://pegjs.org/online
 - https://www.json.org/
 
+Libs:
+- https://astexplorer.net/
+
 GraphQL:
 
 	type Character {
@@ -433,10 +436,7 @@ schema SchedulingInstructions (
                         name "Discipline"
                         type Id
                     )
-                    prefClinicianId? (
-                        name "Pref. Clinician"
-                        type Id | null
-                    )
+                    prefClinicianId? PrefClinician
                     prefTime? (
                         name "Pref. Time"
                         type (null | 30 | 60 | 90 | 120 | 150 | 180)<
@@ -457,3 +457,28 @@ type Id = number<
 
 type OptId = Id | null
 
+schema PrefClinician (
+    name "Pref. Clinician"
+    type Id | null
+)
+
+type CreditCard = string<
+	pattern /\d+/
+	minLength 13
+	maxLength 16
+>
+
+type ValidTimes = null | 30 | 60 | 90 | 120 | 150 | 180
+type ValidTimesError = ValidTimes<
+	message "Please select a valid time"
+>
+
+==============================================================================
+
+TODO: real-time/online validations vs onBlur validations?
+^- maybe an extra property called `runType`?
+^-- but how would we bake "runType" into the CC type above..?
+
+Union type with all constants as options should have a nice default error message.
+
+TODO: run-time $variables
