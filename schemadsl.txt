@@ -193,3 +193,207 @@ Operators:
 							ergo, a^b^c means "one of" and (a^b)^c acts like traditional xor. So... ^ is just the "one of" operator then.
 							
 Our DSL should *require* parens when mixing operators so that order of operations is never a concern!!
+
+
+https://spacetelescope.github.io/understanding-json-schema/reference/array.html
+
+	schema <
+		name: "Scheduling Instructions",
+		message: "The form is invalid",
+		rule: <
+			type: "object",
+			properties {
+				instructions <
+					name "Instructions"
+					type "array"
+					items <
+						type "object"
+						properties {
+							typeId <
+								type "number"
+								minimum 1
+								multipleOf 1
+							>
+						}
+					>
+				>
+			}
+		>
+	>
+	
+	fragment Id <
+		type "number"
+		minimum 1
+		maximum 4294967295
+		multipleOf 1
+	>
+
+FEATURE: run-time values. allow supplying list of valid options for enums... either when .validate() is called, or when 'building' the schema.
+
+Maybe we should do naming like how PegJS does it? Inline after the type...
+
+	Integer "integer"
+	  = _ [0-9]+ { return parseInt(text(), 10); }
+
+
+
+	schema "Scheduling Instructions" {
+		type object
+		message "This form is invalid"
+		properties {
+			instructions "Instructions" {
+				
+			}
+		}
+		
+	}
+
+Should we use "!" to mean required like GraphQL? Should the default be required or optional? Or maybe "*" like is common with forms?
+
+Every schema needs a type. It can have "multiple types" (really just a union type, aka anyOf)
+
+	schema: object {
+		name: "Scheduling Instructions"
+		properties: {
+			instructions: array {
+				minLength: 1
+				items: object {
+					properties: {
+						typeId: Id {
+							name: "Appointment Type"
+						}
+						teamId: Id {
+							name: "Team"
+						}
+						disciplineId: Id {
+							name: "Discipline"
+						}
+						prefClinicianId: Id {
+							name: "Pref Clinician"
+						}
+						childRequired: Boolean <
+							name: "Child Req'd"
+						>
+					}
+				}
+			}
+		}
+	}
+	
+	Id: number {
+		minimum: 1
+		maximum: 4294967295
+	}
+	
+Can't use {} for both "name" and "minimum"...
+
+schema/field properties:
+- name
+- description
+- default
+- formatter
+
+type properties:
+- minimum
+- maximum
+- minLength
+- properties
+- ...
+
+	schema SchedulingInstructions {
+		name: "Scheduling Instructions"
+		default: {
+			instructions: []
+			specialNote: ""
+		}
+		type: object<
+			properties: {
+				instructions: {
+					type: array<
+						minLength: 1
+						items: object<
+							properties: {
+								typeId: {
+									name: "Appointment Type"
+									type: Id
+								}
+								teamId: Team
+							}
+						>
+					>
+				}
+			}
+		>
+	}
+	
+	type Id = number<
+		minimum: 1
+		maximum: 4294967295
+	>
+	
+	schema Team {
+		name: "Team"
+		type: Id
+	}
+	
+	schema Instruction {
+		type: object<
+			properties: {
+				typeId: {
+					name: "Appointment Type"
+					type: Id
+				}
+				teamId: Team
+			}
+		>
+	}
+	
+
+Flow uses {| blah |} for [exact] type definitions...
+	https://github.com/graphql/graphql-js/blob/bc33f2e5382f454f8576e23e9a604c929d21e013/src/utilities/extendSchema.js#L36
+Exact object types: https://flow.org/en/docs/types/objects/#toc-exact-object-types
+
+Alternatively... for objects, maybe we *do* just want to launch right into their "properties" and use some other syntax for defining meta-data..?
+
+According to JSON schema (https://spacetelescope.github.io/understanding-json-schema/reference/object.html), the valid 'options' for an object are:
+- properties
+- required
+- minProperties
+- maxProperties
+- dependencies
+- patternProperties
+- additionalProperties <-- similar to TypeScript's "index signature"
+	*BUT* we're only supporting JSON types, which means the keys can only be strings (not Symbols), however, we may want to document the type (like JsonSchema)... so maybe we should do `*: string`
+
+We could use {} as a shorthand for "object with properties"
+But if {} exclusively means "object" then we need a different token for schemas... so here we go again..
+
+Actually, the "name" can kinda be like a Python doc-string (GraphQL also switched to using strings!): http://www.pythonforbeginners.com/basics/python-docstrings Although they use that for the description, ours is more of a title/name that'll be used in the error messages.. Hmmm...
+
+But we were using <> to be an inline extension...
+
+	schema SchedulingInstructions (
+		name "Scheduling Instructions"
+		default {
+			instructions: []
+			specialNote: ""
+		}
+		type { # type is an object with the following properties. this is shorthand syntax for `type object<properties{`
+			instructions (
+				name "Instructions"
+				type {
+					typeId {
+						name "Appointment Type"
+						type Id
+					}
+				}<minLength 1>[]
+			)
+		}
+	)
+	
+Braces: ({[<
+
+{ object
+[ array
+( schema
+< extends
