@@ -1,0 +1,62 @@
+schema SchedulingInstructions (
+	name "Scheduling Instructions"
+	default {
+        instructions: []
+        specialNote: ""
+    }
+    type {
+        instructions (
+            name "Instructions"
+            type array<
+                minLength 1
+                items {
+                    typeId (
+                        name "Appointment Type"
+                        type Id<
+                            message "Invalid Appointment Type" # Syntax for {..name} and {minimum} and {maximum}?
+                        >
+                    )
+                    teamId (
+                        name "Team"
+                        type Id
+                    )
+                    disciplineId (
+                        name "Discipline"
+                        type Id
+                    ) 
+                    prefClinicianId? PrefClinician
+                    prefTime? (
+                        name "Pref. Time"
+                        type (null | 30 | 60 | 90 | 120 | 150 | 180)<
+                            message "Invalid time"
+                        >
+                    )
+                }
+            >
+        )
+    }
+)
+
+type Id = number<
+	minimum: 1
+	maximum: 4294967295
+	message "Invalid option"
+>
+
+type OptId = Id | null
+
+schema PrefClinician (
+    name "Pref. Clinician"
+    type Id | null
+)
+
+type CreditCard = string<
+	pattern /\d+/
+	minLength 13
+	maxLength 16
+>
+
+type ValidTimes = null | 30 | 60 | 90 | 120 | 150 | 180
+type ValidTimesError = ValidTimes<
+	message "Please select a valid time"
+>

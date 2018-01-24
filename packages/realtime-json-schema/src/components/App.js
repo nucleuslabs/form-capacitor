@@ -10,7 +10,7 @@ const Grid = styled.div`
     left: 0;
     bottom: 0;
     right: 0;
-    background-color: black;
+    background-color: #323230;
     grid-gap: 2px;
 `
 
@@ -24,16 +24,29 @@ const EditorContainer = styled.div`
 
 
 const ResultContainer = styled.div`
-    padding: 10px;
-    background-color: white;
+    padding: 16px;
+   background-color: #F6F8FA;
+    overflow-y: auto;
+      color: #24292e;
+`
+
+const AstContainer = styled.div`
+    font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+    white-space: pre-wrap;
+    line-height: 18px;
+    letter-spacing: 0;
+    font-size: 12px;
+    font-weight: normal;
+    color: #24292e;
+
 `
 
 export default class App extends React.Component {
     
-    state = {error: null}
+    state = {error: null, ast: null}
     
     render() {
-        const {error} = this.state;
+        const {error,ast} = this.state;
         
         return (
             <Grid>
@@ -45,7 +58,7 @@ export default class App extends React.Component {
                         <p><strong>{error.name}:</strong> {error.message}</p>
                         {error.location ? <p>Line {error.location.start.line}, column {error.location.start.column}</p> : null}
                         </ErrorBlock> 
-                    : null}</ResultContainer>
+                    : <AstContainer>{JSON.stringify(ast,null,2)}</AstContainer>}</ResultContainer>
             </Grid>
         )
     }
@@ -53,7 +66,7 @@ export default class App extends React.Component {
     onChange = ev => {
         try {
             const ast = parser.parse(ev.value);
-            this.setState({error:null});
+            this.setState({error:null,ast});
         } catch(error) {
             console.log(error);
             this.setState({error});

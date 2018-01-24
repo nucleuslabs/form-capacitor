@@ -1,63 +1,48 @@
 // https://github.com/pegjs/pegjs/blob/master/examples/javascript.pegjs
+// https://bitbucket.org/mnpenner/async-lang/src/6e6e69119eb22cca4a477ae7483a8043dbf51673/lang/async/grammar.pegjs
+// https://bitbucket.org/mnpenner/async-lang/src/6e6e69119eb22cca4a477ae7483a8043dbf51673/lang/pql/grammar.pegjs
 
 {
-  var TYPES_TO_PROPERTY_NAMES = {
-    CallExpression:   "callee",
-    MemberExpression: "object",
-  };
-
-  function filledArray(count, value) {
-    return Array.apply(null, new Array(count))
-      .map(function() { return value; });
-  }
-
-  function extractOptional(optional, index) {
-    return optional ? optional[index] : null;
-  }
-
-  function extractList(list, index) {
-    return list.map(function(element) { return element[index]; });
-  }
-
-  function buildList(head, tail, index) {
-    return [head].concat(extractList(tail, index));
-  }
-
-  function buildBinaryExpression(head, tail) {
-    return tail.reduce(function(result, element) {
-      return {
-        type: "BinaryExpression",
-        operator: element[1],
-        left: result,
-        right: element[3]
-      };
-    }, head);
-  }
-
-  function buildLogicalExpression(head, tail) {
-    return tail.reduce(function(result, element) {
-      return {
-        type: "LogicalExpression",
-        operator: element[1],
-        left: result,
-        right: element[3]
-      };
-    }, head);
-  }
-
-  function optionalList(value) {
-    return value !== null ? value : [];
-  }
+	function node(type, body) {
+		return {type, body, /*loc: location()*/};
+	}
+	
+	function lastColumn(list) {
+	    return list.map(e => e[e.length-1]);
+	}
+	
+	function list(head, tail) {
+		return [head, ...lastColumn(tail)];
+	}
+}
+  
+Program = _ a:Schema b:(_ Schema)* _ {
+	return list(a,b)
 }
 
-Start
-  = __ program:Program __ { return program; }
-  
-Program = Schema
+Schema = "schema" _ id:Identifier _ "(" _ definition:SchemaDef _ ")" {
+	return node('schema', {name: id.name, definition})
+}
 
-Schema = "schema" _ Identifier _ "(" _ SchemaDef _ ")"
+SchemaDef = a:SchemaLine b:(_ SchemaLine)* {
+	return list(a,b)
+}
 
-SchemaDef = ""
+SchemaLine = NameDef / TypeDef
+
+NameDef = "name" _ str:StringLiteral {
+	return node('name',str.value)
+}
+
+TypeDef = "type" _ schema:Type {
+	return node('type', schema)
+}
+
+Type = BasicType / InlineType
+
+BasicType = "String" / "Number" / "Object" / "Array" / "Boolean"
+
+InlineType = ObjectLiteral
 
 SourceCharacter
   = .
@@ -100,7 +85,7 @@ IdentifierName "identifier"
 
 IdentifierStart
   = UnicodeLetter
-  / "$"
+  // "$"
   / "_"
   / "\\" sequence:UnicodeEscapeSequence { return sequence; }
 
@@ -414,25 +399,39 @@ WithToken       = "with"       !IdentifierPart
 
 // Skipped
 
-__
-  = (WhiteSpace / LineTerminatorSequence / Comment)*
-
 _
+  = (WhiteSpace / LineTerminatorSequence / Comment)* {
+  return node('whitespace')
+}
+
+WS
   = WhiteSpace*
 
 // Automatic Semicolon Insertion
 
 EOS
-  = __ ";"
-  / _ SingleLineComment? LineTerminatorSequence
-  / _ &"}"
-  / __ EOF
+  = _ ";"
+  / WS SingleLineComment? LineTerminatorSequence
+  / WS &"}"
+  / _ EOF
 
 EOF
   = !.
 
-// ----- A.2 Number Conversions -----
+EmptyObject = "{" _ "}" {
+	return node('ObjectLiteral', [])
+}
 
-// Irrelevant.
+PropertyNameAndValueList = a:PropertyAssignment b:(_ "," _ PropertyAssignment)* (_ "," _)? { return list(a,b) }
 
-// ----- A
+PropertyAssignment = name: PropertyName _ ":" _ { return {name,value:null} }
+
+PropertyName = IdentifierName / StringLiteral / NumericLiteral
+
+ObjectLiteral 
+	= EmptyObject
+	/ "{" _ properties:PropertyNameAndValueList _ "}" { return node('ObjectLiteral',{properties})}
+
+//ObjectLiteral
+//  = "{" _ "}" { return node('ObjectLiteral', properties: []); }
+ 
