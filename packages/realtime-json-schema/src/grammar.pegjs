@@ -47,7 +47,7 @@ ObjectSchema = "{" _ properties:PropertyNameAndSchemaList _ "}" {
                		}
                		return literal(o)
                	}
-               	
+
 SchemaValueSeparator
 	=  _
 
@@ -190,6 +190,7 @@ Literal
   / StringLiteral
   / RegularExpressionLiteral
   / ObjectLiteral
+  / ArrayLiteral
 
 NullLiteral
   = NullToken { return literal(null) }
@@ -446,22 +447,25 @@ EOS
 EOF
   = !.
 
-EmptyObject = "{" _ "}" {
-	return literal(Object.create(null))
-}
-
 PropertySeparator
 	= _ "," _ 
 	/ WhiteComment LineTerminatorSequence _
 
+ArraySeparator
+	= _ "," _ / _
+
 PropertyNameAndValueList = a:PropertyAssignment b:(PropertySeparator PropertyAssignment)* (_ "," )? { return list(a,b) }
+
+ValueList = a:Literal b:(ArraySeparator Literal)* (_ "," )? { return list(a,b) }
 
 PropertyAssignment = key: PropertyName PropertyValueSeparator value:Literal { return {key,value} }
 
 PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.body } / x:NumericLiteral { return String(x.body) }
 
 ObjectLiteral 
-	= EmptyObject
+	= "{" _ "}" {
+                	return literal(Object.create(null))
+                }
 	/ "{" _ properties:PropertyNameAndValueList _ "}" { 
 		let o = Object.create(null);
 		//console.log('properties',properties);
@@ -469,4 +473,12 @@ ObjectLiteral
 			o[p.key] = p.value;
 		}
 		return literal(o)
+	}
+
+ArrayLiteral 
+	= "[" _ "]" {
+                	return literal([])
+                }
+	/ "[" _ values:ValueList _ "]" { 
+		return literal(values)
 	}

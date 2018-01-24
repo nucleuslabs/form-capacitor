@@ -24,10 +24,10 @@ const EditorContainer = styled.div`
 
 
 const ResultContainer = styled.div`
-    padding: 16px;
-   background-color: #F6F8FA;
+    padding: 10px;
+    background-color: #F6F8FA;
     overflow-y: auto;
-      color: #24292e;
+    color: #24292e;
 `
 
 const AstContainer = styled.div`
@@ -38,7 +38,6 @@ const AstContainer = styled.div`
     font-size: 12px;
     font-weight: normal;
     color: #24292e;
-
 `
 
 export default class App extends React.Component {
