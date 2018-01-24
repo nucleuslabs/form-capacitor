@@ -28,10 +28,14 @@ SchemaDef = a:SchemaLine b:(_ SchemaLine)* {
 	return list(a,b)
 }
 
-SchemaLine = NameDef / TypeDef
+SchemaLine = NameDef / TypeDef / DefaultDef
 
 NameDef = "name" _ str:StringLiteral {
 	return node('name',str.value)
+}
+
+DefaultDef = "default" _ schema:Type {
+	return node('default', schema)
 }
 
 TypeDef = "type" _ schema:Type {
@@ -164,6 +168,10 @@ Literal
   / NumericLiteral
   / StringLiteral
   / RegularExpressionLiteral
+
+PrimaryExpression
+	= Literal
+	/ ObjectLiteral
 
 NullLiteral
   = NullToken { return { type: "Literal", value: null }; }
@@ -424,9 +432,9 @@ EmptyObject = "{" _ "}" {
 
 PropertyNameAndValueList = a:PropertyAssignment b:(_ "," _ PropertyAssignment)* (_ "," _)? { return list(a,b) }
 
-PropertyAssignment = name: PropertyName _ ":" _ { return {name,value:null} }
+PropertyAssignment = name: PropertyName _ ":" _ value:PrimaryExpression { return {name,value} }
 
-PropertyName = IdentifierName / StringLiteral / NumericLiteral
+PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.value } / x:NumericLiteral { return String(x.value) }
 
 ObjectLiteral 
 	= EmptyObject
