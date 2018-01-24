@@ -49,8 +49,7 @@ ObjectSchema = "{" _ properties:PropertyNameAndSchemaList _ "}" {
                	}
                	
 SchemaValueSeparator
-	= PropertyValueSeparator
-	/ _
+	=  _
 
 PropertyValueSeparator = _ ":" _
 	
