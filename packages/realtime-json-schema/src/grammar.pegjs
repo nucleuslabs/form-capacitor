@@ -24,33 +24,51 @@ Program = _ a:Schema b:(_ Schema)* _ {
 	return list(a,b)
 }
 
-Schema = "schema" _ id:Identifier _ "(" _ definition:SchemaDef _ ")" {
+Schema = "schema" _ id:Identifier _ definition:SchemaDef {
 	return node('schema', {name: id.name, definition})
 }
 
-SchemaDef = a:SchemaLine b:(PropertySeparator SchemaLine)* {
-	return list(a,b)
+SchemaDef 
+	= "(" _ x:SchemaNameAndValueList _ ")" { return x }
+
+SchemaNameAndValueList = a:SchemaAssignment b:(PropertySeparator SchemaAssignment)* (_ ",")? { return list(a,b) }
+
+SchemaAssignment = NameDef / TypeDef / DefaultDef
+
+PropertyNameAndSchemaList = a:SchemaPropertyAssignment b:(PropertySeparator SchemaPropertyAssignment)* (_ "," )? { return list(a,b) }
+
+SchemaPropertyAssignment = key: PropertyName PropertyValueSeparator value:SchemaDef { return {key,value} }
+
+ObjectSchema = "{" _ properties:PropertyNameAndSchemaList _ "}" { 
+               		let o = Object.create(null);
+               		//console.log('properties',properties);
+               		for(let p of properties) {
+               			o[p.key] = p.value;
+               		}
+               		return literal(o)
+               	}
+               	
+SchemaValueSeparator
+	= PropertyValueSeparator
+	/ _
+
+PropertyValueSeparator = _ ":" _
+	
+NameDef = "name" SchemaValueSeparator str:StringLiteral {
+	return node('name',str)
 }
 
-SchemaLine = NameDef / TypeDef / DefaultDef
-
-NameDef = "name" _ str:StringLiteral {
-	return node('name',str.value)
-}
-
-DefaultDef = "default" _ lit:Literal {
+DefaultDef = "default" SchemaValueSeparator lit:Literal {
 	return node('default', lit)
 }
 
-TypeDef = "type" _ schema:Type {
+TypeDef = "type" SchemaValueSeparator schema:Type {
 	return node('type', schema)
 }
 
-Type = BasicType / InlineType
+Type = BasicType / ObjectSchema
 
 BasicType = "String" / "Number" / "Object" / "Array" / "Boolean"
-
-InlineType = ObjectLiteral
 
 SourceCharacter
   = .
@@ -430,16 +448,16 @@ EOF
   = !.
 
 EmptyObject = "{" _ "}" {
-	return node('Literal', Object.create(null))
+	return literal(Object.create(null))
 }
 
 PropertySeparator
 	= _ "," _ 
 	/ WhiteComment LineTerminatorSequence _
 
-PropertyNameAndValueList = a:PropertyAssignment b:(PropertySeparator PropertyAssignment)* (_ "," _)? { return list(a,b) }
+PropertyNameAndValueList = a:PropertyAssignment b:(PropertySeparator PropertyAssignment)* (_ "," )? { return list(a,b) }
 
-PropertyAssignment = key: PropertyName _ ":" _ value:Literal { return {key,value} }
+PropertyAssignment = key: PropertyName PropertyValueSeparator value:Literal { return {key,value} }
 
 PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.body } / x:NumericLiteral { return String(x.body) }
 
