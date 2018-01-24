@@ -7,6 +7,10 @@
 		return {type, body, /*loc: location()*/};
 	}
 	
+	function literal(value) {
+		return node('literal',value);
+	}
+	
 	function lastColumn(list) {
 	    return list.map(e => e[e.length-1]);
 	}
@@ -24,7 +28,7 @@ Schema = "schema" _ id:Identifier _ "(" _ definition:SchemaDef _ ")" {
 	return node('schema', {name: id.name, definition})
 }
 
-SchemaDef = a:SchemaLine b:(_ SchemaLine)* {
+SchemaDef = a:SchemaLine b:(PropertySeparator SchemaLine)* {
 	return list(a,b)
 }
 
@@ -34,8 +38,8 @@ NameDef = "name" _ str:StringLiteral {
 	return node('name',str.value)
 }
 
-DefaultDef = "default" _ schema:Type {
-	return node('default', schema)
+DefaultDef = "default" _ lit:Literal {
+	return node('default', lit)
 }
 
 TypeDef = "type" _ schema:Type {
@@ -168,17 +172,14 @@ Literal
   / NumericLiteral
   / StringLiteral
   / RegularExpressionLiteral
-
-PrimaryExpression
-	= Literal
-	/ ObjectLiteral
+  / ObjectLiteral
 
 NullLiteral
-  = NullToken { return { type: "Literal", value: null }; }
+  = NullToken { return literal(null) }
 
 BooleanLiteral
-  = TrueToken  { return { type: "Literal", value: true  }; }
-  / FalseToken { return { type: "Literal", value: false }; }
+  = TrueToken  { return literal(true) }
+  / FalseToken { return literal(false) }
 
 // The "!(IdentifierStart / DecimalDigit)" predicate is not part of the official
 // grammar, it comes from text in section 7.8.3.
@@ -192,13 +193,13 @@ NumericLiteral "number"
 
 DecimalLiteral
   = DecimalIntegerLiteral "." DecimalDigit* ExponentPart? {
-      return { type: "Literal", value: parseFloat(text()) };
+      return literal(parseFloat(text()))
     }
   / "." DecimalDigit+ ExponentPart? {
-      return { type: "Literal", value: parseFloat(text()) };
+      return literal(parseFloat(text())) 
     }
   / DecimalIntegerLiteral ExponentPart? {
-      return { type: "Literal", value: parseFloat(text()) };
+      return literal(parseFloat(text()))
     }
 
 DecimalIntegerLiteral
@@ -222,7 +223,7 @@ SignedInteger
 
 HexIntegerLiteral
   = "0x"i digits:$HexDigit+ {
-      return { type: "Literal", value: parseInt(digits, 16) };
+      return literal(parseInt(digits, 16))
      }
 
 HexDigit
@@ -230,10 +231,10 @@ HexDigit
 
 StringLiteral "string"
   = '"' chars:DoubleStringCharacter* '"' {
-      return { type: "Literal", value: chars.join("") };
+      return literal(chars.join(""))
     }
   / "'" chars:SingleStringCharacter* "'" {
-      return { type: "Literal", value: chars.join("") };
+      return literal(chars.join("")) 
     }
 
 DoubleStringCharacter
@@ -412,6 +413,8 @@ _
   return node('whitespace')
 }
 
+WhiteComment = (WhiteSpace / Comment)*
+
 WS
   = WhiteSpace*
 
@@ -427,19 +430,26 @@ EOF
   = !.
 
 EmptyObject = "{" _ "}" {
-	return node('ObjectLiteral', [])
+	return node('Literal', Object.create(null))
 }
 
-PropertyNameAndValueList = a:PropertyAssignment b:(_ "," _ PropertyAssignment)* (_ "," _)? { return list(a,b) }
+PropertySeparator
+	= _ "," _ 
+	/ WhiteComment LineTerminatorSequence _
 
-PropertyAssignment = name: PropertyName _ ":" _ value:PrimaryExpression { return {name,value} }
+PropertyNameAndValueList = a:PropertyAssignment b:(PropertySeparator PropertyAssignment)* (_ "," _)? { return list(a,b) }
 
-PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.value } / x:NumericLiteral { return String(x.value) }
+PropertyAssignment = key: PropertyName _ ":" _ value:Literal { return {key,value} }
+
+PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.body } / x:NumericLiteral { return String(x.body) }
 
 ObjectLiteral 
 	= EmptyObject
-	/ "{" _ properties:PropertyNameAndValueList _ "}" { return node('ObjectLiteral',{properties})}
-
-//ObjectLiteral
-//  = "{" _ "}" { return node('ObjectLiteral', properties: []); }
- 
+	/ "{" _ properties:PropertyNameAndValueList _ "}" { 
+		let o = Object.create(null);
+		//console.log('properties',properties);
+		for(let p of properties) {
+			o[p.key] = p.value;
+		}
+		return literal(o)
+	}

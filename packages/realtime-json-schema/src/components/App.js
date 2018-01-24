@@ -68,7 +68,7 @@ export default class App extends React.Component {
             const ast = parser.parse(ev.value);
             this.setState({error:null,ast});
         } catch(error) {
-            console.log(error);
+            // console.log(error);
             this.setState({error});
         }
     }
