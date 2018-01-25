@@ -19,6 +19,8 @@ export default {
         'minLength',
         'maxLength',
         'message',
+        'items',
+        'properties',
 
         'string',
         'number',

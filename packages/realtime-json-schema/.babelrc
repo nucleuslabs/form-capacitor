@@ -1,5 +1,9 @@
 {
   "plugins": [
+    ["babel-plugin-styled-components", {
+      "displayName": false,
+      "minify": true
+    }],
     "transform-object-rest-spread",
     "syntax-jsx",
     "transform-react-jsx",
@@ -21,6 +25,10 @@
   "env": {
     "development": {
       "plugins": [
+        ["babel-plugin-styled-components", {
+          "displayName": true,
+          "minify": false
+        }],
 //        "react-hot-loader/babel",
         "transform-react-jsx-self",
         "transform-react-jsx-source"

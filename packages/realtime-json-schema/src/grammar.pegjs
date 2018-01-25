@@ -24,8 +24,8 @@ Program = _ a:Schema b:(_ Schema)* _ {
 	return list(a,b)
 }
 
-Schema = "schema" _ id:Identifier _ definition:SchemaDef {
-	return node('schema', {name: id.name, definition})
+Schema = "schema" _ id:(Identifier _)? definition:SchemaDef {
+	return node('schema', {name: id ? id[0].name : null, definition})
 }
 
 SchemaDef 
@@ -33,19 +33,25 @@ SchemaDef
 
 SchemaNameAndValueList = a:SchemaAssignment b:(PropertySeparator SchemaAssignment)* (_ ",")? { return list(a,b) }
 
-SchemaAssignment = NameDef / TypeDef / DefaultDef
+SchemaAssignment = SharedSchemaOptions / ArraySchemaOptions / ObjectSchemaOptions
+
+ObjectSchemaOptions = Schema_properties
+
+SharedSchemaOptions = NameDef / TypeDef / DefaultDef
 
 PropertyNameAndSchemaList = a:SchemaPropertyAssignment b:(PropertySeparator SchemaPropertyAssignment)* (_ "," )? { return list(a,b) }
 
 SchemaPropertyAssignment = key: PropertyName PropertyValueSeparator value:SchemaDef { return {key,value} }
 
-ObjectSchema = "{" _ properties:PropertyNameAndSchemaList _ "}" { 
+ObjectSchema 
+	= "{" _ "}" { return node('objectSchema',Object.create(null)) } 
+	/ "{" _ properties:PropertyNameAndSchemaList _ "}" { 
                		let o = Object.create(null);
                		//console.log('properties',properties);
                		for(let p of properties) {
                			o[p.key] = p.value;
                		}
-               		return literal(o)
+               		return node('objectSchema',{properties:o})
                	}
 
 SchemaValueSeparator
@@ -54,20 +60,40 @@ SchemaValueSeparator
 PropertyValueSeparator = _ ":" _
 	
 NameDef = "name" SchemaValueSeparator str:StringLiteral {
-	return node('name',str)
+	return node('schemaName',str)
 }
 
 DefaultDef = "default" SchemaValueSeparator lit:Literal {
-	return node('default', lit)
+	return node('schemaDefault', lit)
 }
 
-TypeDef = "type" SchemaValueSeparator schema:Type {
-	return node('type', schema)
+TypeDef = "type" SchemaValueSeparator x:TypeWithExt {
+	return x
+}
+
+Schema_properties = "properties" SchemaValueSeparator x:ObjectSchema {
+	return x
 }
 
 Type = BasicType / ObjectSchema
 
+TypeWithExt = base:Type ext:TypeExt? {
+	return node('schemaType',{base,ext})
+}
+
+TypeExt = "<" _ x:SchemaNameAndValueList _ ">" { return x }
+
 BasicType = "String" / "Number" / "Object" / "Array" / "Boolean"
+
+ArraySchemaOptions = Array_minLength / Array_items
+
+Array_minLength = "minLength" SchemaValueSeparator value:NumericLiteral {
+	return node('Array_minLength',value)
+}
+
+Array_items = "items" SchemaValueSeparator x:TypeWithExt {
+	return node('Array_items',x)
+}
 
 SourceCharacter
   = .

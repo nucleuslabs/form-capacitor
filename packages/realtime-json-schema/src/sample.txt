@@ -5,9 +5,10 @@ schema SchedulingInstructions (
         specialNote: ""
     }
     type {
-        instructions (
+        @minProperties 5
+        instructions: (
             name "Instructions"
-            type array<
+            type Array<
                 minLength 1
                 items {
                     typeId (
