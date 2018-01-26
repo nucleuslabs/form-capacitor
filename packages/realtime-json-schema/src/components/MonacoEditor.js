@@ -47,6 +47,10 @@ export default class MonacoEditor extends React.Component {
         })
     }
     
+    layout = () => {
+        this.editor.layout();
+    }
+    
     componentDidUpdate() {
         this.editor.layout();
     }

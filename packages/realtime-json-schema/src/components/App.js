@@ -13,6 +13,7 @@ const Grid = styled.div`
     bottom: 0;
     right: 0;
     background-color: #323230;
+    color: white;
     grid-gap: 2px;
     grid-template-areas:
         "pegjs-grammar dsl-schema"
@@ -29,6 +30,9 @@ const DslSchema = styled.div`
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
+    position: absolute;
+    width: 100%;
+    height: 100%;
 `
 
 const AjvSchema = styled.div`
@@ -68,26 +72,33 @@ const AstSchema = styled.div`
     `}
 `
 
+const EditorContainer = styled.div`
+    flex: 1;
+`
+
+
 const BuildMessage = styled.div`
-    flex: 0;
+    //height: 35px;
     font-family: sans-serif;
     font-size: 12px;
+    //display: grid;
+    //grid-template-columns: 1fr;
+    
 `
 
 const ErrorMessage = styled.div`
     background-color: orange;
     padding: 2px 5px;
+    color: white;
 `
 
 const SuccessMessage = styled.div`
     background-color: #c0ffc0;
     padding: 2px 5px;
+    color: black;
 `
 
 
-const EditorContainer = styled.div`
-    flex: 1;
-`
 
 export default class App extends React.Component {
     
@@ -104,7 +115,7 @@ export default class App extends React.Component {
                 
                 <DslSchema>
                     <EditorContainer>
-                        <MonacoEditor onChange={this.onChange}/>
+                        <MonacoEditor ref={e => this.editor=e} onChange={this.onChange}/>
                     </EditorContainer>
                     <BuildMessage>
                         
@@ -126,6 +137,10 @@ export default class App extends React.Component {
                 <Result>Valid</Result>
             </Grid>
         )
+    }
+    
+    componentDidUpdate() {
+        this.editor.layout();
     }
     
     onChange = ev => {
