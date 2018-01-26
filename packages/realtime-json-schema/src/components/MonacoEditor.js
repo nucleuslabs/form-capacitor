@@ -46,6 +46,10 @@ export default class MonacoEditor extends React.Component {
             this.editor.layout();
         })
     }
+    
+    componentDidUpdate() {
+        this.editor.layout();
+    }
 
     componentWillUnmount() {
         this.unsubResize();
