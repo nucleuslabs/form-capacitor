@@ -14,6 +14,7 @@ export default {
         'false',
         'null',
         
+        'title',
         'minimum',
         'maximum',
         'minLength',

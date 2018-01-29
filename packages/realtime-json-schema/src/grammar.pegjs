@@ -29,15 +29,22 @@ Schema = "schema" _ id:(Identifier _)? definition:SchemaDef {
 }
 
 SchemaDef 
-	= "(" _ x:SchemaNameAndValueList _ ")" { return x }
+	= "(" _ x:SchemaNameAndValueList _ ")" { return node('schemaDefinition',x) }
 
-SchemaNameAndValueList = a:SchemaAssignment b:(PropertySeparator SchemaAssignment)* (_ ",")? { return list(a,b) }
+SchemaNameAndValueList = a:SchemaAssignment b:(PropertySeparator SchemaAssignment)* (_ ",")? { 
+	let o = Object.create(null);
+	//console.log('properties',properties);
+	for(let p of list(a,b)) {
+		o[p.type] = p.body;
+	}
+	return o
+}
 
 SchemaAssignment = SharedSchemaOptions / ArraySchemaOptions / ObjectSchemaOptions
 
 ObjectSchemaOptions = Schema_properties
 
-SharedSchemaOptions = NameDef / TypeDef / DefaultDef
+SharedSchemaOptions = TitleDef / TypeDef / DefaultDef / DescriptionDef
 
 PropertyNameAndSchemaList = a:SchemaPropertyAssignment b:(PropertySeparator SchemaPropertyAssignment)* (_ "," )? { return list(a,b) }
 
@@ -59,12 +66,17 @@ SchemaValueSeparator
 
 PropertyValueSeparator = _ ":" _
 	
-NameDef = "name" SchemaValueSeparator str:StringLiteral {
-	return node('schemaName',str)
+TitleDef = "title" SchemaValueSeparator str:StringLiteral {
+	return node('title',str)
 }
 
+DescriptionDef = "description" SchemaValueSeparator str:StringLiteral {
+	return node('description',str)
+}
+
+
 DefaultDef = "default" SchemaValueSeparator lit:Literal {
-	return node('schemaDefault', lit)
+	return node('default', lit)
 }
 
 TypeDef = "type" SchemaValueSeparator x:TypeWithExt {
@@ -78,12 +90,16 @@ Schema_properties = "properties" SchemaValueSeparator x:ObjectSchema {
 Type = BasicType / ObjectSchema
 
 TypeWithExt = base:Type ext:TypeExt? {
-	return node('schemaType',{base,ext})
+	return node('type',{base,ext})
 }
 
-TypeExt = "<" _ x:SchemaNameAndValueList _ ">" { return x }
+TypeExt = "<" _ x:SchemaNameAndValueList _ ">" { return node('typeExt',x) }
 
-BasicType = "String" / "Number" / "Object" / "Array" / "Boolean"
+BasicTypes = "String" / "Number" / "Object" / "Array" / "Boolean"
+
+BasicType = x:BasicTypes {
+	return node('basicType',x)
+}
 
 ArraySchemaOptions = Array_minLength / Array_items
 
@@ -498,7 +514,7 @@ ObjectLiteral
 		for(let p of properties) {
 			o[p.key] = p.value;
 		}
-		return literal(o)
+		return node('objectLiteral',o)
 	}
 
 ArrayLiteral 
@@ -506,5 +522,5 @@ ArrayLiteral
                 	return literal([])
                 }
 	/ "[" _ values:ValueList _ "]" { 
-		return literal(values)
+		return node('arrayLiteral',values);
 	}

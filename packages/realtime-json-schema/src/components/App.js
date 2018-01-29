@@ -36,6 +36,14 @@ const DslSchema = styled.div`
     //height: 100%;
 `
 
+const FlexContainer = styled.div`
+ display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: 100%;
+    width: 100%;
+`
+
 const AjvSchema = styled.div`
     grid-area: ajv-schema;
       position: relative;
@@ -76,16 +84,12 @@ font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace
     font-size: 12px;
     font-weight: normal;
     overflow-y: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    flex: 1;
     
         ${p => p.error ? css`
 
         background-color:#F1E0E0;
-          color: #2e2529;
+          color: rgba(36,41,46,.5);
           cursor: not-allowed;
     ` : css`
           background-color: #F6F8FA;
@@ -139,61 +143,70 @@ const BoxName = styled.span`
 `
 
 export default class App extends React.Component {
-    
+
 
     constructor(props) {
         super(props);
         this.state = {
-            error: null, 
-            ast: null, 
-            ajv: null, 
+            astError: null,
+            ajvError: null,
+            ast: null,
+            ajv: null,
             parseTime: 0
         }
         this.editorDefaultValue = localStorage.getItem('editorValue');
     }
-    
+
     componentDidMount() {
         this.tryParse(this.editorDefaultValue);
     }
-    
+
     render() {
-        const {error,ast,parseTime,ajv} = this.state;
-        
+        const {astError, ajvError, ast, parseTime, ajv} = this.state;
+
         return (
             <Grid>
                 <Panel area="pegjs-grammar">
                     <BoxName>PegJS</BoxName>
                 </Panel>
-                
-                <DslSchema>
-                    <EditorContainer>
-                        <MonacoEditor ref={e => this.editor=e} defaultValue={this.editorDefaultValue} onChange={this.onChange}/>
-                    </EditorContainer>
-                    <StatusBar error={!!error}>
-                        {error ? (
-                            <ErrorMessage>
-                                <strong>
-                                    {!!error.location && <Fragment>[Ln {error.location.start.line}, Col {error.location.start.column}] </Fragment>}
-                                    {error.name}
-                                    {': '}
-                                </strong>
-                                {error.message}
-                            </ErrorMessage>
-                        ):(
-                            <SuccessMessage>
-                                Parsed in {parseTime.toPrecision(3)} ms
-                            </SuccessMessage>
-                        )}
-                    </StatusBar> 
-                </DslSchema>
-                
+
+                <Panel area="dsl-schema">
+                    <FlexContainer>
+                        <EditorContainer>
+                            <MonacoEditor ref={e => this.editor = e} defaultValue={this.editorDefaultValue} onChange={this.onChange}/>
+                        </EditorContainer>
+                        <StatusBar error={!!astError}>
+                            {astError ? (
+                                <ErrorMessage>
+                                    <strong>
+                                        {!!astError.location && <Fragment>[Ln {astError.location.start.line},
+                                            Col {astError.location.start.column}] </Fragment>}
+                                        {astError.name}
+                                        {': '}
+                                    </strong>
+                                    {astError.message}
+                                </ErrorMessage>
+                            ) : (
+                                <SuccessMessage>
+                                    Parsed in {parseTime.toPrecision(3)} ms
+                                </SuccessMessage>
+                            )}
+                        </StatusBar>
+                    </FlexContainer>
+                </Panel>
+
                 <Panel area="ast-schema">
-                    <JsonContainer error={!!error}>{JSON.stringify(ast,null,2)}</JsonContainer>
+                    <FlexContainer>
+                        <JsonContainer error={!!astError}>{JSON.stringify(ast, null, 2)}</JsonContainer>
+                    </FlexContainer>
                     <BoxName>AST</BoxName>
                 </Panel>
                 
                 <Panel area="ajv-schema">
-                    <JsonContainer>{JSON.stringify(ajv,null,2)}</JsonContainer>
+                    <FlexContainer>
+                        <JsonContainer error={!!astError}>{JSON.stringify(ajv, null, 2)}</JsonContainer>
+                        {!!ajvError && <StatusBar error>{String(ajvError)}</StatusBar>}
+                    </FlexContainer>
                     <BoxName>AJV</BoxName>
                 </Panel>
                 <Panel area="data">
@@ -205,24 +218,33 @@ export default class App extends React.Component {
             </Grid>
         )
     }
-    
+
     // componentDidUpdate() {
     //     this.editor.layout();
     // }
-    
+
     tryParse = value => {
+        let ast;
+        const start = performance.now();
         try {
-            const start = performance.now();
-            const ast = parser.parse(value);
-            const parseTime = performance.now() - start;
-            let ajv = ast2ajv(ast);
-            this.setState({error:null,ast,parseTime,ajv});
-        } catch(error) {
-            // console.log(error);
-            this.setState({error});
+            ast = parser.parse(value);
+        } catch(astError) {
+            this.setState({astError});
+            return;
         }
+        const parseTime = performance.now() - start;
+        this.setState({astError: null, ast, parseTime});
+
+        let ajv;
+        try {
+            ajv = ast2ajv(ast);
+        } catch(ajvError) {
+            this.setState({ajvError});
+            return;
+        }
+        this.setState({ajvError: null, ajv});
     }
-    
+
     onChange = ev => {
         localStorage.setItem('editorValue', ev.value);
         this.tryParse(ev.value);
