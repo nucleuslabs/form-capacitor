@@ -19,9 +19,8 @@ monaco.languages.setMonarchTokensProvider(languageId, languageDef);
 export default class MonacoEditor extends React.Component {
 
     componentDidMount() {
-        const value = localStorage.getItem('editorValue');
         this.editor = monaco.editor.create(this.el, {
-            value,
+            value: this.props.defaultValue,
             minimap: {
                 enabled: false
             },
@@ -30,19 +29,15 @@ export default class MonacoEditor extends React.Component {
             fontFamily: `"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace`,
             fontSize: '12px',
             lineHeight: '18px',
-            scrollBeyondLastLine: false
+            scrollBeyondLastLine: false,
+            theme: 'vs-dark',
         });
         if(this.props.onChange) {
-            // FIXME: we shouldn't call the onChange event immediately but...screw it.
-            this.props.onChange.call(this.editor, {value});
-        }
-        this.editor.onDidChangeModelContent(ev => {
-            const value = this.editor.getValue();
-            localStorage.setItem('editorValue', value);
-            if(this.props.onChange) {
+            this.editor.onDidChangeModelContent(ev => {
+                const value = this.editor.getValue();
                 this.props.onChange.call(this.editor, {...ev, value});
-            }
-        });
+            });
+        }
         this.unsubResize = window::addEventListener('optimizedResize', () => {
             this.editor.layout();
         })

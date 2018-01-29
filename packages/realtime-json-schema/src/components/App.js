@@ -2,6 +2,7 @@ import styled, {css} from 'styled-components';
 import MonacoEditor from './MonacoEditor';
 import parser from '../grammar.pegjs';
 import {Fragment} from 'react';
+import ast2ajv from '../ast2ajv';
 
 const Grid = styled.div`
     display: grid;
@@ -37,6 +38,8 @@ const DslSchema = styled.div`
 
 const AjvSchema = styled.div`
     grid-area: ajv-schema;
+      position: relative;
+     
 `
 
 const DataContainer = styled.div`
@@ -53,16 +56,34 @@ const ResultContainer = styled.div`
 
 const AstSchema = styled.div`
     grid-area: ast-schema;
-    font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+    
+    position: relative;
+ 
+`
+
+const Panel = styled.div`
+    grid-area: ${p => p.area};
+    
+    position: relative;
+ 
+`
+
+const JsonContainer = styled.div`
+font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
     white-space: pre-wrap;
     line-height: 18px;
     letter-spacing: 0;
     font-size: 12px;
     font-weight: normal;
     overflow-y: auto;
-  
-  
-    ${p => p.error ? css`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    
+        ${p => p.error ? css`
+
         background-color:#F1E0E0;
           color: #2e2529;
           cursor: not-allowed;
@@ -78,51 +99,81 @@ const EditorContainer = styled.div`
 `
 
 
-const BuildMessage = styled.div`
+const StatusBar = styled.div`
     //height: 35px;
-    font-family: sans-serif;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif;
     font-size: 12px;
     //display: grid;
     //grid-template-columns: 1fr;
+       padding: 2px 5px;
+       color: white;
+    ${p => p.error ? css`
+        background-color: #cc0005;
+    ` : css`
+        background-color: #007ACC;
+    `}
     
 `
 
-const ErrorMessage = styled.div`
-    background-color: orange;
-    padding: 2px 5px;
+const ErrorMessage = styled.span`
+
+`
+
+const SuccessMessage = styled.span`
+
+`
+
+const BoxName = styled.span`
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 50%;
+   transform: translateX(-50%);
+    background-color: #353534;
     color: white;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif;
+    font-size: 12px;
+    padding: 0 5px 2px 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 `
-
-const SuccessMessage = styled.div`
-    background-color: #c0ffc0;
-    padding: 2px 5px;
-    color: black;
-`
-
-
 
 export default class App extends React.Component {
     
-    state = {error: null, ast: null, parseTime: 0}
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            error: null, 
+            ast: null, 
+            ajv: null, 
+            parseTime: 0
+        }
+        this.editorDefaultValue = localStorage.getItem('editorValue');
+    }
+    
+    componentDidMount() {
+        this.tryParse(this.editorDefaultValue);
+    }
     
     render() {
-        const {error,ast,parseTime} = this.state;
+        const {error,ast,parseTime,ajv} = this.state;
         
         return (
             <Grid>
-                <PegJsGrammar>
-                    PegJS
-                </PegJsGrammar>
+                <Panel area="pegjs-grammar">
+                    <BoxName>PegJS</BoxName>
+                </Panel>
                 
                 <DslSchema>
                     <EditorContainer>
-                        <MonacoEditor ref={e => this.editor=e} onChange={this.onChange}/>
+                        <MonacoEditor ref={e => this.editor=e} defaultValue={this.editorDefaultValue} onChange={this.onChange}/>
                     </EditorContainer>
-                    <BuildMessage>
+                    <StatusBar error={!!error}>
                         {error ? (
                             <ErrorMessage>
                                 <strong>
-                                    {!!error.location && <Fragment>[{error.location.start.line}:{error.location.start.column}] </Fragment>}
+                                    {!!error.location && <Fragment>[Ln {error.location.start.line}, Col {error.location.start.column}] </Fragment>}
                                     {error.name}
                                     {': '}
                                 </strong>
@@ -133,16 +184,24 @@ export default class App extends React.Component {
                                 Parsed in {parseTime.toPrecision(3)} ms
                             </SuccessMessage>
                         )}
-                    </BuildMessage> 
+                    </StatusBar> 
                 </DslSchema>
                 
-                <AstSchema error={!!error}>
-                    {JSON.stringify(ast,null,2)}
-                </AstSchema>
+                <Panel area="ast-schema">
+                    <JsonContainer error={!!error}>{JSON.stringify(ast,null,2)}</JsonContainer>
+                    <BoxName>AST</BoxName>
+                </Panel>
                 
-                <AjvSchema>AJV</AjvSchema>
-                <DataContainer>Data</DataContainer>
-                <Result>Valid</Result>
+                <Panel area="ajv-schema">
+                    <JsonContainer>{JSON.stringify(ajv,null,2)}</JsonContainer>
+                    <BoxName>AJV</BoxName>
+                </Panel>
+                <Panel area="data">
+                    <BoxName>Data</BoxName>
+                </Panel>
+                <Panel area="result">
+                    <BoxName>Result</BoxName>
+                </Panel>
             </Grid>
         )
     }
@@ -151,15 +210,21 @@ export default class App extends React.Component {
     //     this.editor.layout();
     // }
     
-    onChange = ev => {
+    tryParse = value => {
         try {
             const start = performance.now();
-            const ast = parser.parse(ev.value);
+            const ast = parser.parse(value);
             const parseTime = performance.now() - start;
-            this.setState({error:null,ast,parseTime});
+            let ajv = ast2ajv(ast);
+            this.setState({error:null,ast,parseTime,ajv});
         } catch(error) {
             // console.log(error);
             this.setState({error});
         }
+    }
+    
+    onChange = ev => {
+        localStorage.setItem('editorValue', ev.value);
+        this.tryParse(ev.value);
     }
 }
