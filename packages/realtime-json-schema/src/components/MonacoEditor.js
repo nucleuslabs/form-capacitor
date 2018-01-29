@@ -29,7 +29,8 @@ export default class MonacoEditor extends React.Component {
             folding: false,
             fontFamily: `"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace`,
             fontSize: '12px',
-            lineHeight: '18px'
+            lineHeight: '18px',
+            scrollBeyondLastLine: false
         });
         if(this.props.onChange) {
             // FIXME: we shouldn't call the onChange event immediately but...screw it.

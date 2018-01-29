@@ -30,9 +30,9 @@ const DslSchema = styled.div`
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    //position: absolute;
+    //width: 100%;
+    //height: 100%;
 `
 
 const AjvSchema = styled.div`
@@ -74,6 +74,7 @@ const AstSchema = styled.div`
 
 const EditorContainer = styled.div`
     flex: 1;
+    overflow: hidden;
 `
 
 
@@ -118,13 +119,20 @@ export default class App extends React.Component {
                         <MonacoEditor ref={e => this.editor=e} onChange={this.onChange}/>
                     </EditorContainer>
                     <BuildMessage>
-                        
-                        {error ? <ErrorMessage>
-                        <strong>{error.name}:</strong> {error.message}
-                            {error.location ? <Fragment><br/>Line {error.location.start.line}, column {error.location.start.column}</Fragment> : null}</ErrorMessage>
-                        : <SuccessMessage>
+                        {error ? (
+                            <ErrorMessage>
+                                <strong>
+                                    {!!error.location && <Fragment>[{error.location.start.line}:{error.location.start.column}] </Fragment>}
+                                    {error.name}
+                                    {': '}
+                                </strong>
+                                {error.message}
+                            </ErrorMessage>
+                        ):(
+                            <SuccessMessage>
                                 Parsed in {parseTime.toPrecision(3)} ms
-                            </SuccessMessage>}
+                            </SuccessMessage>
+                        )}
                     </BuildMessage> 
                 </DslSchema>
                 
@@ -139,9 +147,9 @@ export default class App extends React.Component {
         )
     }
     
-    componentDidUpdate() {
-        this.editor.layout();
-    }
+    // componentDidUpdate() {
+    //     this.editor.layout();
+    // }
     
     onChange = ev => {
         try {
