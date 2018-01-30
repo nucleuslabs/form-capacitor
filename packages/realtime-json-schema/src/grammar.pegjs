@@ -52,17 +52,22 @@ SharedSchemaOptions = TitleDef / TypeDef / DefaultDef / DescriptionDef
 
 PropertyNameAndSchemaList = a:SchemaPropertyAssignment b:(PropertySeparator SchemaPropertyAssignment)* (_ "," )? { return list(a,b) }
 
-SchemaPropertyAssignment = key: PropertyName PropertyValueSeparator value:SchemaDef { return {key,value} }
+SchemaPropertyAssignment = key: PropertyName opt:(_ "?")? PropertyValueSeparator value:SchemaDef { return {key,value,optional:!!opt} }
 
 ObjectSchema 
 	= "{" _ "}" { return node('objectSchema',Object.create(null)) } 
-	/ "{" _ properties:PropertyNameAndSchemaList _ "}" { 
+	/ "{" _ propList:PropertyNameAndSchemaList _ "}" { 
                		let o = Object.create(null);
-               		//console.log('properties',properties);
-               		for(let p of properties) {
+               		let required = [];
+               		
+               		for(let p of propList) {
                			o[p.key] = p.value;
+               			
+               			if(!p.optional) {
+               			    required.push(p.key);
+               			}
                		}
-               		return node('objectSchema',{properties:o})
+               		return node('objectSchema',{properties:o,required})
                	}
 
 SchemaValueSeparator

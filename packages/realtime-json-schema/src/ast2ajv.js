@@ -97,16 +97,15 @@ export function objectSchema(body, context) {
     let schema = {
         type: 'object',
         additionalProperties: false,
+        required: body.required,
     };
     // console.log('OBJECT',body);
     if(body.properties) {
         let keys = Object.keys(body.properties);
-        schema.required = keys; // FIXME: need optional properties
         schema.properties = obj();
         for(let k of keys) {
             schema.properties[k] = parse(body.properties[k]);
         }
-        
     }
 
 
@@ -114,5 +113,5 @@ export function objectSchema(body, context) {
 }
 
 export function typeExt(body, context) {
-    console.log('typeExt',{body,context})
+    // console.log('typeExt',{body,context})
 }

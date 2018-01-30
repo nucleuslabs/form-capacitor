@@ -97,15 +97,15 @@ const BoxName = styled.span`
     position: absolute;
     top: 0;
     left: 50%;
-   transform: translateX(-50%);
+    transform: translateX(-50%);
     background-color: #353534;
     color: white;
-        font-family: -apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif;
     font-size: 12px;
     padding: 0 5px 2px 5px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-     user-select: none;
+    user-select: none;
 `
 
 export default class App extends React.Component {
