@@ -3,6 +3,10 @@
 // https://bitbucket.org/mnpenner/async-lang/src/6e6e69119eb22cca4a477ae7483a8043dbf51673/lang/pql/grammar.pegjs
 
 {
+
+	const EMPTY_OBJECT = Object.freeze(Object.create(null))
+	const EMPTY_ARRAY = Object.freeze([])
+
 	function node(type, body) {
 		return {type, body, /*loc: location()*/};
 	}
@@ -506,7 +510,7 @@ PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.b
 
 ObjectLiteral 
 	= "{" _ "}" {
-                	return literal(Object.create(null))
+                	return literal(EMPTY_OBJECT)
                 }
 	/ "{" _ properties:PropertyNameAndValueList _ "}" { 
 		let o = Object.create(null);
@@ -519,7 +523,7 @@ ObjectLiteral
 
 ArrayLiteral 
 	= "[" _ "]" {
-                	return literal([])
+                	return literal(EMPTY_ARRAY)
                 }
 	/ "[" _ values:ValueList _ "]" { 
 		return node('arrayLiteral',values);

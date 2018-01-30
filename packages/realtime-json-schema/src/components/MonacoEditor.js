@@ -1,18 +1,14 @@
 import React from 'react';
-import * as monaco from '@timkendrick/monaco-editor';
+import monaco from '../monaco';
 import styled from 'styled-components';
 import '../optimizedResize';
 import addEventListener from '../addEventListener';
-import languageDef from '../languageSyntaxDefinition';
 
 const Container = styled.div`
     width: 100%;
     height: 100%;
 `
 
-const languageId = 'jsonSchemaDSL';
-monaco.languages.register({id: languageId});
-monaco.languages.setMonarchTokensProvider(languageId, languageDef);
 
 // https://microsoft.github.io/monaco-editor/monarch.html
 
@@ -24,7 +20,7 @@ export default class MonacoEditor extends React.Component {
             minimap: {
                 enabled: false
             },
-            language: languageId,
+            language: this.props.language,
             folding: false,
             fontFamily: `"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace`,
             fontSize: '12px',

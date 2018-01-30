@@ -3,6 +3,8 @@ import MonacoEditor from './MonacoEditor';
 import parser from '../grammar.pegjs';
 import {Fragment} from 'react';
 import ast2ajv from '../ast2ajv';
+import pegJsGrammar from '!raw-loader!../grammar.pegjs';
+import {JSONSCHEMA_DSL} from '../monaco';
 
 const Grid = styled.div`
     display: grid;
@@ -23,19 +25,6 @@ const Grid = styled.div`
 `
 
 
-const PegJsGrammar = styled.div`
-    grid-area: pegjs-grammar;
-`
-const DslSchema = styled.div`
-    grid-area: dsl-schema;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    //position: absolute;
-    //width: 100%;
-    //height: 100%;
-`
-
 const FlexContainer = styled.div`
  display: flex;
     flex-direction: column;
@@ -44,30 +33,6 @@ const FlexContainer = styled.div`
     width: 100%;
 `
 
-const AjvSchema = styled.div`
-    grid-area: ajv-schema;
-      position: relative;
-     
-`
-
-const DataContainer = styled.div`
-    grid-area: data;
-`
-
-const Result = styled.div`
-    grid-area: result;
-`
-
-const ResultContainer = styled.div`
-    padding: 10px;
-`
-
-const AstSchema = styled.div`
-    grid-area: ast-schema;
-    
-    position: relative;
- 
-`
 
 const Panel = styled.div`
     grid-area: ${p => p.area};
@@ -88,12 +53,12 @@ font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace
     
         ${p => p.error ? css`
 
-        background-color:#F1E0E0;
-          color: rgba(36,41,46,.5);
+        background-color:#231a1a;
+          color: rgba(212,212,212,.5);
           cursor: not-allowed;
     ` : css`
-          background-color: #F6F8FA;
-            color: #24292e;
+          background-color: #232323;
+            color: #d4d4d4;
     `}
 `
 
@@ -140,6 +105,7 @@ const BoxName = styled.span`
     padding: 0 5px 2px 5px;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+     user-select: none;
 `
 
 export default class App extends React.Component {
@@ -167,13 +133,16 @@ export default class App extends React.Component {
         return (
             <Grid>
                 <Panel area="pegjs-grammar">
+                    <FlexContainer>
+                    <JsonContainer>{pegJsGrammar}</JsonContainer>
+                    </FlexContainer>
                     <BoxName>PegJS</BoxName>
                 </Panel>
 
                 <Panel area="dsl-schema">
                     <FlexContainer>
                         <EditorContainer>
-                            <MonacoEditor ref={e => this.editor = e} defaultValue={this.editorDefaultValue} onChange={this.onChange}/>
+                            <MonacoEditor language={JSONSCHEMA_DSL} defaultValue={this.editorDefaultValue} onChange={this.onChange}/>
                         </EditorContainer>
                         <StatusBar error={!!astError}>
                             {astError ? (
@@ -193,6 +162,7 @@ export default class App extends React.Component {
                             )}
                         </StatusBar>
                     </FlexContainer>
+                    <BoxName>DSL</BoxName>
                 </Panel>
 
                 <Panel area="ast-schema">
@@ -210,6 +180,11 @@ export default class App extends React.Component {
                     <BoxName>AJV</BoxName>
                 </Panel>
                 <Panel area="data">
+                    <FlexContainer>
+                        <EditorContainer>
+                            <MonacoEditor language="json"/>
+                        </EditorContainer>
+                    </FlexContainer>
                     <BoxName>Data</BoxName>
                 </Panel>
                 <Panel area="result">
