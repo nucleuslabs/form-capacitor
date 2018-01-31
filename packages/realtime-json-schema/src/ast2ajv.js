@@ -13,10 +13,7 @@ function parse(node, context) {
         console.error('Falsey node',{node,context});
         throw new Error(`Falsey node`);
     }
-    if(!fnMap[node.type]) {
-        console.error(`Unhandled node type: ${node.type}, body:`, node.body);
-        return '❓';
-    }
+
 
     try {
         return parseAs(node.type, node.body, context);
@@ -29,6 +26,11 @@ function parse(node, context) {
 }
 
 function parseAs(type, body, context) {
+    if(!fnMap[type]) {
+        console.error(`Unhandled node type: ${type}, body:`, body);
+        return '❓';
+    }
+    
     return fnMap[type](body, context);
 }
 
@@ -54,6 +56,17 @@ export function schemaDefinition(def) {
     Object.assign(schema,type);
     
     return schema;
+}
+
+export function type(def) {
+    //
+    // // let {base,ext} = def.type;
+    let type = parse(def.base);
+    if(def.ext) {
+        Object.assign(type, parse(def.ext));
+    }
+
+    return type;
 }
 
 export function schema(body, context) {
@@ -89,6 +102,8 @@ export function basicType(type) {
     switch(type) {
         case 'Array':
             return {type: 'array'}
+        case 'Number':
+            return {type: 'number'}
     }
     throw new Error(`Unknown basic type: ${type}`);
 }
@@ -113,5 +128,28 @@ export function objectSchema(body, context) {
 }
 
 export function typeExt(body, context) {
+    
+    let ext = Object.create(null);
+    for(let key of Object.keys(body)) {
+        // console.log('KEEEYY',key,body[key]);
+        Object.assign(ext, parseAs(key,body[key]));
+    }
+    
+    return ext;
     // console.log('typeExt',{body,context})
+    
+    // return {foo:'bar'}
 }
+
+export function Array_minLength(body) {
+    return {minlength: parse(body)}
+}
+
+export function Array_items(body) {
+    return {items: parse(body)}
+}
+
+// export function type(body, context) {
+//    
+//     return {FOOOO:"BAAARR"}
+// }
