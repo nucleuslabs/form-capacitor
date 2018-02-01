@@ -5,6 +5,8 @@ import {Fragment} from 'react';
 import ast2ajv from '../ast2ajv';
 import pegJsGrammar from '!raw-loader!../grammar.pegjs';
 import {JSONSCHEMA_DSL} from '../monaco';
+import Ajv from 'ajv';
+import Json5 from 'json5';
 
 const Grid = styled.div`
     display: grid;
@@ -121,6 +123,17 @@ export default class App extends React.Component {
             parseTime: 0
         }
         this.editorDefaultValue = localStorage.getItem('editorValue');
+        this.dataDefaultValue = localStorage.getItem('dataValue');
+        this.ajv = new Ajv({
+            allErrors: true,
+            $data: true,
+            ownProperties: true,
+            errorDataPath: 'property',
+            jsonPointers: false,
+            schemaId: undefined,
+            async: false,
+            verbose: true,
+        });
     }
 
     componentDidMount() {
@@ -128,7 +141,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        const {astError, ajvError, ast, parseTime, ajv} = this.state;
+        const {astError, ajvError, ast, parseTime, ajv, dataSyntaxError, dataErrors} = this.state;
 
         return (
             <Grid>
@@ -182,12 +195,16 @@ export default class App extends React.Component {
                 <Panel area="data">
                     <FlexContainer>
                         <EditorContainer>
-                            <MonacoEditor language="json"/>
+                            <MonacoEditor language="json" onChange={this.dataChange} defaultValue={this.dataDefaultValue}/>
                         </EditorContainer>
+                        {!!dataSyntaxError && <StatusBar error>{String(dataSyntaxError)}</StatusBar>}
                     </FlexContainer>
                     <BoxName>Data</BoxName>
                 </Panel>
                 <Panel area="result">
+                    <FlexContainer>
+                        <JsonContainer>{JSON.stringify(dataErrors, null, 2)}</JsonContainer>
+                    </FlexContainer>
                     <BoxName>Result</BoxName>
                 </Panel>
             </Grid>
@@ -217,11 +234,33 @@ export default class App extends React.Component {
             this.setState({ajvError});
             return;
         }
+        this.validate = this.ajv.compile(ajv.schemas.default);
         this.setState({ajvError: null, ajv});
     }
 
     onChange = ev => {
         localStorage.setItem('editorValue', ev.value);
         this.tryParse(ev.value);
+    }
+    
+    dataChange = ev => {
+        localStorage.setItem('dataValue', ev.value);
+        
+        try {
+            let data = Json5.parse(ev.value);
+            let valid = this.validate(data);
+            // console.log(data,valid, this.validate.errors);
+
+            // console.dir(this.validate);
+            
+            this.setState({
+                dataSyntaxError: null,
+                dataErrors: Array.isArray(this.validate.errors) ? this.validate.errors.map(err => `${err.dataPath.slice(1)} ${err.message}`) : this.validate.errors,
+            })
+        } catch(err) {
+            this.setState({
+                dataSyntaxError: err.message,
+            })
+        }
     }
 }

@@ -104,6 +104,8 @@ export function basicType(type) {
             return {type: 'array'}
         case 'Number':
             return {type: 'number'}
+        case 'Boolean':
+            return {type: 'boolean'}
     }
     throw new Error(`Unknown basic type: ${type}`);
 }
@@ -148,6 +150,19 @@ export function Array_minLength(body) {
 export function Array_items(body) {
     return {items: parse(body)}
 }
+
+export function Number_minimum(body) {
+    return {minimum: parse(body)}
+}
+
+export function Number_maximum(body) {
+    return {maximum: parse(body)}
+}
+
+export function Number_multipleOf(body) {
+    return {multipleOf: parse(body)}
+}
+
 
 // export function type(body, context) {
 //    

@@ -44,7 +44,7 @@ SchemaNameAndValueList = a:SchemaAssignment b:(PropertySeparator SchemaAssignmen
 	return o
 }
 
-SchemaAssignment = SharedSchemaOptions / ArraySchemaOptions / ObjectSchemaOptions
+SchemaAssignment = SharedSchemaOptions / ArraySchemaOptions / ObjectSchemaOptions / NumberSchemaOptions
 
 ObjectSchemaOptions = Schema_properties
 
@@ -111,6 +111,7 @@ BasicType = x:BasicTypes {
 }
 
 ArraySchemaOptions = Array_minLength / Array_items
+NumberSchemaOptions = Number_minimum / Number_maximum / Number_multipleOf
 
 Array_minLength = "minLength" SchemaValueSeparator value:NumericLiteral {
 	return node('Array_minLength',value)
@@ -118,6 +119,17 @@ Array_minLength = "minLength" SchemaValueSeparator value:NumericLiteral {
 
 Array_items = "items" SchemaValueSeparator x:TypeWithExt {
 	return node('Array_items',x)
+}
+
+Number_minimum = "minimum" SchemaValueSeparator value:NumericLiteral {
+	return node('Number_minimum',value)
+}
+
+Number_maximum = "maximum" SchemaValueSeparator value:NumericLiteral {
+	return node('Number_maximum',value)
+}
+Number_multipleOf = "multipleOf" SchemaValueSeparator value:NumericLiteral {
+	return node('Number_multipleOf',value)
 }
 
 SourceCharacter

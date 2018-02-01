@@ -22,6 +22,7 @@ export default {
         'message',
         'items',
         'properties',
+        'multipleOf',
 
         'string',
         'number',
