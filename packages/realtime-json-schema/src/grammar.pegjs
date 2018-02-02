@@ -44,7 +44,7 @@ SchemaNameAndValueList = a:SchemaAssignment b:(PropertySeparator SchemaAssignmen
 	return o
 }
 
-SchemaAssignment = SharedSchemaOptions / ArraySchemaOptions / ObjectSchemaOptions / NumberSchemaOptions
+SchemaAssignment = SharedSchemaOptions / ArraySchemaOptions / ObjectSchemaOptions / NumberSchemaOptions / StringSchemaOptions
 
 ObjectSchemaOptions = Schema_properties
 
@@ -110,13 +110,19 @@ BasicType = x:BasicTypes {
 	return node('basicType',x)
 }
 
-ArraySchemaOptions = Array_minLength / Array_items
+ArraySchemaOptions = Array_minLength / Array_maxLength / Array_items
 NumberSchemaOptions = Number_minimum / Number_maximum / Number_multipleOf
+StringSchemaOptions = String_pattern / String_minLength / String_maxLength
 
-Array_minLength = "minLength" SchemaValueSeparator value:NumericLiteral {
+// todo: these options should be context-sensitive
+// so that "minLength" can mean something different if applied to a string vs an array
+Array_minLength = "minItems" SchemaValueSeparator value:NumericLiteral {
 	return node('Array_minLength',value)
 }
 
+Array_maxLength = "maxItems" SchemaValueSeparator value:NumericLiteral {
+	return node('Array_maxLength',value)
+}
 Array_items = "items" SchemaValueSeparator x:TypeWithExt {
 	return node('Array_items',x)
 }
@@ -130,6 +136,18 @@ Number_maximum = "maximum" SchemaValueSeparator value:NumericLiteral {
 }
 Number_multipleOf = "multipleOf" SchemaValueSeparator value:NumericLiteral {
 	return node('Number_multipleOf',value)
+}
+
+String_pattern = "pattern" SchemaValueSeparator value:(RegularExpressionLiteral / StringLiteral) {
+	return node('String_pattern',value)
+}
+
+String_minLength = "minLength" SchemaValueSeparator value:NumericLiteral {
+	return node('String_minLength',value)
+}
+
+String_maxLength = "maxLength" SchemaValueSeparator value:NumericLiteral {
+	return node('String_maxLength',value)
 }
 
 SourceCharacter
@@ -381,7 +399,7 @@ RegularExpressionLiteral "regular expression"
         error(e.message);
       }
 
-      return { type: "Literal", value: value };
+      return literal(value);
     }
 
 RegularExpressionBody

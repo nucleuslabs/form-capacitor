@@ -1,0 +1,11 @@
+{
+  "instructions": [
+    {
+      "typeId": 1294,
+      "disciplineId": 15,
+      "childRequired": true,
+      "teamId": 4,
+      "strtest": "x"
+    }
+  ]
+}

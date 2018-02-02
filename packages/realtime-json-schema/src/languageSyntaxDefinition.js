@@ -23,6 +23,9 @@ export default {
         'items',
         'properties',
         'multipleOf',
+        'pattern',
+        'minItems',
+        'maxItems',
 
         'string',
         'number',

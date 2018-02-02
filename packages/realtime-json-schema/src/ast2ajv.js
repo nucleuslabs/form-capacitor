@@ -106,6 +106,8 @@ export function basicType(type) {
             return {type: 'number'}
         case 'Boolean':
             return {type: 'boolean'}
+        case 'String':
+            return {type: 'string'}
     }
     throw new Error(`Unknown basic type: ${type}`);
 }
@@ -144,7 +146,19 @@ export function typeExt(body, context) {
 }
 
 export function Array_minLength(body) {
-    return {minlength: parse(body)}
+    return {minItems: parse(body)}
+}
+
+export function Array_maxLength(body) {
+    return {maxItems: parse(body)}
+}
+
+export function String_minLength(body) {
+    return {minLength: parse(body)}
+}
+
+export function String_maxLength(body) {
+    return {maxLength: parse(body)}
 }
 
 export function Array_items(body) {
@@ -161,6 +175,23 @@ export function Number_maximum(body) {
 
 export function Number_multipleOf(body) {
     return {multipleOf: parse(body)}
+}
+
+export function String_pattern(body) {
+    
+    let pattern = parse(body);
+    
+    // https://github.com/epoberezkin/ajv-keywords#regexp
+    if(pattern instanceof RegExp) {
+        return {
+            regexp: {
+                pattern: pattern.source,
+                flags: pattern.flags,
+            }
+        }
+    } else {
+        return {pattern: String(pattern)}
+    }
 }
 
 
