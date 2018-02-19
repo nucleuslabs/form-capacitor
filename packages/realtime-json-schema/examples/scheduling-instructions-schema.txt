@@ -43,7 +43,7 @@ schema  (
                     ),
                     strtest?: (
                         type String<
-                            pattern "[aeiouy]"
+                            pattern "[aeiouy]|^ng$"
                             minLength 2
                             maxLength 255
                         >
