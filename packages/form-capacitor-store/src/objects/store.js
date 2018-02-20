@@ -1,4 +1,4 @@
-import Store from '../classes/Store';
+import Store from '../Store';
 
 const store = new Store();
 
