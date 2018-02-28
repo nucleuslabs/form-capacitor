@@ -1,5 +1,5 @@
 // inspired by https://github.com/mroderick/PubSubJS/blob/903eb3c45e335ae5bfcda40ae9c5894583869dd8/src/pubsub.js#L168
-import {toPath, unset} from 'lodash';
+import {toPath, unset} from 'lodash'; // TODO: remove lodash dependency
 import {setValue,setValueMut,getValue} from './util';
 // import {clone} from 'lodash';
 // import debounce from '../fast-debounce';

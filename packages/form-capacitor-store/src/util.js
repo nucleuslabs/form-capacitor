@@ -1,14 +1,14 @@
 // import {clone} from 'lodash';
 
 
-function clone(obj) {
+function clone(obj) { // TODO: use clone from jtilz to support more types
     if(Array.isArray(obj)) {
         return [...obj];
     }
     if(typeof obj === 'object') {
         return Object.assign(Object.create(null), obj);
     }
-    throw new Error("Cannot clone object");
+    throw new Error("Cannot clone value");
 }
 
 /**
@@ -24,7 +24,7 @@ export function setValue(obj, path, value) {
         const key = path[i];
         const path1 = path[i+1];
         if(Object.isExtensible(it[key])) {
-            it[key] = clone(it[key]); // FIXME: cloning all the way up the tree is causing some things to rerender, maybe.
+            it[key] = clone(it[key]);
         } else if(isInt(path1)) {
             it[key] = new Array(parseInt(path1,10)+1);
         } else {

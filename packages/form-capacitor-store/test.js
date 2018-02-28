@@ -103,6 +103,29 @@ test("subscribe when ancestor mutated", async t => {
 })
 
 
+test("func callback", async t => {
+    const store = new Store;
+    store.set(['foo'],1);
+    store.subscribe(['foo'], (val,old,ctx) => {
+        t.is(old,1);
+        t.is(val,2);
+    })
+    store.set(['foo'],x => ++x);
+})
+
+test("impure mutation", async t => {
+    const store = new Store;
+    store.set(['foo'],[]);
+    store.subscribe(['foo'], (val,old,ctx) => {
+        t.fail();
+    })
+    store.set(['foo'], x => {
+        x.push(1);
+        return x;
+    });
+    t.pass();
+})
+
 function dump(...args) {
     console.log(...args.map(a => require('util').inspect(a,{colors:true,depth:10})))
 }
