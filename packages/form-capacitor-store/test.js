@@ -89,14 +89,20 @@ test("run all subscriptions", async t => {
 })
 
 test("subscribe when ancestor mutated", async t => {
-    t.plan(4);
+    t.plan(3);
     const store = new Store;
     store.subscribe(['foo','bar'], (val,old,ctx) => {
         t.pass();
     })
     store.set(['foo'],{bar:1});
     store.set(['foo'],{bar:2});
+    // store.set(['foo'],{bar:2});
     store.set(['foo'],{baz:3});
     store.set(['bar'],{baz:4}); // should not run subscription
     store.set([],'root');
 })
+
+
+function dump(...args) {
+    console.log(...args.map(a => require('util').inspect(a,{colors:true,depth:10})))
+}

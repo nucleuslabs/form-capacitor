@@ -1,6 +1,7 @@
 // inspired by https://github.com/mroderick/PubSubJS/blob/903eb3c45e335ae5bfcda40ae9c5894583869dd8/src/pubsub.js#L168
 import {toPath, unset} from 'lodash';
 import {setValue,setValueMut,getValue} from './util';
+// import {clone} from 'lodash';
 // import debounce from '../fast-debounce';
 
 const SUB = Symbol('subscriptions');
@@ -18,12 +19,10 @@ export default class Store {
 
         // console.log('------------------- fire',path.join('.'));
 
-        for(let i=0;;) {
+        for(let i=0;it;++i) {
             this._runPath(it, path.slice(0, i), context);
             if(i === path.length) break;
             it = it[path[i]];
-            if(!it) break;
-            ++i;
         }
 
         if(it) {
@@ -47,9 +46,9 @@ export default class Store {
                 if(!Object.is(currentValue, sub[1])) {
                     sub[0](currentValue, sub[1], context);
                     sub[1] = currentValue;
-                } else {
-                    console.log(`values are the same at path '${path.join('.')}' -- skipping subscription`)
-                }
+                } /*else {
+                    console.warn(`values are the same at path '${path.join('.')}' -- skipping subscription`)
+                }*/
             }
         }
     }
@@ -60,12 +59,13 @@ export default class Store {
         let subKey = Symbol("subscriptionKey");
 
         let subPath = [...path,SUB,subKey];
+        // dump(getValue(this.data,path))
         let subTuple = [callback,getValue(this.data,path)]; // <--- fixme: do we need to store the value here or can we store it once per node?? or maybe not at all now that we're just iterating the proper nodes
         
         setValueMut(this.subscriptions, subPath, subTuple);
 
 
-        dump(this.subscriptions);
+        // dump(this.subscriptions);
 
         // this.subscriptions[subKey] = [path,callback,getValue(this.data,path)];
 
@@ -93,6 +93,7 @@ export default class Store {
         }
         if(Object.is(oldValue, value)) return;
         this.data = setValue(this.data, path, value);
+        // dump(this.data);
         this._fireSubscriptions(path, context);
     }
 
