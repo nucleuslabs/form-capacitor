@@ -50,12 +50,7 @@ export default {
             },
             {
                 test: /\.svg($|\?)/i,
-                include: src,
-                loader: 'svg-url-loader',
-                options: {
-                    limit: 1024 * 2,
-                    noquotes: true,
-                }
+                loader: 'raw-loader',
             },
             {
                 test: /\.css$/,

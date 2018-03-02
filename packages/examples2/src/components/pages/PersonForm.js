@@ -2,6 +2,8 @@ import {Fragment} from 'react';
 import {Title,Control,FieldBody,FieldLabel,Label,InputText,Icon} from '../bulma';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import {Field} from '../bulma';
+import user from '../../icons/fa/solid/user.svg';
+import css from '../bulma/bulma.scss';
 
 export default function HomePage() {
     return (
@@ -15,7 +17,7 @@ export default function HomePage() {
                     <Field>
                         <Control expanded iconsLeft>
                             <InputText placeholder="Name"/>
-                            <Icon small left>X</Icon>
+                            <Icon src={user} className={[css['is-small'],css['is-left']]}/>
                         </Control>
                     </Field>
                     <Field>

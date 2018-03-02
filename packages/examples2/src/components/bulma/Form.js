@@ -1,5 +1,5 @@
 import React from 'react';
-import css from 'bulma/bulma.sass';
+import css from './bulma.scss';
 import cc from 'classcat';
 import {withClass, withProps} from '../../lib/react';
 

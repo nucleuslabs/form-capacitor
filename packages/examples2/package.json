@@ -28,6 +28,7 @@
     "node-sass": "^4.7.2",
     "planck-js": "^0.1.43",
     "postcss-loader": "^2.1.1",
+    "raw-loader": "^0.5.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-hot-loader": "^4.0.0",

@@ -1,5 +1,5 @@
 import React from 'react';
-import css from 'bulma/bulma.sass';
+import css from './bulma.scss';
 import {withClass} from '../../lib/react';
 
 // https://bulma.io/documentation/elements/title/
