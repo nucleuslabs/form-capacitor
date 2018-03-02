@@ -4,8 +4,8 @@ NM := node_modules/.bin
 wds: yarn.lock
 	BABEL_ENV=webpack $(NM)/webpack-dev-server
 
-svgo:
-	find src/icons -type d -links 2 -print0 | xargs -0 -n 1 -P 6 npx svgo --config=svgo.yml
+svgo: yarn.lock
+	find src/icons -type d -links 2 -print0 | xargs -0 -n 1 -P 6 $(NM)/svgo --config=svgo.yml
 
 yarn.lock:: package.json
 	@yarn install --production=false
