@@ -1,12 +1,12 @@
 import React from 'react';
 import cc from 'classcat';
 
-export function withClass(el, className, modifiers) {
+export function classFactory(className, modifiers) {
     const modSet = modifiers ? new Set(Object.keys(modifiers)) : null;
 
-    return function withClass({className: extraClass, ...extraProps}) {
+    return function makeProps({className: extraClass, ...extraProps}) {
         let classes = [];
-        let props;
+        let props = extraProps;
 
         if(className) {
             classes.push(className);
@@ -22,16 +22,21 @@ export function withClass(el, className, modifiers) {
                     props[p] = extraProps[p];
                 }
             }
-        } else {
-            props = {...extraProps};
-        }
+        } 
         if(extraClass) {
             classes.push(extraClass);
         }
         if(classes.length) {
             props.className = cc(classes);
         }
-        return React.createElement(el, props);
+        return props;
+    }
+}
+
+export function withClass(el, className, modifiers) {
+    const factory = classFactory(className, modifiers);
+    return function withClass(props) {
+        return React.createElement(el, factory(props));
     }
 }
 
