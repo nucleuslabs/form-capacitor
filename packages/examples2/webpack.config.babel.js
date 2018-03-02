@@ -2,6 +2,19 @@ import {ProvidePlugin,IgnorePlugin,NamedModulesPlugin,HotModuleReplacementPlugin
 
 const src = `${__dirname}/src`;
 
+const cssLoaders = [
+    {
+        loader: 'style-loader',
+    },
+    {
+        loader: 'css-loader',
+        options: {
+            modules: true,
+            localIdentName: '[name]_[local]--[hash:base64:5]',
+        }
+    }
+];
+
 export default {
     context: `${__dirname}/src`,
     mode: 'development',
@@ -46,17 +59,11 @@ export default {
             },
             {
                 test: /\.css$/,
-                use: [ 
-                    {
-                        loader: 'style-loader',
-                    },
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            modules: true
-                        }
-                    }
-                ]
+                use: cssLoaders
+            },
+            {
+                test: /\.s[ca]ss$/,
+                use: [...cssLoaders, 'sass-loader']
             }
         ]
     },

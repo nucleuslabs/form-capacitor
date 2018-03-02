@@ -1,5 +1,5 @@
 import {Fragment} from 'react';
-import {Title, Container, SubTitle} from 'reactbulma';
+import {Title, Container, SubTitle} from './bulma';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import PersonForm from './pages/PersonForm';
