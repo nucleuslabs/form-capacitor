@@ -4,6 +4,7 @@ import css from './bulma.scss';
 import cc from 'classcat';
 import {classFactory, withClass, withProps} from '../../lib/react';
 import shortid from 'shortid';
+import commonModifiers from './modifiers'
 // https://bulma.io/documentation/form/general/
 
 export const Label = withClass('label',css.label)
@@ -22,12 +23,17 @@ export const Control = withClass('div',css.control, {
     hasIconsLeft: css['has-icons-left'],
     hasIconsRight: css['has-icons-right'],
 })
-export const Input = withClass('input',css.input)
+export const Input = withClass('input',css.input,{
+    ...commonModifiers,
+})
 export const InputText = withProps(Input,{type:'text'});
-export const TextArea = withClass('input',css.textarea)
-export const HelpText = withClass('p',css.help)
+export const InputTel = withProps(Input,{type:'tel'});
+export const TextArea = withClass('textarea',css.textarea)
+export const HelpText = withClass('p',css.help, commonModifiers)
 export const Button = withClass('button',css.button, {
     isStatic: css['is-static'],
+    isInverted: css['is-inverted'],
+    ...commonModifiers,
 })
 
 

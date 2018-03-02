@@ -11,7 +11,7 @@ import {
     Input,
     HelpText,
     Select,
-    Radio, RadioMenu
+    Radio, RadioMenu, TextArea
 } from '../bulma';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import {Field} from '../bulma';
@@ -92,6 +92,44 @@ export default function HomePage() {
                                 <Radio value={1}>Yes</Radio>
                                 <Radio value={0}>No</Radio>
                             </RadioMenu>
+                        </Control>
+                    </Field>
+                </FieldBody>
+            </Field>
+
+            <Field isHorizontal>
+                <FieldLabel>
+                    <Label>Subject</Label>
+                </FieldLabel>
+                <FieldBody>
+                    <Field>
+                        <Control>
+                            <InputText isDanger placeholder="e.g. Partnership opportunity"/>
+                        </Control>
+                        <HelpText isDanger>This field is required.</HelpText>
+                    </Field>
+                </FieldBody>
+            </Field>
+
+            <Field isHorizontal>
+                <FieldLabel>
+                    <Label>Question</Label>
+                </FieldLabel>
+                <FieldBody>
+                    <Field>
+                        <Control>
+                            <TextArea placeholder="Explain how we can help you"/>
+                        </Control>
+                    </Field>
+                </FieldBody>
+            </Field>
+            
+            <Field isHorizontal>
+                <FieldLabel/>
+                <FieldBody>
+                    <Field>
+                        <Control>
+                            <Button isPrimary>Send Message</Button>
                         </Control>
                     </Field>
                 </FieldBody>
