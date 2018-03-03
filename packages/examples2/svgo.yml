@@ -1,4 +1,6 @@
 plugins:
+  - convertColors:
+      currentColor: true
   - addAttributesToSVGElement:
       attributes:
           - fill: currentColor
