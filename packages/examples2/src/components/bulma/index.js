@@ -4,4 +4,3 @@ export * from './documentation';
 export * from './icon';
 export * from './content';
 export * from './container';
-export * from './extra';

@@ -30,8 +30,6 @@ export default function HomePage() {
             
             <Snippet>
                 <SnippetPreview>
-                   
-
                     <Field isHorizontal>
                         <FieldLabel isNormal>
                             <Label>From</Label>

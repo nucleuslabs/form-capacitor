@@ -17,5 +17,4 @@ $primary-invert: findColorInvert($primary);
 
 @import '~bulma';
 @import 'documentation';
-@import './extra.scss';
-@import './override.scss';
+@import 'custom';

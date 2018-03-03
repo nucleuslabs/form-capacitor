@@ -1,4 +1,13 @@
 
+.icon > svg {
+  width: 1em;
+  height: 1em;
+}
+
+.radio > input + span {
+  margin-left: .25em;
+}
+
 .external-link-icon {
   width: .75em;
   height: .75em;
