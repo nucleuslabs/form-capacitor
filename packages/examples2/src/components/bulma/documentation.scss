@@ -1,0 +1,179 @@
+
+.bd-example,
+.bd-structure,
+.bd-snippet {
+  border: 1px solid #ffdd57;
+  position: relative;
+}
+
+.bd-example:before,
+.bd-structure:before,
+.bd-snippet:before {
+  background: #ffdd57;
+  border-radius: 3px 3px 0 0;
+  bottom: 100%;
+  color: rgba(0, 0, 0, 0.7);
+  content: "Example";
+  display: inline-block;
+  font-size: 7px;
+  font-weight: bold;
+  left: -1px;
+  letter-spacing: 1px;
+  padding: 3px 5px;
+  position: absolute;
+  text-transform: uppercase;
+  vertical-align: top;
+}
+
+@media screen and (min-width: 769px), print {
+  .bd-example.is-fullwidth,
+  .bd-structure.is-fullwidth,
+  .bd-snippet.is-fullwidth {
+    border-left: none;
+    border-right: none;
+    padding: 0;
+  }
+}
+
+.bd-snippet {
+  border: 1px solid #ffdd57;
+  margin-top: 2rem;
+  position: relative;
+}
+
+.bd-snippet:not(:last-child) {
+  margin-bottom: 1.5rem;
+}
+
+.bd-snippet::before {
+  content: "Snippet";
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.bd-snippet-preview {
+  padding: 1.5rem;
+}
+
+.bd-snippet-code {
+  background-color: whitesmoke;
+}
+
+.bd-snippet-code.bd-is-more.bd-is-more-clipped .highlight {
+  height: 2em;
+  overflow: hidden;
+}
+
+.bd-snippet-code.bd-is-more.bd-is-more-clipped .highlight pre {
+  overflow: hidden;
+}
+
+.bd-snippet-code.bd-is-more.bd-is-more-clipped .highlight .bd-show {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.bd-snippet.bd-is-horizontal {
+  border-radius: 5px;
+  border-top-left-radius: 0;
+}
+
+.bd-snippet.bd-is-horizontal .bd-snippet-code.bd-is-more.bd-is-more-clipped .highlight pre {
+  padding-top: 0.325rem;
+}
+
+.bd-snippet.bd-is-clipped .bd-snippet-code {
+  overflow: auto;
+}
+
+@media screen and (min-width: 1024px) {
+  .bd-snippet.bd-is-vertical {
+    -webkit-box-align: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+  .bd-snippet.bd-is-vertical .bd-snippet-preview,
+  .bd-snippet.bd-is-vertical .bd-snippet-code {
+    width: 50%;
+  }
+  .bd-snippet.bd-is-vertical .bd-snippet-code,
+  .bd-snippet.bd-is-vertical .bd-snippet-code .highlight,
+  .bd-snippet.bd-is-vertical .bd-snippet-code .highlight pre {
+    -webkit-box-align: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    border-radius: 0 5px 5px 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  .bd-snippet.bd-is-vertical .bd-snippet-code .highlight,
+  .bd-snippet.bd-is-vertical .bd-snippet-code .highlight pre,
+  .bd-snippet.bd-is-vertical .bd-snippet-code .highlight .language-html {
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+  }
+  .bd-snippet.bd-is-vertical .bd-snippet-code .highlight pre {
+    white-space: pre;
+  }
+  .bd-snippet.bd-is-vertical.bd-is-one-fifth .bd-snippet-preview {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: calc(128px + 3rem);
+  }
+  .bd-snippet.bd-is-vertical.bd-is-one-fifth .bd-snippet-code {
+    width: calc(100% - 128px - 3rem);
+  }
+  .bd-snippet.bd-is-vertical.bd-is-two-fifths .bd-snippet-preview {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: calc(256px + 3rem);
+  }
+  .bd-snippet.bd-is-vertical.bd-is-two-fifths .bd-snippet-code {
+    width: calc(100% - 256px - 3rem);
+  }
+  .bd-snippet.bd-is-vertical.bd-is-one-third .bd-snippet-preview {
+    width: 33.3333%;
+  }
+  .bd-snippet.bd-is-vertical.bd-is-one-third .bd-snippet-code {
+    width: 66.6666%;
+  }
+}
+
+.section.is-fullwidth .bd-snippet {
+  border-left: none;
+  border-radius: 0;
+  border-right: none;
+}

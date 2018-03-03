@@ -5,6 +5,7 @@ import cc from 'classcat';
 import {classFactory, withClass, withProps} from '../../lib/react';
 import shortid from 'shortid';
 import commonModifiers from './modifiers'
+
 // https://bulma.io/documentation/form/general/
 
 export const Label = withClass('label',css.label)

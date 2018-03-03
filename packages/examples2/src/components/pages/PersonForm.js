@@ -11,10 +11,11 @@ import {
     Input,
     HelpText,
     Select,
-    Radio, RadioMenu, TextArea
+    Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
+    ExternalLink,
+    Field, Para
 } from '../bulma';
-import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
-import {Field} from '../bulma';
+// import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
 import check from '../../icons/fa/solid/check.svg';
 import email from '../../icons/fa/solid/envelope.svg';
@@ -23,117 +24,125 @@ import email from '../../icons/fa/solid/envelope.svg';
 export default function HomePage() {
     return (
         <Fragment>
-            <Title>Person Form</Title>
+            <Title>Bulma horizontal form</Title>
             
-            <Field isHorizontal>
-                <FieldLabel isNormal>
-                    <Label>From</Label>
-                </FieldLabel>
-                <FieldBody>
-                    <Field>
-                        <Control isExpanded hasIconsLeft>
-                            <InputText placeholder="Name"/>
-                            <Icon src={user} isSmall isLeft/>
-                        </Control>
-                    </Field>
-                    <Field>
-                        <Control isExpanded hasIconsLeft hasIconsRight>
-                            <InputText placeholder="Email"/>
-                            <Icon src={email} isSmall isLeft/>
-                            <Icon src={check} isSmall isRight/>
-                        </Control>
-                    </Field>
-                </FieldBody>
-            </Field>
-
-            <Field isHorizontal>
-                <FieldLabel />
-                <FieldBody>
-                    <Field isExpanded>
-                        <Field hasAddons>
-                            <Control>
-                                <Button isStatic>+1</Button>
-                            </Control>
-                            <Control isExpanded>
-                                <Input type="tel" placeholder="Your phone number"/>
-                            </Control>
-                        </Field>
-                        <HelpText>Do not enter the first zero</HelpText>
-                    </Field>
-                    
-                </FieldBody>
-            </Field>
+            <Para>A basic form from the <ExternalLink href="https://bulma.io/documentation/form/general/#horizontal-form">Bulma documentation</ExternalLink>.</Para>
             
-            <Field isHorizontal>
-                <FieldLabel isNormal>
-                    <Label>Department</Label>
-                </FieldLabel>
-                <FieldBody>
-                    <Field isNarrow>
-                        <Control>
-                            <Select isFullwidth>
-                                <option>Business development</option>
-                                <option>Marketing</option>
-                                <option>Sales</option>
-                            </Select>
-                        </Control>
-                    </Field>
-                </FieldBody>
-            </Field>
+            <Snippet>
+                <SnippetPreview>
+                   
 
-            <Field isHorizontal>
-                <FieldLabel>
-                    <Label>Already a member?</Label>
-                </FieldLabel>
-                <FieldBody>
-                    <Field isNarrow>
-                        <Control>
-                            <RadioMenu>
-                                <Radio value={1}>Yes</Radio>
-                                <Radio value={0}>No</Radio>
-                            </RadioMenu>
-                        </Control>
+                    <Field isHorizontal>
+                        <FieldLabel isNormal>
+                            <Label>From</Label>
+                        </FieldLabel>
+                        <FieldBody>
+                            <Field>
+                                <Control isExpanded hasIconsLeft>
+                                    <InputText placeholder="Name"/>
+                                    <Icon src={user} isSmall isLeft/>
+                                </Control>
+                            </Field>
+                            <Field>
+                                <Control isExpanded hasIconsLeft hasIconsRight>
+                                    <InputText placeholder="Email"/>
+                                    <Icon src={email} isSmall isLeft/>
+                                    <Icon src={check} isSmall isRight/>
+                                </Control>
+                            </Field>
+                        </FieldBody>
                     </Field>
-                </FieldBody>
-            </Field>
 
-            <Field isHorizontal>
-                <FieldLabel>
-                    <Label>Subject</Label>
-                </FieldLabel>
-                <FieldBody>
-                    <Field>
-                        <Control>
-                            <InputText isDanger placeholder="e.g. Partnership opportunity"/>
-                        </Control>
-                        <HelpText isDanger>This field is required.</HelpText>
-                    </Field>
-                </FieldBody>
-            </Field>
+                    <Field isHorizontal>
+                        <FieldLabel/>
+                        <FieldBody>
+                            <Field isExpanded>
+                                <Field hasAddons>
+                                    <Control>
+                                        <Button isStatic>+1</Button>
+                                    </Control>
+                                    <Control isExpanded>
+                                        <Input type="tel" placeholder="Your phone number"/>
+                                    </Control>
+                                </Field>
+                                <HelpText>Do not enter the first zero</HelpText>
+                            </Field>
 
-            <Field isHorizontal>
-                <FieldLabel>
-                    <Label>Question</Label>
-                </FieldLabel>
-                <FieldBody>
-                    <Field>
-                        <Control>
-                            <TextArea placeholder="Explain how we can help you"/>
-                        </Control>
+                        </FieldBody>
                     </Field>
-                </FieldBody>
-            </Field>
-            
-            <Field isHorizontal>
-                <FieldLabel/>
-                <FieldBody>
-                    <Field>
-                        <Control>
-                            <Button isPrimary>Send Message</Button>
-                        </Control>
+
+                    <Field isHorizontal>
+                        <FieldLabel isNormal>
+                            <Label>Department</Label>
+                        </FieldLabel>
+                        <FieldBody>
+                            <Field isNarrow>
+                                <Control>
+                                    <Select isFullwidth>
+                                        <option>Business development</option>
+                                        <option>Marketing</option>
+                                        <option>Sales</option>
+                                    </Select>
+                                </Control>
+                            </Field>
+                        </FieldBody>
                     </Field>
-                </FieldBody>
-            </Field>
+
+                    <Field isHorizontal>
+                        <FieldLabel>
+                            <Label>Already a member?</Label>
+                        </FieldLabel>
+                        <FieldBody>
+                            <Field isNarrow>
+                                <Control>
+                                    <RadioMenu>
+                                        <Radio value={1}>Yes</Radio>
+                                        <Radio value={0}>No</Radio>
+                                    </RadioMenu>
+                                </Control>
+                            </Field>
+                        </FieldBody>
+                    </Field>
+
+                    <Field isHorizontal>
+                        <FieldLabel>
+                            <Label>Subject</Label>
+                        </FieldLabel>
+                        <FieldBody>
+                            <Field>
+                                <Control>
+                                    <InputText isDanger placeholder="e.g. Partnership opportunity"/>
+                                </Control>
+                                <HelpText isDanger>This field is required.</HelpText>
+                            </Field>
+                        </FieldBody>
+                    </Field>
+
+                    <Field isHorizontal>
+                        <FieldLabel>
+                            <Label>Question</Label>
+                        </FieldLabel>
+                        <FieldBody>
+                            <Field>
+                                <Control>
+                                    <TextArea placeholder="Explain how we can help you"/>
+                                </Control>
+                            </Field>
+                        </FieldBody>
+                    </Field>
+
+                    <Field isHorizontal>
+                        <FieldLabel/>
+                        <FieldBody>
+                            <Field>
+                                <Control>
+                                    <Button isPrimary>Send Message</Button>
+                                </Control>
+                            </Field>
+                        </FieldBody>
+                    </Field>
+                </SnippetPreview>
+            </Snippet>
         </Fragment>
     )
 }

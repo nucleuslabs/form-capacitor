@@ -16,12 +16,6 @@ $primary: $cyan;
 $primary-invert: findColorInvert($primary); 
 
 @import '~bulma';
-
-.icon > svg {
-  width: 1em;
-  height: 1em;
-}
-
-.radio > input + span {
-  margin-left: .25em;
-}
+@import 'documentation';
+@import './extra.scss';
+@import './override.scss';
