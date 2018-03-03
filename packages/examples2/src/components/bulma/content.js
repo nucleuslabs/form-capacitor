@@ -1,32 +1,23 @@
 import React from 'react';
 import css from './bulma.scss';
-import {classFactory, withClass, withProps} from '../../lib/react';
-import cc from 'classcat';
+import {withClass, withProps} from '../../lib/react';
 import {Link as RouterLink} from 'react-router-dom';
-
+import elem from './factory';
 // https://bulma.io/documentation/elements/content/
 
 export const Content = withClass('div',css.content)
 
-import modifiers from './modifiers';
+
 import {Icon} from './index';
 import externalLinkIcon from '../../icons/fa/regular/external-link.svg';
 
-const bulmaPropFactory = classFactory(null, modifiers);
 
-
-function bulmaElement(el) {
-    return function withModifiers(props) {
-        return React.createElement(el, bulmaPropFactory(props));
-    }
-}
-
-export const Para = bulmaElement('p');
+export const Para = elem('p');
 export const Code = ({children}) => <pre><code>{children}</code></pre>;
 
-export const InternalLink = bulmaElement(RouterLink);
+export const InternalLink = elem(RouterLink);
 
-const Link = withProps(bulmaElement('a'),{href: ''});
+const Link = withProps(elem('a'),{href: ''});
 
 // export const ExternalLink = withProps(Link, {hasTextDanger: true, target: '_blank'});
 

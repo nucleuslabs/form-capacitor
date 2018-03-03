@@ -1,6 +1,7 @@
 import {ProvidePlugin,IgnorePlugin,NamedModulesPlugin,HotModuleReplacementPlugin} from 'webpack';
 
 const src = `${__dirname}/src`;
+const publicDir = `${__dirname}/public`;
 
 const cssLoaders = [
     {
@@ -11,6 +12,9 @@ const cssLoaders = [
         options: {
             modules: true,
             localIdentName: '[name]_[local]--[hash:base64:5]',
+            sourceMap: true,
+            root: publicDir,
+            camelCase: true,
         }
     }
 ];
@@ -23,7 +27,7 @@ export default {
         `${__dirname}/src/index.js`,
     ],
     output: {
-        path: `${__dirname}/public`,
+        path: publicDir,
         filename: 'bundle.js',
         publicPath: '/',
         pathinfo: true,
@@ -81,7 +85,7 @@ export default {
         hot: true,
         inline: true,
         port: 8080,
-        contentBase: `${__dirname}/public`,
+        contentBase: publicDir,
         historyApiFallback: true,
         stats: 'errors-only',
         headers: {

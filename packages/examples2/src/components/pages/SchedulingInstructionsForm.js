@@ -13,7 +13,7 @@ import {
     Select,
     Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
-    Field, Para
+    Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell
 } from '../bulma';
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
@@ -26,11 +26,60 @@ export default function SchedulingInstructionsForm() {
         <Fragment>
             <Title>Scheduling Instructions</Title>
 
-     
 
             <Snippet>
                 <SnippetPreview>
-                    
+                    <Table isStriped isNarrow isFullwidth>
+                        <TableHead>
+                            <TableRow>
+                                <TableHeadCell>Appointment Type</TableHeadCell>
+                                <TableHeadCell>Team</TableHeadCell>
+                                <TableHeadCell>Discipline</TableHeadCell>
+                                <TableHeadCell>Pref. Clinician</TableHeadCell>
+                                <TableHeadCell>Pref. Time</TableHeadCell>
+                                <TableHeadCell>Child Req'd?</TableHeadCell>
+                                <TableHeadCell/>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                            </TableRow>
+                            <TableRow isSelected>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                                <TableCell>X</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
                 </SnippetPreview>
             </Snippet>
         </Fragment>
