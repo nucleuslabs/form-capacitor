@@ -1,11 +1,33 @@
 
-.icon > svg {
-  width: 1em;
-  height: 1em;
+.icon {
+ 
+  > svg {
+    width: 1em;
+    height: 1em;
+  }
+  
+  &.is-small > svg {
+    width: .875em;
+    height: .875em;
+  }
+
+  &.is-medium > svg {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  &.is-large > svg {
+    width: 2em;
+    height: 2em;
+  }
 }
 
-.radio > input + span {
-  margin-left: .25em;
+
+
+.radio, .checkbox {
+  > input + span {
+    margin-left: .25em;
+  }
 }
 
 .external-link-icon {
@@ -13,4 +35,10 @@
   height: .75em;
   margin-left: .15em;
   vertical-align: .15em;
+}
+
+.table {
+  .vertical-align-middle {
+    vertical-align: middle;
+  }
 }

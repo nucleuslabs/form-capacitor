@@ -5,49 +5,45 @@ import cc from 'classcat';
 import {classFactory, withClass, withProps} from '../../lib/react';
 import shortid from 'shortid';
 import commonModifiers from './modifiers'
-
+import elem from './factory';
 // https://bulma.io/documentation/form/general/
 
-export const Label = withClass('label',css.label)
-export const Field = withClass('div',css.field, {
+export const Label = elem('label',css.label)
+export const Field = elem('div',css.field, {
     isHorizontal: css['is-horizontal'],
     isExpanded: css['is-expanded'],
     hasAddons: css['has-addons'],
     isNarrow: css['is-narrow'],
 });
-export const FieldLabel = withClass('div',css['field-label'], {
+export const FieldLabel = elem('div',css['field-label'], {
     isNormal: css['is-normal'],
 })
-export const FieldBody = withClass('div',css['field-body'])
-export const Control = withClass('div',css.control, {
+export const FieldBody = elem('div',css['field-body'])
+export const Control = elem('div',css.control, {
     isExpanded: css['is-expanded'],
     hasIconsLeft: css['has-icons-left'],
     hasIconsRight: css['has-icons-right'],
 })
-export const Input = withClass('input',css.input,{
-    ...commonModifiers,
-})
+export const Input = elem('input',css.input)
 export const InputText = withProps(Input,{type:'text'});
 export const InputTel = withProps(Input,{type:'tel'});
-export const TextArea = withClass('textarea',css.textarea)
-export const HelpText = withClass('p',css.help, commonModifiers)
-export const Button = withClass('button',css.button, {
+export const TextArea = elem('textarea',css.textarea)
+export const HelpText = elem('p',css.help, commonModifiers)
+export const Button = elem('button',css.button, {
     isStatic: css['is-static'],
     isInverted: css['is-inverted'],
-    ...commonModifiers,
 })
 
-
-const selectFactory = classFactory(css.select, {
-    isFullwidth: css['is-fullwidth'],
+const SelectWrap = elem('div',css.select, {
+    isFullWidth: css['is-fullwidth'],
 });
 
-export function Select({className,style,isFullwidth,...props}) {
-    return <div {...selectFactory({className,style,isFullwidth})}><select {...props}/></div>
+export function Select({value,children,...props}) {
+    return <SelectWrap {...props}><select {...{value,children}}/></SelectWrap>
 }
 
 export function Checkbox({className,style,children,...props}) {
-    return <label className={cc([css.checkbox,className])}><input type="checkbox" {...props} />{children}</label>;
+    return <label className={cc([css.checkbox,className])}><input type="checkbox" {...props} /><span>{children}</span></label>;
 }
 
 const radioNameProp = shortid();

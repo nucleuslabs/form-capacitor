@@ -17,11 +17,23 @@ export const Code = ({children}) => <pre><code>{children}</code></pre>;
 
 export const InternalLink = elem(RouterLink);
 
-const Link = withProps(elem('a'),{href: ''});
+const Link = elem('a',null,null,{href: ''});
 
 // export const ExternalLink = withProps(Link, {hasTextDanger: true, target: '_blank'});
 
-
+export class ActionLink extends React.Component {
+    
+    clickHandler = ev => {
+        ev.preventDefault();
+        if(this.props.onClick) {
+            this.props.onClick.call(this, ev)
+        }
+    }
+    
+    render() {
+        return <Link {...this.props} onClick={this.clickHandler}/>
+    }
+}
 
 export function ExternalLink({children,...props}) {
     return <Link target="_blank" {...props}>{children}<Icon className={css['external-link-icon']} src={externalLinkIcon}/></Link>

@@ -15,5 +15,9 @@ export const TableFoot = elem('tfoot');
 export const TableRow = elem('tr',null,{
     isSelected: css['is-selected'],
 });
-export const TableHeadCell = elem('th');
-export const TableCell = elem('td');
+
+const cellModifiers = {
+    alignMiddle: css.verticalAlignMiddle,
+}
+export const TableHeadCell = elem('th',null,cellModifiers);
+export const TableCell = elem('td',null,cellModifiers);

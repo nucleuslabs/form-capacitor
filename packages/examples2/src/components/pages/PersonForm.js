@@ -13,7 +13,7 @@ import {
     Select,
     Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
-    Field, Para
+    Field, Para, InputTel
 } from '../bulma';
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
@@ -38,14 +38,14 @@ export default function HomePage() {
                             <Field>
                                 <Control isExpanded hasIconsLeft>
                                     <InputText placeholder="Name"/>
-                                    <Icon src={user} isSmall isLeft/>
+                                    <Icon src={user} isLeft/>
                                 </Control>
                             </Field>
                             <Field>
                                 <Control isExpanded hasIconsLeft hasIconsRight>
                                     <InputText placeholder="Email"/>
-                                    <Icon src={email} isSmall isLeft/>
-                                    <Icon src={check} isSmall isRight/>
+                                    <Icon src={email} isLeft/>
+                                    <Icon src={check} isRight/>
                                 </Control>
                             </Field>
                         </FieldBody>
@@ -60,7 +60,7 @@ export default function HomePage() {
                                         <Button isStatic>+1</Button>
                                     </Control>
                                     <Control isExpanded>
-                                        <Input type="tel" placeholder="Your phone number"/>
+                                        <InputTel placeholder="Your phone number"/>
                                     </Control>
                                 </Field>
                                 <HelpText>Do not enter the first zero</HelpText>

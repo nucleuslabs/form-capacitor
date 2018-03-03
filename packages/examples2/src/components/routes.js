@@ -3,8 +3,8 @@ import SchedulingInstructionsForm from './pages/SchedulingInstructionsForm';
 
 export default [
     {
-        url: '/person',
-        name: "Person Form",
+        url: '/contact-form',
+        name: "Contact Form",
         desc: "various input types",
         component: PersonForm,
     },

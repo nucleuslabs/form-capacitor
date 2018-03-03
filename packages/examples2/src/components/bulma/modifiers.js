@@ -49,4 +49,6 @@ export default {
     hasTextGreyLighter: css['has-text-grey-lighter'],
     hasTextWhiteTer: css['has-text-white-ter'],
     hasTextWhiteBis: css['has-text-white-bis'],
+    
+    isFullWidth: css['is-fullwidth']
 }
