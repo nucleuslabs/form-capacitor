@@ -2,6 +2,7 @@ import React from 'react';
 import css from './bulma.scss';
 import {classFactory, withClass, withProps} from '../../lib/react';
 import cc from 'classcat';
+import {Link as RouterLink} from 'react-router-dom';
 
 // https://bulma.io/documentation/elements/content/
 
@@ -23,7 +24,9 @@ function bulmaElement(el) {
 export const Para = bulmaElement('p');
 export const Code = ({children}) => <pre><code>{children}</code></pre>;
 
-export const Link = withProps(bulmaElement('a'),{href: ''});
+export const InternalLink = bulmaElement(RouterLink);
+
+const Link = withProps(bulmaElement('a'),{href: ''});
 
 // export const ExternalLink = withProps(Link, {hasTextDanger: true, target: '_blank'});
 
