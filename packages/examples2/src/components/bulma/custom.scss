@@ -21,8 +21,6 @@
   }
 }
 
-
-
 .radio, .checkbox {
   > input + span {
     margin-left: .25em;
@@ -36,8 +34,19 @@
   vertical-align: .15em;
 }
 
-.table {
-  .vertical-align-middle {
+.is-middle-aligned {
+  > td, > th {
     vertical-align: middle;
   }
+}
+
+.button-bar {
+  margin: -3px;
+  > .button {
+    margin: 3px;
+  }
+}
+
+.table {
+  margin-bottom: 1rem; // default was 1.5 which is too much!
 }

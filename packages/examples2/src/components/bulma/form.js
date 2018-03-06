@@ -34,6 +34,24 @@ export const Button = elem('button',css.button, {
     isInverted: css['is-inverted'],
 })
 
+export function ButtonBar({children}) {
+    return <div className={css.buttonBar}>{children}</div>;
+}
+
+export class ActionButton extends React.Component {
+
+    clickHandler = ev => {
+        ev.preventDefault();
+        if(this.props.onClick) {
+            this.props.onClick.call(this, ev)
+        }
+    }
+
+    render() {
+        return <Button {...this.props} onClick={this.clickHandler}/>
+    }
+}
+
 const SelectWrap = elem('div',css.select, {
     isFullWidth: css['is-fullwidth'],
 });

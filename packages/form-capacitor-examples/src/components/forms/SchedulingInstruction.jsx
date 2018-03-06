@@ -12,7 +12,7 @@ import VCenter from '../VCenter';
 
 
 export default createComponent({
-    displayName: "SchedulingInstructionsForm",
+    displayName: "SchedulingInstruction",
     enhancers: [
         mount({add: p => p.name}),
         // withValue(), 

@@ -6,7 +6,7 @@ export const Table = elem('table',css.table, {
     isStriped: css['is-striped'],
     isNarrow: css['is-narrow'],
     isHoverable: css['is-hoverable'],
-    isFullwidth: css['is-fullwidth'],
+    // isFullWidth: css['is-fullwidth'],
 })
 
 export const TableHead = elem('thead');
@@ -14,10 +14,11 @@ export const TableBody = elem('tbody');
 export const TableFoot = elem('tfoot');
 export const TableRow = elem('tr',null,{
     isSelected: css['is-selected'],
+    isMiddleAligned: css['is-middle-aligned'],
 });
 
 const cellModifiers = {
-    alignMiddle: css.verticalAlignMiddle,
+   
 }
 export const TableHeadCell = elem('th',null,cellModifiers);
 export const TableCell = elem('td',null,cellModifiers);

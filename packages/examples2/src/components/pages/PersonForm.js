@@ -76,7 +76,7 @@ export default function HomePage() {
                         <FieldBody>
                             <Field isNarrow>
                                 <Control>
-                                    <Select isFullwidth>
+                                    <Select isFullWidth>
                                         <option>Business development</option>
                                         <option>Marketing</option>
                                         <option>Sales</option>

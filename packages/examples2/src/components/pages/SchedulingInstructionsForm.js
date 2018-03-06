@@ -13,69 +13,128 @@ import {
     Select,
     Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
-    Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, Checkbox, ActionLink
+    Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, Checkbox, ActionLink, ActionButton,
+    ButtonBar
 } from '../bulma';
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
-import trashCan from '../../icons/fa/regular/trash-alt.svg';
+import trashIcon from '../../icons/fa/regular/trash-alt.svg';
+import addIcon from '../../icons/fa/regular/plus-hexagon.svg';
+import restoreIcon from '../../icons/fa/regular/sync-alt.svg';
+import saveIcon from '../../icons/fa/regular/save.svg';
+import clearIcon from '../../icons/fa/regular/eraser.svg';
 // import css from '../bulma/bulma.scss';
 import * as options from '../../options';
 import {appointmentTypes} from '../../../../form-capacitor-examples/src/options';
+import {observer} from 'mobx-react';
+import {observable,extendObservable,toJS,action} from 'mobx';
+import shortid from 'shortid';
+import connect from '../../form-capacitor/connect';
+import SchedulingInstruction from './SchedulingInstruction';
 
-export default function SchedulingInstructionsForm() {
-    return (
-        <Fragment>
-            <Title>Scheduling Instructions</Title>
+function Instruction(defaults) {
+    Object.assign(this,{
+        // typeId: null,
+        // teamId: null,
+        // disciplineId: null,
+        // prefClinicianId: null,
+        // prefTime: null,
+        // childRequired: false,
+        ...defaults,
+        key: shortid()
+    });
+}
+
+// @connect({dataPropName: "formData", initialData: p => ({
+//         instructions: [new Instruction]
+//     })})
+// @ajaxLoader({
+//     route: 'helloSteve.endpoint',
+//     handler(data,props)  {
+//         this.formData = data;
+//    
+//        
+//         Object.assign(props.formData, data);
+//     }
+// })
+//
+//
+// @mobxAjaxForm({
+//     route: 'endpoint',
+//     data: props => {
+//         if(props.id) {
+//             return {id: props.id}
+//         }
+//         return undefined;
+//     },
+//     initialData: () => ({
+//         instructions: [new Instruction]
+//     })
+// })
 
 
-            <Table isStriped isNarrow isFullwidth>
-                <TableHead>
-                    <TableRow>
-                        <TableHeadCell>Appointment Type</TableHeadCell>
-                        <TableHeadCell>Team</TableHeadCell>
-                        <TableHeadCell>Discipline</TableHeadCell>
-                        <TableHeadCell>Pref. Clinician</TableHeadCell>
-                        <TableHeadCell>Pref. Time</TableHeadCell>
-                        <TableHeadCell>Child Req'd?</TableHeadCell>
-                        <TableHeadCell/>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    <TableRow>
-                        <TableCell>
-                            <Select>
-                                {options.appointmentTypes.map(({value, label}) => <option key={value}>{label}</option>)}
-                            </Select>
-                        </TableCell>
-                        <TableCell>
-                            <Select>
-                                {options.teams.map(({value, label}) => <option key={value}>{label}</option>)}
-                            </Select>
-                        </TableCell>
-                        <TableCell>
-                            <Select>
-                                {options.disciplines.map(({value, label}) => <option key={value}>{label}</option>)}
-                            </Select>
-                        </TableCell>
-                        <TableCell>
-                            <Select>
-                                {options.clinicians.map(({value, label}) => <option key={value}>{label}</option>)}
-                            </Select>
-                        </TableCell>
-                        <TableCell>
-                            <Select>
-                                {options.times.map(({value, label}) => <option key={value}>{label}</option>)}
-                            </Select>
-                        </TableCell>
-                        <TableCell alignMiddle>
-                            <Checkbox>Yes</Checkbox>
-                        </TableCell>
-                        <TableCell alignMiddle>
-                            <ActionLink hasTextDanger><Icon src={trashCan} isMedium/></ActionLink>
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-           
-        </Fragment>
-    )
+
+@connect({
+    propName: 'formData',
+    initialValue: {
+        instructions: [new Instruction],
+    }
+})
+export default class SchedulingInstructionsForm extends React.Component {
+    
+    @action.bound
+    addInstruction(ev) {
+        this.props.formData.instructions.push(new Instruction);
+    }
+
+    @action.bound
+    clearInstructions(ev) {
+        this.props.formData.instructions = [];
+    }
+    
+    deleteInstruction = idx => action(ev => {
+        this.props.formData.instructions.splice(idx,1);
+    })
+    
+    saveState = ev => {
+        this.saved = toJS(this.props.formData, false);
+    }
+
+    @action.bound
+    restoreState(ev) {
+        // this.props.formData = observable(this.saved);
+        extendObservable(this.props.formData, this.saved);
+    }
+    
+    render() {
+        // console.log(this.props.formData);
+        return (
+            <Fragment>
+                <Title>Scheduling Instructions</Title>
+
+                <Table isStriped isNarrow isFullWidth>
+                    <TableHead>
+                        <TableRow>
+                            <TableHeadCell>Appointment Type</TableHeadCell>
+                            <TableHeadCell>Team</TableHeadCell>
+                            <TableHeadCell>Discipline</TableHeadCell>
+                            <TableHeadCell>Pref. Clinician</TableHeadCell>
+                            <TableHeadCell>Pref. Time</TableHeadCell>
+                            <TableHeadCell>Child Req'd?</TableHeadCell>
+                            <TableHeadCell/>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {this.props.formData.instructions.map((inst,idx) => <SchedulingInstruction key={inst.key} doDelete={this.deleteInstruction(idx)}/>)}
+                    </TableBody>
+                </Table>
+
+                <ButtonBar>
+                    <ActionButton isPrimary onClick={this.addInstruction}><Icon src={addIcon} /><span>Add Instruction</span></ActionButton>
+                    <ActionButton isDanger onClick={this.clearInstructions}><Icon src={clearIcon} /><span>Clear</span></ActionButton>
+                    <ActionButton isSuccess onClick={this.saveState}><Icon src={saveIcon} /><span>Save</span></ActionButton>
+                    <ActionButton onClick={this.restoreState}><Icon src={restoreIcon} /><span>Restore</span></ActionButton>
+                </ButtonBar>
+            </Fragment>
+        )
+    }
 }
