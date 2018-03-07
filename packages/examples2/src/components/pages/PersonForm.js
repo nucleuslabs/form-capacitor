@@ -13,15 +13,18 @@ import {
     Select,
     Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
-    Field, Para, InputTel
+    Field, Para, InputTel, Code
 } from '../bulma';
+import {TextBox} from '../controls';
+
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
 import check from '../../icons/fa/solid/check.svg';
 import email from '../../icons/fa/solid/envelope.svg';
+import connect from '../../form-capacitor/connect';
 // import css from '../bulma/bulma.scss';
 
-export default function HomePage() {
+function HomePage({formData}) {
     return (
         <Fragment>
             <Title>Bulma horizontal form</Title>
@@ -37,7 +40,7 @@ export default function HomePage() {
                         <FieldBody>
                             <Field>
                                 <Control isExpanded hasIconsLeft>
-                                    <InputText placeholder="Name"/>
+                                    <TextBox name="name" placeholder="Name"/>
                                     <Icon src={user} isLeft/>
                                 </Control>
                             </Field>
@@ -109,7 +112,7 @@ export default function HomePage() {
                         <FieldBody>
                             <Field>
                                 <Control>
-                                    <InputText isDanger placeholder="e.g. Partnership opportunity"/>
+                                    <TextBox name="subject" isDanger placeholder="e.g. Partnership opportunity"/>
                                 </Control>
                                 <HelpText isDanger>This field is required.</HelpText>
                             </Field>
@@ -141,6 +144,16 @@ export default function HomePage() {
                     </Field>
                 </SnippetPreview>
             </Snippet>
+            <Code>
+                {JSON.stringify(formData,null,2)}
+            </Code>
         </Fragment>
     )
 }
+
+export default connect({
+    propName: 'formData',
+    initialValue: {
+        name: "Mark"
+    }
+})(HomePage);

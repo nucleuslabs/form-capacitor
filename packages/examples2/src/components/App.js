@@ -14,18 +14,18 @@ export default function App() {
         <BrowserRouter onUpdate={() => window.scrollTo(0, 0)}>
             <Container>
                 <div><Link to="/">&laquo; form-capacitor</Link></div>
-                
+
                 <ErrorBoundary>
-                <Switch>
-                    {routes.reduce((acc,route) => {
-                        if(route.component) {
-                            acc.push(<Route key={route.url} exact path={route.url} component={route.component}/>)
-                        }
-                        return acc;
-                    },[])}
-                    <Route exact path="/" component={HomePage}/>
-                    <Route component={NotFound}/>
-                </Switch>
+                    <Switch>
+                        {routes.reduce((acc, route) => {
+                            if(route.component) {
+                                acc.push(<Route key={route.url} exact path={route.url} component={route.component}/>)
+                            }
+                            return acc;
+                        }, [])}
+                        <Route exact path="/" component={HomePage}/>
+                        <Route component={NotFound}/>
+                    </Switch>
                 </ErrorBoundary>
             </Container>
         </BrowserRouter>

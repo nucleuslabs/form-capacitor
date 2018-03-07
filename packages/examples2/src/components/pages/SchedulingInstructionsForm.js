@@ -72,7 +72,6 @@ function Instruction(defaults) {
 // })
 
 
-
 @connect({
     propName: 'formData',
     initialValue: {

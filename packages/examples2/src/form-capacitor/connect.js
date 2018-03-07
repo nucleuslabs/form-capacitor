@@ -1,12 +1,13 @@
-import {resolveValue} from './util';
+import {resolveValue,setValue,toPath,getValue} from './util';
 import {observer} from 'mobx-react';
-import {observable} from 'mobx';
+import {observable,action,runInAction,isObservable} from 'mobx';
 import {CTX_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
 export default function connect({
     propName = undefined,
     initialValue = Object.create(null),
+    mountPoint = undefined,
 }) {
     
     return Component => {
@@ -14,16 +15,38 @@ export default function connect({
 
         const WrappedComponent = class extends React.Component {
             static childContextTypes = CTX_TYPES;
-
+            static contextTypes = CTX_TYPES;
+            
             getChildContext() {
                 return {
                     [CTX_KEY]: this._data
                 }
             }
-
-            constructor(props) {
-                super(props);
-                this._data = observable(resolveValue.call(this, initialValue, props));
+            
+            constructor(props,context) {
+                super(props,context);
+                
+                let resolvedValue = resolveValue.call(this, initialValue, props);
+                
+                if(context[CTX_KEY] && mountPoint) {
+                    let path = resolveValue.call(this, mountPoint, props);
+                    if(path) {
+                        path = toPath(path);
+                        let currentValue = getValue(context[CTX_KEY], path);
+                        
+                        if(isObservable(currentValue)) {
+                            this._data = currentValue;
+                        } else {
+                            if(currentValue === undefined) {
+                                currentValue = resolvedValue;
+                            }
+                            this._data = observable(currentValue);
+                            runInAction(() => setValue(context[CTX_KEY], toPath(path), this._data));
+                        }
+                    }
+                } else {
+                    this._data = observable(resolvedValue);
+                }
             }
 
             render() {
