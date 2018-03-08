@@ -5,17 +5,20 @@ import {
     FieldBody,
     FieldLabel,
     Label,
-    InputText,
     Icon,
     Button,
-    Input,
     HelpText,
-    Select,
-    RadioMenu, TextArea, Snippet, SnippetPreview, Content,
+    RadioMenu, 
+    Snippet, 
+    SnippetPreview, 
+    Content,
     ExternalLink,
-    Field, Para, Code, SnippetCode
+    Field, 
+    Para,
+    Code,
+    SnippetCode
 } from '../bulma';
-import {TextBox, SelectBox, EmailInput, TelInput, Radio} from '../controls';
+import {TextBox, SelectBox, EmailInput, TelInput, Radio, TextArea} from '../controls';
 
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
@@ -127,7 +130,7 @@ function HomePage({formData}) {
                         <FieldBody>
                             <Field>
                                 <Control>
-                                    <TextArea placeholder="Explain how we can help you"/>
+                                    <TextArea name="howHelp" placeholder="Explain how we can help you"/>
                                 </Control>
                             </Field>
                         </FieldBody>

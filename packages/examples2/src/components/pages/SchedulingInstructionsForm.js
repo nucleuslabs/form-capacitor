@@ -14,7 +14,7 @@ import {
     Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
     Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, Checkbox, ActionLink, ActionButton,
-    ButtonBar
+    ButtonBar, Code
 } from '../bulma';
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import trashIcon from '../../icons/fa/regular/trash-alt.svg';
@@ -32,16 +32,26 @@ import connect from '../../form-capacitor/connect';
 import SchedulingInstruction from './SchedulingInstruction';
 
 function Instruction(defaults) {
-    Object.assign(this,{
-        // typeId: null,
-        // teamId: null,
-        // disciplineId: null,
-        // prefClinicianId: null,
-        // prefTime: null,
-        // childRequired: false,
+    // Object.assign(this,{
+    //     typeId: null,
+    //     teamId: null,
+    //     disciplineId: null,
+    //     prefClinicianId: null,
+    //     prefTime: null,
+    //     childRequired: false,
+    //     ...defaults,
+    //     key: shortid()
+    // });
+    return {
+        typeId: null,
+        teamId: null,
+        disciplineId: null,
+        prefClinicianId: null,
+        prefTime: null,
+        childRequired: false,
         ...defaults,
         key: shortid()
-    });
+    };
 }
 
 // @connect({dataPropName: "formData", initialData: p => ({
@@ -75,36 +85,40 @@ function Instruction(defaults) {
 @connect({
     propName: 'formData',
     initialValue: {
-        instructions: [new Instruction],
+        instructions: [Instruction()],
     }
 })
 export default class SchedulingInstructionsForm extends React.Component {
     
     @action.bound
     addInstruction(ev) {
-        this.props.formData.instructions.push(new Instruction);
+        this.props.formData.get().instructions.push(Instruction());
     }
 
     @action.bound
     clearInstructions(ev) {
-        this.props.formData.instructions = [];
+        this.props.formData.get().instructions = [];
     }
     
     deleteInstruction = idx => action(ev => {
-        this.props.formData.instructions.splice(idx,1);
+        this.props.formData.get().instructions.splice(idx,1);
     })
     
     saveState = ev => {
-        this.saved = toJS(this.props.formData, false);
+        this.saved = toJS(this.props.formData,true);
+        // this.saved = {instructions:[]};
     }
 
     @action.bound
     restoreState(ev) {
         // this.props.formData = observable(this.saved);
-        extendObservable(this.props.formData, this.saved);
+        // console.log('restoring',this.saved);
+        this.props.formData.set(this.saved);
     }
     
     render() {
+        const formData = toJS(this.props.formData);
+        // console.log(formData);
         // console.log(this.props.formData);
         return (
             <Fragment>
@@ -123,7 +137,9 @@ export default class SchedulingInstructionsForm extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.props.formData.instructions.map((inst,idx) => <SchedulingInstruction key={inst.key} doDelete={this.deleteInstruction(idx)}/>)}
+                        {formData.instructions.map((inst,idx) => {
+                            return <SchedulingInstruction key={inst.key} name={['instructions',idx]} doDelete={this.deleteInstruction(idx)}/>;
+                        })}
                     </TableBody>
                 </Table>
 
@@ -133,6 +149,10 @@ export default class SchedulingInstructionsForm extends React.Component {
                     <ActionButton isSuccess onClick={this.saveState}><Icon src={saveIcon} /><span>Save</span></ActionButton>
                     <ActionButton onClick={this.restoreState}><Icon src={restoreIcon} /><span>Restore</span></ActionButton>
                 </ButtonBar>
+
+                <Code>
+                    {JSON.stringify(formData,null,2)}
+                </Code>
             </Fragment>
         )
     }

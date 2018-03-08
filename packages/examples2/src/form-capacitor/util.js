@@ -73,7 +73,7 @@ export function getValue(obj, path, def) {
 
     for(let key of path) {
         // console.log(obj,ret,key,path);
-        if(ret == null || !Object.hasOwnProperty.call(ret,key)) {
+        if(ret == null || ret[key] == null) {
             return def;
         }
         ret = ret[key];

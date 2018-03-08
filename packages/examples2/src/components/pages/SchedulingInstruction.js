@@ -5,13 +5,13 @@ import {
     FieldBody,
     FieldLabel,
     Label,
-    InputText,
+  
     Icon,
     Button,
-    Input,
+
     HelpText,
     Select,
-    Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
+    RadioMenu, Snippet, SnippetPreview, Content,
     ExternalLink,
     Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, Checkbox, ActionLink, ActionButton,
     ButtonBar
@@ -29,36 +29,38 @@ import {observer} from 'mobx-react';
 import {observable,extendObservable,toJS} from 'mobx';
 import shortid from 'shortid';
 import connect from '../../form-capacitor/connect';
+import {mount} from '../../form-capacitor';
+
+import {TextBox, SelectBox, EmailInput, TelInput, Radio, TextArea} from '../controls';
 
 
-
-export default function SchedulingInstruction({doDelete}) {
+function SchedulingInstruction({doDelete}) {
     return (
         <TableRow isMiddleAligned>
             <TableCell>
-                <Select name="typeId">
+                <SelectBox name="typeId">
                     {options.appointmentTypes.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
+                </SelectBox>
             </TableCell>
             <TableCell>
-                <Select name="teamId">
+                <SelectBox name="teamId">
                     {options.teams.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
+                </SelectBox>
             </TableCell>
             <TableCell>
-                <Select name="disciplineId">
+                <SelectBox name="disciplineId">
                     {options.disciplines.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
+                </SelectBox>
             </TableCell>
             <TableCell>
-                <Select name="prefClinicianId">
+                <SelectBox name="prefClinicianId">
                     {options.clinicians.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
+                </SelectBox>
             </TableCell>
             <TableCell>
-                <Select name="prefTime">
+                <SelectBox name="prefTime">
                     {options.times.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
+                </SelectBox>
             </TableCell>
             <TableCell>
                 <Checkbox name="childRequired">Yes</Checkbox>
@@ -69,3 +71,6 @@ export default function SchedulingInstruction({doDelete}) {
         </TableRow>
     )
 }
+
+export default mount({})(SchedulingInstruction);
+// export default SchedulingInstruction;
