@@ -13,7 +13,7 @@ import {
     Select,
     RadioMenu, Snippet, SnippetPreview, Content,
     ExternalLink,
-    Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, Checkbox, ActionLink, ActionButton,
+    Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, ActionLink, ActionButton,
     ButtonBar
 } from '../bulma';
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
@@ -31,7 +31,7 @@ import shortid from 'shortid';
 import connect from '../../form-capacitor/connect';
 import {mount} from '../../form-capacitor';
 
-import {TextBox, SelectBox, EmailInput, TelInput, Radio, TextArea} from '../controls';
+import {TextBox, SelectBox, EmailInput, TelInput, Radio, TextArea, Checkbox} from '../controls';
 
 
 function SchedulingInstruction({doDelete}) {
