@@ -56,8 +56,15 @@ const SelectWrap = elem('div',css.select, {
     isFullWidth: css['is-fullwidth'],
 });
 
-export function Select({value,onChange,children,...props}) {
-    return <SelectWrap {...props}><select {...{value,onChange,children}}/></SelectWrap>
+export function Select({value,onChange,children,placeholder,...props}) {
+    return (
+        <SelectWrap {...props}>
+            <select {...{value,onChange}}>
+                {placeholder != null && <option value="" disabled>{placeholder}</option>}
+                {children}
+            </select>
+        </SelectWrap>
+    )
 }
 
 export function Checkbox({className,style,children,...props}) {

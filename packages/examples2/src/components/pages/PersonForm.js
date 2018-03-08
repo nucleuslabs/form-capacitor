@@ -13,9 +13,9 @@ import {
     Select,
     Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
-    Field, Para, InputTel, Code, SnippetCode
+    Field, Para, Code, SnippetCode
 } from '../bulma';
-import {TextBox,SelectBox} from '../controls';
+import {TextBox, SelectBox, EmailInput, TelInput} from '../controls';
 
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
@@ -47,7 +47,7 @@ function HomePage({formData}) {
                             </Field>
                             <Field>
                                 <Control isExpanded hasIconsLeft hasIconsRight>
-                                    <InputText placeholder="Email"/>
+                                    <EmailInput name="email" placeholder="Email" defaultValue="@nucleuslabs.com"/>
                                     <Icon src={email} isLeft/>
                                     <Icon src={check} isRight/>
                                 </Control>
@@ -64,7 +64,7 @@ function HomePage({formData}) {
                                         <Button isStatic>+1</Button>
                                     </Control>
                                     <Control isExpanded>
-                                        <InputTel placeholder="Your phone number"/>
+                                        <TelInput name="phone" placeholder="Your phone number"/>
                                     </Control>
                                 </Field>
                                 <HelpText>Do not enter the first zero</HelpText>
@@ -80,8 +80,8 @@ function HomePage({formData}) {
                         <FieldBody>
                             <Field isNarrow>
                                 <Control>
-                                    <SelectBox name="department" isFullWidth>
-                                        <option value="business-development">Business development</option>
+                                    <SelectBox name="department" placeholder="– Please Choose –">
+                                        <option data-value={999} value="business-development">Business development</option>
                                         <option value="marketing">Marketing</option>
                                         <option value="sales">Sales</option>
                                     </SelectBox>

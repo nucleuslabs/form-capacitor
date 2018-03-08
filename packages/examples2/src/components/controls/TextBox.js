@@ -4,7 +4,7 @@ import {action} from 'mobx';
 
 @connect({
     propName: 'value',
-    initialValue: '',
+    initialValue: p => p.defaultValue !== undefined ? p.defaultValue : '',
     mountPoint: p => p.name,
 })
 export default class TextBox extends React.Component {

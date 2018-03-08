@@ -4,7 +4,7 @@ import {action,toJS} from 'mobx';
 
 @connect({
     propName: 'value',
-    initialValue: null,
+    initialValue: '',
     mountPoint: p => p.name,
 })
 export default class SelectBox extends React.Component {
@@ -18,7 +18,7 @@ export default class SelectBox extends React.Component {
     }
 
     render() {
-        let {value, name, ...props} = this.props;
+        let {value, name, defaultValue, ...props} = this.props;
         value = toJS(value);
         if(value != null) {
             // have not set the `value` prop at all -- React will complain about about `undefined` and `null` and using an empty string isn't necessarily correct
