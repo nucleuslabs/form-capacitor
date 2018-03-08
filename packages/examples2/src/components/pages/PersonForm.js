@@ -11,11 +11,11 @@ import {
     Input,
     HelpText,
     Select,
-    Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
+    RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
     Field, Para, Code, SnippetCode
 } from '../bulma';
-import {TextBox, SelectBox, EmailInput, TelInput} from '../controls';
+import {TextBox, SelectBox, EmailInput, TelInput, Radio} from '../controls';
 
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';

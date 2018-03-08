@@ -18,7 +18,7 @@ export default class TextBox extends React.Component {
     }
     
     render() {
-        const {value, name, ...props} = this.props;
+        const {value, name, defaultValue, ...props} = this.props;
         return <InputText {...props} value={value.get()} onChange={this.handleChange}/>
     }
 }
