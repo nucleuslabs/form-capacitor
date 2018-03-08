@@ -12,6 +12,11 @@ export default function connect({
     
     return Component => {
         const ObserverComponent = observer(Component);
+        let displayName;
+
+        if(process.env.NODE_ENV !== 'production') {
+            displayName = getDisplayName(Component);
+        }
 
         const WrappedComponent = class extends React.Component {
             static childContextTypes = CTX_TYPES;
@@ -26,26 +31,21 @@ export default function connect({
             constructor(props,context) {
                 super(props,context);
                 
-                let resolvedValue = resolveValue.call(this, initialValue, props);
+                let defaultValue = resolveValue.call(this, initialValue, props);
                 
                 if(context[CTX_KEY] && mountPoint) {
                     let path = resolveValue.call(this, mountPoint, props);
-                    if(path) {
-                        path = toPath(path);
-                        let currentValue = getValue(context[CTX_KEY], path);
-                        
-                        if(isObservable(currentValue)) {
-                            this._data = currentValue;
-                        } else {
-                            if(currentValue === undefined) {
-                                currentValue = resolvedValue;
-                            }
-                            this._data = observable(currentValue);
-                            runInAction(() => setValue(context[CTX_KEY], toPath(path), this._data));
-                        }
+                    if(!path) throw new Error(`mountPoint does not resolve to a valid path`);
+                    path = toPath(path);
+                    let currentValue = getValue(context[CTX_KEY], path);
+                    
+                    if(currentValue === undefined) {
+                        currentValue = defaultValue;
                     }
+                    this._data = observable.box(currentValue, `${displayName}#${path.join('.')}`);
+                    runInAction(() => setValue(context[CTX_KEY], path, this._data));
                 } else {
-                    this._data = observable(resolvedValue);
+                    this._data = observable.box(defaultValue, displayName);
                 }
             }
 
@@ -62,7 +62,7 @@ export default function connect({
         }
 
         if(process.env.NODE_ENV !== 'production') {
-            WrappedComponent.displayName = `@connect(${getDisplayName(Component)})`;
+            WrappedComponent.displayName = `@connect(${displayName})`;
         }
         
         return WrappedComponent;

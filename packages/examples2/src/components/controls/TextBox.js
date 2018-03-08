@@ -9,12 +9,13 @@ import {action} from 'mobx';
 })
 export default class TextBox extends React.Component {
 
-    handleChange = action(ev => {
-        this.props.value.set(ev.currentTarget.value);
+    @action.bound
+    handleChange(ev) {
+        this.props.value.set(ev.target.value);
         if(this.props.onChange) {
             this.props.onChange(ev)
         }
-    })
+    }
     
     render() {
         const {value, name, ...props} = this.props;

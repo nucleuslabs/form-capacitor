@@ -13,15 +13,16 @@ import {
     Select,
     Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
     ExternalLink,
-    Field, Para, InputTel, Code
+    Field, Para, InputTel, Code, SnippetCode
 } from '../bulma';
-import {TextBox} from '../controls';
+import {TextBox,SelectBox} from '../controls';
 
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
 import check from '../../icons/fa/solid/check.svg';
 import email from '../../icons/fa/solid/envelope.svg';
 import connect from '../../form-capacitor/connect';
+import {toJS} from 'mobx';
 // import css from '../bulma/bulma.scss';
 
 function HomePage({formData}) {
@@ -31,7 +32,7 @@ function HomePage({formData}) {
             
             <Para>A basic form from the <ExternalLink href="https://bulma.io/documentation/form/general/#horizontal-form">Bulma documentation</ExternalLink>.</Para>
             
-            <Snippet>
+            <Snippet isHorizontal>
                 <SnippetPreview>
                     <Field isHorizontal>
                         <FieldLabel isNormal>
@@ -79,11 +80,11 @@ function HomePage({formData}) {
                         <FieldBody>
                             <Field isNarrow>
                                 <Control>
-                                    <Select isFullWidth>
-                                        <option>Business development</option>
-                                        <option>Marketing</option>
-                                        <option>Sales</option>
-                                    </Select>
+                                    <SelectBox name="department" isFullWidth>
+                                        <option value="business-development">Business development</option>
+                                        <option value="marketing">Marketing</option>
+                                        <option value="sales">Sales</option>
+                                    </SelectBox>
                                 </Control>
                             </Field>
                         </FieldBody>
@@ -106,7 +107,7 @@ function HomePage({formData}) {
                     </Field>
 
                     <Field isHorizontal>
-                        <FieldLabel>
+                        <FieldLabel isNormal>
                             <Label>Subject</Label>
                         </FieldLabel>
                         <FieldBody>
@@ -143,10 +144,12 @@ function HomePage({formData}) {
                         </FieldBody>
                     </Field>
                 </SnippetPreview>
+                <SnippetCode>
+                    <Code>
+                        {JSON.stringify(formData,null,2)}
+                    </Code>
+                </SnippetCode>
             </Snippet>
-            <Code>
-                {JSON.stringify(formData,null,2)}
-            </Code>
         </Fragment>
     )
 }
@@ -154,6 +157,7 @@ function HomePage({formData}) {
 export default connect({
     propName: 'formData',
     initialValue: {
-        name: "Mark"
+        name: "Mark",
+        // department: "marketing"
     }
 })(HomePage);

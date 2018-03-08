@@ -1,4 +1,5 @@
 import stringToPath from './stringToPath';
+import {isBoxedObservable} from 'mobx';
 
 export function setDefaults(obj, defaults, overwrite) {
     for(let key of Object.keys(defaults)) {
@@ -25,8 +26,14 @@ function isInt(obj) {
 }
 
 export function setValue(obj, path, value) {
-    if(!path.length) {
-        throw new Error('Path cannot be empty');
+    if(isBoxedObservable(obj)) {
+        if(!path.length) {
+            obj.set(value);
+            return;
+        }
+        obj = obj.get();
+    } else if(!path.length) {
+        throw new Error('Cannot set root of unboxed object');
     }
     const end = path.length - 1;
     for(let i=0; i<end; ++i) {
@@ -56,8 +63,11 @@ export function toPath(value) {
 
 export function getValue(obj, path, def) {
     if(!obj) return def;
+    if(isBoxedObservable(obj)) {
+        obj = obj.get();
+    }
     if(!Array.isArray(path)) {
-        throw new Error("`path` must be an array");
+        path = stringToPath(path);
     }
     let ret = obj;
 
