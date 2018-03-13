@@ -7,8 +7,9 @@ import SchedulingInstructionsForm from './pages/SchedulingInstructionsForm';
 import ErrorBoundary from './ErrorBoundary';
 import routes from './routes';
 import NotFound from './pages/NotFound';
+import {hot} from 'react-hot-loader'
 
-export default function App() {
+function App() {
 
     return (
         <BrowserRouter onUpdate={() => window.scrollTo(0, 0)}>
@@ -31,3 +32,5 @@ export default function App() {
         </BrowserRouter>
     )
 }
+
+export default hot(module)(App);

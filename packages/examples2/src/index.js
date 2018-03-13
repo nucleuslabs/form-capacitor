@@ -1,29 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {AppContainer} from 'react-hot-loader'
 import App from './components/App'
 import {useStrict} from 'mobx';
 
 useStrict(true);
 
-const render = Component => {
-    ReactDOM.render(
-        <AppContainer>
-            <Component/>
-        </AppContainer>,
-        document.getElementById('react-root'),
-    )
-}
 
-render(App)
+ReactDOM.render(<App/>, document.getElementById('react-root'))
 
-// Webpack Hot Module Replacement API
-if(module.hot) {
-    module.hot.accept('./components/App', () => {
-        console.clear();
-        render(App)
-    })
-}
 
 
 // import {observable,toJS} from 'mobx';
