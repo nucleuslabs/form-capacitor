@@ -84,7 +84,7 @@ function Instruction(defaults) {
 
 @connect({
     propName: 'formData',
-    initialValue: {
+    defaultValue: {
         instructions: [Instruction()],
     }
 })
@@ -117,8 +117,10 @@ export default class SchedulingInstructionsForm extends React.Component {
     }
     
     render() {
+        // console.log(this.props.formData.get());
         const formData = toJS(this.props.formData);
         // console.log(formData);
+        // console.log(this.props);
         // console.log(this.props.formData);
         return (
             <Fragment>

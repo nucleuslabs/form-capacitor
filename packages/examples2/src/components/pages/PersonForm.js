@@ -159,7 +159,7 @@ function HomePage({formData}) {
 
 export default connect({
     propName: 'formData',
-    initialValue: {
+    defaultValue: {
         name: "Mark",
         // department: "marketing"
     }

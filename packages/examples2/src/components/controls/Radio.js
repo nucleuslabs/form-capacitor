@@ -4,7 +4,7 @@ import {action} from 'mobx';
 
 @connect({
     propName: 'menuValue',
-    initialValue: p => p.defaultValue !== undefined ? p.defaultValue : null,
+    defaultValue: p => p.defaultValue !== undefined ? p.defaultValue : null,
     // mountPoint: p => p.name,
 })
 export default class Radio extends React.Component {

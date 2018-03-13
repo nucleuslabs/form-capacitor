@@ -4,7 +4,7 @@ import {action,toJS} from 'mobx';
 
 @connect({
     propName: 'value',
-    initialValue: '',
+    defaultValue: '',
     mountPoint: p => p.name,
 })
 export default class SelectBox extends React.Component {

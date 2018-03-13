@@ -4,7 +4,7 @@ import {action} from 'mobx';
 
 @connect({
     propName: 'checked',
-    initialValue: p => !!p.defaultValue,
+    defaultValue: p => !!p.defaultValue,
     mountPoint: p => p.name,
 })
 export default class Checkbox extends React.Component {

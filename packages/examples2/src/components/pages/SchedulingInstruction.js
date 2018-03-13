@@ -38,27 +38,27 @@ function SchedulingInstruction({doDelete}) {
     return (
         <TableRow isMiddleAligned>
             <TableCell>
-                <SelectBox name="typeId">
+                <SelectBox name="typeId" isFullWidth>
                     {options.appointmentTypes.map(({value, label}) => <option key={value}>{label}</option>)}
                 </SelectBox>
             </TableCell>
             <TableCell>
-                <SelectBox name="teamId">
+                <SelectBox name="teamId" isFullWidth>
                     {options.teams.map(({value, label}) => <option key={value}>{label}</option>)}
                 </SelectBox>
             </TableCell>
             <TableCell>
-                <SelectBox name="disciplineId">
+                <SelectBox name="disciplineId" isFullWidth>
                     {options.disciplines.map(({value, label}) => <option key={value}>{label}</option>)}
                 </SelectBox>
             </TableCell>
             <TableCell>
-                <SelectBox name="prefClinicianId">
+                <SelectBox name="prefClinicianId" isFullWidth>
                     {options.clinicians.map(({value, label}) => <option key={value}>{label}</option>)}
                 </SelectBox>
             </TableCell>
             <TableCell>
-                <SelectBox name="prefTime">
+                <SelectBox name="prefTime" isFullWidth>
                     {options.times.map(({value, label}) => <option key={value}>{label}</option>)}
                 </SelectBox>
             </TableCell>

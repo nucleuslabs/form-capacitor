@@ -6,7 +6,7 @@
 @mount(p => p.name)
 @connect({
     propName: 'value',
-    initialValue: '',
+    defaultValue: '',
 })
 export class TextBox extends React.Component {
     
