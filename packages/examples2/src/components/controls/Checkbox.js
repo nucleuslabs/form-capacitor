@@ -11,7 +11,7 @@ export default class Checkbox extends React.Component {
 
     @action.bound
     handleChange(ev) {
-        this.props.checked.set(ev.target.checked);
+        this.checked = ev.target.checked;
         if(this.props.onChange) {
             this.props.onChange(ev)
         }
@@ -19,6 +19,6 @@ export default class Checkbox extends React.Component {
 
     render() {
         const {checked, value, defaultValue, name, ...props} = this.props;
-        return <Component {...props} checked={checked.get()} onChange={this.handleChange}/>
+        return <Component {...props} checked={this.checked} onChange={this.handleChange}/>
     }
 }

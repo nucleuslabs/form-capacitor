@@ -28,7 +28,7 @@ import {appointmentTypes} from '../../../../form-capacitor-examples/src/options'
 import {observer} from 'mobx-react';
 import {observable,extendObservable,toJS,action} from 'mobx';
 import shortid from 'shortid';
-import connect from '../../form-capacitor/connect';
+import {connect,mount} from '../../form-capacitor';
 import SchedulingInstruction from './SchedulingInstruction';
 
 function Instruction(defaults) {
@@ -81,31 +81,33 @@ function Instruction(defaults) {
 //     })
 // })
 
-
-@connect({
-    propName: 'formData',
+@mount({
     defaultValue: {
         instructions: [Instruction()],
     }
+})
+@connect({
+    propName: 'formData',
+
 })
 export default class SchedulingInstructionsForm extends React.Component {
     
     @action.bound
     addInstruction(ev) {
-        this.props.formData.get().instructions.push(Instruction());
+        this.formData.instructions.push(Instruction());
     }
 
     @action.bound
     clearInstructions(ev) {
-        this.props.formData.get().instructions = [];
+        this.formData.instructions = [];
     }
     
     deleteInstruction = idx => action(ev => {
-        this.props.formData.get().instructions.splice(idx,1);
+        this.formData.instructions.splice(idx,1);
     })
     
     saveState = ev => {
-        this.saved = toJS(this.props.formData,true);
+        this.saved = toJS(this.formData,true);
         // this.saved = {instructions:[]};
     }
 
@@ -113,12 +115,13 @@ export default class SchedulingInstructionsForm extends React.Component {
     restoreState(ev) {
         // this.props.formData = observable(this.saved);
         // console.log('restoring',this.saved);
-        this.props.formData.set(this.saved);
+        this.formData = this.saved;
     }
     
     render() {
+        // console.log(this.formData)
         // console.log(this.props.formData.get());
-        const formData = toJS(this.props.formData);
+        // const formData = toJS(this.props.formData);
         // console.log(formData);
         // console.log(this.props);
         // console.log(this.props.formData);
@@ -139,7 +142,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {formData.instructions.map((inst,idx) => {
+                        {this.formData.instructions.map((inst,idx) => {
                             return <SchedulingInstruction key={inst.key} name={['instructions',idx]} doDelete={this.deleteInstruction(idx)}/>;
                         })}
                     </TableBody>
@@ -153,7 +156,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                 </ButtonBar>
 
                 <Code>
-                    {JSON.stringify(formData,null,2)}
+                    {JSON.stringify(toJS(this.formData),null,2)}
                 </Code>
             </Fragment>
         )

@@ -1,17 +1,19 @@
 import {InputText, Select} from '../bulma';
-import connect from '../../form-capacitor/connect';
+import {connect,mount} from '../../form-capacitor';
 import {action,toJS} from 'mobx';
 
+@mount({
+    defaultValue: '',
+    path: p => p.name,
+})
 @connect({
     propName: 'value',
-    defaultValue: '',
-    mountPoint: p => p.name,
 })
 export default class SelectBox extends React.Component {
 
     @action.bound
     handleChange(ev) {
-        this.props.value.set(ev.target.value);
+        this.value = ev.target.value;
         if(this.props.onChange) {
             this.props.onChange(ev)
         }
@@ -19,7 +21,7 @@ export default class SelectBox extends React.Component {
 
     render() {
         let {value, name, defaultValue, ...props} = this.props;
-        value = toJS(value);
+        value = toJS(this.value);
         if(value != null) {
             // have not set the `value` prop at all -- React will complain about about `undefined` and `null` and using an empty string isn't necessarily correct
             props.value = String(value);

@@ -1,11 +1,11 @@
 import {resolveValue,setValue,toPath,getValue} from './util';
 import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,toJS} from 'mobx';
+import {observable,action,runInAction,isObservable,toJS,extendObservable} from 'mobx';
 import {CTX_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
 export default function mount({
-    name = ({name}) => name,
+    path = ({name}) => name,
     defaultValue = () => Object.create(null),
 }) {
     return Component => {
@@ -28,23 +28,39 @@ export default function mount({
             constructor(props,context) {
                 super(props,context);
 
-                let rDefaultValue = resolveValue.call(this, defaultValue, props);
-
-                if(context[CTX_KEY] && name) {
-                    let path = resolveValue.call(this, name, props);
-                    if(!path) throw new Error(`name does not resolve to a valid path`);
-                    path = toPath(path);
-                    let currentValue = getValue(context[CTX_KEY], path);
-                    // console.log('currentValue',currentValue,toJS(context[CTX_KEY]),path,getValue(context[CTX_KEY], ['instructions']));
-
-                    if(currentValue === undefined) {
-                        currentValue = rDefaultValue;
+             
+                let _defaultValue = resolveValue.call(this, defaultValue, props);
+                let value = _defaultValue;
+                
+                if(context[CTX_KEY] && path) {
+                    let _path = toPath(resolveValue.call(this, path, props));
+                    value = getValue(context[CTX_KEY], _path);
+                    console.log('value',value);
+                    if(value === undefined) {
+                        value = _defaultValue;
                     }
-                    this._data = observable.box(currentValue, `${displayName}#${path.join('.')}`);
-                    runInAction(() => setValue(context[CTX_KEY], path, this._data));
-                } else {
-                    this._data = observable.box(rDefaultValue, displayName);
-                }
+                } 
+                
+                extendObservable(this, {
+                    _data: value,
+                })
+                // this._data = observable(_defa)
+
+                // if(context[CTX_KEY] && name) {
+                //     let path = resolveValue.call(this, name, props);
+                //     if(!path) throw new Error(`name does not resolve to a valid path`);
+                //     path = toPath(path);
+                //     let currentValue = getValue(context[CTX_KEY], path);
+                //     // console.log('currentValue',currentValue,toJS(context[CTX_KEY]),path,getValue(context[CTX_KEY], ['instructions']));
+                //
+                //     if(currentValue === undefined) {
+                //         currentValue = _defaultValue;
+                //     }
+                //     this._data = observable.box(currentValue, `${displayName}#${path.join('.')}`);
+                //     runInAction(() => setValue(context[CTX_KEY], path, this._data));
+                // } else {
+                //     this._data = observable.box(_defaultValue, displayName);
+                // }
             }
 
             render() {
