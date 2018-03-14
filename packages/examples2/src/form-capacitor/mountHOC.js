@@ -1,6 +1,6 @@
 import {resolveValue,setValue,toPath,getValue} from './util';
 import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,toJS,extendObservable} from 'mobx';
+import {observable,action,runInAction,isObservable,toJS,extendObservable,observe} from 'mobx';
 import {CTX_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
@@ -35,15 +35,28 @@ export default function mount({
                 if(context[CTX_KEY] && path) {
                     let _path = toPath(resolveValue.call(this, path, props));
                     value = getValue(context[CTX_KEY], _path);
-                    // console.log('value',value,_path,context[CTX_KEY]);
+                    // console.log(_path,value);
                     if(value === undefined) {
                         value = _defaultValue;
                     }
-                } 
+
+                    this._data = observable.box(value, `${displayName}#${_path.join('.')}`);
+                    // runInAction(() => setValue(context[CTX_KEY], _path, this._data));
+
+                    observe(this._data, change => {
+                        setValue(context[CTX_KEY], _path, change.newValue);
+                        // console.log('this.data',change)
+                    })
+                } else {
+
+                    this._data = observable.box(value, displayName);
+                }
+
+              
                 
-                extendObservable(this, {
-                    _data: value,
-                })
+                // extendObservable(this, {
+                //     _data: value,
+                // })
                 // this._data = observable(_defa)
 
                 // if(context[CTX_KEY] && name) {

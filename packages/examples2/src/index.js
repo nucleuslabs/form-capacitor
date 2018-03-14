@@ -1,9 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './components/App'
-import {useStrict} from 'mobx';
+import {configure} from 'mobx';
 
-useStrict(true);
+configure({
+    enforceActions: true,
+    isolateGlobalState: true,
+});
 
 
 ReactDOM.render(<App/>, document.getElementById('react-root'))

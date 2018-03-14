@@ -1,11 +1,12 @@
 import {resolveValue,setValue,toPath,getValue} from './util';
 import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,extendObservable} from 'mobx';
+import {observable,action,runInAction,isObservable,extendObservable,observe as addObserve} from 'mobx';
 import {CTX_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
 export default function connect({
     propName = undefined,
+    observe = undefined,
 }) {
     
     return Component => {
@@ -25,13 +26,27 @@ export default function connect({
                 super(props,context);
                 
                 // let _defaultValue = resolveValue.call(this, defaultValue, props);
-                let _propName = resolveValue.call(this, propName, props);
+                if(propName) {
+                    let _propName = resolveValue.call(this, propName, props);
 
-                extendObservable(this, {
-                    [_propName]: context[CTX_KEY],
-                });
-                
-        
+                    let obs = context[CTX_KEY];
+                    
+                    extendObservable(this, {
+                        [_propName]: obs.get(),
+                    });
+
+                    addObserve(this,_propName,change => {
+                        // console.log('heyyyy',change.newValue);
+                        obs.set(change.newValue);
+                    });
+                } else if(observe) {
+                    throw new Error('not supported');
+                    addObserve(context[CTX_KEY],change => {
+                        observe.call(this,change);
+                    });
+                }
+
+             
             }
 
             // render() {

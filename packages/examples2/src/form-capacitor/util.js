@@ -79,7 +79,7 @@ export function getValue(obj, path, def) {
         }
         ret = ret[key];
     }
-    console.log(obj,path);
+    // console.log(obj,path);
 
     return ret;
 }
