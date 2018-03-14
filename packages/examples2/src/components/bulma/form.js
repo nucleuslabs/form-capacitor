@@ -91,6 +91,6 @@ export class RadioMenu extends React.Component {
     }
 }
 
-export function Radio({className,style,children,name,value,...props}, ctx) {
-    return <label className={cc([css.radio,className])}><input type="radio" {...props} name={name} value={value}/><span>{children}</span></label>;
+export function Radio({className,style,children,name,value,onChange}) {
+    return <label className={cc([css.radio,className])}><input type="radio" name={name} value={value} onChange={onChange}/><span>{children}</span></label>;
 }

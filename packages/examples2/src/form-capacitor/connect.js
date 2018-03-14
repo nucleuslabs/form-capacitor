@@ -32,11 +32,11 @@ export default function connect({
                     let obs = context[CTX_KEY];
                     
                     extendObservable(this, {
-                        [_propName]: obs.get(),
+                        [_propName]: obs.get(), // screws up radio menus because each radio gets its own copy which doesnt actually change
                     });
 
                     addObserve(this,_propName,change => {
-                        // console.log('heyyyy',change.newValue);
+                        console.log('heyyyy',change.newValue);
                         obs.set(change.newValue);
                     });
                 } else if(observe) {
