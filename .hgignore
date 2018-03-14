@@ -3,4 +3,5 @@
 (?<![^/])node_modules/
 (?<![^/])dist/
 (?<![^/])package-lock\.json$
+(?<![^/])packages/examples2/src/icons/fa
 \.log$

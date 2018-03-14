@@ -1,6 +1,6 @@
 import {resolveValue,setValue,toPath,getValue} from './util';
 import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,toJS,extendObservable,observe} from 'mobx';
+import {observable,action,runInAction,isObservable,toJS,extendObservable,observe,autorun} from 'mobx';
 import {CTX_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
@@ -43,7 +43,12 @@ export default function mount({
                     this._data = observable.box(value, `${displayName}#${_path.join('.')}`);
                     // runInAction(() => setValue(context[CTX_KEY], _path, this._data));
 
+                    // autorun(() => setValue(context[CTX_KEY], _path, this._data))
+
+                    // runInAction(() => setValue(context[CTX_KEY], _path, value));
+                    
                     observe(this._data, change => {
+                        console.log('they see me firin');
                         setValue(context[CTX_KEY], _path, change.newValue);
                         // console.log('this.data',change)
                     })

@@ -1,11 +1,14 @@
 import {Checkbox as Component} from '../bulma';
 import connect from '../../form-capacitor/connect';
 import {action} from 'mobx';
+import {mount} from '../../form-capacitor';
 
+@mount({
+    defaultValue: false,
+    path: p => p.name,
+})
 @connect({
     propName: 'checked',
-    defaultValue: p => !!p.defaultValue,
-    mountPoint: p => p.name,
 })
 export default class Checkbox extends React.Component {
 

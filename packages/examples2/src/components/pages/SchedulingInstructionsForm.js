@@ -43,8 +43,8 @@ function Instruction(defaults) {
     //     key: shortid()
     // });
     return {
-        typeId: 'Rounds',
-        teamId: 'Kelowna',
+        typeId: null,
+        teamId: null,
         disciplineId: null,
         prefClinicianId: null,
         prefTime: null,

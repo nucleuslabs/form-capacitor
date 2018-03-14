@@ -1,28 +1,58 @@
 import {Radio as Component} from '../bulma';
-import connect from '../../form-capacitor/connect';
+import {mount,connect} from '../../form-capacitor';
 import {action} from 'mobx';
+import React from 'react';
+import shortid from 'shortid';
+import PropTypes from 'prop-types';
+
+
+const radioNameProp = shortid();
+
+const radioContextTypes = {
+    [radioNameProp]: PropTypes.string,
+    _fcMount: PropTypes.any,
+};
+
+
+export class _RadioMenu extends React.Component {
+    static childContextTypes = radioContextTypes;
+    
+    getChildContext() {
+        // console.log('xxx');
+        return {
+            [radioNameProp]: shortid(),
+        }
+    }
+
+    render() {
+        // console.log('rendder',this.getChildContext);
+        return this.props.children;
+    }
+}
+
+export const RadioMenu = mount({
+    defaultValue: p => p.defaultValue !== undefined ? p.defaultValue : null,
+    path: p => p.name,
+})(_RadioMenu);
+
 
 @connect({
     propName: 'menuValue',
-    defaultValue: p => p.defaultValue !== undefined ? p.defaultValue : null,
-    // mountPoint: p => p.name,
 })
-export default class Radio extends React.Component {
-
+export class Radio extends React.Component {
+    static contextTypes = radioContextTypes;
+    
     @action.bound
     handleChange(ev) {
-        this.props.menuValue.set(ev.target.value);
+        this.menuValue = ev.target.value;
         if(this.props.onChange) {
             this.props.onChange(ev)
         }
     }
 
     render() {
-        const {value, menuValue, defaultValue, name, ...props} = this.props;
-        if(value != null) {
-            // have not set the `value` prop at all -- React will complain about about `undefined` and `null` and using an empty string isn't necessarily correct
-            props.value = String(value);
-        }
-        return <Component {...props} checked={menuValue.get()==value} onChange={this.handleChange}/>
+        const {value, ...props} = this.props;
+        // console.log('this.context',this.context,radioNameProp);
+        return <Component {...props} checked={this.menuValue==value} onChange={this.handleChange} name={this.context[radioNameProp]} value={value}/>
     }
 }

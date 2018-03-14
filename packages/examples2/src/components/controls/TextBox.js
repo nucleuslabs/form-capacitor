@@ -1,17 +1,20 @@
 import {InputText} from '../bulma';
 import connect from '../../form-capacitor/connect';
 import {action} from 'mobx';
+import {mount} from '../../form-capacitor';
 
+@mount({
+    defaultValue: p => p.defaultValue !== undefined ? p.defaultValue : '',
+    path: p => p.name,
+})
 @connect({
     propName: 'value',
-    defaultValue: p => p.defaultValue !== undefined ? p.defaultValue : '',
-    mountPoint: p => p.name,
 })
 export default class TextBox extends React.Component {
 
     @action.bound
     handleChange(ev) {
-        this.props.value.set(ev.target.value);
+        this.value = ev.target.value;
         if(this.props.onChange) {
             this.props.onChange(ev)
         }
@@ -19,6 +22,6 @@ export default class TextBox extends React.Component {
     
     render() {
         const {value, name, defaultValue, ...props} = this.props;
-        return <InputText {...props} value={value.get()} onChange={this.handleChange}/>
+        return <InputText {...props} value={this.value} onChange={this.handleChange}/>
     }
 }
