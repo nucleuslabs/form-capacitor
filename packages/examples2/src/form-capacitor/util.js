@@ -73,11 +73,13 @@ export function getValue(obj, path, def) {
 
     for(let key of path) {
         // console.log(obj,ret,key,path);
-        if(ret == null || ret[key] == null) {
+        if(ret == null || ret[key] === undefined) {
+            // console.log('key not found',ret,key);
             return def;
         }
         ret = ret[key];
     }
+    console.log(obj,path);
 
     return ret;
 }

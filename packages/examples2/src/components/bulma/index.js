@@ -5,3 +5,4 @@ export * from './icon';
 export * from './content';
 export * from './container';
 export * from './elements/Table';
+export {splitAria} from '../../lib/react';

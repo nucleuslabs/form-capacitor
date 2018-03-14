@@ -92,6 +92,8 @@ function Instruction(defaults) {
 })
 export default class SchedulingInstructionsForm extends React.Component {
     
+    formId = shortid()
+    
     @action.bound
     addInstruction(ev) {
         this.formData.instructions.push(Instruction());
@@ -132,7 +134,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                 <Table isStriped isNarrow isFullWidth>
                     <TableHead>
                         <TableRow>
-                            <TableHeadCell>Appointment Type</TableHeadCell>
+                            <TableHeadCell id={`appointment-type-header--${this.formId}`}>Appointment Type</TableHeadCell>
                             <TableHeadCell>Team</TableHeadCell>
                             <TableHeadCell>Discipline</TableHeadCell>
                             <TableHeadCell>Pref. Clinician</TableHeadCell>
@@ -143,7 +145,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                     </TableHead>
                     <TableBody>
                         {this.formData.instructions.map((inst,idx) => {
-                            return <SchedulingInstruction key={inst.key} name={['instructions',idx]} doDelete={this.deleteInstruction(idx)}/>;
+                            return <SchedulingInstruction key={inst.key} name={['instructions',idx]} doDelete={this.deleteInstruction(idx)} formId={this.formId} number={idx+1}/>;
                         })}
                     </TableBody>
                 </Table>

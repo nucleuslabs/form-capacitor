@@ -35,7 +35,7 @@ export default function mount({
                 if(context[CTX_KEY] && path) {
                     let _path = toPath(resolveValue.call(this, path, props));
                     value = getValue(context[CTX_KEY], _path);
-                    console.log('value',value);
+                    // console.log('value',value,_path,context[CTX_KEY]);
                     if(value === undefined) {
                         value = _defaultValue;
                     }
@@ -69,7 +69,7 @@ export default function mount({
         }
 
         if(process.env.NODE_ENV !== 'production') {
-            WrappedComponent.displayName = `@connect(${displayName})`;
+            WrappedComponent.displayName = `@mount(${displayName})`;
         }
 
         return WrappedComponent;

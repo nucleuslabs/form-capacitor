@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import css from './bulma.scss';
 import cc from 'classcat';
-import {classFactory, withClass, withProps} from '../../lib/react';
+import {splitAria, withProps} from '../../lib/react';
 import shortid from 'shortid';
 import commonModifiers from './modifiers'
 import elem from './factory';
@@ -57,9 +57,10 @@ const SelectWrap = elem('div',css.select, {
 });
 
 export function Select({value,onChange,children,placeholder,...props}) {
+    let [aria,attrs] = splitAria(props);
     return (
-        <SelectWrap {...props}>
-            <select {...{value,onChange}}>
+        <SelectWrap {...attrs}>
+            <select {...{value,onChange}} {...aria}>
                 {placeholder != null && <option value="" disabled>{placeholder}</option>}
                 {children}
             </select>

@@ -34,11 +34,11 @@ import {mount} from '../../form-capacitor';
 import {TextBox, SelectBox, EmailInput, TelInput, Radio, TextArea, Checkbox} from '../controls';
 
 
-function SchedulingInstruction({doDelete}) {
+function SchedulingInstruction({doDelete,number,formId}) {
     return (
-        <TableRow isMiddleAligned>
+        <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>
             <TableCell>
-                <SelectBox name="typeId" isFullWidth>
+                <SelectBox name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`}>
                     {options.appointmentTypes.map(({value, label}) => <option key={value}>{label}</option>)}
                 </SelectBox>
             </TableCell>

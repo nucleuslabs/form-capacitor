@@ -89,3 +89,16 @@ export function getDisplayName(Component) {
 
     return Component.displayName || Component.name || 'Component'
 }
+
+export function splitAria(props) {
+    let aria = Object.create(null);
+    let notAria = Object.create(null);
+    for(let key of Object.keys(props)) {
+        if(key.startsWith('aria-')) {
+            aria[key] = props[key];
+        } else {
+            notAria[key] = props[key];
+        }
+    }
+    return [aria, notAria];
+}
