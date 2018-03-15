@@ -1,4 +1,4 @@
-import {InputText, Select} from '../bulma';
+import {InputText, Select as Component} from '../bulma';
 import {connect,mount} from '../../form-capacitor';
 import {action,toJS} from 'mobx';
 
@@ -12,7 +12,7 @@ import {action,toJS} from 'mobx';
     //     console.log('selectbox change',change);
     // }
 })
-export default class SelectBox extends React.Component {
+export default class Select extends React.Component {
 
     @action.bound
     handleChange(ev) {
@@ -30,6 +30,6 @@ export default class SelectBox extends React.Component {
             // have not set the `value` prop at all -- React will complain about about `undefined` and `null` and using an empty string isn't necessarily correct
             props.value = String(value);
         }
-        return <Select {...props} onChange={this.handleChange}/>
+        return <Component {...props} onChange={this.handleChange}/>
     }
 }

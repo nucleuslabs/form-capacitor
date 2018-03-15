@@ -1,5 +1,5 @@
 import stringToPath from './stringToPath';
-import {isBoxedObservable} from 'mobx';
+import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray} from 'mobx';
 
 export function setDefaults(obj, defaults, overwrite) {
     for(let key of Object.keys(defaults)) {
@@ -22,10 +22,13 @@ export function resolveValue(functionOrValue, ...args) {
 
 function isInt(obj) {
     return (typeof obj === 'string' && /^(0|[1-9][0-9]*)$/.test(obj))
-        || (Number.isFinite(obj) && Number.trunc(obj) === obj);
+        || (Number.isFinite(obj) && Math.trunc(obj) === obj);
 }
 
 export function setValue(obj, path, value) {
+    if(!isObject(obj)) {
+        throw new Error(`Cannot set property of non-object`);
+    }
     if(isBoxedObservable(obj)) {
         if(!path.length) {
             obj.set(value);
@@ -45,13 +48,33 @@ export function setValue(obj, path, value) {
             // overwritten. Objets, arrays, functions, regexes, Dates and more will
             // have new properties added.
         } else if(isInt(path1)) {
-            obj[key] = new Array(parseInt(path1,10)+1);
+            setProperty(obj, key, new Array(parseInt(path1,10)+1));
         } else {
-            obj[key] = Object.create(null);
+            setProperty(obj, key, Object.create(null));
         }
         obj = obj[key];
     }
-    obj[path[end]] = value;
+    // console.log('setting',obj,'@',path[end],'to',value);
+    setProperty(obj, path[end],value)
+}
+
+function setProperty(obj, key, value) {
+    if(isObservableObject(obj)) {
+        // console.log('oooooooooooo',obj);
+        if(isObservableProp(obj, key)) {
+            // console.log('already obs');
+            obj[key] = value;
+        } else {
+            // console.log('extending');
+            extendObservable(obj, {
+                [key]: value
+            })
+        }
+    } else if(isObservableArray(obj)) {
+        obj[key] = value;
+    } else {
+        throw new Error(`Cannot set property '${key}' on non-observable`);
+    }
 }
 
 export function toPath(value) {
@@ -82,4 +105,14 @@ export function getValue(obj, path, def) {
     // console.log(obj,path);
 
     return ret;
+}
+
+export const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
+
+export function isObject(obj) {
+    return obj !== null && typeof obj === 'object';
+}
+
+export function toObservable(obj) {
+    return isObject(obj) && !isObservable(obj) ? observable(obj) : obj;
 }

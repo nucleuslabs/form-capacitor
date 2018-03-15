@@ -118,6 +118,8 @@ export default class SchedulingInstructionsForm extends React.Component {
     }
     
     render() {
+        const formData = toJS(this.formData);
+        // console.log(this.formData);
         return (
             <Fragment>
                 <Title>Scheduling Instructions</Title>
@@ -136,6 +138,8 @@ export default class SchedulingInstructionsForm extends React.Component {
                     </TableHead>
                     <TableBody>
                         {this.formData.instructions.map((inst,idx) => {
+                            // console.log(inst.key);
+                            // console.log(JSON.stringify(inst),inst.key,JSON.stringify(inst.key),toJS(inst.key),toJS(inst).key);
                             return <SchedulingInstruction key={inst.key} name={['instructions',idx]} doDelete={this.deleteInstruction(idx)} formId={this.formId} number={idx+1}/>;
                         })}
                     </TableBody>
@@ -149,7 +153,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                 </ButtonBar>
 
                 <Code>
-                    {JSON.stringify(this.formData,null,2)}
+                    {JSON.stringify(formData,null,2)}
                 </Code>
             </Fragment>
         )

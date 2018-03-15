@@ -2,7 +2,7 @@ import {withProps} from '../../lib/react';
 
 import TextBox from './TextBox';
 export {default as TextBox} from './TextBox';
-export {default as SelectBox} from './SelectBox';
+export {default as Select} from './Select';
 export * from './Radio';
 export {default as TextArea} from './TextArea';
 export {default as Checkbox} from './Checkbox';

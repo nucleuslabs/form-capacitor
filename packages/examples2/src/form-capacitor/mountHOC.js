@@ -1,53 +1,51 @@
-import {resolveValue,setValue,toPath,getValue} from './util';
+import {resolveValue, setValue, toPath, getValue, isObject, toObservable} from './util';
 import {observer} from 'mobx-react';
 import {observable,action,runInAction,isObservable,isBoxedObservable,toJS,extendObservable,observe,autorun} from 'mobx';
-import {CTX_KEY, CTX_TYPES} from './consts';
+import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
-export default function mount({
-    path = ({name}) => name,
-    defaultValue = () => Object.create(null),
-}) {
+export default function mount(options) {
+    options = Object.assign({
+        path: ({name}) => name,
+        defaultValue: null,
+    }, options)
+    
     return Component => {
-        let displayName;
-
-        if(process.env.NODE_ENV !== 'production') {
-            displayName = getDisplayName(Component);
-        }
-
+        let displayName = getDisplayName(Component);
+        
         const WrappedComponent = class extends React.Component {
             static childContextTypes = CTX_TYPES;
             static contextTypes = CTX_TYPES;
 
             getChildContext() {
                 return {
-                    [CTX_KEY]: this._data
+                    [STORE_KEY]: this._data,
+                    [PATH_KEY]: this._path,
                 }
             }
 
             constructor(props,context) {
                 super(props,context);
                 
-                let _defaultValue = resolveValue.call(this, defaultValue, props);
-                let value = _defaultValue;
+                let defaultValue = resolveValue.call(this, options.defaultValue, props);
                 
-                if(context[CTX_KEY] && path) {
-                    let _path = toPath(resolveValue.call(this, path, props));
-                    value = getValue(context[CTX_KEY], _path);
+                if(context[STORE_KEY] && options.path) {
+                    this._data = context[STORE_KEY];
+                    this._path = toPath(resolveValue.call(this, options.path, props));
+                    if(context[PATH_KEY]) {
+                        this._path = [...context[PATH_KEY], ...this._path];
+                    }
+                    let value = getValue(context[STORE_KEY], this._path);
                     // console.log(_path,value);
                     if(value === undefined) {
-                        value = _defaultValue;
+                        value = defaultValue;
                     }
-
-                    if(isBoxedObservable(value)) {
-                        this._data = value;
-                    } else {
-                        this._data = observable.box(value, `${displayName}#${_path.join('.')}`);
-                    }
-
-                    runInAction(() => setValue(context[CTX_KEY], _path, this._data));
+                    
+                    // console.log('setting',context[STORE_KEY],this._path);
+                    runInAction(() => setValue(context[STORE_KEY], this._path, value));
                 } else {
-                    this._data = observable.box(value, displayName);
+                    this._data = observable.box(defaultValue, displayName);
+                    this._path = [];
                 }
             }
 

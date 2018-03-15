@@ -10,7 +10,6 @@ import {
     Button,
 
     HelpText,
-    Select,
     RadioMenu, Snippet, SnippetPreview, Content,
     ExternalLink,
     Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, ActionLink, ActionButton,
@@ -31,36 +30,36 @@ import shortid from 'shortid';
 import connect from '../../form-capacitor/connect';
 import {mount} from '../../form-capacitor';
 
-import {TextBox, SelectBox, EmailInput, TelInput, Radio, TextArea, Checkbox} from '../controls';
+import {TextBox, Select, EmailInput, TelInput, Radio, TextArea, Checkbox} from '../controls';
 
 
 function SchedulingInstruction({doDelete,number,formId}) {
     return (
         <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>
             <TableCell>
-                <SelectBox name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`}>
+                <Select name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`}>
                     {options.appointmentTypes.map(({value, label}) => <option key={value}>{label}</option>)}
-                </SelectBox>
+                </Select>
             </TableCell>
             <TableCell>
-                <SelectBox name="teamId" isFullWidth>
+                <Select name="teamId" isFullWidth>
                     {options.teams.map(({value, label}) => <option key={value}>{label}</option>)}
-                </SelectBox>
+                </Select>
             </TableCell>
             <TableCell>
-                <SelectBox name="disciplineId" isFullWidth>
+                <Select name="disciplineId" isFullWidth>
                     {options.disciplines.map(({value, label}) => <option key={value}>{label}</option>)}
-                </SelectBox>
+                </Select>
             </TableCell>
             <TableCell>
-                <SelectBox name="prefClinicianId" isFullWidth>
+                <Select name="prefClinicianId" isFullWidth>
                     {options.clinicians.map(({value, label}) => <option key={value}>{label}</option>)}
-                </SelectBox>
+                </Select>
             </TableCell>
             <TableCell>
-                <SelectBox name="prefTime" isFullWidth>
+                <Select name="prefTime" isFullWidth>
                     {options.times.map(({value, label}) => <option key={value}>{label}</option>)}
-                </SelectBox>
+                </Select>
             </TableCell>
             <TableCell>
                 <Checkbox name="childRequired">Yes</Checkbox>
@@ -72,5 +71,7 @@ function SchedulingInstruction({doDelete,number,formId}) {
     )
 }
 
-export default mount({})(SchedulingInstruction);
+export default mount({
+    defaultValue: {},
+})(SchedulingInstruction);
 // export default SchedulingInstruction;

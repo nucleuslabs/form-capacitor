@@ -1,13 +1,14 @@
-import {resolveValue,setValue,toPath,getValue} from './util';
+import {resolveValue, setValue, toPath, getValue, toObservable} from './util';
 import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,extendObservable,observe as addObserve} from 'mobx';
-import {CTX_KEY, CTX_TYPES} from './consts';
+import {observable,action,runInAction,isObservable,extendObservable,observe as addObserve,toJS,isBoxedObservable} from 'mobx';
+import {STORE_KEY,PATH_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
-export default function connect({
-    propName = undefined,
-    observe = undefined,
-}) {
+export default function connect(options) {
+    options = Object.assign({
+        propName: undefined,
+        observe: undefined,
+    }, options)
     
     return Component => {
         // const ObserverComponent = observer(Component);
@@ -24,8 +25,8 @@ export default function connect({
                 super(props,context);
                 
                 // let _defaultValue = resolveValue.call(this, defaultValue, props);
-                if(propName) {
-                    let _propName = resolveValue.call(this, propName, props);
+                if(options.propName) {
+                    let _propName = resolveValue.call(this, options.propName, props);
 
                     // let obs = context[CTX_KEY];
                     
@@ -33,10 +34,10 @@ export default function connect({
                     
                     Object.defineProperty(this, _propName, {
                         get() {
-                            return context[CTX_KEY].get();
+                            return getValue(context[STORE_KEY], context[PATH_KEY]);
                         },
                         set(value) {
-                            context[CTX_KEY].set(value)
+                            setValue(context[STORE_KEY],context[PATH_KEY],value);
                         }
                     })
                     
@@ -48,10 +49,10 @@ export default function connect({
                     //     console.log('heyyyy',change.newValue);
                     //     obs.set(change.newValue);
                     // });
-                } else if(observe) {
+                } else if(options.observe) {
                     throw new Error('not supported');
-                    addObserve(context[CTX_KEY],change => {
-                        observe.call(this,change);
+                    addObserve(context[STORE_KEY], change => {
+                        options.observe.call(this,change);
                     });
                 }
 

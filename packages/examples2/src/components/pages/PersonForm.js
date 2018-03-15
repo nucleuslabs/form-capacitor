@@ -17,7 +17,7 @@ import {
     Code,
     SnippetCode
 } from '../bulma';
-import {TextBox, SelectBox, EmailInput, TelInput, Radio, TextArea,RadioMenu} from '../controls';
+import {TextBox, Select, EmailInput, TelInput, Radio, TextArea,RadioMenu} from '../controls';
 
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
@@ -95,11 +95,11 @@ export default class HomePage extends React.Component {
                             <FieldBody>
                                 <Field isNarrow>
                                     <Control>
-                                        <SelectBox name="department" placeholder="– Please Choose –">
+                                        <Select name="department" placeholder="– Please Choose –">
                                             <option data-value={999} value="business-development">Business development</option>
                                             <option value="marketing">Marketing</option>
                                             <option value="sales">Sales</option>
-                                        </SelectBox>
+                                        </Select>
                                     </Control>
                                 </Field>
                             </FieldBody>
