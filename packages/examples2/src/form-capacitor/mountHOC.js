@@ -1,6 +1,6 @@
 import {resolveValue,setValue,toPath,getValue} from './util';
 import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,toJS,extendObservable,observe,autorun} from 'mobx';
+import {observable,action,runInAction,isObservable,isBoxedObservable,toJS,extendObservable,observe,autorun} from 'mobx';
 import {CTX_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
@@ -40,18 +40,26 @@ export default function mount({
                         value = _defaultValue;
                     }
 
-                    this._data = observable.box(value, `${displayName}#${_path.join('.')}`);
+                    if(isBoxedObservable(value)) {
+                        this._data = value;
+                    } else {
+                        this._data = observable.box(value, `${displayName}#${_path.join('.')}`);
+                      
+                    }
+
+                    runInAction(() => setValue(context[CTX_KEY], _path, this._data));
+                    
                     // runInAction(() => setValue(context[CTX_KEY], _path, this._data));
 
                     // autorun(() => setValue(context[CTX_KEY], _path, this._data))
 
                     // runInAction(() => setValue(context[CTX_KEY], _path, value));
-                    
-                    observe(this._data, change => {
-                        console.log('they see me firin');
-                        setValue(context[CTX_KEY], _path, change.newValue);
-                        // console.log('this.data',change)
-                    })
+                    //
+                    // observe(this._data, change => {
+                    //     console.log('they see me firin');
+                    //     setValue(context[CTX_KEY], _path, change.newValue);
+                    //     // console.log('this.data',change)
+                    // })
                 } else {
 
                     this._data = observable.box(value, displayName);

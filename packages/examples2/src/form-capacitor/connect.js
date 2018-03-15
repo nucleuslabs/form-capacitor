@@ -29,16 +29,27 @@ export default function connect({
                 if(propName) {
                     let _propName = resolveValue.call(this, propName, props);
 
-                    let obs = context[CTX_KEY];
+                    // let obs = context[CTX_KEY];
                     
-                    extendObservable(this, {
-                        [_propName]: obs.get(), // screws up radio menus because each radio gets its own copy which doesnt actually change
-                    });
+                    // this[_propName] = context[CTX_KEY];
+                    
+                    Object.defineProperty(this, _propName, {
+                        get() {
+                            return context[CTX_KEY].get();
+                        },
+                        set(value) {
+                            context[CTX_KEY].set(value)
+                        }
+                    })
+                    
+                    // extendObservable(this, {
+                    //     [_propName]: context[CTX_KEY], // screws up radio menus because each radio gets its own copy which doesnt actually change
+                    // });
 
-                    addObserve(this,_propName,change => {
-                        console.log('heyyyy',change.newValue);
-                        obs.set(change.newValue);
-                    });
+                    // addObserve(this,_propName,change => {
+                    //     console.log('heyyyy',change.newValue);
+                    //     obs.set(change.newValue);
+                    // });
                 } else if(observe) {
                     throw new Error('not supported');
                     addObserve(context[CTX_KEY],change => {

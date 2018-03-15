@@ -121,6 +121,7 @@ export default class SchedulingInstructionsForm extends React.Component {
     }
     
     render() {
+        const formData = toJS(this.formData);
         // console.log(this.formData)
         // console.log(this.props.formData.get());
         // const formData = toJS(this.props.formData);
@@ -144,7 +145,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.formData.instructions.map((inst,idx) => {
+                        {formData.instructions.map((inst,idx) => {
                             return <SchedulingInstruction key={inst.key} name={['instructions',idx]} doDelete={this.deleteInstruction(idx)} formId={this.formId} number={idx+1}/>;
                         })}
                     </TableBody>
@@ -158,7 +159,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                 </ButtonBar>
 
                 <Code>
-                    {JSON.stringify(toJS(this.formData),null,2)}
+                    {JSON.stringify(formData,null,2)}
                 </Code>
             </Fragment>
         )
