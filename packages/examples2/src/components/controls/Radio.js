@@ -10,7 +10,7 @@ const radioNameProp = shortid();
 
 const radioContextTypes = {
     [radioNameProp]: PropTypes.string,
-    _fcMount: PropTypes.any,
+    // _fcMount: PropTypes.any,
 };
 
 
@@ -36,10 +36,7 @@ export const RadioMenu = mount({
 })(_RadioMenu);
 
 
-@connect({
-    propName: 'menuValue',
-})
-export class Radio extends React.Component {
+class _Radio extends React.Component {
     static contextTypes = radioContextTypes;
     
     @action.bound
@@ -56,3 +53,7 @@ export class Radio extends React.Component {
         return <Component {...props} checked={this.menuValue==value} onChange={this.handleChange} name={this.context[radioNameProp]} value={value}/>
     }
 }
+
+export const Radio = connect({
+    propName: 'menuValue'
+})(_Radio);

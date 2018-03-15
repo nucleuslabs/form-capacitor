@@ -18,8 +18,6 @@ export default function connect({
         }
 
         const WrappedComponent = class extends Component {
-            static contextTypes = CTX_TYPES;
-            
         
             
             constructor(props,context) {
@@ -71,6 +69,8 @@ export default function connect({
             //     return React.createElement(ObserverComponent, props);
             // }
         }
+
+        WrappedComponent.contextTypes = {...CTX_TYPES, ...Component.contextTypes};
 
         if(process.env.NODE_ENV !== 'production') {
             WrappedComponent.displayName = `@connect(${displayName})`;
