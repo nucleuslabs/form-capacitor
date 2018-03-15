@@ -27,8 +27,7 @@ export default function mount({
 
             constructor(props,context) {
                 super(props,context);
-
-             
+                
                 let _defaultValue = resolveValue.call(this, defaultValue, props);
                 let value = _defaultValue;
                 
@@ -44,49 +43,12 @@ export default function mount({
                         this._data = value;
                     } else {
                         this._data = observable.box(value, `${displayName}#${_path.join('.')}`);
-                      
                     }
 
                     runInAction(() => setValue(context[CTX_KEY], _path, this._data));
-                    
-                    // runInAction(() => setValue(context[CTX_KEY], _path, this._data));
-
-                    // autorun(() => setValue(context[CTX_KEY], _path, this._data))
-
-                    // runInAction(() => setValue(context[CTX_KEY], _path, value));
-                    //
-                    // observe(this._data, change => {
-                    //     console.log('they see me firin');
-                    //     setValue(context[CTX_KEY], _path, change.newValue);
-                    //     // console.log('this.data',change)
-                    // })
                 } else {
-
                     this._data = observable.box(value, displayName);
                 }
-
-              
-                
-                // extendObservable(this, {
-                //     _data: value,
-                // })
-                // this._data = observable(_defa)
-
-                // if(context[CTX_KEY] && name) {
-                //     let path = resolveValue.call(this, name, props);
-                //     if(!path) throw new Error(`name does not resolve to a valid path`);
-                //     path = toPath(path);
-                //     let currentValue = getValue(context[CTX_KEY], path);
-                //     // console.log('currentValue',currentValue,toJS(context[CTX_KEY]),path,getValue(context[CTX_KEY], ['instructions']));
-                //
-                //     if(currentValue === undefined) {
-                //         currentValue = _defaultValue;
-                //     }
-                //     this._data = observable.box(currentValue, `${displayName}#${path.join('.')}`);
-                //     runInAction(() => setValue(context[CTX_KEY], path, this._data));
-                // } else {
-                //     this._data = observable.box(_defaultValue, displayName);
-                // }
             }
 
             render() {

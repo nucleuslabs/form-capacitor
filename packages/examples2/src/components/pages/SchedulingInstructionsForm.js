@@ -109,25 +109,15 @@ export default class SchedulingInstructionsForm extends React.Component {
     })
     
     saveState = ev => {
-        this.saved = toJS(this.formData,true);
-        // this.saved = {instructions:[]};
+        this.saved = toJS(this.formData);
     }
 
     @action.bound
     restoreState(ev) {
-        // this.props.formData = observable(this.saved);
-        // console.log('restoring',this.saved);
         this.formData = this.saved;
     }
     
     render() {
-        const formData = toJS(this.formData);
-        // console.log(this.formData)
-        // console.log(this.props.formData.get());
-        // const formData = toJS(this.props.formData);
-        // console.log(formData);
-        // console.log(this.props);
-        // console.log(this.props.formData);
         return (
             <Fragment>
                 <Title>Scheduling Instructions</Title>
@@ -145,7 +135,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {formData.instructions.map((inst,idx) => {
+                        {this.formData.instructions.map((inst,idx) => {
                             return <SchedulingInstruction key={inst.key} name={['instructions',idx]} doDelete={this.deleteInstruction(idx)} formId={this.formId} number={idx+1}/>;
                         })}
                     </TableBody>
@@ -159,7 +149,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                 </ButtonBar>
 
                 <Code>
-                    {JSON.stringify(formData,null,2)}
+                    {JSON.stringify(this.formData,null,2)}
                 </Code>
             </Fragment>
         )
