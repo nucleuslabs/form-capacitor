@@ -1,5 +1,5 @@
 import stringToPath from './stringToPath';
-import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray} from 'mobx';
+import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray, set as mobSet} from 'mobx';
 
 export function setDefaults(obj, defaults, overwrite) {
     for(let key of Object.keys(defaults)) {
@@ -48,14 +48,14 @@ export function setValue(obj, path, value) {
             // overwritten. Objets, arrays, functions, regexes, Dates and more will
             // have new properties added.
         } else if(isInt(path1)) {
-            setProperty(obj, key, new Array(parseInt(path1,10)+1));
+            mobSet(obj, key, new Array(parseInt(path1,10)+1));
         } else {
-            setProperty(obj, key, Object.create(null));
+            mobSet(obj, key, Object.create(null));
         }
         obj = obj[key];
     }
     // console.log('setting',obj,'@',path[end],'to',value);
-    setProperty(obj, path[end],value)
+    mobSet(obj, path[end],value)
 }
 
 function setProperty(obj, key, value) {
