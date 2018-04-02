@@ -31,7 +31,13 @@ import React from 'react';
 
 @mount({
     defaultValue: {
-        name: "Mark"
+        name: "Mark",
+        email: '@nucleuslabs.com',
+        phone: '',
+        department: '',
+        isMember: true,
+        subject: "Please...",
+        howHelp: '',
     }
 })
 @connect({

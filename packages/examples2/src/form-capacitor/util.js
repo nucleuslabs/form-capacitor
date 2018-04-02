@@ -48,14 +48,23 @@ export function setValue(obj, path, value) {
             // overwritten. Objets, arrays, functions, regexes, Dates and more will
             // have new properties added.
         } else if(isInt(path1)) {
-            mobSet(obj, key, new Array(parseInt(path1,10)+1));
+            setProperty(obj, key, new Array(parseInt(path1,10)+1));
         } else {
-            mobSet(obj, key, Object.create(null));
+            setProperty(obj, key, Object.create(null));
+        }
+        if(isObservableObject(obj)) {
+            if(isObservableProp(obj, key)) {
+                throw new Error(`Property '${path.slice(0,i+1).join('.')}' is not observable`);
+            }
+        } else if(isObservableArray(obj)) {
+            // good
+        } else {
+            throw new Error(`Cannot add property '${path.slice(0,i+1).join('.')}' to non-observable`);
         }
         obj = obj[key];
     }
     // console.log('setting',obj,'@',path[end],'to',value);
-    mobSet(obj, path[end],value)
+    setProperty(obj, path[end],value)
 }
 
 function setProperty(obj, key, value) {
@@ -65,10 +74,7 @@ function setProperty(obj, key, value) {
             // console.log('already obs');
             obj[key] = value;
         } else {
-            // console.log('extending');
-            extendObservable(obj, {
-                [key]: value
-            })
+            throw new Error(`Cannot add property '${key}' to object; changes wouldn't be tracked`)
         }
     } else if(isObservableArray(obj)) {
         obj[key] = value;

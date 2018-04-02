@@ -371,7 +371,7 @@ According to JSON schema (https://spacetelescope.github.io/understanding-json-sc
 We could use {} as a shorthand for "object with properties"
 But if {} exclusively means "object" then we need a different token for schemas... so here we go again..
 
-Actually, the "name" can kinda be like a Python doc-string (GraphQL also switched to using strings!): http://www.pythonforbeginners.com/basics/python-docstrings Although they use that for the description, ours is more of a title/name that'll be used in the error messages.. Hmmm...
+Actually, the "name" can kinda be like a Python doc-string (GraphQL also switched to using strings! https://www.apollographql.com/docs/graphql-tools/generate-schema.html): http://www.pythonforbeginners.com/basics/python-docstrings Although they use that for the description, ours is more of a title/name that'll be used in the error messages.. Hmmm...
 
 But we were using <> to be an inline extension...
 
@@ -475,6 +475,10 @@ type ValidTimesError = ValidTimes<
 
 ==============================================================================
 
+Maybe properties don't have to have a "title" and such, they can go straight to the type definition, in which case they'll be referred to by their property name in error messages, or maybe the whole object should just error out instead (i.e. errors are folded into the closest named field?)
+
+==============================================================================
+
 TODO: real-time/online validations vs onBlur validations?
 ^- maybe an extra property called `runType`?
 ^-- but how would we bake "runType" into the CC type above..?
@@ -482,3 +486,6 @@ TODO: real-time/online validations vs onBlur validations?
 Union type with all constants as options should have a nice default error message.
 
 TODO: run-time $variables
+
+use $ref for JSON Schema like https://app.quicktype.io/?s=AddressBook.ts&l=swift
+

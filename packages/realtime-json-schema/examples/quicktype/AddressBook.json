@@ -1,0 +1,94 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "definitions": {
+        "AddressBook": {
+            "title": "AddressBook",
+            "type": "object",
+            "properties": {
+                "contacts": {
+                    "description": "A dictionary of Contacts, indexed by unique ID",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Contact"
+                    },
+                    "title": "contacts"
+                }
+            },
+            "required": [
+                "contacts"
+            ]
+        },
+        "Contact": {
+            "title": "Contact",
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string",
+                    "title": "firstName"
+                },
+                "lastName": {
+                    "type": "string",
+                    "title": "lastName"
+                },
+                "birthday": {
+                    "type": "string",
+                    "format": "date-time",
+                    "title": "birthday"
+                },
+                "title": {
+                    "enum": [
+                        "Mr.",
+                        "Mrs.",
+                        "Ms.",
+                        "Prof."
+                    ],
+                    "type": "string",
+                    "title": "title"
+                },
+                "emails": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "emails"
+                },
+                "phones": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PhoneNumber"
+                    },
+                    "title": "phones"
+                },
+                "highScore": {
+                    "type": "integer",
+                    "title": "highScore"
+                }
+            },
+            "required": [
+                "emails",
+                "firstName",
+                "highScore",
+                "phones"
+            ]
+        },
+        "PhoneNumber": {
+            "description": "A Contact's phone number.",
+            "title": "PhoneNumber",
+            "type": "object",
+            "properties": {
+                "number": {
+                    "type": "string",
+                    "title": "number"
+                },
+                "label": {
+                    "description": "An optional label (e.g. \"mobile\")",
+                    "type": "string",
+                    "title": "label"
+                }
+            },
+            "required": [
+                "number"
+            ]
+        }
+    }
+}
