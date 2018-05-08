@@ -26,6 +26,9 @@ Inspiration:
 
 Libs:
 - https://astexplorer.net/
+- http://btmills.github.io/parserapi/
+- https://github.com/babel/babel/tree/master/packages/babylon
+- https://github.com/babel/babylon/blob/master/ast/spec.md
 
 GraphQL:
 
@@ -399,7 +402,7 @@ Braces: ({[<
 { object
 [ array
 ( schema
-< extends
+< extends -- or maybe <: for extends, like the Babylon schema?
 
 TODO: syntax for optional.... https://stackoverflow.com/a/37166319/65387
 	https://www.typescriptlang.org/docs/handbook/interfaces.html#optional-properties
@@ -489,3 +492,16 @@ TODO: run-time $variables
 
 use $ref for JSON Schema like https://app.quicktype.io/?s=AddressBook.ts&l=swift
 
+
+==============================================================================
+
+ things:
+ - schema (validates a thing, w/ a type + rules and has a name + desc)
+ - type (like "string", or "int", or "bool", ... just the JSOn types)
+ - rule (min/max/pattern,...)
+ - meta
+    - title
+    - description
+    - error message
+    
+Rules are specific to types. e.g. [regex] patterns only work on strings. min/max only works on numbers. So the rules have to be within the type.
