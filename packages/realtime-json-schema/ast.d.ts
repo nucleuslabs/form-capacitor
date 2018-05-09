@@ -90,4 +90,5 @@ interface ObjectExpression extends Expression {
     - title
     - description
     - error message
+    - default value
 */ 
