@@ -2,49 +2,41 @@
 // https://bitbucket.org/mnpenner/async-lang/src/6e6e69119eb22cca4a477ae7483a8043dbf51673/lang/async/grammar.pegjs
 // https://bitbucket.org/mnpenner/async-lang/src/6e6e69119eb22cca4a477ae7483a8043dbf51673/lang/pql/grammar.pegjs
 
-{
 
-	const EMPTY_OBJECT = Object.freeze(Object.create(null))
-	const EMPTY_ARRAY = Object.freeze([])
-
-	function node(type, body) {
-		return {type, body, /*loc: location()*/};
-	}
-	
-	function literal(value) {
-		return node('literal',value);
-	}
-	
-	function lastColumn(list) {
-	    return list.map(e => e[e.length-1]);
-	}
-	
-	function list(head, tail) {
-		return [head, ...lastColumn(tail)];
-	}
-}
   
 Program = _ a:Schema b:(_ Schema)* _ {
 	return list(a,b)
 }
 
 Schema = "schema" _ id:(Identifier _)? definition:SchemaDef {
-	return node('schema', {name: id ? id[0].name : null, definition})
+	return Schema({name: id ? id[0].name : null, definition})
 }
 
 SchemaDef 
-	= "(" _ x:SchemaNameAndValueList _ ")" { return node('schemaDefinition',x) }
+	= "(" _ x:SchemaNameAndValueList _ ")" {  
+	 //console.log('x',x);
+	 return x;
+ }
 
 SchemaNameAndValueList = a:SchemaAssignment b:(PropertySeparator SchemaAssignment)* (_ ",")? { 
 	let o = Object.create(null);
-	//console.log('properties',properties);
-	for(let p of list(a,b)) {
-		o[p.type] = p.body;
+	
+	for(let [k,v] of list(a,b)) {
+		o[k] = v;
 	}
 	return o
 }
 
-SchemaAssignment = SharedSchemaOptions / ArraySchemaOptions / ObjectSchemaOptions / NumberSchemaOptions / StringSchemaOptions
+SchemaPropertyPair = key: PropertyName SchemaValueSeparator  value: SchemaPropertyValue {
+	return [key,value]
+}
+SchemaPropertyValue = Literal / SchemaDef
+
+//SchemaProperties = "title" / "description" / "default" / "type"
+
+SchemaAssignment = key: PropertyName SchemaValueSeparator  value: SchemaPropertyValue {
+                   	return [key,value]
+                   }
 
 ObjectSchemaOptions = Schema_properties
 
@@ -55,7 +47,7 @@ PropertyNameAndSchemaList = a:SchemaPropertyAssignment b:(PropertySeparator Sche
 SchemaPropertyAssignment = key: PropertyName opt:(_ "?")? PropertyValueSeparator value:SchemaDef { return {key,value,optional:!!opt} }
 
 ObjectSchema 
-	= "{" _ "}" { return node('objectSchema',Object.create(null)) } 
+	= "{" _ "}" { return Node('objectSchema',Object.create(null)) } 
 	/ "{" _ propList:PropertyNameAndSchemaList _ "}" { 
                		let o = Object.create(null);
                		let required = [];
@@ -67,7 +59,7 @@ ObjectSchema
                			    required.push(p.key);
                			}
                		}
-               		return node('objectSchema',{properties:o,required})
+               		return Node('objectSchema',{properties:o,required})
                	}
 
 SchemaValueSeparator
@@ -76,16 +68,16 @@ SchemaValueSeparator
 PropertyValueSeparator = _ ":" _
 	
 TitleDef = "title" SchemaValueSeparator str:StringLiteral {
-	return node('title',str)
+	return Node('title',str)
 }
 
 DescriptionDef = "description" SchemaValueSeparator str:StringLiteral {
-	return node('description',str)
+	return Node('description',str)
 }
 
 
 DefaultDef = "default" SchemaValueSeparator lit:Literal {
-	return node('default', lit)
+	return Node('default', lit)
 }
 
 TypeDef = "type" SchemaValueSeparator x:TypeWithExt {
@@ -99,15 +91,15 @@ Schema_properties = "properties" SchemaValueSeparator x:ObjectSchema {
 Type = BasicType / ObjectSchema
 
 TypeWithExt = base:Type ext:TypeExt? {
-	return node('type',{base,ext})
+	return Node('type',{base,ext})
 }
 
-TypeExt = "<" _ x:SchemaNameAndValueList _ ">" { return node('typeExt',x) }
+TypeExt = "<" _ x:SchemaNameAndValueList _ ">" { return Node('typeExt',x) }
 
 BasicTypes = "String" / "Number" / "Object" / "Array" / "Boolean"
 
 BasicType = x:BasicTypes {
-	return node('basicType',x)
+	return Node('basicType',x)
 }
 
 ArraySchemaOptions = Array_minLength / Array_maxLength / Array_items
@@ -117,37 +109,37 @@ StringSchemaOptions = String_pattern / String_minLength / String_maxLength
 // todo: these options should be context-sensitive
 // so that "minLength" can mean something different if applied to a string vs an array
 Array_minLength = "minItems" SchemaValueSeparator value:NumericLiteral {
-	return node('Array_minLength',value)
+	return Node('Array_minLength',value)
 }
 
 Array_maxLength = "maxItems" SchemaValueSeparator value:NumericLiteral {
-	return node('Array_maxLength',value)
+	return Node('Array_maxLength',value)
 }
 Array_items = "items" SchemaValueSeparator x:TypeWithExt {
-	return node('Array_items',x)
+	return Node('Array_items',x)
 }
 
 Number_minimum = "minimum" SchemaValueSeparator value:NumericLiteral {
-	return node('Number_minimum',value)
+	return Node('Number_minimum',value)
 }
 
 Number_maximum = "maximum" SchemaValueSeparator value:NumericLiteral {
-	return node('Number_maximum',value)
+	return Node('Number_maximum',value)
 }
 Number_multipleOf = "multipleOf" SchemaValueSeparator value:NumericLiteral {
-	return node('Number_multipleOf',value)
+	return Node('Number_multipleOf',value)
 }
 
 String_pattern = "pattern" SchemaValueSeparator value:(RegularExpressionLiteral / StringLiteral) {
-	return node('String_pattern',value)
+	return Node('String_pattern',value)
 }
 
 String_minLength = "minLength" SchemaValueSeparator value:NumericLiteral {
-	return node('String_minLength',value)
+	return Node('String_minLength',value)
 }
 
 String_maxLength = "maxLength" SchemaValueSeparator value:NumericLiteral {
-	return node('String_maxLength',value)
+	return Node('String_maxLength',value)
 }
 
 SourceCharacter
@@ -183,10 +175,7 @@ Identifier
   
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
-      return {
-        type: "Identifier",
-        name: head + tail.join("")
-      };
+      return Identifier(head + tail.join(""))
     }
 
 IdentifierStart
@@ -274,31 +263,31 @@ Literal
   / ArrayLiteral
 
 NullLiteral
-  = NullToken { return literal(null) }
+  = NullToken { return NullLiteral() }
 
 BooleanLiteral
-  = TrueToken  { return literal(true) }
-  / FalseToken { return literal(false) }
+  = TrueToken  { return BooleanLiteral(true) }
+  / FalseToken { return BooleanLiteral(false) }
 
 // The "!(IdentifierStart / DecimalDigit)" predicate is not part of the official
 // grammar, it comes from text in section 7.8.3.
 NumericLiteral "number"
-  = literal:HexIntegerLiteral !(IdentifierStart / DecimalDigit) {
-      return literal;
+  = Literal:HexIntegerLiteral !(IdentifierStart / DecimalDigit) {
+      return Literal;
     }
-  / literal:DecimalLiteral !(IdentifierStart / DecimalDigit) {
-      return literal;
+  / Literal:DecimalLiteral !(IdentifierStart / DecimalDigit) {
+      return Literal;
     }
 
 DecimalLiteral
   = DecimalIntegerLiteral "." DecimalDigit* ExponentPart? {
-      return literal(parseFloat(text()))
+      return NumericLiteral(parseFloat(text()))
     }
   / "." DecimalDigit+ ExponentPart? {
-      return literal(parseFloat(text())) 
+      return NumericLiteral(parseFloat(text())) 
     }
   / DecimalIntegerLiteral ExponentPart? {
-      return literal(parseFloat(text()))
+      return NumericLiteral(parseFloat(text()))
     }
 
 DecimalIntegerLiteral
@@ -322,7 +311,7 @@ SignedInteger
 
 HexIntegerLiteral
   = "0x"i digits:$HexDigit+ {
-      return literal(parseInt(digits, 16))
+      return NumericLiteral(parseInt(digits, 16))
      }
 
 HexDigit
@@ -330,10 +319,10 @@ HexDigit
 
 StringLiteral "string"
   = '"' chars:DoubleStringCharacter* '"' {
-      return literal(chars.join(""))
+      return StringLiteral(chars.join(""))
     }
   / "'" chars:SingleStringCharacter* "'" {
-      return literal(chars.join("")) 
+      return StringLiteral(chars.join("")) 
     }
 
 DoubleStringCharacter
@@ -391,15 +380,13 @@ UnicodeEscapeSequence
 
 RegularExpressionLiteral "regular expression"
   = "/" pattern:$RegularExpressionBody "/" flags:$RegularExpressionFlags {
-      var value;
-
       try {
-        value = new RegExp(pattern, flags);
+        new RegExp(pattern, flags);
       } catch (e) {
         error(e.message);
       }
 
-      return literal(value);
+      return RegExpLiteral(pattern, flags);
     }
 
 RegularExpressionBody
@@ -509,7 +496,7 @@ WithToken       = "with"       !IdentifierPart
 
 _
   = (WhiteSpace / LineTerminatorSequence / Comment)* {
-  return node('whitespace')
+  return Node('whitespace')
 }
 
 WhiteComment = (WhiteSpace / Comment)*
@@ -545,7 +532,7 @@ PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.b
 
 ObjectLiteral 
 	= "{" _ "}" {
-                	return literal(EMPTY_OBJECT)
+                	return Literal(EMPTY_OBJECT)
                 }
 	/ "{" _ properties:PropertyNameAndValueList _ "}" { 
 		let o = Object.create(null);
@@ -553,13 +540,13 @@ ObjectLiteral
 		for(let p of properties) {
 			o[p.key] = p.value;
 		}
-		return node('objectLiteral',o)
+		return Node('objectLiteral',o)
 	}
 
 ArrayLiteral 
 	= "[" _ "]" {
-                	return literal(EMPTY_ARRAY)
+                	return Literal(EMPTY_ARRAY)
                 }
 	/ "[" _ values:ValueList _ "]" { 
-		return node('arrayLiteral',values);
+		return Node('arrayLiteral',values);
 	}

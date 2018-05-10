@@ -91,4 +91,53 @@ interface ObjectExpression extends Expression {
     - description
     - error message
     - default value
-*/ 
+*/
+
+interface JsonArray extends Array<JsonValue> {}
+interface JsonObject {
+    [id: string]: JsonValue;
+}
+type JsonValue = string|number|JsonObject|JsonArray|boolean|null;
+
+// https://app.quicktype.io?share=xk5v9tUOCR78hoFvOsQz
+
+interface Schema {
+    name: string
+    title?: string
+    description?: string
+    default?: JsonValue
+    type: Type
+}
+
+interface RuleMap {
+    [x: string]: JsonValue
+}
+
+interface Type {
+    kind: 'string' | 'number' | 'object' | 'array' | 'tuple' | 'boolean' | 'null'
+    rules: RuleMap
+}
+
+interface StringRules {
+    minLength?: number,
+    maxLength?: number,
+    pattern?: string,
+    /**
+     * @see https://github.com/epoberezkin/ajv#formats
+     */
+    format?: "date" | "time" | "date-time" | "uri" | "url" | "uri-template" | "email" | "hostname" | "ipv4" | "ipv6" | "regex" | "uuid" | "json-pointer" | "relative-json-pointer" | "iri" | "iri-reference" | "uri-template" | "idn-email" | "idn-hostname" | "json-pointer" | "relative-json-pointer" | "regex" | "date" | "time"
+
+    // https://github.com/epoberezkin/ajv-keywords#formatmaximum--formatminimum-and-formatexclusivemaximum--formatexclusiveminimum
+    formatMaximum?: string,
+    formatMinimum?: string,
+    formatExclusiveMaximum?: boolean,
+    formatExclusiveMinimum?: boolean,
+}
+
+interface NumberRules {
+    multipleOf?: number,
+    minimum?: number,
+    maximum?: number,
+    exclusiveMinimum?: boolean,
+    exclusiveMaximum?: boolean,
+}

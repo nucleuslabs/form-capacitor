@@ -14,9 +14,10 @@ function parse(node, context) {
         throw new Error(`Falsey node`);
     }
 
+    const {type, ...body} = node;
 
     try {
-        return parseAs(node.type, node.body, context);
+        return parseAs(type, body, context);
     } catch(err) {
         if(!err.location) {
             err.location = node.loc;
@@ -69,9 +70,9 @@ export function type(def) {
     return type;
 }
 
-export function schema(body, context) {
+export function Schema(body, context) {
     let name = body.name || 'default';
-    let schema = context.schemas[name] = parse(body.definition);
+    // let schema = context.schemas[name] = body.definition;
     
     
     
@@ -80,6 +81,10 @@ export function schema(body, context) {
     // console.log('base',base,'ext',ext);
     // Object.assign(def, parse(def.type));
     // console.log('schema',body);
+}
+
+export function StringLiteral({value}) {
+    return value;
 }
 
 export function objectLiteral(body, context) {

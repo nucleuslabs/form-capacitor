@@ -1,12 +1,46 @@
 import styled, {css} from 'styled-components';
 import MonacoEditor from './MonacoEditor';
-import parser from '../grammar.pegjs';
+// import parser from '../grammar.pegjs';
 import {Fragment} from 'react';
 import ast2ajv from '../ast2ajv';
 import pegJsGrammar from '!raw-loader!../grammar.pegjs';
+import initializerSource from 'raw-loader!../initializer.js';
 import {JSONSCHEMA_DSL} from '../monaco';
 import Ajv from 'ajv';
 import Json5 from 'json5';
+import peg from 'pegjs';
+// import FS from 'fs';
+
+// const sourceGrammar = FS.readSync(`${__dirname}/grammar.pegjs`,{encoding:'utf8'});
+// console.log(initializerSource);
+
+const parser = peg.generate(pegJsGrammar,{
+    "--": [],
+    "cache": false,
+    "dependencies": {},
+    "exportVar": null,
+    "format": "commonjs",
+    "optimize": "speed",
+    "output": "parser",
+    "plugins": [
+        {
+            use(config, options) {
+                // console.log('config',config);
+                config.passes.generate.unshift(function injectInitializer(ast) {
+                    if(!ast.initializer) {
+                        ast.initializer = { type: "initializer", code: initializerSource };
+                    } else {
+                        ast.initializer.code = initializerSource + "\n;" + ast.initializer.code;
+                    }
+                    // console.log('ast',JSON.stringify(ast.initializer));
+                })
+            }
+        }
+    ],
+    "trace": false
+})
+
+// console.log(parser);
 
 const Grid = styled.div`
     display: grid;
@@ -234,7 +268,13 @@ export default class App extends React.Component {
             this.setState({ajvError});
             return;
         }
-        this.validate = this.ajv.compile(ajv.schemas.default);
+
+        try {
+            this.validate = this.ajv.compile(ajv.schemas.default);
+        } catch(compileError) {
+            this.setState({ajvError: `Invalid JSON Schema: ${compileError.message}`});
+            return;
+        }
         this.setState({ajvError: null, ajv});
     }
 
