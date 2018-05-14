@@ -162,7 +162,7 @@ PropertyNameAndValueList = a:PropertyAssignment b:(PropertySeparator PropertyAss
 
 ValueList = a:Literal b:(ArraySeparator Literal)* (_ "," )? { return list(a,b) }
 
-PropertyAssignment = key: PropertyName PropertyValueSeparator value:Literal { return {key,value} }
+PropertyAssignment = key: PropertyName PropertyValueSeparator value:SchemaPropertyValue { return {key,value} }
 
 PropertyName = x:IdentifierName { return x.name } / x:StringLiteral { return x.value } / x:NumericLiteral { return String(x.value) }
 
