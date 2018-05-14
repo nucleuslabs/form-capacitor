@@ -1,0 +1,52 @@
+.icon {
+  > svg {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+  }
+  
+  &.is-small > svg {
+    width: .875em;
+    height: .875em;
+  }
+
+  &.is-medium > svg {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  &.is-large > svg {
+    width: 2em;
+    height: 2em;
+  }
+}
+
+.radio, .checkbox {
+  > input + span {
+    margin-left: .25em;
+  }
+}
+
+.external-link-icon {
+  width: .75em;
+  height: .75em;
+  margin-left: .15em;
+  vertical-align: .15em;
+}
+
+.is-middle-aligned {
+  > td, > th {
+    vertical-align: middle;
+  }
+}
+
+.button-bar {
+  margin: -3px;
+  > .button {
+    margin: 3px;
+  }
+}
+
+.table {
+  margin-bottom: 1rem; // default was 1.5 which is too much!
+}
