@@ -1,0 +1,54 @@
+SchedulingInstructionsForm = (
+    title "Scheduling Instructions"
+    description "Instructions for booking client appointments"
+    default {
+        requiredAssessments []
+        specialInstructions "Heyy"
+    }
+    type Object<
+        requiredAssessments (
+           title "Instructions"
+           description "List of appointments that need to be booked"
+           default []
+           type Array<
+                minItems 1
+                items {
+                    typeId (
+                        title "Appointment Type"
+                        type Number<
+                            minimum 1
+                            maximum 4294967295
+                            multipleOf 1
+                        >
+                    )
+                    teamId (
+                        title "Team"
+                        type Number
+                    )
+                    disciplineId (
+                        title "Discipline"
+                        type Number
+                    )
+                    prefClinicianId (
+                        title "Preferred Clinician"
+                        type Number
+                    )
+                    prefTime (
+                        title "Preferred Time"
+                        type Number
+                    )
+                    childRequired (
+                        title "Child Req'd"
+                        type Boolean
+                    )
+                }
+           >
+        )
+        specialInstructions (
+            title "Special Instructions"
+            type String<
+                minLength 1
+            >
+        )
+    >
+)

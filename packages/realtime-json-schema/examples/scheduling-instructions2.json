@@ -1,0 +1,64 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "definitions": {
+        "SchedulingInstructions": {
+            "title": "Scheduling Instructions",
+            "description": "Instructions for booking client appointments",
+            "type": "object",
+            "properties": {
+                "requiredAssessments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Instruction"
+                    },
+                    "title": "Instructions",
+                    "description": "List of appointments that need to be booked"
+                },
+                "specialInstructions": {
+                    "type": "string",
+                    "title": "specialInstructions"
+                }
+            },
+            "required": [
+                "requiredAssessments",
+                "specialInstructions"
+            ]
+        },
+        "Instruction": {
+            "title": "Instruction",
+            "type": "object",
+            "properties": {
+                "typeId": {
+                    "type": "number",
+                    "title": "Appointment Type"
+                },
+                "teamId": {
+                    "type": "number",
+                    "title": "Team"
+                },
+                "disciplineId": {
+                    "type": "number",
+                    "title": "Discipline"
+                },
+                "prefClinicianId": {
+                    "type": "number",
+                    "title": "Preferred Clinician"
+                },
+                "prefTime": {
+                    "type": "number",
+                    "title": "Preferred Time"
+                },
+                "childRequired": {
+                    "type": "boolean",
+                    "title": "Child Req'd"
+                }
+            },
+            "required": [
+                "childRequired",
+                "disciplineId",
+                "teamId",
+                "typeId"
+            ]
+        }
+    }
+}
