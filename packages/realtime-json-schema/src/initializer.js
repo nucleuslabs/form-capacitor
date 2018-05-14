@@ -24,21 +24,18 @@ function Node(type, extra) {
     return {
         type,
         ...extra,
-        loc: {
-            start: {
-                line: start.line,
-                column: start.column /*-1*/,
-            },
-            end: {
-                line: end.line,
-                column: end.column /*-1*/,
-            },
-        },
-      
+        // loc: {
+        //     start: {
+        //         line: start.line,
+        //         column: start.column /*-1*/,
+        //     },
+        //     end: {
+        //         line: end.line,
+        //         column: end.column /*-1*/,
+        //     },
+        // },
     }
 }
-
-
 
 const Expression = Node;
 
@@ -67,4 +64,16 @@ function StringLiteral(value) {
 
 function Identifier(name) {
     return Node('Identifier',{name})
+}
+
+function ObjectExpression(properties) {
+    return Node('ObjectExpression',{properties})
+}
+
+function ArrayExpression(elements) {
+    return Node('ArrayExpression',{elements})
+}
+
+function Type(kind,rules) {
+    return Node('Type',{kind,rules})
 }

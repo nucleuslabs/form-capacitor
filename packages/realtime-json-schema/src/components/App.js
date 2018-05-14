@@ -4,6 +4,7 @@ import MonacoEditor from './MonacoEditor';
 import {Fragment} from 'react';
 import ast2ajv from '../ast2ajv';
 import pegJsGrammar from '!raw-loader!../grammar.pegjs';
+import jsPegJsGrammar from '!raw-loader!../jsgrammar.pegjs';
 import initializerSource from 'raw-loader!../initializer.js';
 import {JSONSCHEMA_DSL} from '../monaco';
 import Ajv from 'ajv';
@@ -14,7 +15,7 @@ import peg from 'pegjs';
 // const sourceGrammar = FS.readSync(`${__dirname}/grammar.pegjs`,{encoding:'utf8'});
 // console.log(initializerSource);
 
-const parser = peg.generate(pegJsGrammar,{
+const parser = peg.generate(pegJsGrammar + "\n" + jsPegJsGrammar,{
     "--": [],
     "cache": false,
     "dependencies": {},

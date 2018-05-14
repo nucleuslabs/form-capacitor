@@ -82,7 +82,8 @@ interface ObjectExpression extends Expression {
     properties: ObjectProperty[];
 }
 
-/* things:
+/* 
+things:
  - schema (validates a thing, w/ a type + rules and has a name + desc)
  - type (like "string", or "int", or "bool", ... just the JSOn types)
  - rule (min/max/pattern,...)

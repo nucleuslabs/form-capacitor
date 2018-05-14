@@ -505,3 +505,32 @@ use $ref for JSON Schema like https://app.quicktype.io/?s=AddressBook.ts&l=swift
     - error message
     
 Rules are specific to types. e.g. [regex] patterns only work on strings. min/max only works on numbers. So the rules have to be within the type.
+
+top-level things:
+- schema
+- string
+- number
+- object
+- array
+- null
+- bool
+- regex
+- type
+
+=============
+
+we can do 'default exports' like GraphQL's "short-hand syntax":
+- https://graphql.org/learn/queries/#fragments
+- https://graphql.org/learn/queries/#operation-name
+
+i.e., launch right into a schema:
+
+```
+(
+	title "Scheduling Instructions"
+)
+
+frag = Array<
+	minItems 1
+>
+```
