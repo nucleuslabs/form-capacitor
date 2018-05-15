@@ -144,36 +144,47 @@ const checkProp = {
             errors.set('type','number');
             return;
         }
-        if(schema.minimum != null) {
-            if(schema.exclusiveMinimum) {
-                if(change.newValue <= schema.minimum) {
-                    errors.set('minimum',schema.minimum);
-                    errors.set('exclusiveMinimum',schema.exclusiveMinimum);}
-            } else {
-                if(change.newValue < schema.minimum) {
-                    errors.set('minimum',schema.minimum);
-                }
-            }
+        return checkNumber(schema,change,errors);
+    },
+    integer(schema,change,errors) {
+        if(!isNumber(change.newValue) || !Number.isFinite(change.newValue) || change.newValue < Number.MIN_SAFE_INTEGER || change.newValue > Number.MAX_SAFE_INTEGER || change.newValue % 1 !== 0) {
+            errors.set('type','integer');
+            return;
         }
-        if(schema.maximum != null) {
-            if(schema.exclusiveMaximum) {
-                if(change.newValue >= schema.maximum) {
-                    errors.set('maximum',schema.maximum);
-                    errors.set('exclusiveMaximum',schema.exclusiveMaximum);}
-            } else {
-                if(change.newValue > schema.maximum) {
-                    errors.set('maximum',schema.maximum);
-                }
-            }
-        }
-        if(schema.multipleOf != null) {
-            if(change.newValue % schema.multipleOf !== 0) {
-                errors.set('multipleOf',schema.multipleOf);
+        
+        return checkNumber(schema,change,errors);
+    }
+}
+
+function checkNumber(schema,change,errors) {
+    if(schema.minimum != null) {
+        if(schema.exclusiveMinimum) {
+            if(change.newValue <= schema.minimum) {
+                errors.set('minimum',schema.minimum);
+                errors.set('exclusiveMinimum',schema.exclusiveMinimum);}
+        } else {
+            if(change.newValue < schema.minimum) {
+                errors.set('minimum',schema.minimum);
             }
         }
     }
+    if(schema.maximum != null) {
+        if(schema.exclusiveMaximum) {
+            if(change.newValue >= schema.maximum) {
+                errors.set('maximum',schema.maximum);
+                errors.set('exclusiveMaximum',schema.exclusiveMaximum);}
+        } else {
+            if(change.newValue > schema.maximum) {
+                errors.set('maximum',schema.maximum);
+            }
+        }
+    }
+    if(schema.multipleOf != null) {
+        if(change.newValue % schema.multipleOf !== 0) {
+            errors.set('multipleOf',schema.multipleOf);
+        }
+    }
 }
-checkProp.integer = checkProp.number;
 
 export default function schema(options) {
     options = Object.assign({
