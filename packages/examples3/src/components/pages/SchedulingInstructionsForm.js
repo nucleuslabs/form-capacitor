@@ -11,7 +11,7 @@ import {
     Input,
     HelpText,
     Select,
-    Radio, RadioMenu, TextArea, Snippet, SnippetPreview, Content,
+    Radio, RadioMenu, Snippet, SnippetPreview, Content,
     ExternalLink,
     Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, ActionLink, ActionButton,
     ButtonBar, Code
@@ -31,6 +31,7 @@ import shortid from 'shortid';
 import {connect,mount,schema} from '../../form-capacitor';
 import SchedulingInstruction from './SchedulingInstruction';
 import jsonSchema from '../../schemas/scheduling-instructions.json';
+import {TextArea} from '../controls';
 
 function Instruction(defaults) {
     // Object.assign(this,{
@@ -84,7 +85,8 @@ function Instruction(defaults) {
 
 @mount({
     defaultValue: {
-    //     instructions: [Instruction()],
+        // requiredAssessments: [Instruction()],
+        // specialInstructions: '',
     }
 })
 @schema({
@@ -101,7 +103,6 @@ export default class SchedulingInstructionsForm extends React.Component {
     
     @action.bound
     addInstruction(ev) {
-        console.log(this.props,this.formData);
         this.formData.requiredAssessments.push(Instruction());
     }
 
@@ -124,6 +125,7 @@ export default class SchedulingInstructionsForm extends React.Component {
     }
     
     render() {
+        if(!this.formData.requiredAssessments) return null;
         const formData = toJS(this.formData);
         // console.log(this.formData);
         return (
@@ -154,8 +156,18 @@ export default class SchedulingInstructionsForm extends React.Component {
                 <ButtonBar>
                     <ActionButton isPrimary onClick={this.addInstruction}><Icon src={addIcon} /><span>Add Instruction</span></ActionButton>
                     <ActionButton isDanger onClick={this.clearInstructions}><Icon src={clearIcon} /><span>Clear</span></ActionButton>
+                </ButtonBar>
+
+                <Field>
+                    <Label>Special Instructions</Label>
+                    <Control>
+                        <TextArea name="specialInstructions" placeholder="Special scheduling instructions..."/>
+                    </Control>
+                </Field>
+
+                <ButtonBar>
                     <ActionButton isSuccess onClick={this.saveState}><Icon src={saveIcon} /><span>Save</span></ActionButton>
-                    <ActionButton onClick={this.restoreState}><Icon src={restoreIcon} /><span>Restore</span></ActionButton>
+                    <ActionButton onClick={this.restoreState}><Icon src={restoreIcon} /><span>Reset</span></ActionButton>
                 </ButtonBar>
 
                 <Code>

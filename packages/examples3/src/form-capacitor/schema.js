@@ -1,6 +1,7 @@
 import {resolveValue, setValue, toPath, getValue, toObservable} from './util';
 import {observer} from 'mobx-react';
 import {
+    autorun,
     observable,
     action,
     runInAction,
@@ -23,9 +24,16 @@ function keys(obj) {
     return obj ? Object.keys(obj) : [];
 }
 
+function hasProp(obj,key) {
+    return Object.hasOwnProperty.call(obj,key);
+}
+
 function resolveDefaultValue(schema) {
     if(!schema) throw new Error(`Missing schema`);
     if(schema.type === 'object') {
+        if(schema.additionalProperties) {
+            throw new Error("`additionalProperties` is not supported due to mobx constraint");
+        }
         const properties = unique([...keys(schema.properties), ...schema.required]);
         const required = schema.required ? new Set(schema.required) : new Set;
         const defaultValue = Object.create(null);
@@ -36,9 +44,10 @@ function resolveDefaultValue(schema) {
                 defaultValue[p] = undefined;
             }
         }
-        if(Object.hasOwnProperty.call(schema,'default')) {
+        if(hasProp(schema,'default')) {
             Object.assign(defaultValue, schema.default);
         }
+        // console.log('defaultValue',defaultValue);
         return defaultValue;
     }
     if(Object.hasOwnProperty.call(schema,'default')) {
@@ -46,6 +55,7 @@ function resolveDefaultValue(schema) {
     }
     switch(schema.type) {
         case 'array':
+            // TODO: resolve all elements in the array if it contains objects...?
             return [];
         case 'string':
             return '';
@@ -58,6 +68,44 @@ function resolveDefaultValue(schema) {
             return 0;
     }
     throw new Error(`Unsupported JSON Schema type "${schema.type}"`);
+}
+
+function bindErrorHandlers(schema, obs) {
+    console.log('bind',schema,obs);
+    switch(schema.type) {
+        case 'object':
+            if(schema.required) {
+                autorun(() => {
+                    const missingRequiredProps = [];
+                    for(let p of schema.required) {
+                        if(obs[p] === undefined) {
+                            missingRequiredProps.push(p);
+                        }
+                    }
+                    // console.log('missingRequiredProps',missingRequiredProps);
+                })
+            }
+            if(schema.properties) {
+                for(let p of Object.keys(schema.properties)) {
+                    // console.log(obs,p);
+                    
+                    const propSchema = schema.properties[p];
+                    addObserve(obs, p, change => {
+                        const errorObject = Object.create(null);
+                        switch(propSchema.type) {
+                            case 'string':
+                                if(hasProp(propSchema,'minLength') && change.newValue.length < propSchema.minLength) {
+                                    errorObject.minLength = `Too short` 
+                                }
+                                break;
+                        }
+                        console.log(`prop ${p} changed`,change,propSchema,errorObject);
+                    })
+                    // bindErrorHandlers(schema.properties[p], obs[p]);
+                }
+            }
+            break;
+    }
 }
 
 export default function schema(options) {
@@ -74,10 +122,6 @@ export default function schema(options) {
     }
 
     return Component => {
-        
-        
-
-        
         // let schemaPromise = $RefParser.resolve(options.schema)
         //    
         // if(options.$ref) {
@@ -102,6 +146,7 @@ export default function schema(options) {
                 schemaPromise.then(action(schema => {
                     const defaultValue = resolveDefaultValue(schema);
                     setValue(context[STORE_KEY], context[PATH_KEY], defaultValue)
+                    bindErrorHandlers(schema, getValue(context[STORE_KEY], context[PATH_KEY]));
                 }));
                 
                 
@@ -114,9 +159,9 @@ export default function schema(options) {
             }
 
 
-            // render() {
-            //     return React.createElement(Component, this.props);
-            // }
+            render() {
+                return React.createElement(Component, this.props);
+            }
             // render() {
             //     // console.log('rennddder', this._data.instructions[0]);
             //     let props;
