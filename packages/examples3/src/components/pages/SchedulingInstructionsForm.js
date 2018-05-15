@@ -127,6 +127,8 @@ export default class SchedulingInstructionsForm extends React.Component {
     render() {
         if(!this.formData.requiredAssessments) return null;
         const formData = toJS(this.formData);
+        // console.log(toJS(this.errorMap));
+        // console.log(this.errorMap);
         // console.log(this.formData);
         return (
             <Fragment>
@@ -172,6 +174,9 @@ export default class SchedulingInstructionsForm extends React.Component {
 
                 <Code>
                     {JSON.stringify(formData,null,2)}
+                </Code>
+                <Code>
+                    {JSON.stringify(this.errorMap,null,2)}
                 </Code>
             </Fragment>
         )

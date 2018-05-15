@@ -17,7 +17,9 @@
                 "specialInstructions": {
                     "type": "string",
                     "title": "specialInstructions",
-                    "minLength": 10
+                    "minLength": 10,
+                    "maxLength": 20,
+                    "pattern": "\\w"
                 }
             },
             "required": [

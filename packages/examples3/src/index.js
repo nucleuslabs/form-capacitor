@@ -4,7 +4,7 @@ import App from './components/App'
 import {configure} from 'mobx';
 
 configure({
-    enforceActions: true,
+    // enforceActions: true,
     isolateGlobalState: true,
 });
 

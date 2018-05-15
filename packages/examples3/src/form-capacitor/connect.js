@@ -41,6 +41,8 @@ export default function connect(options) {
                         }
                     })
                     
+                    
+                    
                     // extendObservable(this, {
                     //     [_propName]: context[CTX_KEY], // screws up radio menus because each radio gets its own copy which doesnt actually change
                     // });

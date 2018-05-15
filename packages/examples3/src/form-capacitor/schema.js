@@ -14,7 +14,7 @@ import {
 import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
-
+import {isNumber, isString} from '../lib/types';
 
 function unique(arr) {
     return Array.from(new Set(arr));
@@ -70,43 +70,110 @@ function resolveDefaultValue(schema) {
     throw new Error(`Unsupported JSON Schema type "${schema.type}"`);
 }
 
-function bindErrorHandlers(schema, obs) {
-    console.log('bind',schema,obs);
+function bindErrorHandlers(schema, value, errMap={}) {
+    // console.log('bind',schema,value);
     switch(schema.type) {
         case 'object':
             if(schema.required) {
-                autorun(() => {
+                addObserve(value,change => {
+                    // console.log('obs',value,change);
                     const missingRequiredProps = [];
                     for(let p of schema.required) {
-                        if(obs[p] === undefined) {
+                        if(change.object[p] === undefined) {
                             missingRequiredProps.push(p);
                         }
                     }
+                    if(missingRequiredProps.length) {
+                        errMap.set('required',missingRequiredProps);
+                    } else {
+                        errMap.delete('required');
+                    }
+                    // errMap.set('required',missingRequiredProps.length ? missingRequiredProps : false);
                     // console.log('missingRequiredProps',missingRequiredProps);
                 })
             }
             if(schema.properties) {
+                let propErrors = observable.map();
+                errMap.set('properties',propErrors);
                 for(let p of Object.keys(schema.properties)) {
-                    // console.log(obs,p);
+                    // console.log(value,p);
+                    
+                    let ppErr = observable.map();
+                    propErrors.set(p, ppErr);
                     
                     const propSchema = schema.properties[p];
-                    addObserve(obs, p, change => {
-                        const errorObject = Object.create(null);
-                        switch(propSchema.type) {
-                            case 'string':
-                                if(hasProp(propSchema,'minLength') && change.newValue.length < propSchema.minLength) {
-                                    errorObject.minLength = `Too short` 
-                                }
-                                break;
-                        }
-                        console.log(`prop ${p} changed`,change,propSchema,errorObject);
-                    })
-                    // bindErrorHandlers(schema.properties[p], obs[p]);
+                    
+                    addObserve(value, p, change => checkTypeErrors(propSchema,change,ppErr), false)
+                    // bindErrorHandlers(schema.properties[p], value[p]);
                 }
             }
             break;
     }
 }
+
+function checkTypeErrors(schema,change,errors) {
+    errors.clear();
+    return checkProp[schema.type](schema,change,errors);
+}
+
+const checkProp = {
+    string(schema,change,errors) {
+        if(!isString(change.newValue)) {
+            errors.set('type','string');
+            return;
+        }
+        if(schema.minLength != null && change.newValue.length < schema.minLength) {
+            // FIXME: what the heck do we put here..?
+            errors.set('minLength',schema.minLength);
+        } 
+        if(schema.maxLength != null && change.newValue.length > schema.maxLength) {
+            errors.set('maxLength',schema.maxLength);
+        } 
+        if(schema.pattern != null) {
+            const re = new RegExp(schema.pattern);
+            if(!re.test(change.newValue)) {
+                errors.set('pattern', schema.pattern)
+            } 
+        } 
+        if(schema.format != null) {
+            throw new Error(`"format" rule not implemented`);
+        }
+    },
+    number(schema,change,errors) {
+        if(!isNumber(change.newValue)) {
+            errors.set('type','number');
+            return;
+        }
+        if(schema.minimum != null) {
+            if(schema.exclusiveMinimum) {
+                if(change.newValue <= schema.minimum) {
+                    errors.set('minimum',schema.minimum);
+                    errors.set('exclusiveMinimum',schema.exclusiveMinimum);}
+            } else {
+                if(change.newValue < schema.minimum) {
+                    errors.set('minimum',schema.minimum);
+                }
+            }
+        }
+        if(schema.maximum != null) {
+            if(schema.exclusiveMaximum) {
+                if(change.newValue >= schema.maximum) {
+                    errors.set('maximum',schema.maximum);
+                    errors.set('exclusiveMaximum',schema.exclusiveMaximum);}
+            } else {
+                if(change.newValue > schema.maximum) {
+                    errors.set('maximum',schema.maximum);
+                }
+            }
+        }
+        if(schema.multipleOf != null) {
+            if(change.newValue % schema.multipleOf !== 0) {
+                errors.set('multipleOf',schema.multipleOf);
+            }
+        }
+    }
+}
+checkProp.integer = checkProp.number;
 
 export default function schema(options) {
     options = Object.assign({
@@ -142,11 +209,31 @@ export default function schema(options) {
 
                 // const store = getValue(context[STORE_KEY], context[PATH_KEY])
 
+                const errorMap = observable.map();
+                
 
+                Object.defineProperty(this, 'errorMap', {
+                    get() {
+                        return errorMap;
+                    },
+                    // set(value) {
+                    //     setValue(context[STORE_KEY],context[PATH_KEY],value);
+                    // }
+                })
+                
+                // extendObservable(this, {
+                //     get errorMap() {
+                //         return toJS(errorMap);
+                //     }
+                // })
+                
+               
+                
                 schemaPromise.then(action(schema => {
                     const defaultValue = resolveDefaultValue(schema);
                     setValue(context[STORE_KEY], context[PATH_KEY], defaultValue)
-                    bindErrorHandlers(schema, getValue(context[STORE_KEY], context[PATH_KEY]));
+
+                    bindErrorHandlers(schema, getValue(context[STORE_KEY], context[PATH_KEY]), errorMap);
                 }));
                 
                 
@@ -159,9 +246,9 @@ export default function schema(options) {
             }
 
 
-            render() {
-                return React.createElement(Component, this.props);
-            }
+            // render() {
+            //     return React.createElement(Component, this.props);
+            // }
             // render() {
             //     // console.log('rennddder', this._data.instructions[0]);
             //     let props;
