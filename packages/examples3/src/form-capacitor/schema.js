@@ -15,6 +15,9 @@ import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
 import {isNumber, isString} from '../lib/types';
+import {types} from 'mobx-state-tree';
+import makeJsonSchemaToMST from '../lib/jsonschema-to-mobx-state-tree';
+const jsonSchemaToMST = makeJsonSchemaToMST(types);
 
 function unique(arr) {
     return Array.from(new Set(arr));
@@ -70,6 +73,10 @@ function resolveDefaultValue(schema) {
     throw new Error(`Unsupported JSON Schema type "${schema.type}"`);
 }
 
+function buildMstModel(schema) {
+    
+}
+
 function bindErrorHandlers(schema, value, errMap={}) {
     // console.log('bind',schema,value);
     switch(schema.type) {
@@ -113,14 +120,14 @@ function bindErrorHandlers(schema, value, errMap={}) {
             console.log(schema.items);
             let propErrors = observable.map();
             errMap.set('items',propErrors);
-            addObserve(value,change => {
-                // console.log('hcanage',change);
-               for(let i=change.index; i<change.index+change.addedCount; ++i) {
-                   let ppErr = observable.map();
-                   propErrors.set(i, ppErr);
-                   addObserve(change.object[i], change => checkTypeErrors(schema.items,change,ppErr), false)
-               }
-            });
+            // addObserve(value,change => {
+            //     // console.log('hcanage',change);
+            //    for(let i=change.index; i<change.index+change.addedCount; ++i) {
+            //        let ppErr = observable.map();
+            //        propErrors.set(i, ppErr);
+            //        addObserve(change.object[i], change => checkTypeErrors(schema.items,change,ppErr), false)
+            //    }
+            // });
             break;
     }
 }
@@ -219,6 +226,9 @@ export default function schema(options) {
     options = Object.assign({
         schema: undefined,
         $ref: undefined,
+        actions: undefined,
+        views: undefined,
+        default: undefined,
     }, options)
 
     const parser = new $RefParser();
@@ -252,14 +262,14 @@ export default function schema(options) {
                 const errorMap = observable.map();
                 
 
-                Object.defineProperty(this, 'errorMap', {
-                    get() {
-                        return errorMap;
-                    },
-                    // set(value) {
-                    //     setValue(context[STORE_KEY],context[PATH_KEY],value);
-                    // }
-                })
+                // Object.defineProperty(this, 'errorMap', {
+                //     get() {
+                //         return errorMap;
+                //     },
+                //     // set(value) {
+                //     //     setValue(context[STORE_KEY],context[PATH_KEY],value);
+                //     // }
+                // })
                 
                 // extendObservable(this, {
                 //     get errorMap() {
@@ -267,14 +277,31 @@ export default function schema(options) {
                 //     }
                 // })
                 
+                this.state = {
+                    formData: null,
+                }
+                
                
                 
-                schemaPromise.then(action(schema => {
-                    const defaultValue = resolveDefaultValue(schema);
-                    setValue(context[STORE_KEY], context[PATH_KEY], defaultValue)
+                schemaPromise.then(schema => {
+                    let Model = jsonSchemaToMST(schema);
+                    if(options.views) {
+                        Model = Model.views(options.views);
+                    }
+                    if(options.actions) {
+                        Model = Model.actions(options.actions);
+                    }
+                    this.setState({
+                        formData: Model.create(options.default),
+                    })
+                  
+                    // console.log(mst.create());
+                    // console.log(mst);
+                    // const defaultValue = resolveDefaultValue(schema);
+                    // setValue(context[STORE_KEY], context[PATH_KEY], defaultValue)
 
-                    bindErrorHandlers(schema, getValue(context[STORE_KEY], context[PATH_KEY]), errorMap);
-                }));
+                    // bindErrorHandlers(schema, getValue(context[STORE_KEY], context[PATH_KEY]), errorMap);
+                });
                 
                 
                 
@@ -286,9 +313,12 @@ export default function schema(options) {
             }
 
 
-            // render() {
-            //     return React.createElement(Component, this.props);
-            // }
+            render() {
+                return React.createElement(Component, {
+                    ...this.props,
+                    ...this.state,
+                });
+            }
             // render() {
             //     // console.log('rennddder', this._data.instructions[0]);
             //     let props;
@@ -301,13 +331,13 @@ export default function schema(options) {
             // }
         }
 
-        WrappedComponent.contextTypes = {...CTX_TYPES, ...Component.contextTypes};
+        // WrappedComponent.contextTypes = {...CTX_TYPES, ...Component.contextTypes};
 
         if(process.env.NODE_ENV !== 'production') {
             const displayName = getDisplayName(Component);
             WrappedComponent.displayName = `@schema(${displayName})`;
         }
 
-        return observer(WrappedComponent);
+        return WrappedComponent;
     }
 }

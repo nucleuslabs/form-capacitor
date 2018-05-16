@@ -33,7 +33,7 @@ import {mount} from '../../form-capacitor';
 import {TextBox, Select, EmailInput, TelInput, Radio, TextArea, Checkbox} from '../controls';
 
 
-function SchedulingInstruction({doDelete,number,formId}) {
+export default function SchedulingInstruction({doDelete,number,formId}) {
     return (
         <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>
             <TableCell>
@@ -71,7 +71,7 @@ function SchedulingInstruction({doDelete,number,formId}) {
     )
 }
 
-export default mount({
-    defaultValue: {},
-})(SchedulingInstruction);
+// export default mount({
+//     defaultValue: {},
+// })(SchedulingInstruction);
 // export default SchedulingInstruction;

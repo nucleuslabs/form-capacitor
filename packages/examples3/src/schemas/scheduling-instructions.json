@@ -19,7 +19,8 @@
                     "title": "specialInstructions",
                     "minLength": 10,
                     "maxLength": 20,
-                    "pattern": "\\w"
+                    "pattern": "\\w",
+                    "specialInstructions": ""
                 }
             },
             "required": [
@@ -33,34 +34,45 @@
             "properties": {
                 "typeId": {
                     "type": "number",
-                    "title": "Appointment Type"
+                    "title": "Appointment Type",
+                    "default": null
                 },
                 "teamId": {
                     "type": "number",
-                    "title": "Team"
+                    "title": "Team",
+                    "default": null
                 },
                 "disciplineId": {
                     "type": "number",
-                    "title": "Discipline"
+                    "title": "Discipline",
+                    "default": null
                 },
                 "prefClinicianId": {
                     "type": "number",
-                    "title": "Preferred Clinician"
+                    "title": "Preferred Clinician",
+                    "default": null
                 },
                 "prefTime": {
                     "type": "number",
-                    "title": "Preferred Time"
+                    "title": "Preferred Time",
+                    "default": null
                 },
                 "childRequired": {
                     "type": "boolean",
-                    "title": "Child Req'd"
+                    "title": "Child Req'd",
+                    "default": false
+                },
+                "key": {
+                    "type": "string",
+                    "title": "Key"
                 }
             },
             "required": [
                 "childRequired",
                 "disciplineId",
                 "teamId",
-                "typeId"
+                "typeId",
+                "key"
             ]
         }
     }

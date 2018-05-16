@@ -83,50 +83,69 @@ function Instruction(defaults) {
 //     })
 // })
 
-@mount({
-    defaultValue: {
-        // requiredAssessments: [Instruction()],
-        // specialInstructions: '',
-    }
-})
+// @mount({
+//     defaultValue: {
+//         // requiredAssessments: [Instruction()],
+//         // specialInstructions: '',
+//     }
+// })
 @schema({
     schema: jsonSchema,
-    $ref: '#/definitions/SchedulingInstructions'
+    $ref: '#/definitions/SchedulingInstructions',
+    default: {
+        requiredAssessments: [{key: shortid()}],
+        specialInstructions: '',
+    },
+    actions: formData => ({
+        addInstruction() {
+            formData.requiredAssessments.push({key: shortid()})
+        },
+        clearInstructions() {
+            formData.requiredAssessments.length = 0;
+        },
+        deleteInstruction(idx) {
+            formData.requiredAssessments.splice(idx,1);
+        }
+    })
 })
-@connect({
-    propName: 'formData',
-
-})
+@observer
+// @connect({
+//     propName: 'formData',
+// })
 export default class SchedulingInstructionsForm extends React.Component {
     
-    formId = shortid()
-    
-    @action.bound
-    addInstruction(ev) {
-        this.formData.requiredAssessments.push(Instruction());
-    }
-
-    @action.bound
-    clearInstructions(ev) {
-        this.formData.requiredAssessments = [];
-    }
-    
-    deleteInstruction = idx => action(ev => {
-        this.formData.requiredAssessments.splice(idx,1);
-    })
-    
-    saveState = ev => {
-        this.saved = toJS(this.formData);
-    }
-
-    @action.bound
-    restoreState(ev) {
-        this.formData = this.saved;
-    }
+    // formId = shortid()
+    //
+    // @action.bound
+    // addInstruction(ev) {
+    //     this.formData.requiredAssessments.push(Instruction());
+    // }
+    //
+    // @action.bound
+    // clearInstructions(ev) {
+    //     this.formData.requiredAssessments = [];
+    // }
+    //
+    // deleteInstruction = idx => action(ev => {
+    //     this.formData.requiredAssessments.splice(idx,1);
+    // })
+    //
+    // saveState = ev => {
+    //     this.saved = toJS(this.formData);
+    // }
+    //
+    // @action.bound
+    // restoreState(ev) {
+    //     this.formData = this.saved;
+    // }
     
     render() {
-        if(!this.formData.requiredAssessments) return null;
-        const formData = toJS(this.formData);
+        const {formData} = this.props;
+        if(!formData) return <p>Loading schema...</p>;
+        console.log('formData',formData)
+        // if(!this.formData.requiredAssessments) return null; // fixme: remove when schema loading is dealt with
+        // console.log(this.formData.requiredAssessments.length);
+        // const formData = toJS(this.formData);
         // console.log(toJS(this.errorMap));
         // console.log(this.errorMap);
         // console.log(this.formData);
@@ -147,17 +166,17 @@ export default class SchedulingInstructionsForm extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.formData.requiredAssessments ? this.formData.requiredAssessments.map((inst,idx) => {
+                        {formData.requiredAssessments.map((inst,idx) => {
                             // console.log(inst.key);
                             // console.log(JSON.stringify(inst),inst.key,JSON.stringify(inst.key),toJS(inst.key),toJS(inst).key);
-                            return <SchedulingInstruction key={inst.key} name={['requiredAssessments',idx]} doDelete={this.deleteInstruction(idx)} formId={this.formId} number={idx+1}/>;
-                        }) : null}
+                            return <SchedulingInstruction key={inst.key} name={['requiredAssessments',idx]} doDelete={() => formData.deleteInstruction(idx)} formId={this.formId} number={idx+1}/>;
+                        })}
                     </TableBody>
                 </Table>
 
                 <ButtonBar>
-                    <ActionButton isPrimary onClick={this.addInstruction}><Icon src={addIcon} /><span>Add Instruction</span></ActionButton>
-                    <ActionButton isDanger onClick={this.clearInstructions}><Icon src={clearIcon} /><span>Clear</span></ActionButton>
+                    <ActionButton isPrimary onClick={formData.addInstruction}><Icon src={addIcon} /><span>Add Instruction</span></ActionButton>
+                    <ActionButton isDanger onClick={formData.clearInstructions}><Icon src={clearIcon} /><span>Clear</span></ActionButton>
                 </ButtonBar>
 
                 <Field>

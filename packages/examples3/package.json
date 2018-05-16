@@ -48,6 +48,7 @@
     "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
-    "json-schema-ref-parser": "^5.0.3"
+    "json-schema-ref-parser": "^5.0.3",
+    "mobx-state-tree": "^2.0.5"
   }
 }
