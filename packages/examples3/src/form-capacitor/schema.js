@@ -9,7 +9,7 @@ import {
     extendObservable,
     observe as addObserve,
     toJS,
-    isBoxedObservable
+    isBoxedObservable, isObservableArray
 } from 'mobx';
 import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
@@ -104,10 +104,15 @@ function bindErrorHandlers(schema, value, errMap={}) {
                     const propSchema = schema.properties[p];
                     
                     addObserve(value, p, change => checkTypeErrors(propSchema,change,ppErr), false)
+                    bindErrorHandlers(propSchema,value[p],ppErr);
                     // bindErrorHandlers(schema.properties[p], value[p]);
                 }
             }
             break;
+        case 'array':
+            addObserve(value,change => {
+               console.log('array changed'); 
+            });
     }
 }
 
@@ -140,20 +145,32 @@ const checkProp = {
         }
     },
     number(schema,change,errors) {
-        if(!isNumber(change.newValue)) {
+        if(!Number.isFinite(change.newValue)) {
             errors.set('type','number');
             return;
         }
         return checkNumber(schema,change,errors);
     },
     integer(schema,change,errors) {
-        if(!isNumber(change.newValue) || !Number.isFinite(change.newValue) || change.newValue < Number.MIN_SAFE_INTEGER || change.newValue > Number.MAX_SAFE_INTEGER || change.newValue % 1 !== 0) {
+        if(!Number.isInteger(change.newValue)) {
             errors.set('type','integer');
             return;
         }
-        
         return checkNumber(schema,change,errors);
+    },
+    array(schema,change,errors) {
+        if(!isArray(change.newValue)) {
+            errors.set('type','array');
+            return;
+        }
+        console.log('array prop changed');
+        // only do minItems/maxItems and stuff here...do recursion up there??
+        // TODO: how to recurse....?
     }
+}
+
+function isArray(arr) {
+    return isObservableArray(arr) || Array.isArray(arr)
 }
 
 function checkNumber(schema,change,errors) {

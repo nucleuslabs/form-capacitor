@@ -73,7 +73,7 @@ export function isPlainObject(obj) {
 }
 
 export function isSymbol(obj) {
-    return Object.prototype.toString.call(obj) === '[object Symbol]';
+    return typeof obj === 'symbol';
 }
 
 export function isError(obj) {
