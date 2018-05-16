@@ -110,9 +110,18 @@ function bindErrorHandlers(schema, value, errMap={}) {
             }
             break;
         case 'array':
+            console.log(schema.items);
+            let propErrors = observable.map();
+            errMap.set('items',propErrors);
             addObserve(value,change => {
-               console.log('array changed'); 
+                // console.log('hcanage',change);
+               for(let i=change.index; i<change.index+change.addedCount; ++i) {
+                   let ppErr = observable.map();
+                   propErrors.set(i, ppErr);
+                   addObserve(change.object[i], change => checkTypeErrors(schema.items,change,ppErr), false)
+               }
             });
+            break;
     }
 }
 
@@ -122,6 +131,9 @@ function checkTypeErrors(schema,change,errors) {
 }
 
 const checkProp = {
+    object(schema,change,errors) {
+        
+    },
     string(schema,change,errors) {
         if(!isString(change.newValue)) {
             errors.set('type','string');
