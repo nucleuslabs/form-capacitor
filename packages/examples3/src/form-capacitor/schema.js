@@ -18,6 +18,7 @@ import {isNumber, isString} from '../lib/types';
 import {types} from 'mobx-state-tree';
 import makeJsonSchemaToMST from '../lib/jsonschema-to-mobx-state-tree';
 const jsonSchemaToMST = makeJsonSchemaToMST(types);
+import FormContext from './context';
 
 function unique(arr) {
     return Array.from(new Set(arr));
@@ -222,6 +223,8 @@ function checkNumber(schema,change,errors) {
     }
 }
 
+
+
 export default function schema(options) {
     options = Object.assign({
         schema: undefined,
@@ -285,6 +288,11 @@ export default function schema(options) {
                 
                 schemaPromise.then(schema => {
                     let Model = jsonSchemaToMST(schema);
+                    Model = Model.actions(self => ({
+                        set(name, value) {
+                            setValue(self, name, value);
+                        }
+                    }));
                     if(options.views) {
                         Model = Model.views(options.views);
                     }
@@ -314,10 +322,12 @@ export default function schema(options) {
 
 
             render() {
-                return React.createElement(Component, {
-                    ...this.props,
-                    ...this.state,
-                });
+                return (
+                    <FormContext.Provider value={this.state.formData}>
+                        {React.createElement(observer(Component), {...this.props,...this.state})}
+                        {/*<Component {...this.props} {...this.state}/>*/}
+                    </FormContext.Provider>
+                )
             }
             // render() {
             //     // console.log('rennddder', this._data.instructions[0]);

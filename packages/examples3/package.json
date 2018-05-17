@@ -30,9 +30,13 @@
     "planck-js": "^0.1.43",
     "postcss-loader": "^2.1.1",
     "raw-loader": "^0.5.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "react-hot-loader": "^4.0.0",
+    "react": "^16.3.2",
+    "react-addons-shallow-compare": "^15.6.2",
+    "react-ajax-loader": "^0.1.5",
+    "react-dnd": "^2.6.0",
+    "react-dnd-html5-backend": "^2.6.0",
+    "react-dom": "^16.3.2",
+    "react-hot-loader": "^4.2.0",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "sass-loader": "^6.0.6",
@@ -49,6 +53,7 @@
   },
   "dependencies": {
     "json-schema-ref-parser": "^5.0.3",
+    "jsonschema-nodewalker": "^1.0.4",
     "mobx-state-tree": "^2.0.5"
   }
 }

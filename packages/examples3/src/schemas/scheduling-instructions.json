@@ -12,7 +12,8 @@
                         "$ref": "#/definitions/Instruction"
                     },
                     "title": "Instructions",
-                    "description": "List of appointments that need to be booked"
+                    "description": "List of appointments that need to be booked",
+                    "default": []
                 },
                 "specialInstructions": {
                     "type": "string",
@@ -20,9 +21,10 @@
                     "minLength": 10,
                     "maxLength": 20,
                     "pattern": "\\w",
-                    "specialInstructions": ""
+                    "default": ""
                 }
             },
+         
             "required": [
                 "requiredAssessments",
                 "specialInstructions"

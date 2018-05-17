@@ -108,7 +108,7 @@ function Instruction(defaults) {
         }
     })
 })
-@observer
+// @observer
 // @connect({
 //     propName: 'formData',
 // })
@@ -139,10 +139,23 @@ export default class SchedulingInstructionsForm extends React.Component {
     //     this.formData = this.saved;
     // }
     
+    componentDidMount() {
+        setTimeout(() => {
+            // console.log(this.props);
+            if(this.props.formData) {
+                this.props.formData.set('specialInstructions', "foo");
+            }
+        }, 1000);
+        
+    }
+    
     render() {
         const {formData} = this.props;
         if(!formData) return <p>Loading schema...</p>;
-        console.log('formData',formData)
+        // console.log('formData',formData)
+        
+
+        
         // if(!this.formData.requiredAssessments) return null; // fixme: remove when schema loading is dealt with
         // console.log(this.formData.requiredAssessments.length);
         // const formData = toJS(this.formData);
@@ -183,6 +196,8 @@ export default class SchedulingInstructionsForm extends React.Component {
                     <Label>Special Instructions</Label>
                     <Control>
                         <TextArea name="specialInstructions" placeholder="Special scheduling instructions..."/>
+                        {/*{formData.specialInstructions}*/}
+                        {/*<textarea value={formData.specialInstructions} onChange={ev => formData.set('specialInstructions',ev.target.value)}/>*/}
                     </Control>
                 </Field>
 

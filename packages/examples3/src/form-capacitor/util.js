@@ -29,6 +29,7 @@ export function setValue(obj, path, value) {
     if(!isObject(obj)) {
         throw new Error(`Cannot set property of non-object`);
     }
+    path = toPath(path);
     if(isBoxedObservable(obj)) {
         if(!path.length) {
             obj.set(value);
