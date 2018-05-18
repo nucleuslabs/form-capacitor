@@ -33,6 +33,22 @@ export function classFactory(className, modifiers) {
     }
 }
 
+// export function withDisplayName(displayName, component) {
+//     if(process.env.NODE_ENV !== 'production') {
+//         // TODO: fix forwardRefs
+//         component.displayName = displayName;
+//     }
+//     return component;
+// }
+// export function wrapDisplayName(prefix, wrappedComponent, newComponent) {
+//     if(process.env.NODE_ENV !== 'production') {
+//         // TODO: fix forwardRefs
+//         const componentDisplayName = getDisplayName(wrappedComponent);
+//         newComponent.displayName = `${prefix}(${componentDisplayName})`;
+//     }
+//     return newComponent;
+// }
+
 export function withClass(component, className, modifiers) {
     const factory = classFactory(className, modifiers);
     const wrapped = props => React.createElement(component, factory(props));

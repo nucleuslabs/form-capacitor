@@ -1,31 +1,37 @@
 import {InputText, Select as Component} from '../bulma';
 import {connect, consumeValue, mount} from '../../form-capacitor';
-import {action,toJS} from 'mobx';
-import * as options from '../../options';
 
 @consumeValue()
 export default class Select extends React.Component {
 
-    el = React.createRef();
+    select = React.createRef();
+    state = {index: -1}
     
     handleChange = ev => {
         const index = ev.target.selectedIndex;
         const value = index < 0 ? null : this.props.options[index].value;
-        
         this.props.setValue(value);
+    }
+
+    componentDidMount() {
+        this.select.current.selectedIndex = this.state.index;
+    }
+    
+    componentDidUpdate() {
+        this.select.current.selectedIndex = this.state.index;
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        // this method gets called unnecessarily when there's a change event, which kind of sucks, but not sure what to do about it.
+        const index = nextProps.options.findIndex(opt => opt.value === nextProps.value);
+        return index === prevState.index ? null : {index};
     }
 
     render() {
         let {value, name, setValue, options, ...props} = this.props;
-        value = toJS(this.value);
-        // console.log('select',value);
-        if(value != null) {
-            // have not set the `value` prop at all -- React will complain about about `undefined` and `null` and using an empty string isn't necessarily correct
-            props.value = String(value);
-        }
         return (
-            <Component {...props} onChange={this.handleChange} ref={this.el}>
-                {options.map(({value, label}) => <option key={value}>{label}</option>)}
+            <Component {...props} onChange={this.handleChange} ref={this.select}>
+                {options.map(({value, label, key}) => <option key={key != null ? key : value}>{label}</option>)}
             </Component>
         )
     }

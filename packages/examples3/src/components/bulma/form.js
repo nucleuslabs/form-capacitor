@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import css from './bulma.scss';
 import cc from 'classcat';
-import {splitAria, withProps} from '../../lib/react';
+import {splitAria, withDisplayName, withProps} from '../../lib/react';
 import shortid from 'shortid';
 import commonModifiers from './modifiers'
 import elem from './factory';
@@ -55,7 +55,6 @@ export class ActionButton extends React.Component {
 const SelectWrap = elem('div',css.select, {
     isFullWidth: css['is-fullwidth'],
 });
-
 
 export const Select = React.forwardRef(({value,onChange,children,placeholder,...props},ref) => {
         let [aria,attrs] = splitAria(props);

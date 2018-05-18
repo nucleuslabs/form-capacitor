@@ -12,3 +12,4 @@ export default function(component, className, modifiers, defaultProps) {
     }
     return React.forwardRef(wrapped);
 }
+
