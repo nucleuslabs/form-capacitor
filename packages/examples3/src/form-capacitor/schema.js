@@ -323,7 +323,10 @@ export default function schema(options) {
 
             render() {
                 return (
-                    <FormContext.Provider value={this.state.formData}>
+                    <FormContext.Provider value={{
+                        formData: this.state.formData,
+                        path: [],
+                    }}>
                         {React.createElement(observer(Component), {...this.props,...this.state})}
                         {/*<Component {...this.props} {...this.state}/>*/}
                     </FormContext.Provider>

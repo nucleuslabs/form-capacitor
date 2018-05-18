@@ -9,12 +9,13 @@ export default function consumeValue(options) {
     
     return Component => props => (
         <FormContext.Consumer>
-            {formData => {
-                const path = toPath(resolveValue(options.path,props));
-                const value = getValue(formData, path);
-                const doSet = value => formData.set(path,value);
+            {({formData,path}) => {
+                const fullPath = [...path,...toPath(resolveValue(options.path,props))];
+                const value = getValue(formData, fullPath);
+                // console.log(formData,fullPath,value);
+                const doSet = value => formData.set(fullPath,value);
                 return (
-                    <FormContext.Provider value={value}>
+                    <FormContext.Provider value={{formData,path:fullPath}}>
                         {React.createElement(Component,{...props,[options.name]:value,setValue: doSet})}
                     </FormContext.Provider>
                 )

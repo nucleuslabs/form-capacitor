@@ -56,17 +56,19 @@ const SelectWrap = elem('div',css.select, {
     isFullWidth: css['is-fullwidth'],
 });
 
-export function Select({value,onChange,children,placeholder,...props}) {
-    let [aria,attrs] = splitAria(props);
-    return (
-        <SelectWrap {...attrs}>
-            <select {...{value,onChange}} {...aria}>
-                {placeholder != null && <option value="" disabled>{placeholder}</option>}
-                {children}
-            </select>
-        </SelectWrap>
-    )
-}
+
+export const Select = React.forwardRef(({value,onChange,children,placeholder,...props},ref) => {
+        let [aria,attrs] = splitAria(props);
+        return (
+            <SelectWrap {...attrs}>
+                <select {...{value,onChange}} {...aria} ref={ref}>
+                    {placeholder != null && <option value="" disabled>{placeholder}</option>}
+                    {children}
+                </select>
+            </SelectWrap>
+        )
+    }
+)
 
 export function Checkbox({className,style,children,...props}) {
     return <label className={cc([css.checkbox,className])}><input type="checkbox" {...props} /><span>{children}</span></label>;

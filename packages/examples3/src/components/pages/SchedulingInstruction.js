@@ -31,45 +31,46 @@ import connect from '../../form-capacitor/connect';
 import {mount} from '../../form-capacitor';
 
 import {TextBox, Select, EmailInput, TelInput, Radio, TextArea, Checkbox} from '../controls';
+import {consumeValue} from '../../form-capacitor';
 
 
-export default function SchedulingInstruction({doDelete,number,formId}) {
-    return (
-        <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>
-            <TableCell>
-                <Select name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`}>
-                    {options.appointmentTypes.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
-            </TableCell>
-            <TableCell>
-                <Select name="teamId" isFullWidth>
-                    {options.teams.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
-            </TableCell>
-            <TableCell>
-                <Select name="disciplineId" isFullWidth>
-                    {options.disciplines.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
-            </TableCell>
-            <TableCell>
-                <Select name="prefClinicianId" isFullWidth>
-                    {options.clinicians.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
-            </TableCell>
-            <TableCell>
-                <Select name="prefTime" isFullWidth>
-                    {options.times.map(({value, label}) => <option key={value}>{label}</option>)}
-                </Select>
-            </TableCell>
-            <TableCell>
-                <Checkbox name="childRequired">Yes</Checkbox>
-            </TableCell>
-            <TableCell>
-                <ActionLink hasTextDanger onClick={doDelete}><Icon src={trashIcon} isMedium/></ActionLink>
-            </TableCell>
-        </TableRow>
-    )
+@consumeValue()
+export default class SchedulingInstruction extends React.Component {
+    
+    
+    render() {
+        const {doDelete,number,formId, value:instruction} = this.props;
+
+        return (
+            <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>
+                <TableCell>
+                    <Select name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`} options={options.appointmentTypes}/>
+                </TableCell>
+                <TableCell>
+                    <Select name="teamId" isFullWidth options={options.teams}/>
+                </TableCell>
+                <TableCell>
+                    <Select name="disciplineId" isFullWidth options={options.disciplines}/>
+                </TableCell>
+                <TableCell>
+                    <Select name="prefClinicianId" isFullWidth options={options.clinicians}/>
+                </TableCell>
+                <TableCell>
+                    <Select name="prefTime" isFullWidth options={options.times}/>
+                </TableCell>
+                <TableCell>
+                    <Checkbox name="childRequired">Yes</Checkbox>
+                </TableCell>
+                <TableCell>
+                    <ActionLink hasTextDanger onClick={doDelete}><Icon src={trashIcon} isMedium/></ActionLink>
+                </TableCell>
+            </TableRow>
+        )
+
+    }
 }
+
+
 
 // export default mount({
 //     defaultValue: {},
