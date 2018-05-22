@@ -19,6 +19,8 @@ import {types} from 'mobx-state-tree';
 import makeJsonSchemaToMST from '../lib/jsonschema-to-mobx-state-tree';
 const jsonSchemaToMST = makeJsonSchemaToMST(types);
 import FormContext from './context';
+import {findDOMNode} from 'react-dom';
+import {watchForErrors} from './errors';
 
 function unique(arr) {
     return Array.from(new Set(arr));
@@ -262,7 +264,7 @@ export default function schema(options) {
 
                 // const store = getValue(context[STORE_KEY], context[PATH_KEY])
 
-                const errorMap = observable.map();
+                // const errorMap = observable.map();
                 
 
                 // Object.defineProperty(this, 'errorMap', {
@@ -282,9 +284,9 @@ export default function schema(options) {
                 
                 this.state = {
                     formData: null,
+                    errorMap: null,
                 }
                 
-               
                 
                 schemaPromise.then(schema => {
                     let Model = jsonSchemaToMST(schema);
@@ -299,8 +301,13 @@ export default function schema(options) {
                     if(options.actions) {
                         Model = Model.actions(options.actions);
                     }
+                    
+                    const formData = Model.create(options.default);
+                    const errorMap = watchForErrors(schema, formData);
+                    
                     this.setState({
-                        formData: Model.create(options.default),
+                        formData,
+                        errorMap,
                     })
                   
                     // console.log(mst.create());
@@ -325,6 +332,7 @@ export default function schema(options) {
                 return (
                     <FormContext.Provider value={{
                         formData: this.state.formData,
+                        errorMap: this.state.errorMap,
                         path: [],
                     }}>
                         {React.createElement(observer(Component), {...this.props,...this.state})}

@@ -1,5 +1,5 @@
-import {InputText, Select as Component} from '../bulma';
-import {connect, consumeValue, mount} from '../../form-capacitor';
+import {Select as Component} from '../bulma';
+import {consumeValue} from '../../form-capacitor';
 
 @consumeValue()
 export default class Select extends React.Component {

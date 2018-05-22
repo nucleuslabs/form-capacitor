@@ -93,12 +93,12 @@ function Instruction(defaults) {
     schema: jsonSchema,
     $ref: '#/definitions/SchedulingInstructions',
     default: {
-        requiredAssessments: [{key: shortid()}],
+        requiredAssessments: [{}],
         specialInstructions: '',
     },
     actions: formData => ({
         addInstruction() {
-            formData.requiredAssessments.push({key: shortid()})
+            formData.requiredAssessments.push({})
         },
         clearInstructions() {
             formData.requiredAssessments.length = 0;
@@ -150,7 +150,7 @@ export default class SchedulingInstructionsForm extends React.Component {
     }
     
     render() {
-        const {formData} = this.props;
+        const {formData,errorMap} = this.props;
         if(!formData) return <p>Loading schema...</p>;
         // console.log('formData',formData)
         
@@ -210,7 +210,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                     {JSON.stringify(formData,null,2)}
                 </Code>
                 <Code>
-                    {JSON.stringify(this.errorMap,null,2)}
+                    {JSON.stringify(errorMap,null,2)}
                 </Code>
             </Fragment>
         )

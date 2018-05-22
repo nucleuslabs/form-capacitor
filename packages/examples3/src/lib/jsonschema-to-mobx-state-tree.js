@@ -3,8 +3,36 @@
 
 import walkNodes from 'jsonschema-nodewalker';
 import Lo from 'lodash';
+import shortid from 'shortid';
+// import {types} from 'mobx-state-tree';
+import {isPlainObject} from './types';
 
 const titleCase = str => Lo.deburr(Lo.upperFirst(Lo.camelCase(str)));
+
+function hasProp(obj,prop) {
+    return Object.hasOwnProperty.call(obj,prop);
+}
+
+function getDefault(node) {
+    if(!hasProp(node,'default')) return undefined;
+    if(isPlainObject(node.default)) {
+        const keys = Object.keys(node.default);
+        if(keys.length === 1 && hasProp(defaultKeywords,keys[0])) {
+            return defaultKeywords[keys[0]](node.default[keys[0]])
+        }
+    }
+    return node.default;
+}
+
+const defaultKeywords = {
+    $uuid(type) {
+        switch(type) {
+            case 'shortid':
+                return () => shortid();
+        }
+        throw new Error(`$uuid type "${type}" not implemented`);
+    }
+}
 
 export default (types) => {
     const TYPE_MAP = Object.freeze({
@@ -33,7 +61,7 @@ export default (types) => {
         if(hasDefault) {
             result = node.default === null 
                 ? types.maybe(type) 
-                : types.optional(type, node.default);
+                : types.optional(type, getDefault(node));
         } else if(!isRequired) {
             result = types.maybe(type);
         }

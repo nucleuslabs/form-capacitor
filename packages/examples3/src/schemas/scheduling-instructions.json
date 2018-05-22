@@ -34,10 +34,16 @@
             "title": "Instruction",
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "number",
+                    "title": "ID",
+                    "default": null
+                },
                 "typeId": {
                     "type": "number",
                     "title": "Appointment Type",
-                    "default": null
+                    "default": null,
+                    "minimum": 100
                 },
                 "teamId": {
                     "type": "number",
@@ -66,7 +72,8 @@
                 },
                 "key": {
                     "type": "string",
-                    "title": "Key"
+                    "title": "Key",
+                    "default": {"$uuid": "shortid"}
                 }
             },
             "required": [
