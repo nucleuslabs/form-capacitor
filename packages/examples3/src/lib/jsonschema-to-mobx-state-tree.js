@@ -34,44 +34,114 @@ const defaultKeywords = {
     }
 }
 
-const Integer = types.refinement('integer',types.number, i => Number.isInteger(i));
 
-export default (types) => {
-    const TYPE_MAP = Object.freeze({
-        boolean: (node, meta) => types.boolean,
-        number: (node, meta) => types.number,
-        integer: (node, meta) => Integer,
-        string: (node, meta) => {
-            const format = node.format;
-            if(format === 'datetime') return types.Date;
-            return types.string;
-        },
-        object: (node, meta) => {
-            return Object.keys(meta.childObjectProperties).length ?
-                node.title ?
-                    types.model(titleCase(node.title), meta.childObjectProperties) :
-                    types.model(meta.childObjectProperties) :
-                types.frozen;
-        },
-        array: (node, meta) => types.array(meta.childArrayItem)
-    });
-
-    return (schema = {}, onNode) => walkNodes(schema, (node, meta) => {
-        const type = TYPE_MAP[node.type](node, meta);
-        const hasDefault = node.default !== undefined;
-        const isRequired = meta.isRequired || !meta.lineage;
-        let result = type;
-        // TODO: see https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
-        // might be able to make 'shortid' an identifier
-        if(hasDefault) {
-            result = node.default === null 
-                ? types.maybe(type) 
-                : types.optional(type, getDefault(node));
-        } else if(!isRequired) {
-            result = types.maybe(type);
+const TYPE_MAP = Object.freeze({
+    boolean: (node, meta) => types.boolean,
+    number: (node, meta) => types.number,
+    integer: (node, meta) => types.refinement('integer',types.number, i => Number.isInteger(i)),
+    string: (node, meta) => {
+        const format = node.format;
+        if(format === 'datetime') return types.Date;
+        return types.string;
+    },
+    object: (node, meta) => {
+        const properties = Object.entries(node.properties).reduce((acc,[k,v]) => {
+            acc[k] = makeType(v, {
+                parent: node,
+                depth: meta.depth+1,
+            })
+            return acc;
+        }, Object.create(null)); 
+        
+        // console.log('properties',properties);
+        
+        return node.title
+            ? types.model(titleCase(node.title), properties)
+            : types.model(properties);
+    },
+    array: (node, meta) => {
+        if(isPlainObject(node.items)) {
+            return types.array(makeType(node.items, {
+                parent: node,
+                depth: meta.depth+1,
+            }))
+        } else if(isArray(node.items)) {
+            throw new Error('not implemented');
         }
-        return onNode 
-            ? onNode(result, {node, meta, typeMap: TYPE_MAP}) 
-            : result;
-    });
-};
+        throw new Error('array.items must be an object or array');
+    },
+    null: (node, meta) => types.null,
+});
+
+// https://github.com/mobxjs/mobx-state-tree#types-overview
+function makeType(node, meta) {
+    const typeArr = [];
+    if(node.type) {
+        typeArr.push(TYPE_MAP[node.type](node, meta));
+    }
+    if(node.anyOf) {
+        // console.log(node,meta);
+        typeArr.push(types.union(...node.anyOf.map(x => makeType(x, {})))) // fixme: meta-data missing
+    }
+    if(node.allOf) {
+        typeArr.push(types.compose(...node.allOf.map(x => makeType(x, {}))))
+    }
+    if(typeArr.length) {
+        let type = types.length > 1
+            ? types.compose(...typeArr)
+            : typeArr[0];
+
+        if(node.default !== undefined) {
+            if(node.default === null) {
+                if((type.flags & UNION)===UNION 
+                    && type.types.some(t => (t.flags & NULL) === NULL)) {
+                    return types.optional(type, null);
+                }
+                return types.maybe(type);
+                // if((type.flags & UNION)===UNION && type.types.some(t => (t.flags & NULL) === NULL)) {
+                //     // if type already contains `null` as one of its allowed values...
+                //     return type;
+                // }
+            }
+            return types.optional(type, getDefault(node));
+        }
+        return type;
+    }
+    throw new Error(`Could not make type; missing one of "type", "anyOf" or "allOf"`);
+    
+}
+
+const OPTIONAL = 1 << 9;
+const NULL = 1 << 15;
+const UNION = 1<<14; // https://github.com/mobxjs/mobx-state-tree/blob/878d7f312d03276304d20af9dc055837666dbc6f/packages/mobx-state-tree/src/core/type/type.ts#L36
+const OPTIONAL_UNION = OPTIONAL|UNION;
+
+// TODO: scrap walkNodes, roll own
+const foo = (schema = {}, onNode) => walkNodes(schema, (node, meta) => {
+    const type = makeType(node,meta);
+    const hasDefault = node.default !== undefined;
+    const isRequired = meta.isRequired || !meta.lineage; // lineage is for root element
+    let result = type;
+    // TODO: see https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
+    // might be able to make 'shortid' an identifier
+    console.log(type.name,{type,hasDefault,isRequired});
+    if(hasDefault) {
+        // console.log(type,(type.flags & UNION)===UNION);
+        let includesNull = (type.flags & UNION)===UNION && type.types.some(t => (t.flags & NULL) === NULL);
+        
+        
+        result = node.default === null
+            ? (includesNull ? type : types.maybe(type))
+            : types.optional(type, getDefault(node));
+    } else if(!isRequired) {
+        result = types.maybe(type);
+    }
+    // console.log('result',result);
+    return onNode
+        ? onNode(result, {node, meta})
+        : result;
+});
+
+
+
+export default schema => makeType(schema,{parent:null,depth:0})

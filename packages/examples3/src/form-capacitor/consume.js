@@ -11,7 +11,7 @@ function getErrors(err, path) {
             err = getValue(err,['items',k]);
         }
     }
-    console.log(err,path,err.toJS())
+    // console.log(err,path,err.toJS())
     return err;
 }
 
@@ -28,7 +28,7 @@ export default function consumeValue(options) {
                     const fullPath = [...path, ...toPath(resolveValue(options.path, props))];
                     const value = getValue(formData, fullPath);
                     // console.log('i has an errormap?',errorMap,value);
-                    const errors = getErrors(errorMap,fullPath);
+                    const errors = getErrors(errorMap,fullPath) || new Map;
                     // console.log('errors',getErrors(errorMap,path));
                     // console.log(formData,fullPath,value);
                     const doSet = value => formData.set(fullPath, value);

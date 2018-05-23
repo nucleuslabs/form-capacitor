@@ -162,8 +162,8 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                 }
             }));
             break;
-        default:
-            throw new Error(`'${schema.type}' not supported`);
+        // default:
+        //     throw new Error(`'${schema.type}' not supported`);
     }
     return {
         errors,

@@ -16,8 +16,7 @@ import {getDisplayName} from '../lib/react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
 import {isNumber, isString} from '../lib/types';
 import {types} from 'mobx-state-tree';
-import makeJsonSchemaToMST from '../lib/jsonschema-to-mobx-state-tree';
-const jsonSchemaToMST = makeJsonSchemaToMST(types);
+import jsonSchemaToMST from '../lib/jsonschema-to-mobx-state-tree';
 import FormContext from './context';
 import {findDOMNode} from 'react-dom';
 import {watchForErrors} from './errors';

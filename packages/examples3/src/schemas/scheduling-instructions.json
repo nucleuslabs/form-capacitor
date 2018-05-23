@@ -13,7 +13,7 @@
                     },
                     "title": "Instructions",
                     "description": "List of appointments that need to be booked",
-                    "default": []
+                    "default": [{}]
                 },
                 "specialInstructions": {
                     "type": "string",
@@ -24,7 +24,6 @@
                     "default": ""
                 }
             },
-         
             "required": [
                 "requiredAssessments",
                 "specialInstructions"
@@ -34,6 +33,13 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 4294967295
+        },
+        "OptionalID": {
+            "anyOf": [
+                { "$ref": "#/definitions/ID"},
+                {"type": "null"}
+            ],
+            "default": null
         },
         "Instruction": {
             "title": "Instruction",
@@ -60,15 +66,23 @@
                     "default": null
                 },
                 "prefClinicianId": {
-                    "$ref": "#/definitions/ID",
-                    "title": "Preferred Clinician",
-                    "default": null
+                    "$ref": "#/definitions/OptionalID",
+                    "title": "Preferred Clinician"
                 },
                 "prefTime": {
-                    "type": "integer",
                     "title": "Preferred Time",
-                    "minimum": 0,
-                    "default": null
+                    "default": null,
+                    "anyOf": [
+                        {
+                            "type": "integer",
+                            "minimum": 30,
+                            "maximum": 720,
+                            "multipleOf": 30
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "childRequired": {
                     "type": "boolean",

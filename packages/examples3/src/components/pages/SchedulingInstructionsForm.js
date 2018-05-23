@@ -92,10 +92,10 @@ function Instruction(defaults) {
 @schema({
     schema: jsonSchema,
     $ref: '#/definitions/SchedulingInstructions',
-    default: {
-        requiredAssessments: [{}],
-        specialInstructions: '',
-    },
+    // default: {
+    //     requiredAssessments: [{}],
+    //     specialInstructions: '',
+    // },
     actions: formData => ({
         addInstruction() {
             formData.requiredAssessments.push({})
