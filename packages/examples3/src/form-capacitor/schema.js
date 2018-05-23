@@ -176,6 +176,7 @@ const checkProp = {
         return checkNumber(schema,change,errors);
     },
     integer(schema,change,errors) {
+        
         if(!Number.isInteger(change.newValue)) {
             errors.set('type','integer');
             return;
@@ -291,6 +292,7 @@ export default function schema(options) {
                 
                 
                 schemaPromise.then(schema => {
+                    // console.log(schema);
                     let Model = jsonSchemaToMST(schema);
                     Model = Model.actions(self => ({
                         set(name, value) {

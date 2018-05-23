@@ -30,39 +30,44 @@
                 "specialInstructions"
             ]
         },
+        "ID": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+        },
         "Instruction": {
             "title": "Instruction",
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "number",
+                    "$ref": "#/definitions/ID",
                     "title": "ID",
                     "default": null
                 },
                 "typeId": {
-                    "type": "number",
+                    "$ref": "#/definitions/ID",
                     "title": "Appointment Type",
-                    "default": null,
-                    "minimum": 100
+                    "default": null
                 },
                 "teamId": {
-                    "type": "number",
+                    "$ref": "#/definitions/ID",
                     "title": "Team",
                     "default": null
                 },
                 "disciplineId": {
-                    "type": "number",
+                    "$ref": "#/definitions/ID",
                     "title": "Discipline",
                     "default": null
                 },
                 "prefClinicianId": {
-                    "type": "number",
+                    "$ref": "#/definitions/ID",
                     "title": "Preferred Clinician",
                     "default": null
                 },
                 "prefTime": {
-                    "type": "number",
+                    "type": "integer",
                     "title": "Preferred Time",
+                    "minimum": 0,
                     "default": null
                 },
                 "childRequired": {

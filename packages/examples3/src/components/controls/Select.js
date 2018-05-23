@@ -28,9 +28,9 @@ export default class Select extends React.Component {
     }
 
     render() {
-        let {value, name, setValue, options, ...props} = this.props;
+        let {value, name, setValue, errors, options, ...props} = this.props;
         return (
-            <Component {...props} onChange={this.handleChange} ref={this.select}>
+            <Component {...props} isDanger={errors.size > 0} onChange={this.handleChange} ref={this.select}>
                 {options.map(({value, label, key}) => <option key={key != null ? key : value}>{label}</option>)}
             </Component>
         )

@@ -12,7 +12,7 @@ import {
     isObservableObject,
     reaction
 } from 'mobx';
-import {isString} from '../lib/types';
+import {isString,isBoolean} from '../lib/types';
 
 
 const observeMap = {
@@ -137,6 +137,33 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                 checkNumber(schema,value,errors);
             }));
             break;
+        case 'integer':
+            // console.log(mobxStateTree,propName);
+            disposers.push(doObserve(mobxStateTree,propName,value => {
+                // console.log('number change',mobxStateTree,propName,change);
+
+                errors.clear();
+                if(!Number.isInteger(value)) {
+                    errors.set('type','integer');
+                    return;
+                }
+                checkNumber(schema,value,errors);
+            }));
+            break;
+        case 'boolean':
+            // console.log(mobxStateTree,propName);
+            disposers.push(doObserve(mobxStateTree,propName,value => {
+                // console.log('number change',mobxStateTree,propName,change);
+
+                errors.clear();
+                if(isBoolean(value)) {
+                    errors.set('type','boolean');
+                    return;
+                }
+            }));
+            break;
+        default:
+            throw new Error(`'${schema.type}' not supported`);
     }
     return {
         errors,

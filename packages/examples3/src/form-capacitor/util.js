@@ -1,5 +1,5 @@
 import stringToPath from './stringToPath';
-import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray, set as mobSet} from 'mobx';
+import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray,isObservableMap, set as mobSet} from 'mobx';
 
 export function setDefaults(obj, defaults, overwrite) {
     for(let key of Object.keys(defaults)) {
@@ -103,15 +103,26 @@ export function getValue(obj, path, def) {
 
     for(let key of path) {
         // console.log(obj,ret,key,path);
-        if(ret == null || ret[key] === undefined) {
+        if(ret == null) {
             // console.log('key not found',ret,key);
             return def;
         }
-        ret = ret[key];
+        if(isMap(ret)) {
+            ret = ret.get(key);
+        } else {
+            ret = ret[key];
+        }
+        if(ret === undefined) {
+            return def;
+        }
     }
     // console.log(obj,path);
 
     return ret;
+}
+
+function isMap(x) {
+    return isObservableMap(x) || x instanceof Map || x instanceof WeakMap;
 }
 
 export const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));

@@ -4,7 +4,7 @@
 import walkNodes from 'jsonschema-nodewalker';
 import Lo from 'lodash';
 import shortid from 'shortid';
-// import {types} from 'mobx-state-tree';
+import {types} from 'mobx-state-tree';
 import {isPlainObject} from './types';
 
 const titleCase = str => Lo.deburr(Lo.upperFirst(Lo.camelCase(str)));
@@ -34,10 +34,13 @@ const defaultKeywords = {
     }
 }
 
+const Integer = types.refinement('integer',types.number, i => Number.isInteger(i));
+
 export default (types) => {
     const TYPE_MAP = Object.freeze({
         boolean: (node, meta) => types.boolean,
         number: (node, meta) => types.number,
+        integer: (node, meta) => Integer,
         string: (node, meta) => {
             const format = node.format;
             if(format === 'datetime') return types.Date;
