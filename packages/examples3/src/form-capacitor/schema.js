@@ -305,12 +305,14 @@ export default function schema(options) {
                     }
                     
                     const formData = Model.create(options.default);
-                    const errorMap = watchForErrors(schema, formData);
+                    const {errors,dispose} = watchForErrors(schema, formData);
                     connectReduxDevtools(remotedev, formData)
+                    
+                    this._dispose = dispose;
                     
                     this.setState({
                         formData,
-                        errorMap,
+                        errorMap: errors,
                     })
                   
                     // console.log(mst.create());
@@ -330,6 +332,12 @@ export default function schema(options) {
                 // console.log(props,context,options,store);
             }
 
+            componentWillUnmount() {
+                if(this._dispose) {
+                    // FIXME: what if the schema promise resolves after the component is unmounted..?
+                    this._dispose();
+                }
+            }
 
             render() {
                 return (

@@ -31,6 +31,7 @@ function watchProp() {
 
 export function watchForErrors(schema, mobxStateTree, propName) {
     const errors = observable.map();
+    const disposers = [];
     let value = mobxStateTree;
     if(propName !== undefined) {
         // console.log('value',value, propName, value[propName]);
@@ -39,7 +40,7 @@ export function watchForErrors(schema, mobxStateTree, propName) {
     switch(schema.type) {
         case 'object':
             // console.log('obj',mobxStateTree,propName,value)
-            doObserve(value,newValue => {
+            disposers.push(doObserve(value,newValue => {
                 // console.log('object',value);
                 const missingRequiredProps = [];
                 for(let p of schema.required) {
@@ -52,17 +53,19 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                 } else {
                     errors.delete('required');
                 }
-            })
+            }))
             if(schema.properties) {
                 const propErrors = observable.map();
                 errors.set('properties',propErrors);
                 for(let p of Object.keys(schema.properties)) {
-                    propErrors.set(p, watchForErrors(schema.properties[p], value, p));
+                    const {errors,dispose} = watchForErrors(schema.properties[p], value, p); 
+                    propErrors.set(p, errors);
+                    disposers.push(dispose);
                 }
             }
             break;
         case 'string':
-            doObserve(mobxStateTree,propName,value => {
+            disposers.push(doObserve(mobxStateTree,propName,value => {
                 errors.clear();
                 if(!isString(value)) {
                     errors.set('type','string');
@@ -83,7 +86,7 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                 if(schema.format != null) {
                     throw new Error(`"format" rule not implemented`);
                 }
-            });
+            }));
             break;
         case 'array':
             // console.log('arr',mobxStateTree,propName);
@@ -93,23 +96,37 @@ export function watchForErrors(schema, mobxStateTree, propName) {
             // const disposers = [];
             // console.log('arrayyy',mobxStateTree,propName);
 
-            const itemErrors = observable.map();
+            const itemErrors = observable.array();
             errors.set('items',itemErrors);
             
             for(let i=0; i<value.length; ++i) {
-                // TODO: how to dispose observer when this item is deleted...?
-                // --> watchForErrors should return {errors, dispose}, where
-                // dispose disposes all observers + descendants; schema.js
-                // will dispose on unmount
-                itemErrors.set(i, watchForErrors(schema.items,value,i));
+                const {errors,dispose} = watchForErrors(schema.items,value,i);
+                itemErrors[i] = errors;
+                disposers.push(dispose);
             }
-            doObserve(value,value => {
-                console.log('array change',value);
-            });
+            disposers.push(doObserve(value,change => {
+                // console.log('arrchange',change);
+                if(change.addedCount) {
+                    const end = change.index + change.addedCount;
+                    for(let i=change.index; i<end; ++i) {
+                        const {errors,dispose} = watchForErrors(schema.items,value,i);
+                        itemErrors.set(i, errors);
+                        disposers.push(dispose);
+                    }
+                } else if(change.removedCount) {
+                    // const end = change.index + change.removedCount;
+                    // console.log('slicing',change.index,end);
+                    itemErrors.splice(change.index,change.removedCount);
+                    const del = disposers.splice(change.index, change.removedCount);
+                    del.forEach(exec);
+                    // console.log(itemErrors.length);
+                    
+                }
+            }));
             break;
         case 'number':
             // console.log(mobxStateTree,propName);
-            doObserve(mobxStateTree,propName,value => {
+            disposers.push(doObserve(mobxStateTree,propName,value => {
                // console.log('number change',mobxStateTree,propName,change);
 
                 errors.clear();
@@ -118,10 +135,13 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                     return;
                 }
                 checkNumber(schema,value,errors);
-            });
+            }));
             break;
     }
-    return errors;
+    return {
+        errors,
+        dispose: () => disposers.forEach(d => d()),
+    };
 }
 
 function checkNumber(schema,value,errors) {
@@ -196,4 +216,8 @@ function doObserve(mobxStateTree,propName,change) {
 
 function unbox(mstNode) {
     return mstNode.value;
+}
+
+function exec(f) {
+    f();
 }
