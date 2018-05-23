@@ -97,7 +97,7 @@ export function watchForErrors(schema, mobxStateTree, propName) {
             errors.set('items',itemErrors);
             
             for(let i=0; i<value.length; ++i) {
-               
+                // TODO: how to dispose observer when this item is deleted...?
                 itemErrors.set(i, watchForErrors(schema.items,value,i));
             }
             doObserve(value,value => {
@@ -171,5 +171,26 @@ function doObserve(mobxStateTree,propName,change) {
     // let handler = c => c.newValue.value;
     // if(isObervableObject())
     change(propName !== undefined ? mobxStateTree[propName] : mobxStateTree);
-    return observe(mobxStateTree,propName,c => change(c.newValue.value));
+    return observe(mobxStateTree,propName,c => {
+        // console.log(c.type);
+        switch(c.type) {
+            case 'splice':
+                change({
+                    ...c,
+                    added: c.added.map(unbox),
+                    removed: c.removed.map(unbox),
+                });
+                break;
+            case 'update':
+                change(c.newValue.value)
+                break;
+            default:
+                throw new Error(`unhandled change type ${c.type}`);
+        }
+        
+    });
+}
+
+function unbox(mstNode) {
+    return mstNode.value;
 }

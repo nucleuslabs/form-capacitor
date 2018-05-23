@@ -58,6 +58,8 @@ export default (types) => {
         const hasDefault = node.default !== undefined;
         const isRequired = meta.isRequired || !meta.lineage;
         let result = type;
+        // TODO: see https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
+        // might be able to make 'shortid' an identifier
         if(hasDefault) {
             result = node.default === null 
                 ? types.maybe(type) 
