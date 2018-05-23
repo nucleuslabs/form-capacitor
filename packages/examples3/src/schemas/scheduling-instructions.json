@@ -41,6 +41,12 @@
             ],
             "default": null
         },
+        "shortid": {
+            "type": "string",
+            "default": {"$uuid": "shortid"},
+            "pattern": "^[0-9a-zA-Z_-]{7,14}$",
+            "title": "shortid"
+        },
         "Instruction": {
             "title": "Instruction",
             "type": "object",
@@ -90,9 +96,7 @@
                     "default": false
                 },
                 "key": {
-                    "type": "string",
-                    "title": "Key",
-                    "default": {"$uuid": "shortid"}
+                    "$ref": "#/definitions/shortid"
                 }
             },
             "required": [

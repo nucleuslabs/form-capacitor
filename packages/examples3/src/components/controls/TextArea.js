@@ -17,8 +17,8 @@ export default class TextArea extends React.Component {
     }
     
     render() {
-        const {name, setValue, ...props} = this.props;
-        return <Component {...props} onChange={this.handleChange}/>
+        const {name, setValue, errors, ...props} = this.props;
+        return <Component {...props} isDanger={errors && errors.size > 0} onChange={this.handleChange}/>
     }
 }
 
