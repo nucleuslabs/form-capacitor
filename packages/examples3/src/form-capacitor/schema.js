@@ -21,6 +21,8 @@ const jsonSchemaToMST = makeJsonSchemaToMST(types);
 import FormContext from './context';
 import {findDOMNode} from 'react-dom';
 import {watchForErrors} from './errors';
+import { asReduxStore, connectReduxDevtools } from "mst-middlewares"
+import remotedev from 'remotedev';
 
 function unique(arr) {
     return Array.from(new Set(arr));
@@ -304,6 +306,7 @@ export default function schema(options) {
                     
                     const formData = Model.create(options.default);
                     const errorMap = watchForErrors(schema, formData);
+                    connectReduxDevtools(remotedev, formData)
                     
                     this.setState({
                         formData,
