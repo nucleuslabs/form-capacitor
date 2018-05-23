@@ -98,6 +98,9 @@ export function watchForErrors(schema, mobxStateTree, propName) {
             
             for(let i=0; i<value.length; ++i) {
                 // TODO: how to dispose observer when this item is deleted...?
+                // --> watchForErrors should return {errors, dispose}, where
+                // dispose disposes all observers + descendants; schema.js
+                // will dispose on unmount
                 itemErrors.set(i, watchForErrors(schema.items,value,i));
             }
             doObserve(value,value => {
