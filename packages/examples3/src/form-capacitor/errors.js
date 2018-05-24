@@ -110,15 +110,16 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                     const end = change.index + change.addedCount;
                     for(let i=change.index; i<end; ++i) {
                         const {errors,dispose} = watchForErrors(schema.items,value,i);
-                        itemErrors.set(i, errors);
+                        itemErrors[i] = errors;
                         disposers.push(dispose);
                     }
                 } else if(change.removedCount) {
                     // const end = change.index + change.removedCount;
-                    // console.log('slicing',change.index,end);
+                    console.log('splicing',change.index,change.removedCount);
                     itemErrors.splice(change.index,change.removedCount);
                     const del = disposers.splice(change.index, change.removedCount);
-                    del.forEach(exec);
+                    console.log('del',del);
+                    execAll(del);
                     // console.log(itemErrors.length);
                     
                 }
@@ -167,8 +168,12 @@ export function watchForErrors(schema, mobxStateTree, propName) {
     }
     return {
         errors,
-        dispose: () => disposers.forEach(d => d()),
+        dispose: () => execAll(disposers),
     };
+}
+
+function execAll(arrayOfFuncs) {
+    return arrayOfFuncs.forEach(exec);
 }
 
 function checkNumber(schema,value,errors) {
@@ -202,7 +207,10 @@ function checkNumber(schema,value,errors) {
     }
 }
 
+let obsCount = 0;
+
 function doObserve(mobxStateTree,propName,change) {
+    console.log(`++observe ${++obsCount}`)
     if(change === undefined) {
         change = propName;
         propName = undefined;
@@ -221,7 +229,7 @@ function doObserve(mobxStateTree,propName,change) {
     // let handler = c => c.newValue.value;
     // if(isObervableObject())
     change(propName !== undefined ? mobxStateTree[propName] : mobxStateTree);
-    return observe(mobxStateTree,propName,c => {
+    const dispose = observe(mobxStateTree,propName,c => {
         // console.log(c.type);
         switch(c.type) {
             case 'splice':
@@ -237,8 +245,12 @@ function doObserve(mobxStateTree,propName,change) {
             default:
                 throw new Error(`unhandled change type ${c.type}`);
         }
-        
     });
+    
+    return () => {
+        console.log(`--observe ${--obsCount}`)
+        dispose();
+    }
 }
 
 function unbox(mstNode) {

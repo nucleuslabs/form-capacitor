@@ -83,7 +83,7 @@
                             "type": "integer",
                             "minimum": 30,
                             "maximum": 720,
-                            "multipleOf": 30
+                            "multipleOf": 15
                         },
                         {
                             "type": "null"

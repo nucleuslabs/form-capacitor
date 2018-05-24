@@ -25,10 +25,11 @@ function getDefault(node) {
 }
 
 const defaultKeywords = {
+    // should we have resolved all these defaults into functions during the schema resolution phase..?
     $uuid(type) {
         switch(type) {
             case 'shortid':
-                return () => shortid();
+                return shortid;
         }
         throw new Error(`$uuid type "${type}" not implemented`);
     }
@@ -48,12 +49,13 @@ const TYPE_MAP = Object.freeze({
         const properties = Object.entries(node.properties).reduce((acc,[k,v]) => {
             acc[k] = makeType(v, {
                 parent: node,
-                depth: meta.depth+1,
+                // depth: meta.depth+1,
+                key: k,
             })
             return acc;
         }, Object.create(null)); 
         
-        // console.log('properties',properties);
+        console.log('properties',properties);
         
         return node.title
             ? types.model(titleCase(node.title), properties)
@@ -63,7 +65,7 @@ const TYPE_MAP = Object.freeze({
         if(isPlainObject(node.items)) {
             return types.array(makeType(node.items, {
                 parent: node,
-                depth: meta.depth+1,
+                // depth: meta.depth+1,
             }))
         } else if(isArray(node.items)) {
             throw new Error('not implemented');
@@ -81,10 +83,17 @@ function makeType(node, meta) {
     }
     if(node.anyOf) {
         // console.log(node,meta);
-        typeArr.push(types.union(...node.anyOf.map(x => makeType(x, {})))) // fixme: meta-data missing
+        typeArr.push(types.union(...node.anyOf.map(x => makeType(x, {
+            parent: node,
+        })))) 
     }
     if(node.allOf) {
-        typeArr.push(types.compose(...node.allOf.map(x => makeType(x, {}))))
+        typeArr.push(types.compose(...node.allOf.map(x => makeType(x, {
+            parent: node
+        }))))
+    }
+    if(node.oneOf) {
+        throw new Error(`JsonSchema "oneOf" is presently not supported`); // I guess it would be identical to node.anyOf for the purposes of MST no?
     }
     if(typeArr.length) {
         let type = types.length > 1
@@ -93,24 +102,33 @@ function makeType(node, meta) {
 
         if(node.default !== undefined) {
             if(node.default === null) {
-                if((type.flags & UNION)===UNION 
-                    && type.types.some(t => (t.flags & NULL) === NULL)) {
+                if(hasUnionFlag(type,NULL)) {
                     return types.optional(type, null);
                 }
                 return types.maybe(type);
-                // if((type.flags & UNION)===UNION && type.types.some(t => (t.flags & NULL) === NULL)) {
-                //     // if type already contains `null` as one of its allowed values...
-                //     return type;
-                // }
             }
             return types.optional(type, getDefault(node));
+        }
+        if(meta.parent && meta.key !== undefined && (!meta.parent.required || !meta.parent.required.includes(meta.key))) {
+            if(hasUnionFlag(type,UNDEFINED)) {
+                return types.optional(type, undefined);
+            }
+            return types.optional(types.union(type, types.undefined), undefined);
         }
         return type;
     }
     throw new Error(`Could not make type; missing one of "type", "anyOf" or "allOf"`);
-    
 }
 
+function hasUnionFlag(type, flag) {
+    return (type.flags & flag) === flag
+        || (
+            (type.flags & UNION) === UNION
+            && type.types.some(t => (t.flags & flag) === flag)
+        );
+}
+
+const UNDEFINED = 1 << 16;
 const OPTIONAL = 1 << 9;
 const NULL = 1 << 15;
 const UNION = 1<<14; // https://github.com/mobxjs/mobx-state-tree/blob/878d7f312d03276304d20af9dc055837666dbc6f/packages/mobx-state-tree/src/core/type/type.ts#L36
