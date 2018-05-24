@@ -98,11 +98,12 @@ export function watchForErrors(schema, mobxStateTree, propName) {
 
             const itemErrors = observable.array();
             errors.set('items',itemErrors);
+            const rowDisposers = [];
             
             for(let i=0; i<value.length; ++i) {
                 const {errors,dispose} = watchForErrors(schema.items,value,i);
                 itemErrors[i] = errors;
-                disposers.push(dispose);
+                rowDisposers[i] = dispose;
             }
             disposers.push(doObserve(value,change => {
                 // console.log('arrchange',change);
@@ -111,19 +112,21 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                     for(let i=change.index; i<end; ++i) {
                         const {errors,dispose} = watchForErrors(schema.items,value,i);
                         itemErrors[i] = errors;
-                        disposers.push(dispose);
+                        rowDisposers[i] = dispose;
                     }
                 } else if(change.removedCount) {
                     // const end = change.index + change.removedCount;
-                    console.log('splicing',change.index,change.removedCount);
+                    // console.log('splicing',change.index,change.removedCount,disposers.length);
                     itemErrors.splice(change.index,change.removedCount);
-                    const del = disposers.splice(change.index, change.removedCount);
-                    console.log('del',del);
+                    const del = rowDisposers.splice(change.index, change.removedCount);
+                    // console.log('del',del);
                     execAll(del);
                     // console.log(itemErrors.length);
                     
                 }
             }));
+
+            disposers.push(() => execAll(rowDisposers));
             break;
         case 'number':
             // console.log(mobxStateTree,propName);
@@ -207,10 +210,10 @@ function checkNumber(schema,value,errors) {
     }
 }
 
-let obsCount = 0;
+// let obsCount = 0;
 
 function doObserve(mobxStateTree,propName,change) {
-    console.log(`++observe ${++obsCount}`)
+    // console.log(`++observe ${++obsCount}`)
     if(change === undefined) {
         change = propName;
         propName = undefined;
@@ -248,7 +251,7 @@ function doObserve(mobxStateTree,propName,change) {
     });
     
     return () => {
-        console.log(`--observe ${--obsCount}`)
+        // console.log(`--observe ${--obsCount}`)
         dispose();
     }
 }

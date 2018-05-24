@@ -55,7 +55,7 @@ const TYPE_MAP = Object.freeze({
             return acc;
         }, Object.create(null)); 
         
-        console.log('properties',properties);
+        // console.log('properties',properties);
         
         return node.title
             ? types.model(titleCase(node.title), properties)
