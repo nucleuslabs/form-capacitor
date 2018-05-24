@@ -57,18 +57,15 @@
                 },
                 "typeId": {
                     "$ref": "#/definitions/ID",
-                    "title": "Appointment Type",
-                    "default": null
+                    "title": "Appointment Type"
                 },
                 "teamId": {
                     "$ref": "#/definitions/ID",
-                    "title": "Team",
-                    "default": null
+                    "title": "Team"
                 },
                 "disciplineId": {
                     "$ref": "#/definitions/ID",
-                    "title": "Discipline",
-                    "default": null
+                    "title": "Discipline"
                 },
                 "prefClinicianId": {
                     "$ref": "#/definitions/OptionalID",
@@ -99,10 +96,10 @@
                 }
             },
             "required": [
-                "childRequired",
-                "disciplineId",
-                "teamId",
                 "typeId",
+                "teamId",
+                "disciplineId",
+                "childRequired",
                 "key"
             ]
         }

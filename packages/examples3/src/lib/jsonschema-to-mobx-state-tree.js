@@ -109,7 +109,7 @@ function makeType(node, meta) {
             }
             return types.optional(type, getDefault(node));
         }
-        if(meta.parent && meta.key !== undefined && (!meta.parent.required || !meta.parent.required.includes(meta.key))) {
+        if(meta.parent && meta.key !== undefined) {
             if(hasUnionFlag(type,UNDEFINED)) {
                 return types.optional(type, undefined);
             }
