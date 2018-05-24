@@ -160,7 +160,7 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                 // console.log('number change',mobxStateTree,propName,change);
 
                 errors.clear();
-                if(isBoolean(value)) {
+                if(!isBoolean(value)) {
                     errors.set('type','boolean');
                     return;
                 }

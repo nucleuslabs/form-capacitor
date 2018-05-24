@@ -52,9 +52,8 @@
             "type": "object",
             "properties": {
                 "id": {
-                    "$ref": "#/definitions/ID",
-                    "title": "ID",
-                    "default": null
+                    "$ref": "#/definitions/OptionalID",
+                    "title": "ID"
                 },
                 "typeId": {
                     "$ref": "#/definitions/ID",
