@@ -114,8 +114,8 @@ function Instruction(defaults) {
 // })
 export default class SchedulingInstructionsForm extends React.Component {
     
-    // formId = shortid()
-    //
+    formId = shortid()
+
     // @action.bound
     // addInstruction(ev) {
     //     this.formData.requiredAssessments.push(Instruction());
@@ -179,11 +179,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {formData.requiredAssessments.map((inst,idx) => {
-                            // console.log(inst.key);
-                            // console.log(JSON.stringify(inst),inst.key,JSON.stringify(inst.key),toJS(inst.key),toJS(inst).key);
-                            return <SchedulingInstruction key={inst.key} name={['requiredAssessments',idx]} doDelete={() => formData.deleteInstruction(idx)} formId={this.formId} number={idx+1}/>;
-                        })}
+                        <SchedulingInstructions requiredAssessments={formData.requiredAssessments} formId={this.formId} deleteInstruction={formData.deleteInstruction} />
                     </TableBody>
                 </Table>
 
@@ -215,4 +211,12 @@ export default class SchedulingInstructionsForm extends React.Component {
             </Fragment>
         )
     }
+}
+
+function SchedulingInstructions({requiredAssessments, deleteInstruction, formId}) {
+    return requiredAssessments.map((inst,idx) => {
+        // console.log(inst.key);
+        // console.log(JSON.stringify(inst),inst.key,JSON.stringify(inst.key),toJS(inst.key),toJS(inst).key);
+        return <SchedulingInstruction key={inst.key} name={['requiredAssessments',idx]} doDelete={() => deleteInstruction(idx)} formId={formId} number={idx+1}/>;
+    })
 }

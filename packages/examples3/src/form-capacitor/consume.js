@@ -1,7 +1,8 @@
 import FormContext from './context';
-import {getValue, setValue, toPath, resolveValue} from './util';
-import {getDisplayName} from '../lib/react';
+import {getValue, setValue, toPath, resolveValue, arrayEquals} from './util';
+import {getDisplayName, scuChildren} from '../lib/react';
 import {isString,isNumber} from '../lib/types';
+import {EMPTY_ARRAY, EMPTY_MAP} from '../lib/consts';
 
 function getErrors(err, path) {
     for(let k of path) {
@@ -21,33 +22,51 @@ export default function consumeValue(options) {
         name: 'value',
     }, options)
 
-    return Component => {
+    return component => {
         const WrappedComponent = props => (
             <FormContext.Consumer>
-                {({formData, errorMap, path}) => {
-                    const fullPath = [...path, ...toPath(resolveValue(options.path, props))];
-                    const value = getValue(formData, fullPath);
-                    // console.log('i has an errormap?',errorMap,value);
-                    const errors = getErrors(errorMap,fullPath) || new Map;
-                    // console.log('errors',getErrors(errorMap,path));
-                    // console.log(formData,fullPath,value);
-                    const doSet = value => formData.set(fullPath, value);
-                    return (
-                        <FormContext.Provider value={{formData, errorMap, path: fullPath}}>
-                            {React.createElement(Component, {...props, [options.name]: value, setValue: doSet, errors})}
-                        </FormContext.Provider>
-                    )
-                }}
+                {context => <Consumed component={component} props={props} context={context} options={options}/>}
             </FormContext.Consumer>
         )
 
         if(process.env.NODE_ENV !== 'production') {
-            const displayName = getDisplayName(Component);
-            WrappedComponent.displayName = `@consumeValue(${displayName})`;
+            WrappedComponent.displayName = `@consume(${getDisplayName(component)})`;
         }
         
         return WrappedComponent
     }
+}
 
+class Consumed extends React.PureComponent {
+    
+    state = {
+        path: EMPTY_ARRAY,
+    }
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+        const {component,props,context,options} = nextProps;
+        const path = [...context.path, ...toPath(resolveValue(options.path, props))];
+        const value = getValue(context.formData, path);
+        const errors = getErrors(context.errorMap,path) || EMPTY_MAP;
+        const nextState = {value,errors};
+
+        if(!arrayEquals(prevState.path, path)) {
+            nextState.path = path;
+            // nextState.setValue = v => context.formData.set(path,v);
+        }
+
+        return nextState
+    }
+
+    setValue = v => this.props.context.formData.set(this.state.path,v)
+    
+    render() {
+        const {component,props,context,options} = this.props;
+        const {value,errors,path,setValue} = this.state;
+        return (
+            <FormContext.Provider value={{...context, path: path}}>
+                {React.createElement(component, {...props, [options.name]: value, setValue: this.setValue, errors})}
+            </FormContext.Provider>
+        )
+    }
 }

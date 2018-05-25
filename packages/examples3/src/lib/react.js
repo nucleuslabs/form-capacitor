@@ -1,5 +1,6 @@
 import React from 'react';
 import cc from 'classcat';
+import {shallowEqual} from 'shouldcomponentupdate-children';
 
 export function classFactory(className, modifiers) {
     const modSet = modifiers ? new Set(Object.keys(modifiers)) : null;
@@ -117,4 +118,31 @@ export function splitAria(props) {
         }
     }
     return [aria, notAria];
+}
+
+export function scuChildren(nextProps, nextState) {
+    const shouldUpdate = shallowEqual(this.props, nextProps, this.state, nextState);
+    
+    if(shouldUpdate) {
+        const props = new Set([...Object.keys(this.props),...Object.keys(nextProps)]);
+        
+        let id = nextProps.id || nextProps.name || nextProps.key;
+        if(id) {
+            if(Array.isArray(id)) {
+                id = id.join('.');
+            }
+        } else {
+            id = 'unnamed';
+        }
+        console.group(id);
+        for(let p of props) {
+            if(this.props[p] !== nextProps[p]) {
+                // console.log(p,this.props[p],'!==',nextProps[p])
+                console.log(`%c${p} %c${this.props[p]} %c!== %c${nextProps[p]}`,'color:green','','color:magenta','');
+            }
+        }
+        console.groupEnd();
+        // console.log(nextProps.name,this.props===nextProps,this.props,nextProps,this.state===nextState,this.state,nextState);
+    }
+    return shouldUpdate;
 }

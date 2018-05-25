@@ -12,7 +12,7 @@ import {
     isBoxedObservable, isObservableArray
 } from 'mobx';
 import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
-import {getDisplayName} from '../lib/react';
+import {getDisplayName, scuChildren} from '../lib/react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
 import {isNumber, isString} from '../lib/types';
 import {types} from 'mobx-state-tree';
@@ -332,6 +332,8 @@ export default function schema(options) {
                 
                 // console.log(props,context,options,store);
             }
+            
+            // shouldComponentUpdate = scuChildren;
 
             componentWillUnmount() {
                 if(this._dispose) {

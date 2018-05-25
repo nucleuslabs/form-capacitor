@@ -1,10 +1,11 @@
 import {Select as Component} from '../bulma';
 import {consumeValue} from '../../form-capacitor';
+import {scuChildren} from '../../lib/react';
 
 const equalityCheck = Object.is;
 
 @consumeValue()
-export default class Select extends React.Component {
+export default class Select extends React.PureComponent {
     select = React.createRef();
     state = {index: -1}
 
@@ -23,6 +24,8 @@ export default class Select extends React.Component {
         this.select.current.selectedIndex = this.state.index;
     }
 
+    // shouldComponentUpdate = scuChildren;
+
     static getDerivedStateFromProps(nextProps, prevState) {
         if((prevState.index < 0 && nextProps.value === undefined)
             || (
@@ -39,6 +42,7 @@ export default class Select extends React.Component {
 
     render() {
         let {value, name, setValue, errors, options, ...props} = this.props;
+        // console.log(name);
         return (
             <Component {...props} isDanger={errors && errors.size > 0} onChange={this.handleChange} ref={this.select}>
                 {options.map(({value, label, key}) => <option key={key != null ? key : value}>{label}</option>)}

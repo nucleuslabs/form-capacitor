@@ -56,6 +56,7 @@
     "jsonschema-nodewalker": "^1.0.4",
     "mobx-state-tree": "^2.0.5",
     "mst-middlewares": "^2.0.5",
-    "remotedev": "^0.2.7"
+    "remotedev": "^0.2.7",
+    "shouldcomponentupdate-children": "^1.1.0"
   }
 }

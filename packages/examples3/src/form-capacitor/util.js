@@ -125,6 +125,10 @@ function isMap(x) {
     return isObservableMap(x) || x instanceof Map || x instanceof WeakMap;
 }
 
+function isArray(x) {
+    return isObservableArray(x) || Array.isArray(x);
+}
+
 export const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
 
 export function isObject(obj) {
@@ -133,4 +137,29 @@ export function isObject(obj) {
 
 export function toObservable(obj) {
     return isObject(obj) && !isObservable(obj) ? observable(obj) : obj;
+}
+
+/**
+ * Checks if two arrays are equivalent
+ *
+ * @param {array} arr1 First array
+ * @param {array} arr2 Second array
+ * @returns {boolean} True if arrays are equivalent, false otherwise
+ * @link http://stackoverflow.com/a/14853974/65387
+ */
+export function arrayEquals(arr1, arr2) {
+    if(!arr1 || !arr2 || arr1.length !== arr2.length) {
+        return false;
+    }
+
+    for(let i = 0; i < arr1.length; ++i) {
+        if(isArray(arr1[i]) && isArray(arr2[i])) {
+            if(!arrayEquals(arr1[i], arr2[i])) {
+                return false;
+            }
+        } else if(!Object.is(arr1[i], arr2[i])) {
+            return false;
+        }
+    }
+    return true;
 }
