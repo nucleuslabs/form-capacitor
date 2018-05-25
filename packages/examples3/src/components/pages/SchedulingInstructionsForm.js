@@ -14,7 +14,7 @@ import {
     Radio, RadioMenu, Snippet, SnippetPreview, Content,
     ExternalLink,
     Field, Para, Table, TableHead, TableHeadCell, TableRow, TableBody, TableCell, ActionLink, ActionButton,
-    ButtonBar, Code
+    ButtonBar, Code, Title4
 } from '../bulma';
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import trashIcon from '../../icons/fa/regular/trash-alt.svg';
@@ -32,6 +32,7 @@ import {connect,mount,schema} from '../../form-capacitor';
 import SchedulingInstruction from './SchedulingInstruction';
 import jsonSchema from '../../schemas/scheduling-instructions.json';
 import {TextArea} from '../controls';
+import FormErrors from './FormErrors';
 
 function Instruction(defaults) {
     // Object.assign(this,{
@@ -150,7 +151,7 @@ export default class SchedulingInstructionsForm extends React.Component {
     }
     
     render() {
-        const {formData,errorMap} = this.props;
+        const {formData,errorMap,schema} = this.props;
         if(!formData) return <p>Loading schema...</p>;
         // console.log('formData',formData)
         
@@ -166,6 +167,8 @@ export default class SchedulingInstructionsForm extends React.Component {
             <Fragment>
                 <Title>Scheduling Instructions</Title>
 
+                <Title4>Required Assements</Title4>
+                
                 <Table isStriped isNarrow isFullWidth>
                     <TableHead>
                         <TableRow>
@@ -189,14 +192,16 @@ export default class SchedulingInstructionsForm extends React.Component {
                 </ButtonBar>
 
                 <Field>
-                    <Label>Special Instructions</Label>
+                    <Label htmlFor={`specialInstructions--${this.formId}`}>Special Instructions</Label>
                     <Control>
-                        <TextArea name="specialInstructions" placeholder="Special scheduling instructions..."/>
+                        <TextArea id={`specialInstructions--${this.formId}`} name="specialInstructions" placeholder="Special scheduling instructions..."/>
                         {/*{formData.specialInstructions}*/}
                         {/*<textarea value={formData.specialInstructions} onChange={ev => formData.set('specialInstructions',ev.target.value)}/>*/}
                     </Control>
                 </Field>
 
+                <FormErrors schema={schema} errors={errorMap} />
+                
                 <ButtonBar>
                     <ActionButton isSuccess onClick={this.saveState}><Icon src={saveIcon} /><span>Save</span></ActionButton>
                     <ActionButton onClick={this.restoreState}><Icon src={restoreIcon} /><span>Reset</span></ActionButton>

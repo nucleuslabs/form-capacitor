@@ -9,17 +9,18 @@
                 "requiredAssessments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Instruction"
+                        "$ref": "#/definitions/Assessment"
                     },
-                    "title": "Instructions",
+                    "title": "Required Assessments",
                     "description": "List of appointments that need to be booked",
                     "default": [{}]
                 },
                 "specialInstructions": {
                     "type": "string",
-                    "title": "specialInstructions",
+                    "title": "Special Instructions",
                     "minLength": 10,
                     "maxLength": 20,
+                    "exclusiveMinimum": true,
                     "pattern": "\\w",
                     "default": ""
                 }
@@ -47,8 +48,8 @@
             "pattern": "^[0-9a-zA-Z_-]{7,14}$",
             "title": "shortid"
         },
-        "Instruction": {
-            "title": "Instruction",
+        "Assessment": {
+            "title": "Assessment",
             "type": "object",
             "properties": {
                 "id": {

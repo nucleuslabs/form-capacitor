@@ -314,6 +314,7 @@ export default function schema(options) {
                     this.setState({
                         formData,
                         errorMap: errors,
+                        schema,
                     })
                   
                     // console.log(mst.create());

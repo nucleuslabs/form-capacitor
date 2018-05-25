@@ -185,7 +185,8 @@ function checkNumber(schema,value,errors) {
         if(schema.exclusiveMinimum) {
             if(value <= schema.minimum) {
                 errors.set('minimum',schema.minimum);
-                errors.set('exclusiveMinimum',schema.exclusiveMinimum);}
+                errors.set('exclusiveMinimum',schema.exclusiveMinimum);
+            }
         } else {
             if(value < schema.minimum) {
                 errors.set('minimum',schema.minimum);
@@ -196,7 +197,8 @@ function checkNumber(schema,value,errors) {
         if(schema.exclusiveMaximum) {
             if(value >= schema.maximum) {
                 errors.set('maximum',schema.maximum);
-                errors.set('exclusiveMaximum',schema.exclusiveMaximum);}
+                errors.set('exclusiveMaximum',schema.exclusiveMaximum);
+            }
         } else {
             if(value > schema.maximum) {
                 errors.set('maximum',schema.maximum);
