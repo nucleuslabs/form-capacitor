@@ -57,6 +57,7 @@
     "mobx-state-tree": "^2.0.5",
     "mst-middlewares": "^2.0.5",
     "remotedev": "^0.2.7",
-    "shouldcomponentupdate-children": "^1.1.0"
+    "shouldcomponentupdate-children": "^1.1.0",
+    "stringz": "^1.0.0"
   }
 }

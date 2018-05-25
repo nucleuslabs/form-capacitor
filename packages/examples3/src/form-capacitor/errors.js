@@ -13,7 +13,7 @@ import {
     reaction
 } from 'mobx';
 import {isString,isBoolean} from '../lib/types';
-
+import {length as getStringLength} from 'stringz';
 
 const observeMap = {
     object() {
@@ -71,10 +71,11 @@ export function watchForErrors(schema, mobxStateTree, propName) {
                     errors.set('type','string');
                     return;
                 }
-                if(schema.minLength != null && value.length < schema.minLength) {
+                const len = getStringLength(value);
+                if(schema.minLength != null && len < schema.minLength) {
                     errors.set('minLength',schema.minLength);
                 }
-                if(schema.maxLength != null && value.length > schema.maxLength) {
+                if(schema.maxLength != null && len > schema.maxLength) {
                     errors.set('maxLength',schema.maxLength);
                 }
                 if(schema.pattern != null) {
