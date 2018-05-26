@@ -44,6 +44,9 @@ export default class SchedulingInstruction extends React.Component {
         return (
             <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>
                 <TableCell>
+                    {number}
+                </TableCell>
+                <TableCell>
                     <Select name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`} options={options.appointmentTypes}/>
                 </TableCell>
                 <TableCell>

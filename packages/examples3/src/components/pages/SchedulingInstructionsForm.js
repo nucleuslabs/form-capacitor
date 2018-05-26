@@ -172,6 +172,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                 <Table isStriped isNarrow isFullWidth>
                     <TableHead>
                         <TableRow>
+                            <TableHeadCell>#</TableHeadCell>
                             <TableHeadCell id={`appointment-type-header--${this.formId}`}>Appointment Type</TableHeadCell>
                             <TableHeadCell>Team</TableHeadCell>
                             <TableHeadCell>Discipline</TableHeadCell>
