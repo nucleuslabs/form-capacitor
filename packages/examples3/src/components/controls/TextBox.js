@@ -9,7 +9,7 @@ export default class TextArea extends React.Component {
     }
 
     render() {
-        const {setValue, ...props} = this.props;
-        return <Component {...props} onChange={this.handleChange}/>
+        const {setValue,errors,name, ...props} = this.props;
+        return <Component {...props} isDanger={errors && errors.size > 0} onChange={this.handleChange}/>
     }
 }

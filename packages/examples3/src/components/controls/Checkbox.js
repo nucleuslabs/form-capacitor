@@ -12,7 +12,7 @@ export default class Checkbox extends React.Component {
     }
 
     render() {
-        const { setValue, ...props} = this.props;
+        const { setValue,name, errors, ...props} = this.props;
         // console.log(props.checked);
         return <Component {...props} onChange={this.handleChange}/>
     }
