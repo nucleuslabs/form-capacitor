@@ -5,13 +5,15 @@ import {consumeValue, mount} from '../../form-capacitor';
 
 
 @consumeValue({name:'checked'})
-export default class TextArea extends React.Component {
+export default class Checkbox extends React.Component {
     handleChange = ev => {
+        // console.log('checkkked',ev.target.checked);
         this.props.setValue(ev.target.checked);
     }
 
     render() {
         const { setValue, ...props} = this.props;
+        // console.log(props.checked);
         return <Component {...props} onChange={this.handleChange}/>
     }
 }

@@ -103,10 +103,10 @@ export function getValue(obj, path, def) {
 
     for(let key of path) {
         // console.log(obj,ret,key,path);
-        if(ret == null) {
-            // console.log('key not found',ret,key);
-            return def;
-        }
+        // if(ret == null) {
+        //     // console.log('key not found',ret,key);
+        //     return def;
+        // }
         if(isMap(ret)) {
             ret = ret.get(key);
         } else {

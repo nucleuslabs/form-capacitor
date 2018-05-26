@@ -185,7 +185,7 @@ export default class SchedulingInstructionsForm extends React.Component {
                         {formData.requiredAssessments.map((inst,idx) => {
                         // console.log(inst.key);
                         // console.log(JSON.stringify(inst),inst.key,JSON.stringify(inst.key),toJS(inst.key),toJS(inst).key);
-                        return <WrapSchedulingInstruction key={inst.key} index={idx} deletInstruction={formData.deleteInstruction} formId={this.formId} />;
+                        return <WrapSchedulingInstruction key={inst.key} index={idx} formData={formData} formId={this.formId} />;
                     })}
                     
                     </TableBody>
@@ -226,8 +226,8 @@ export default class SchedulingInstructionsForm extends React.Component {
 class WrapSchedulingInstruction extends React.PureComponent {
     
     render() {
-        const {index, deleteInstruction, formId} = this.props;
+        const {index, formData, formId} = this.props;
 
-        return <SchedulingInstruction name={['requiredAssessments',index]} doDelete={() => deleteInstruction(index)} formId={formId} number={index+1}/>;
+        return <SchedulingInstruction name={['requiredAssessments',index]} doDelete={() => formData.deleteInstruction(index)} formId={formId} number={index+1}/>;
     }
 }

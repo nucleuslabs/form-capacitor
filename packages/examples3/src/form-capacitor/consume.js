@@ -3,6 +3,7 @@ import {getValue, setValue, toPath, resolveValue, arrayEquals} from './util';
 import {getDisplayName, scuChildren} from '../lib/react';
 import {isString,isNumber} from '../lib/types';
 import {EMPTY_ARRAY, EMPTY_MAP} from '../lib/consts';
+import {observer} from 'mobx-react';
 
 function getErrors(err, path) {
     for(let k of path) {
@@ -25,7 +26,8 @@ export default function consumeValue(options) {
     return component => {
         const WrappedComponent = props => (
             <FormContext.Consumer>
-                {context => <Consumed component={component} props={props} context={context} options={options}/>}
+                {/*{context => <Consumed component={component} props={props} context={context} options={options}/>}*/}
+                {context => React.createElement(observer(Consumed),{component,props,context,options})}
             </FormContext.Consumer>
         )
 
@@ -37,7 +39,7 @@ export default function consumeValue(options) {
     }
 }
 
-class Consumed extends React.PureComponent {
+class Consumed extends React.Component {
     
     state = {
         path: EMPTY_ARRAY,
@@ -62,10 +64,10 @@ class Consumed extends React.PureComponent {
     
     render() {
         const {component,props,context,options} = this.props;
-        const {value,errors,path,setValue} = this.state;
+        const {value,errors,path} = this.state;
         return (
             <FormContext.Provider value={{...context, path: path}}>
-                {React.createElement(component, {...props, [options.name]: value, setValue: this.setValue, errors})}
+                {React.createElement(observer(component), {...props, [options.name]: value, setValue: this.setValue, errors})}
             </FormContext.Provider>
         )
     }

@@ -5,7 +5,7 @@ import {scuChildren} from '../../lib/react';
 const equalityCheck = Object.is;
 
 @consumeValue()
-export default class Select extends React.PureComponent {
+export default class Select extends React.Component {
     select = React.createRef();
     state = {index: -1}
 

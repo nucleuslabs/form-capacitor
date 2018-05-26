@@ -3,24 +3,27 @@ import {Content} from '../bulma';
 import {getValue} from '../../form-capacitor'
 
 export default function FormErrors(props) {
-    return <Content><ul><Inner {...props}/></ul></Content>
+    return <Content><ul><ErrorItem {...props}/></ul></Content>
 }
 
-function Inner({schema,errors,propName,title}) {
+function ErrorItem({schema,errors,propName,title}) {
+    const innerErrors = getErrorList({schema,errors});
+    if(!innerErrors || !innerErrors.length) return null;
+    // console.log(innerErrors);
+    
     return (
         <li>
             {title || schema.title || propName}
-            <ul>
-                <Inner2 schema={schema} errors={errors}/>
-            </ul>
+            <ul>{innerErrors}</ul>
         </li>
     )
 }
 
-function Inner2({schema,errors,propName}) {
+function getErrorList({schema,errors,propName}) {
     const errorList = [];
     if(errors.has('type')) {
-        errorList.push(<li key="type">Must be a <code>{errors.get('type')}</code></li>)
+        const errType = errors.get('type');
+        errorList.push(<li key="type">Must be {/^[aeiouy]/i.test(errType)?'an':'a'} <code>{errType}</code></li>)
     }
     switch(schema.type) {
         case 'object':
@@ -30,13 +33,11 @@ function Inner2({schema,errors,propName}) {
             }
             
             errorList.push(...Object.keys(schema.properties).map(propName => (
-                <Inner key={propName} schema={getValue(schema,['properties',propName])} errors={getValue(errors,['properties',propName])} propName={propName} />
+                <ErrorItem key={propName} schema={getValue(schema,['properties',propName])} errors={getValue(errors,['properties',propName])} propName={propName} />
             )));
-            
-         
             break;
         case 'array':
-            errorList.push(...errors.get('items').map((val,idx) => <Inner title={<Fragment>{schema.items.title} <sup>#</sup>{idx+1}</Fragment>} key={idx} schema={schema.items} errors={val}/>));
+            errorList.push(...errors.get('items').map((val,idx) => <ErrorItem title={<Fragment>{schema.items.title} <sup>#</sup>{idx+1}</Fragment>} key={idx} schema={schema.items} errors={val}/>));
             break;
         case 'number':
         case 'integer':
