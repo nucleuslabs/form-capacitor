@@ -68,6 +68,62 @@ export function setValue(obj, path, value) {
     setProperty(obj, path[end], typeof value === 'function' ? value(obj[path[end]]) : value)
 }
 
+export function setMap(map, path, value) {
+    if(!isObservableMap(map)) {
+        throw new Error(`setMap only works on observable maps`);
+    }
+    path = toPath(path);
+    if(!path.length) {
+        throw new Error("Cannot set root");
+    }
+    const end = path.length - 1;
+    let it = map;
+    for(let i = 0; i < end; ++i) {
+        const key = path[i];
+        if(it.has(key)) {
+            it = it.get(key);
+        } else {
+            const next = observable.map();
+            it.set(key, next);
+            it = next;
+        }
+    }
+    it.set(path[end], value);
+    return map;
+}
+
+export function setOrDel(map, condition, path, value) {
+    if(condition) {
+        setMap(map,path,value);
+    } else {
+        delMap(map,path);
+    }
+}
+
+export function delMap(map, path) {
+    if(!isObservableMap(map)) {
+        throw new Error(`delMap only works on observable maps`);
+    }
+    path = toPath(path);
+    if(!path.length) {
+        throw new Error("Cannot delete root");
+    }
+    return delMapR(map, path);
+}
+
+
+function delMapR(map, path) {
+    if(path.length > 1) {
+        const [first, ...rest] = path;
+        const next = map.get(first);
+        if(!next) return false;
+        const deleted = delMapR(next, rest);
+        if(!next.size) map.delete(first)
+        return deleted;
+    }
+    return map.delete(path[0]);
+}
+
 function setProperty(obj, key, value) {
     if(isObservableObject(obj)) {
         // console.log('oooooooooooo',obj);

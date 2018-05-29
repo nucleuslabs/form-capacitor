@@ -2,11 +2,14 @@ import {Fragment} from 'react';
 import {Content} from '../bulma';
 import {getValue} from '../../form-capacitor'
 
+// see also: https://github.com/epoberezkin/ajv-errors#messages-for-keywords
+
 export default function FormErrors(props) {
     return <Content><ul><ErrorItem {...props}/></ul></Content>
 }
 
 function ErrorItem({schema,errors,propName,title}) {
+    if(!errors) return null;
     const innerErrors = getErrorList({schema,errors});
     if(!innerErrors || !innerErrors.length) return null;
     // console.log(innerErrors);
@@ -37,7 +40,32 @@ function getErrorList({schema,errors,propName}) {
             )));
             break;
         case 'array':
-            errorList.push(...errors.get('items').map((val,idx) => <ErrorItem title={<Fragment>{schema.items.title} <sup>#</sup>{idx+1}</Fragment>} key={idx} schema={schema.items} errors={val}/>));
+            const items = errors.get('items');
+            if(items) {
+                for(const [idx,val] of items.entries()) {
+                    // console.log(idx,val,val.size);
+                    errorList.push(<ErrorItem title={<Fragment>{schema.items.title} <sup>#</sup>{idx+1}</Fragment>} key={idx} schema={schema.items} errors={val}/>)
+                }
+                
+                // const subErrors = Array.from(items.keys()).map(idx => <ErrorItem title={<Fragment>{schema.items.title} <sup>#</sup>{idx+1}</Fragment>} key={idx} schema={schema.items} errors={items.get(idx)}/>)
+                // errorList.push(...subErrors);
+                // console.log(items,items.get(items.get(0)));
+                
+                // const indexes = items.keys();
+                // for(let idx of indexes) {
+                //     console.log(idx);
+                // }
+            }
+            // if(errors.has('items')) {
+            //    
+            //     for(let [idx, val] of errors.get('items')) {
+            //         if(!val) {
+            //             console.log(idx,val);
+            //             continue;
+            //         }
+            //         // errorList.push(<ErrorItem title={<Fragment>{schema.items.title} <sup>#</sup>{idx+1}</Fragment>} key={idx} schema={schema.items} errors={val}/>);
+            //     }
+            // }
             break;
         case 'number':
         case 'integer':

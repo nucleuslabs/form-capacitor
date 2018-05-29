@@ -12,8 +12,9 @@ import {
     isObservableObject,
     reaction
 } from 'mobx';
-import {isString,isBoolean} from '../lib/types';
+import {isString,isBoolean,isNumber} from '../lib/types';
 import {length as getStringLength} from 'stringz';
+import {delMap, setMap, getValue, setOrDel} from './util';
 
 const observeMap = {
     object() {
@@ -29,7 +30,146 @@ function watchProp() {
     
 }
 
-export function watchForErrors(schema, mobxStateTree, propName) {
+
+export function watchForErrors(schema, data) {
+    const errors = observable.map();
+    const dispose = watchForErrorsR(schema, data, undefined, errors, []);
+    return {errors,dispose};
+}
+
+function watchForErrorsR(schema, obj, propName, errors, errorPath) {
+    const disposers = [];
+    const value = propName === undefined ? obj : getValue(obj,[propName]);
+    
+    switch(schema.type) {
+        case 'object':
+            // console.log('obj',mobxStateTree,propName,value)
+            disposers.push(doObserve(value,() => {
+                // console.log('object',value);
+                const missingRequiredProps = [];
+                for(let p of schema.required) {
+                    if(value[p] === undefined) {
+                        missingRequiredProps.push(p);
+                    }
+                }
+                setOrDel(errors,missingRequiredProps.length,[...errorPath,'required'],missingRequiredProps)
+            }))
+            if(schema.properties) {
+                for(let p of Object.keys(schema.properties)) {
+                    const dispose = watchForErrorsR(schema.properties[p], value, p, errors, [...errorPath, 'properties', p]);
+                    disposers.push(dispose);
+                }
+            }
+            break;
+        case 'string':
+            if(!propName) throw new Error("Cannot watch primitive string");
+            disposers.push(doObserve(obj,propName,value => {
+                if(!isString(value)) {
+                    setMap(errors,[...errorPath],observable.map([['type','string']]));
+                    return;
+                }else {
+                    delMap(errors,[...errorPath,'type'])
+                }
+                const len = getStringLength(value);
+                
+                setOrDel(errors,isNumber(schema.minLength) && len < schema.minLength,[...errorPath,'minLength'],schema.minLength)
+                setOrDel(errors,isNumber(schema.maxLength) && len > schema.maxLength,[...errorPath,'maxLength'],schema.maxLength)
+                setOrDel(errors,isString(schema.pattern) && !(new RegExp(schema.pattern)).test(value),[...errorPath,'pattern'],schema.pattern)
+                if(schema.format != null) {
+                    throw new Error(`"format" rule not implemented`);
+                }
+            }));
+            break;
+        case 'array':
+            // console.log('arr',mobxStateTree,propName);
+            // if(propName) {
+            //     mobxStateTree = mobxStateTree[propName];
+            // }
+            // const disposers = [];
+            // console.log('arrayyy',mobxStateTree,propName);
+
+            // const itemErrors = observable.array();
+            // errors.set('items',itemErrors);
+            const rowDisposers = [];
+
+            for(let i=0; i<value.length; ++i) {
+                rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i]);
+            }
+            disposers.push(doObserve(value,change => {
+                // console.log('arrchange',change);
+                if(change.addedCount) {
+                    const end = change.index + change.addedCount;
+                    for(let i=change.index; i<end; ++i) {
+                        rowDisposers[i] = watchForErrorsR(schema.items,value,i,errors,[...errorPath, 'items', i]);
+                    }
+                } else if(change.removedCount) {
+                    // const end = change.index + change.removedCount;
+                    // console.log('splicing',change.index,change.removedCount,disposers.length);
+                    // itemErrors.splice(change.index,change.removedCount);
+                    const end = change.index + change.removedCount;
+                    for(let i=change.index; i<end; ++i) {
+                        // fixme: gotta shift errors up...
+                        delMap(errors,[...errorPath, 'items', i]);
+                    }
+                    const del = rowDisposers.splice(change.index, change.removedCount);
+                    // console.log('del',del);
+                    execAll(del);
+                    // console.log(itemErrors.length);
+
+                }
+            }));
+
+            disposers.push(() => execAll(rowDisposers));
+            break;
+        case 'number':
+            if(!propName) throw new Error("Cannot watch primitive number");
+            // console.log(mobxStateTree,propName);
+            disposers.push(doObserve(obj,propName,value => {
+                // console.log('number change',mobxStateTree,propName,change);
+
+                if(!Number.isFinite(value)) {
+                    setMap(errors,[...errorPath],observable.map([['type','number']]));
+                    return;
+                }else {
+                    delMap(errors,[...errorPath,'type'])
+                }
+                // checkNumber(schema,value,errors);
+            }));
+            break;
+        case 'integer':
+            if(!propName) throw new Error("Cannot watch primitive integer");
+            // console.log(mobxStateTree,propName);
+            disposers.push(doObserve(obj,propName,value => {
+                // console.log('number change',mobxStateTree,propName,change);
+                
+                if(!Number.isInteger(value)) {
+                    setMap(errors,[...errorPath],observable.map([['type','integer']]));
+                    return;
+                } else {
+                    delMap(errors,[...errorPath,'type'])
+                }
+                // checkNumber(schema,value,errors);
+            }));
+            break;
+        case 'boolean':
+            if(!propName) throw new Error("Cannot watch primitive boolean");
+            // console.log(mobxStateTree,propName);
+            disposers.push(doObserve(obj,propName,value => {
+                // console.log('number change',mobxStateTree,propName,change);
+
+                if(!isBoolean(value)) {
+                    setMap(errors,[...errorPath],observable.map([['type','boolean']]));
+                    return;
+                }
+            }));
+            break;
+        // default:
+        //     throw new Error(`'${schema.type}' not supported`);
+    }
+    return () => execAll(disposers);
+}
+
+export function watchForErrorsBak(schema, mobxStateTree, propName) {
     const errors = observable.map();
     const disposers = [];
     let value = mobxStateTree;
@@ -181,9 +321,20 @@ function execAll(arrayOfFuncs) {
 }
 
 function checkNumber(schema,value,errors) {
-    if(schema.minimum != null) {
+    if(isNumber(schema.exclusiveMinimum)) {
+        // this changed from a bool to a number in draft 6: https://github.com/spacetelescope/understanding-json-schema/pull/66
+        if(value <= schema.exclusiveMinimum) {
+            errors.set('exclusiveMinimum',schema.exclusiveMinimum);
+        }
+    }
+    if(isNumber(schema.exclusiveMaximum)) {
+        if(value >= schema.exclusiveMaximum) {
+            errors.set('exclusiveMaximum',schema.exclusiveMaximum);
+        }
+    }
+    if(isNumber(schema.minimum)) {
         // console.log('heyyy',schema.minimum);
-        if(schema.exclusiveMinimum) {
+        if(schema.exclusiveMinimum === true) {
             if(value <= schema.minimum) {
                 errors.set('minimum',schema.minimum);
                 errors.set('exclusiveMinimum',schema.exclusiveMinimum);
@@ -194,8 +345,8 @@ function checkNumber(schema,value,errors) {
             }
         }
     }
-    if(schema.maximum != null) {
-        if(schema.exclusiveMaximum) {
+    if(isNumber(schema.maximum)) {
+        if(schema.exclusiveMaximum === true) {
             if(value >= schema.maximum) {
                 errors.set('maximum',schema.maximum);
                 errors.set('exclusiveMaximum',schema.exclusiveMaximum);
@@ -206,7 +357,7 @@ function checkNumber(schema,value,errors) {
             }
         }
     }
-    if(schema.multipleOf != null) {
+    if(isNumber(schema.multipleOf)) {
         if(value % schema.multipleOf !== 0) {
             errors.set('multipleOf',schema.multipleOf);
         }

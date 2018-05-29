@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema",
     "definitions": {
         "SchedulingInstructions": {
             "title": "Scheduling Instructions",
@@ -20,7 +20,6 @@
                     "title": "Special Instructions",
                     "minLength": 10,
                     "maxLength": 20,
-                    "exclusiveMinimum": true,
                     "pattern": "\\w",
                     "default": ""
                 }
@@ -33,7 +32,8 @@
         "ID": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 4294967295
+            "maximum": 4294967295,
+            "errorMessage": "Please choose a valid option"
         },
         "OptionalID": {
             "anyOf": [
