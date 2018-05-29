@@ -47,6 +47,7 @@ import { consumeValue } from "../../form-capacitor";
 export default class SchedulingInstruction extends React.Component {
     render() {
         const { doDelete, number, formId, value: instruction } = this.props;
+        // console.log('rerendering',number);
 
         return (
             <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>

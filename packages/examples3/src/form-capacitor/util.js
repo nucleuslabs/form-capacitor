@@ -92,6 +92,37 @@ export function setMap(map, path, value) {
     return map;
 }
 
+export function getMap(map, path, def) {
+    if(!isObservableMap(map)) {
+        throw new Error(`getMap only works on observable maps`);
+    }
+    path = toPath(path);
+    if(!path.length) {
+        throw new Error("Cannot set root");
+    }
+    for(let i = 0; i < path.length; ++i) {
+        const key = path[i];
+        if(map.has(key)) {
+            map = map.get(key);
+        } else {
+            return def;
+        }
+    }
+    return map;
+}
+
+export function spliceMap(map,index,count) {
+    const end = index+count;
+    for(const [key,val] of Array.from(map)) {
+        if(key >= index) {
+            map.delete(key);
+            if(key >= end) {
+                map.set(key - count, val);
+            }
+        }
+    }
+}
+
 export function setOrDel(map, condition, path, value) {
     if(condition) {
         setMap(map,path,value);

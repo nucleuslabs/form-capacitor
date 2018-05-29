@@ -126,14 +126,12 @@ export function scuChildren(nextProps, nextState) {
     if(shouldUpdate) {
         const props = new Set([...Object.keys(this.props),...Object.keys(nextProps)]);
         
-        let id = nextProps.id || nextProps.name || nextProps.key;
-        if(id) {
-            if(Array.isArray(id)) {
-                id = id.join('.');
-            }
-        } else {
-            id = 'unnamed';
+        let id = nextProps.id || nextProps.name || nextProps.key || getDisplayName(this);
+   
+        if(Array.isArray(id)) {
+            id = id.join('.');
         }
+     
         console.group(id);
         for(let p of props) {
             if(this.props[p] !== nextProps[p]) {

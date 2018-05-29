@@ -20,8 +20,8 @@ import jsonSchemaToMST from '../lib/jsonschema-to-mobx-state-tree';
 import FormContext from './context';
 import {findDOMNode} from 'react-dom';
 import {watchForErrors} from './errors';
-import { asReduxStore, connectReduxDevtools } from "mst-middlewares"
-import remotedev from 'remotedev';
+// import { asReduxStore, connectReduxDevtools } from "mst-middlewares"
+// import remotedev from 'remotedev';
 
 function unique(arr) {
     return Array.from(new Set(arr));
@@ -307,7 +307,7 @@ export default function schema(options) {
                     
                     const formData = Model.create(options.default);
                     const {errors,dispose} = watchForErrors(schema, formData);
-                    connectReduxDevtools(remotedev, formData)
+                    // connectReduxDevtools(remotedev, formData)
                     
                     this._dispose = dispose;
                     

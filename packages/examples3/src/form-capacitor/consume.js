@@ -4,6 +4,7 @@ import {getDisplayName, scuChildren} from '../lib/react';
 import {isString,isNumber} from '../lib/types';
 import {EMPTY_ARRAY, EMPTY_MAP} from '../lib/consts';
 import {observer} from 'mobx-react';
+import {computed} from 'mobx';
 
 function getErrors(err, path) {
     for(let k of path) {
@@ -39,35 +40,37 @@ export default function consumeValue(options) {
     }
 }
 
+
 class Consumed extends React.Component {
     
     state = {
         path: EMPTY_ARRAY,
     }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        const {component,props,context,options} = nextProps;
-        const path = [...context.path, ...toPath(resolveValue(options.path, props))];
-        const value = getValue(context.formData, path);
-        const errors = getErrors(context.errorMap,path) || EMPTY_MAP;
-        const nextState = {value,errors};
-
-        if(!arrayEquals(prevState.path, path)) {
-            nextState.path = path;
-            // nextState.setValue = v => context.formData.set(path,v);
-        }
-
-        return nextState
+    
+    @computed get path() {
+        const {props,context,options} = this.props;
+        return [...context.path, ...toPath(resolveValue(options.path, props))]
+    }
+    
+    @computed get value() {
+        return getValue(this.props.context.formData, this.path)
     }
 
-    setValue = v => this.props.context.formData.set(this.state.path,v)
+    @computed get errors() {
+        return getErrors(this.props.context.errorMap, this.path) || EMPTY_MAP
+    }
+    
+    @computed get setValue() {
+        return v => this.props.context.formData.set(this.path,v)
+    }
     
     render() {
         const {component,props,context,options} = this.props;
-        const {value,errors,path} = this.state;
+        // const {value,errors,path} = this.state;
+        // console.log('rneder consume',getDisplayName(component));
         return (
-            <FormContext.Provider value={{...context, path: path}}>
-                {React.createElement(observer(component), {...props, [options.name]: value, setValue: this.setValue, errors})}
+            <FormContext.Provider value={{...context, path: this.path}}>
+                {React.createElement(component, {...props, [options.name]: this.value, setValue: this.setValue, errors: this.errors})}
             </FormContext.Provider>
         )
     }

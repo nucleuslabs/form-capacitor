@@ -14,7 +14,7 @@ import {
 } from 'mobx';
 import {isString,isBoolean,isNumber} from '../lib/types';
 import {length as getStringLength} from 'stringz';
-import {delMap, setMap, getValue, setOrDel} from './util';
+import {delMap, setMap, getValue, setOrDel, getMap, spliceMap} from './util';
 
 const observeMap = {
     object() {
@@ -103,17 +103,43 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath) {
                         rowDisposers[i] = watchForErrorsR(schema.items,value,i,errors,[...errorPath, 'items', i]);
                     }
                 } else if(change.removedCount) {
+                    
+                    
+                    
                     // const end = change.index + change.removedCount;
                     // console.log('splicing',change.index,change.removedCount,disposers.length);
                     // itemErrors.splice(change.index,change.removedCount);
-                    const end = change.index + change.removedCount;
-                    for(let i=change.index; i<end; ++i) {
-                        // fixme: gotta shift errors up...
-                        delMap(errors,[...errorPath, 'items', i]);
+                    // const end = change.index + change.removedCount;
+                    // for(let i=change.index; i<end; ++i) {
+                    //     // fixme: gotta shift errors up...
+                    //     delMap(errors,[...errorPath, 'items', i]);
+                    // }
+                    // console.log('change',change)
+                    const itemErrors = getMap(errors,[...errorPath,'items']);
+                    
+                    if(itemErrors) {
+                        const lastKey = Math.max(...itemErrors.keys());
+                        const end = change.index + change.removedCount;
+                        console.log(change.index,end,lastKey);
+                        for(let i=change.index; i<=lastKey; ++i) {
+                            // console.log('disposing',i);
+                            rowDisposers[i]();
+                            const err = itemErrors.get(i);
+                            if(err) {
+                                itemErrors.delete(i);
+                                if(i >= end) {
+                                    const newIdx = i-change.removedCount;
+                                    err.set(newIdx, err);
+                                    rowDisposers[newIdx] = watchForErrorsR(schema.items,value,newIdx,errors,[...errorPath, 'items', newIdx]);
+                                }
+                            }
+                        }
+                        
+                        // spliceMap(itemErrors,change.index,change.removedCount);
                     }
-                    const del = rowDisposers.splice(change.index, change.removedCount);
+                    // const del = rowDisposers.splice(change.index, change.removedCount);
                     // console.log('del',del);
-                    execAll(del);
+                    // execAll(del);
                     // console.log(itemErrors.length);
 
                 }
@@ -364,14 +390,15 @@ function checkNumber(schema,value,errors) {
     }
 }
 
-// let obsCount = 0;
+let obsCount = 0;
 
 function doObserve(mobxStateTree,propName,change) {
-    // console.log(`++observe ${++obsCount}`)
+    
     if(change === undefined) {
         change = propName;
         propName = undefined;
     }
+    console.log(`++observe ${++obsCount}`,propName)
     // if(propName === undefined) {
     //     return observe(mobxStateTree,c => change(c.newValue.value));
     // }
@@ -385,6 +412,7 @@ function doObserve(mobxStateTree,propName,change) {
     // }
     // let handler = c => c.newValue.value;
     // if(isObervableObject())
+    // change = action(change);
     change(propName !== undefined ? mobxStateTree[propName] : mobxStateTree);
     const dispose = observe(mobxStateTree,propName,c => {
         // console.log(c.type);
@@ -405,7 +433,7 @@ function doObserve(mobxStateTree,propName,change) {
     });
     
     return () => {
-        // console.log(`--observe ${--obsCount}`)
+        console.log(`--observe ${--obsCount}`)
         dispose();
     }
 }

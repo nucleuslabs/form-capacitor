@@ -48,6 +48,7 @@ import SchedulingInstruction from "./SchedulingInstruction";
 import jsonSchema from "../../schemas/scheduling-instructions.json";
 import { TextArea } from "../controls";
 import FormErrors from "./FormErrors";
+import {scuChildren} from '../../lib/react';
 
 function Instruction(defaults) {
     // Object.assign(this,{
@@ -243,6 +244,8 @@ export default class SchedulingInstructionsForm extends React.Component {
 }
 
 class WrapSchedulingInstruction extends React.Component {
+    shouldComponentUpdate = scuChildren;
+    
     render() {
         const { index, formData, formId } = this.props;
 
