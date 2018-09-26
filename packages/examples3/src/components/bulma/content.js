@@ -9,7 +9,7 @@ export const Content = withClass('div',css.content)
 
 
 import {Icon} from './index';
-import externalLinkIcon from '../../icons/fa/regular/external-link.svg';
+import externalLinkIcon from '../../icons/fa/solid/external-link-alt.svg';
 
 
 export const Para = elem('p');

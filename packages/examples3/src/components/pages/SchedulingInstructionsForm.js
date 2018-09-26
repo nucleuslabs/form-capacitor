@@ -33,10 +33,10 @@ import {
 } from "../bulma";
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import trashIcon from "../../icons/fa/regular/trash-alt.svg";
-import addIcon from "../../icons/fa/regular/plus-hexagon.svg";
-import restoreIcon from "../../icons/fa/regular/sync-alt.svg";
+import addIcon from "../../icons/fa/solid/plus-circle.svg";
+import restoreIcon from "../../icons/fa/solid/sync-alt.svg";
 import saveIcon from "../../icons/fa/regular/save.svg";
-import clearIcon from "../../icons/fa/regular/eraser.svg";
+import clearIcon from "../../icons/fa/solid/eraser.svg";
 // import css from '../bulma/bulma.scss';
 import * as options from "../../options";
 import { appointmentTypes } from "../../../../form-capacitor-examples/src/options";
