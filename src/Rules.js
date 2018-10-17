@@ -60,6 +60,20 @@ export function digits(message = (value) => `Please enter only digits.`) {
     return custom(value => /^\d+$/.test(value), {id: 'digits', message});
 }
 
+export function gt(otherField, message = (value, otherField) => `Please enter a value greater than or equal to ${otherField}.`) {
+    return custom((value, smallValue) => value >= smallValue, {
+        dependsOn: [otherField],
+        message: message
+    });
+}
+
+export function lt(otherField, message = (value, otherField) => `Please enter a value less than or equal to ${otherField}.`) {
+    return custom((value, smallValue) => value <= smallValue, {
+        dependsOn: [otherField],
+        message: message
+    });
+}
+
 /**
  * @param {boolean} negative
  * @param message
