@@ -33,7 +33,7 @@ const defaultKeywords = {
         }
         throw new Error(`$uuid type "${type}" not implemented`);
     }
-}
+};
 
 
 const TYPE_MAP = Object.freeze({
@@ -51,7 +51,7 @@ const TYPE_MAP = Object.freeze({
                 parent: node,
                 // depth: meta.depth+1,
                 key: k,
-            })
+            });
             return acc;
         }, Object.create(null)); 
         
@@ -135,30 +135,30 @@ const UNION = 1<<14; // https://github.com/mobxjs/mobx-state-tree/blob/878d7f312
 const OPTIONAL_UNION = OPTIONAL|UNION;
 
 // TODO: scrap walkNodes, roll own
-const foo = (schema = {}, onNode) => walkNodes(schema, (node, meta) => {
-    const type = makeType(node,meta);
-    const hasDefault = node.default !== undefined;
-    const isRequired = meta.isRequired || !meta.lineage; // lineage is for root element
-    let result = type;
-    // TODO: see https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
-    // might be able to make 'shortid' an identifier
-    console.log(type.name,{type,hasDefault,isRequired});
-    if(hasDefault) {
-        // console.log(type,(type.flags & UNION)===UNION);
-        let includesNull = (type.flags & UNION)===UNION && type.types.some(t => (t.flags & NULL) === NULL);
-        
-        
-        result = node.default === null
-            ? (includesNull ? type : types.maybe(type))
-            : types.optional(type, getDefault(node));
-    } else if(!isRequired) {
-        result = types.maybe(type);
-    }
-    // console.log('result',result);
-    return onNode
-        ? onNode(result, {node, meta})
-        : result;
-});
+// const foo = (schema = {}, onNode) => walkNodes(schema, (node, meta) => {
+//     const type = makeType(node,meta);
+//     const hasDefault = node.default !== undefined;
+//     const isRequired = meta.isRequired || !meta.lineage; // lineage is for root element
+//     let result = type;
+//     // TODO: see https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
+//     // might be able to make 'shortid' an identifier
+//     console.log(type.name,{type,hasDefault,isRequired});
+//     if(hasDefault) {
+//         // console.log(type,(type.flags & UNION)===UNION);
+//         let includesNull = (type.flags & UNION)===UNION && type.types.some(t => (t.flags & NULL) === NULL);
+//
+//
+//         result = node.default === null
+//             ? (includesNull ? type : types.maybe(type))
+//             : types.optional(type, getDefault(node));
+//     } else if(!isRequired) {
+//         result = types.maybe(type);
+//     }
+//     // console.log('result',result);
+//     return onNode
+//         ? onNode(result, {node, meta})
+//         : result;
+// });
 
 
 

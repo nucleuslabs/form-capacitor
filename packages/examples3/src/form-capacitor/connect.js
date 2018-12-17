@@ -1,6 +1,8 @@
-import {resolveValue, setValue, toPath, getValue, toObservable} from './util';
+import {resolveValue, setValue, getValue} from './util';
 import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,extendObservable,observe as addObserve,toJS,isBoxedObservable} from 'mobx';
+// import {resolveValue, setValue, toPath, getValue, toObservable} from './util';
+// import {observable,action,runInAction,isObservable,extendObservable,observe as addObserve,toJS,isBoxedObservable} from 'mobx';
+import {observe as addObserve} from 'mobx';
 import {STORE_KEY,PATH_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
 
@@ -8,7 +10,7 @@ export default function connect(options) {
     options = Object.assign({
         propName: undefined,
         observe: undefined,
-    }, options)
+    }, options);
     
     return Component => {
         // const ObserverComponent = observer(Component);
@@ -53,9 +55,9 @@ export default function connect(options) {
                     // });
                 } else if(options.observe) {
                     throw new Error('not supported');
-                    addObserve(context[STORE_KEY], change => {
-                        options.observe.call(this,change);
-                    });
+                    // addObserve(context[STORE_KEY], change => {
+                    //     options.observe.call(this,change);
+                    // });
                 }
 
              
@@ -71,7 +73,7 @@ export default function connect(options) {
             //     }
             //     return React.createElement(ObserverComponent, props);
             // }
-        }
+        };
 
         WrappedComponent.contextTypes = {...CTX_TYPES, ...Component.contextTypes};
 

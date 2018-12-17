@@ -1,24 +1,17 @@
-import {resolveValue, setValue, toPath, getValue, toObservable} from './util';
+// import {resolveValue, setValue, toPath, getValue, toObservable} from './util';
+// import {autorun, observable, action, runInAction, isObservable, extendObservable, observe as addObserve, toJS, isBoxedObservable, isObservableArray} from 'mobx';
+import {setValue} from './util';
 import {observer} from 'mobx-react';
-import {
-    autorun,
-    observable,
-    action,
-    runInAction,
-    isObservable,
-    extendObservable,
-    observe as addObserve,
-    toJS,
-    isBoxedObservable, isObservableArray
-} from 'mobx';
-import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
-import {getDisplayName, scuChildren} from '../lib/react';
+import {observable, observe as addObserve, isObservableArray} from 'mobx';
+// import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
+// import {getDisplayName, scuChildren} from '../lib/react';
+import {getDisplayName} from '../lib/react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
-import {isNumber, isString} from '../lib/types';
-import {types} from 'mobx-state-tree';
+import {isString} from '../lib/types';
+// import {types} from 'mobx-state-tree';
 import jsonSchemaToMST from '../lib/jsonschema-to-mobx-state-tree';
 import FormContext from './context';
-import {findDOMNode} from 'react-dom';
+// import {findDOMNode} from 'react-dom';
 import {watchForErrors} from './errors';
 // import { asReduxStore, connectReduxDevtools } from "mst-middlewares"
 // import remotedev from 'remotedev';
@@ -77,9 +70,9 @@ function resolveDefaultValue(schema) {
     throw new Error(`Unsupported JSON Schema type "${schema.type}"`);
 }
 
-function buildMstModel(schema) {
-    
-}
+// function buildMstModel(schema) {
+//
+// }
 
 function bindErrorHandlers(schema, value, errMap={}) {
     // console.log('bind',schema,value);
@@ -108,13 +101,13 @@ function bindErrorHandlers(schema, value, errMap={}) {
                 errMap.set('properties',propErrors);
                 for(let p of Object.keys(schema.properties)) {
                     // console.log(value,p);
-                    
+
                     let ppErr = observable.map();
                     propErrors.set(p, ppErr);
-                    
+
                     const propSchema = schema.properties[p];
-                    
-                    addObserve(value, p, change => checkTypeErrors(propSchema,change,ppErr), false)
+
+                    addObserve(value, p, change => checkTypeErrors(propSchema,change,ppErr), false);
                     bindErrorHandlers(propSchema,value[p],ppErr);
                     // bindErrorHandlers(schema.properties[p], value[p]);
                 }
@@ -191,7 +184,7 @@ const checkProp = {
         // only do minItems/maxItems and stuff here...do recursion up there??
         // TODO: how to recurse....?
     }
-}
+};
 
 function isArray(arr) {
     return isObservableArray(arr) || Array.isArray(arr)
@@ -236,7 +229,7 @@ export default function schema(options) {
         actions: undefined,
         views: undefined,
         default: undefined,
-    }, options)
+    }, options);
 
     const parser = new $RefParser();
     let schemaPromise = parser.dereference(options.schema);
@@ -287,7 +280,7 @@ export default function schema(options) {
                 this.state = {
                     formData: null,
                     errorMap: null,
-                }
+                };
                 
                 
                 schemaPromise.then(schema => {
@@ -365,7 +358,7 @@ export default function schema(options) {
             //     }
             //     return React.createElement(ObserverComponent, props);
             // }
-        }
+        };
 
         // WrappedComponent.contextTypes = {...CTX_TYPES, ...Component.contextTypes};
 

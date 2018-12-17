@@ -1,10 +1,13 @@
 import FormContext from './context';
-import {getValue, setValue, toPath, resolveValue, arrayEquals} from './util';
-import {getDisplayName, scuChildren} from '../lib/react';
+// import {getValue, setValue, toPath, resolveValue, arrayEquals} from './util';
+// import {getDisplayName, scuChildren} from '../lib/react';
+import {getValue, toPath, resolveValue} from './util';
+import {getDisplayName} from '../lib/react';
 import {isString,isNumber} from '../lib/types';
 import {EMPTY_ARRAY, EMPTY_MAP} from '../lib/consts';
 import {observer} from 'mobx-react';
 import {computed} from 'mobx';
+import * as React from "react";
 
 function getErrors(err, path) {
     for(let k of path) {
@@ -22,7 +25,7 @@ export default function consumeValue(options) {
     options = Object.assign({
         path: p => p.name,
         name: 'value',
-    }, options)
+    }, options);
 
     return component => {
         const WrappedComponent = props => (
@@ -30,7 +33,7 @@ export default function consumeValue(options) {
                 {/*{context => <Consumed component={component} props={props} context={context} options={options}/>}*/}
                 {context => React.createElement(observer(Consumed),{component,props,context,options})}
             </FormContext.Consumer>
-        )
+        );
 
         if(process.env.NODE_ENV !== 'production') {
             WrappedComponent.displayName = `@consume(${getDisplayName(component)})`;
@@ -45,7 +48,7 @@ class Consumed extends React.Component {
     
     state = {
         path: EMPTY_ARRAY,
-    }
+    };
     
     @computed get path() {
         const {props,context,options} = this.props;

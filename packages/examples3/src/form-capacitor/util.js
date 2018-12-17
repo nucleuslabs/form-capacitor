@@ -1,5 +1,6 @@
 import stringToPath from './stringToPath';
-import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray,isObservableMap, set as mobSet} from 'mobx';
+// import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray,isObservableMap, set as mobSet} from 'mobx';
+import {isBoxedObservable,isObservable,observable,isObservableProp,isObservableObject,isObservableArray,isObservableMap} from 'mobx';
 
 export function setDefaults(obj, defaults, overwrite) {
     for(let key of Object.keys(defaults)) {
@@ -149,7 +150,7 @@ function delMapR(map, path) {
         const next = map.get(first);
         if(!next) return false;
         const deleted = delMapR(next, rest);
-        if(!next.size) map.delete(first)
+        if(!next.size) map.delete(first);
         return deleted;
     }
     return map.delete(path[0]);

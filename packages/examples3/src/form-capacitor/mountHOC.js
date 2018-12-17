@@ -1,14 +1,17 @@
-import {resolveValue, setValue, toPath, getValue, isObject, toObservable} from './util';
-import {observer} from 'mobx-react';
-import {observable,action,runInAction,isObservable,isBoxedObservable,toJS,extendObservable,observe,autorun} from 'mobx';
+import {resolveValue, setValue, toPath, getValue} from './util';
+// import {resolveValue, setValue, toPath, getValue, isObject, toObservable} from './util';
+// import {observer} from 'mobx-react';
+// import {observable,action,runInAction,isObservable,isBoxedObservable,toJS,extendObservable,observe,autorun} from 'mobx';
+import {observable,runInAction} from 'mobx';
 import {STORE_KEY, PATH_KEY, CTX_TYPES} from './consts';
 import {getDisplayName} from '../lib/react';
+import * as React from "react";
 
 export default function mount(options) {
     options = Object.assign({
         path: ({name}) => name,
         defaultValue: null,
-    }, options)
+    }, options);
     
     return Component => {
         let displayName = getDisplayName(Component);
@@ -52,7 +55,7 @@ export default function mount(options) {
             render() {
                 return React.createElement(Component, this.props);
             }
-        }
+        };
 
         if(process.env.NODE_ENV !== 'production') {
             WrappedComponent.displayName = `@mount(${displayName})`;
