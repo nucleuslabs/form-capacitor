@@ -2,21 +2,19 @@ import { Fragment } from "react";
 import {
     Title,
     Control,
-    FieldBody,
-    FieldLabel,
     Label,
-    InputText,
+    // InputText,
     Icon,
-    Button,
-    Input,
-    HelpText,
-    Select,
-    Radio,
-    RadioMenu,
-    Snippet,
-    SnippetPreview,
-    Content,
-    ExternalLink,
+    // Button,
+    // Input,
+    // HelpText,
+    // Select,
+    // Radio,
+    // RadioMenu,
+    // Snippet,
+    // SnippetPreview,
+    // Content,
+    // ExternalLink,
     Field,
     Para,
     Table,
@@ -24,26 +22,21 @@ import {
     TableHeadCell,
     TableRow,
     TableBody,
-    TableCell,
-    ActionLink,
+    // TableCell,
+    // ActionLink,
     ActionButton,
     ButtonBar,
     Code,
     Title4,
 } from "../bulma";
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
-import trashIcon from "../../icons/fa/regular/trash-alt.svg";
 import addIcon from "../../icons/fa/solid/plus-circle.svg";
 import restoreIcon from "../../icons/fa/solid/sync-alt.svg";
 import saveIcon from "../../icons/fa/regular/save.svg";
 import clearIcon from "../../icons/fa/solid/eraser.svg";
 // import css from '../bulma/bulma.scss';
-import * as options from "../../options";
-import { appointmentTypes } from "../../../../form-capacitor-examples/src/options";
-import { observer } from "mobx-react";
-import { observable, extendObservable, toJS, action } from "mobx";
 import shortid from "shortid";
-import { connect, mount, schema } from "../../form-capacitor";
+import { schema } from "../../form-capacitor";
 import SchedulingInstruction from "./SchedulingInstruction";
 import jsonSchema from "../../schemas/scheduling-instructions.json";
 import { TextArea } from "../controls";
