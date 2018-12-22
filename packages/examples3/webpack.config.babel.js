@@ -63,6 +63,10 @@ export default {
             {
                 test: /\.s[ca]ss$/,
                 use: [...cssLoaders, 'sass-loader']
+            },
+            {
+                test: /\.less$/,
+                use: [...cssLoaders, 'less-loader']
             }
         ]
     },

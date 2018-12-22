@@ -42,6 +42,8 @@ import jsonSchema from "../../schemas/scheduling-instructions.json";
 import { TextArea } from "../controls";
 import FormErrors from "./FormErrors";
 import {scuChildren} from '../../lib/react';
+import DateSelector from "../controls/DateSelector";
+import TimeSelector from "../controls/TimeSelector";
 
 function Instruction(defaults) {
     // Object.assign(this,{
@@ -215,6 +217,14 @@ export default class SchedulingInstructionsForm extends React.Component {
                         {/*<textarea value={formData.specialInstructions} onChange={ev => formData.set('specialInstructions',ev.target.value)}/>*/}
                     </Control>
                 </Field>
+
+                <Field>
+                    <Label htmlFor={`startDate--${this.formId}`}>Start Date/ Time</Label>
+                    <Control>
+                        <DateSelector id={`startDate--${this.formId}`} name="startDate"/> <TimeSelector id={`startTime--${this.formId}`} name="startTime"/>
+                    </Control>
+                </Field>
+
 
                 <FormErrors schema={schema} errors={errorMap} />
 
