@@ -1,4 +1,4 @@
-import {ProvidePlugin,NamedModulesPlugin,HotModuleReplacementPlugin} from 'webpack';
+import {ProvidePlugin,IgnorePlugin,NamedModulesPlugin,HotModuleReplacementPlugin} from 'webpack';
 
 const src = `${__dirname}/src`;
 const publicDir = `${__dirname}/public`;
