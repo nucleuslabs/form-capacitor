@@ -22,6 +22,30 @@
                     "maxLength": 20,
                     "pattern": "\\w",
                     "default": ""
+                },
+                "startDate": {
+                    "title": "Start Date",
+                    "default": null,
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "null"}
+                    ]
+                },
+                "startTime": {
+                    "title": "Start Time",
+                    "default": null,
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "null"}
+                    ]
+                },
+                "endDateTime": {
+                    "title": "End Date Time",
+                    "default": null,
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "null"}
+                    ]
                 }
             },
             "required": [

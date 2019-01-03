@@ -145,7 +145,7 @@ Can properties given types, or only rules? A type is kind of like a rule with no
 	
 	schema = < # schema consists of a single field
 		rule: BirthDate
-		name: "Date of Birth"
+		name: "DateSelector of Birth"
 		description: "The date you were born"
 	>
 	
@@ -164,7 +164,7 @@ Can properties given types, or only rules? A type is kind of like a rule with no
 		rule: MinLength(2)
 	>
 
-In Form Capacitor 2, everything is a "field". An entire form is just a complex field. A "DateTime" must consist of two sub-fields: "Date and Time". A "Scheduling Instruction" (see examles) is a complex field with several subfields. Therefore the schema root should also be a field, and we should not allow objects, or union types at the root (above examples should be invalid).
+In Form Capacitor 2, everything is a "field". An entire form is just a complex field. A "DateTime" must consist of two sub-fields: "DateSelector and Time". A "Scheduling Instruction" (see examles) is a complex field with several subfields. Therefore the schema root should also be a field, and we should not allow objects, or union types at the root (above examples should be invalid).
 
 But if everything is a field, and each field has its own name and error message, are we not doubling-down on the errors?
 

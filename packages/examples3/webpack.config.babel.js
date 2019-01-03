@@ -1,4 +1,4 @@
-import {ProvidePlugin,IgnorePlugin,NamedModulesPlugin,HotModuleReplacementPlugin} from 'webpack';
+import {ProvidePlugin,NamedModulesPlugin,HotModuleReplacementPlugin} from 'webpack';
 
 const src = `${__dirname}/src`;
 const publicDir = `${__dirname}/public`;
@@ -63,6 +63,10 @@ export default {
             {
                 test: /\.s[ca]ss$/,
                 use: [...cssLoaders, 'sass-loader']
+            },
+            {
+                test: /\.less$/,
+                use: [...cssLoaders, 'less-loader']
             }
         ]
     },
