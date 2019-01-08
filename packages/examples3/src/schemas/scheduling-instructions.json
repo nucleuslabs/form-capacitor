@@ -1,140 +1,132 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "definitions": {
-    "SchedulingInstructions": {
-      "title": "Scheduling Instructions",
-      "description": "Instructions for booking client appointments",
-      "type": "object",
-      "properties": {
-        "requiredAssessments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Assessment"
-          },
-          "title": "Required Assessments",
-          "description": "List of appointments that need to be booked",
-          "default": [
-            {}
-          ]
-        },
-        "specialInstructions": {
-          "type": "string",
-          "title": "Special Instructions",
-          "minLength": 10,
-          "maxLength": 20,
-          "pattern": "\\w",
-          "default": ""
-        },
-        "startDate": {
-          "title": "Start Date",
-          "anyOf": [
-            {
-              "type": "integer"
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "definitions": {
+        "SchedulingInstructions": {
+            "title": "Scheduling Instructions",
+            "description": "Instructions for booking client appointments",
+            "type": "object",
+            "properties": {
+                "requiredAssessments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Assessment"
+                    },
+                    "title": "Required Assessments",
+                    "description": "List of appointments that need to be booked",
+                    "default": [{}]
+                },
+                "specialInstructions": {
+                    "type": "string",
+                    "title": "Special Instructions",
+                    "minLength": 10,
+                    "maxLength": 20,
+                    "pattern": "\\w",
+                    "default": ""
+                },
+                "startDate": {
+                    "title": "Start Date",
+                    "default": null,
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "null"}
+                    ]
+                },
+                "startTime": {
+                    "title": "Start Time",
+                    "default": null,
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "null"}
+                    ]
+                },
+                "endDateTime": {
+                    "title": "End Date Time",
+                    "default": null,
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "null"}
+                    ]
+                }
             },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null
+            "required": [
+                "requiredAssessments",
+                "specialInstructions"
+            ]
         },
-        "startTime": {
-          "title": "Start Time",
-          "anyOf": [
-            {
-              "type": "integer"
+        "ID": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "errorMessage": "Please choose a valid option"
+        },
+        "OptionalID": {
+            "anyOf": [
+                { "$ref": "#/definitions/ID"},
+                {"type": "null"}
+            ],
+            "default": null
+        },
+        "shortid": {
+            "type": "string",
+            "default": {"$uuid": "shortid"},
+            "pattern": "^[0-9a-zA-Z_-]{7,14}$",
+            "title": "shortid"
+        },
+        "Assessment": {
+            "title": "Assessment",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/OptionalID",
+                    "title": "ID"
+                },
+                "typeId": {
+                    "$ref": "#/definitions/ID",
+                    "title": "Appointment Type"
+                },
+                "teamId": {
+                    "$ref": "#/definitions/ID",
+                    "title": "Team"
+                },
+                "disciplineId": {
+                    "$ref": "#/definitions/ID",
+                    "title": "Discipline"
+                },
+                "prefClinicianId": {
+                    "$ref": "#/definitions/OptionalID",
+                    "title": "Preferred Clinician"
+                },
+                "prefTime": {
+                    "title": "Preferred Time",
+                    "default": null,
+                    "anyOf": [
+                        {
+                            "type": "integer",
+                            "minimum": 30,
+                            "maximum": 720,
+                            "multipleOf": 15
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "childRequired": {
+                    "type": "boolean",
+                    "title": "Child Req'd",
+                    "default": false
+                },
+                "key": {
+                    "$ref": "#/definitions/shortid"
+                }
             },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null
+            "required": [
+                "typeId",
+                "teamId",
+                "disciplineId",
+                "childRequired",
+                "key"
+            ]
         }
-      },
-      "required": [
-        "requiredAssessments",
-        "specialInstructions"
-      ]
-    },
-    "ID": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 4294967295,
-      "errorMessage": "Please choose a valid option"
-    },
-    "OptionalID": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/ID"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null
-    },
-    "shortid": {
-      "type": "string",
-      "default": {
-        "$uuid": "shortid"
-      },
-      "pattern": "^[0-9a-zA-Z_-]{7,14}$",
-      "title": "shortid"
-    },
-    "Assessment": {
-      "title": "Assessment",
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/OptionalID",
-          "title": "ID"
-        },
-        "typeId": {
-          "$ref": "#/definitions/ID",
-          "title": "Appointment Type"
-        },
-        "teamId": {
-          "$ref": "#/definitions/ID",
-          "title": "Team"
-        },
-        "disciplineId": {
-          "$ref": "#/definitions/ID",
-          "title": "Discipline"
-        },
-        "prefClinicianId": {
-          "$ref": "#/definitions/OptionalID",
-          "title": "Preferred Clinician"
-        },
-        "prefTime": {
-          "title": "Preferred Time",
-          "default": null,
-          "anyOf": [
-            {
-              "type": "integer",
-              "minimum": 30,
-              "maximum": 720,
-              "multipleOf": 15
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "childRequired": {
-          "type": "boolean",
-          "title": "Child Req'd",
-          "default": false
-        },
-        "key": {
-          "$ref": "#/definitions/shortid"
-        }
-      },
-      "required": [
-        "typeId",
-        "teamId",
-        "disciplineId",
-        "childRequired",
-        "key"
-      ]
     }
-  }
 }

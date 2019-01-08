@@ -123,7 +123,7 @@ export function requiredObject(options) {
 export function date(options) {
     return {
         ...options,
-        instanceof: 'Date',
+        instanceof: 'DateSelector',
     }
 }
 

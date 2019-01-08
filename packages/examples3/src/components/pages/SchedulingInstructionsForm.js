@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import {Fragment} from "react";
 import {
     Title,
     Control,
@@ -16,7 +16,7 @@ import {
     // Content,
     // ExternalLink,
     Field,
-    Para,
+    // Para,
     Table,
     TableHead,
     TableHeadCell,
@@ -36,37 +36,38 @@ import saveIcon from "../../icons/fa/regular/save.svg";
 import clearIcon from "../../icons/fa/solid/eraser.svg";
 // import css from '../bulma/bulma.scss';
 import shortid from "shortid";
-import { schema } from "../../form-capacitor";
+import {schema} from "../../form-capacitor";
 import SchedulingInstruction from "./SchedulingInstruction";
 import jsonSchema from "../../schemas/scheduling-instructions.json";
-import { TextArea } from "../controls";
+import {TextArea} from "../controls";
 import FormErrors from "./FormErrors";
 import {scuChildren} from '../../lib/react';
 import DateSelector from "../controls/DateSelector";
 import TimeSelector from "../controls/TimeSelector";
+import DateTimeSelector from "../controls/DateTimeSelector";
 
-function Instruction(defaults) {
-    // Object.assign(this,{
-    //     typeId: null,
-    //     teamId: null,
-    //     disciplineId: null,
-    //     prefClinicianId: null,
-    //     prefTime: null,
-    //     childRequired: false,
-    //     ...defaults,
-    //     key: shortid()
-    // });
-    return {
-        typeId: null,
-        teamId: null,
-        disciplineId: null,
-        prefClinicianId: null,
-        prefTime: null,
-        childRequired: false,
-        ...defaults,
-        key: shortid(),
-    };
-}
+// function Instruction(defaults) {
+//     // Object.assign(this,{
+//     //     typeId: null,
+//     //     teamId: null,
+//     //     disciplineId: null,
+//     //     prefClinicianId: null,
+//     //     prefTime: null,
+//     //     childRequired: false,
+//     //     ...defaults,
+//     //     key: shortid()
+//     // });
+//     return {
+//         typeId: null,
+//         teamId: null,
+//         disciplineId: null,
+//         prefClinicianId: null,
+//         prefTime: null,
+//         childRequired: false,
+//         ...defaults,
+//         key: shortid(),
+//     };
+// }
 
 // @connect({dataPropName: "formData", initialData: p => ({
 //         instructions: [new Instruction]
@@ -104,10 +105,9 @@ function Instruction(defaults) {
 @schema({
     schema: jsonSchema,
     $ref: "#/definitions/SchedulingInstructions",
-    // default: {
-    //     requiredAssessments: [{}],
-    //     specialInstructions: '',
-    // },
+    default: {
+        startDate: null,
+    },
     actions: formData => ({
         addInstruction() {
             formData.requiredAssessments.push({});
@@ -153,15 +153,16 @@ export default class SchedulingInstructionsForm extends React.Component {
     componentDidMount() {
         setTimeout(() => {
             // console.log(this.props);
-            if (this.props.formData) {
+            if(this.props.formData) {
                 this.props.formData.set("specialInstructions", "foo");
+                // this.props.formData.set("startDate", new Date(2015,12,14));
             }
         }, 1000);
     }
 
     render() {
-        const { formData, errorMap, schema } = this.props;
-        if (!formData) return <p>Loading schema...</p>;
+        const {formData, errorMap, schema} = this.props;
+        if(!formData) return <p>Loading schema...</p>;
         // console.log('formData',formData)
 
         // if(!this.formData.requiredAssessments) return null; // fixme: remove when schema loading is dealt with
@@ -186,25 +187,25 @@ export default class SchedulingInstructionsForm extends React.Component {
                             <TableHeadCell>Pref. Clinician</TableHeadCell>
                             <TableHeadCell>Pref. Time</TableHeadCell>
                             <TableHeadCell>Child Req'd?</TableHeadCell>
-                            <TableHeadCell />
+                            <TableHeadCell/>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {formData.requiredAssessments.map((inst, idx) => {
                             // console.log(inst.key);
                             // console.log(JSON.stringify(inst),inst.key,JSON.stringify(inst.key),toJS(inst.key),toJS(inst).key);
-                            return <WrapSchedulingInstruction key={inst.key} index={idx} formData={formData} formId={this.formId} />;
+                            return <WrapSchedulingInstruction key={inst.key} index={idx} formData={formData} formId={this.formId}/>;
                         })}
                     </TableBody>
                 </Table>
 
                 <ButtonBar>
                     <ActionButton isPrimary onClick={formData.addInstruction}>
-                        <Icon src={addIcon} />
+                        <Icon src={addIcon}/>
                         <span>Add Instruction</span>
                     </ActionButton>
                     <ActionButton isDanger onClick={formData.clearInstructions}>
-                        <Icon src={clearIcon} />
+                        <Icon src={clearIcon}/>
                         <span>Clear</span>
                     </ActionButton>
                 </ButtonBar>
@@ -212,29 +213,42 @@ export default class SchedulingInstructionsForm extends React.Component {
                 <Field>
                     <Label htmlFor={`specialInstructions--${this.formId}`}>Special Instructions</Label>
                     <Control>
-                        <TextArea id={`specialInstructions--${this.formId}`} name="specialInstructions" placeholder="Special scheduling instructions..." />
+                        <TextArea id={`specialInstructions--${this.formId}`} name="specialInstructions" placeholder="Special scheduling instructions..."/>
                         {/*{formData.specialInstructions}*/}
                         {/*<textarea value={formData.specialInstructions} onChange={ev => formData.set('specialInstructions',ev.target.value)}/>*/}
                     </Control>
                 </Field>
+                <Field>
+                    <Label htmlFor={`startDate--${this.formId}`}>Start Date</Label>
+                    <Control>
+                        <div style={{width: "120px"}}><DateSelector id={`startDate--${this.formId}`} name="startDate"/></div>
+                    </Control>
+                </Field>
 
                 <Field>
-                    <Label htmlFor={`startDate--${this.formId}`}>Start Date/ Time</Label>
+                    <Label htmlFor={`startTime--${this.formId}`}>Start Time</Label>
                     <Control>
-                        <DateSelector id={`startDate--${this.formId}`} name="startDate"/> <TimeSelector id={`startTime--${this.formId}`} name="startTime"/>
+                        <TimeSelector id={`startTime--${this.formId}`} name="startTime"/>
                     </Control>
                 </Field>
 
 
-                <FormErrors schema={schema} errors={errorMap} />
+                <Field>
+                    <Label htmlFor={`endDateTime--${this.formId}`}>End Date Time</Label>
+                    <Control>
+                        <DateTimeSelector id={`endDateTime--${this.formId}`} name="endDateTime"/>
+                    </Control>
+                </Field>
+
+                <FormErrors schema={schema} errors={errorMap}/>
 
                 <ButtonBar>
                     <ActionButton isSuccess onClick={this.saveState}>
-                        <Icon src={saveIcon} />
+                        <Icon src={saveIcon}/>
                         <span>Save</span>
                     </ActionButton>
                     <ActionButton onClick={this.restoreState}>
-                        <Icon src={restoreIcon} />
+                        <Icon src={restoreIcon}/>
                         <span>Reset</span>
                     </ActionButton>
                 </ButtonBar>
@@ -248,10 +262,10 @@ export default class SchedulingInstructionsForm extends React.Component {
 
 class WrapSchedulingInstruction extends React.Component {
     shouldComponentUpdate = scuChildren;
-    
-    render() {
-        const { index, formData, formId } = this.props;
 
-        return <SchedulingInstruction name={["requiredAssessments", index]} doDelete={() => formData.deleteInstruction(index)} formId={formId} number={index + 1} />;
+    render() {
+        const {index, formData, formId} = this.props;
+
+        return <SchedulingInstruction name={["requiredAssessments", index]} doDelete={() => formData.deleteInstruction(index)} formId={formId} number={index + 1}/>;
     }
 }
