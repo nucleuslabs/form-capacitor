@@ -1999,11 +1999,6 @@ date-fns@^1.27.2:
   version "1.29.0"
   resolved "http://code.nucleuslabs.com:4873/date-fns/-/date-fns-1.29.0.tgz#12e609cdcb935127311d04d33334e2960a2a54e6"
 
-date-fns@^1.30.1:
-  version "1.30.1"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
-  integrity sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==
-
 date-fns@^2.0.0-alpha.23:
   version "2.0.0-alpha.26"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-alpha.26.tgz#e46afd73a2b50e0359446309ee7cb631d7467227"
@@ -2122,11 +2117,6 @@ destroy@~1.0.4:
 detect-conflict@^1.0.0:
   version "1.0.1"
   resolved "http://code.nucleuslabs.com:4873/detect-conflict/-/detect-conflict-1.0.1.tgz#088657a66a961c05019db7c4230883b1c6b4176e"
-
-detect-element-overflow@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/detect-element-overflow/-/detect-element-overflow-1.1.1.tgz#771c50ec9d69f487477fef9728db0766a8f6962d"
-  integrity sha512-07f/EWuaPHU2JqPLg1JPuNaf47h+A5dt70EHO+X+U1zzSuAsgmI5qAU3kP1bCMICYmuvMrcqEZOIxiLB9d8zdg==
 
 detect-indent@^4.0.0:
   version "4.0.0"
@@ -2870,13 +2860,6 @@ get-stdin@^4.0.1:
 get-stream@^3.0.0:
   version "3.0.0"
   resolved "http://code.nucleuslabs.com:4873/get-stream/-/get-stream-3.0.0.tgz#8e943d1358dc37555054ecbe2edb05aa174ede14"
-
-get-user-locale@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/get-user-locale/-/get-user-locale-1.1.1.tgz#edff0a8bbd6aa3ed0ca30cc441e1acd111543b7f"
-  integrity sha512-KuA+vMhsY+rSPK8hrmOvf7xXIMTs+L06RkgZ83jawZHSEqPLafZtQ63d3waXW3r8z6EQ49I/trraNncWM+s/2g==
-  dependencies:
-    lodash.once "^4.1.1"
 
 get-value@^2.0.3, get-value@^2.0.6:
   version "2.0.6"
@@ -4073,11 +4056,6 @@ lodash.mergewith@^4.6.0:
   version "4.6.1"
   resolved "http://code.nucleuslabs.com:4873/lodash.mergewith/-/lodash.mergewith-4.6.1.tgz#639057e726c3afbdb3e7d42741caa8d6e4335927"
 
-lodash.once@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/lodash.once/-/lodash.once-4.1.1.tgz#0dd3971213c7c56df880977d504c88fb471a97ac"
-  integrity sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=
-
 lodash.tail@^4.1.1:
   version "4.1.1"
   resolved "http://code.nucleuslabs.com:4873/lodash.tail/-/lodash.tail-4.1.1.tgz#d2333a36d9e7717c8ad2f7cacafec7c32b444664"
@@ -4160,11 +4138,6 @@ make-dir@^1.0.0:
   resolved "http://code.nucleuslabs.com:4873/make-dir/-/make-dir-1.2.0.tgz#6d6a49eead4aae296c53bbf3a1a008bd6c89469b"
   dependencies:
     pify "^3.0.0"
-
-make-event-props@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/make-event-props/-/make-event-props-1.1.0.tgz#900a4818aeda72ec0ab6b5dc2c3407291592da76"
-  integrity sha512-BqMN1ToP0Fi7sHPBt6gvIPbDWSULFBmMZPmf+73cohr6LQZtcEWZcDX/mCysky2DL7x1d+E35NVaBorj/eVZSg==
 
 map-cache@^0.2.2:
   version "0.2.2"
@@ -4249,11 +4222,6 @@ meow@^3.3.0, meow@^3.7.0:
     read-pkg-up "^1.0.1"
     redent "^1.0.0"
     trim-newlines "^1.0.0"
-
-merge-class-names@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/merge-class-names/-/merge-class-names-1.1.1.tgz#3bd2f38eb5418c464a0fef615484fdf6c8932256"
-  integrity sha512-+UUWBUoFw9QLY/UlBKU/xk9h6OhyG3BUDDuF2eIJcxmusWb/uedvNpZGkysqMw5b/ds+wkX7NJTDSdUuRsCNyA==
 
 merge-descriptors@1.0.1:
   version "1.0.1"
@@ -5538,37 +5506,6 @@ react-ajax-loader@^0.1.5:
     object-hash "^1.2.0"
     shallowequal "^1.0.2"
 
-react-calendar@^2.17.4:
-  version "2.17.5"
-  resolved "https://registry.yarnpkg.com/react-calendar/-/react-calendar-2.17.5.tgz#eba17a5614c27b70caa635ce74a1471b033f4890"
-  integrity sha512-8QeCsZUoe+X0NjNVMx6kZQyPSV8ttnRyqXV72Dxp16t6wGyOFBHMLmsHJVcdlxlIUFKp6LfHrCRZ9IWp6RrZBw==
-  dependencies:
-    get-user-locale "^1.1.1"
-    merge-class-names "^1.1.1"
-    prop-types "^15.6.0"
-    react-lifecycles-compat "^3.0.4"
-
-react-clock@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/react-clock/-/react-clock-2.3.0.tgz#de5c328c7bdcec58348da5c2ccd8d8ca4fc10b76"
-  integrity sha1-3lwyjHvc7Fg0jaXCzNjYyk/BC3Y=
-  dependencies:
-    merge-class-names "^1.1.1"
-    prop-types "^15.6.0"
-
-react-date-picker@^7.1.0, react-date-picker@^7.1.1:
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/react-date-picker/-/react-date-picker-7.1.1.tgz#d8548e2be09bdfcc2fa75e2c3be947aabad79d90"
-  integrity sha512-tFc8oEHozcPkCHUOW9EQVAikxVA+XSjJ8WEf6U2f2Z2ZuxTxuKY46HodpRasXrwb1kcjxKBMMMdG7kmA+2bKRg==
-  dependencies:
-    detect-element-overflow "^1.1.1"
-    get-user-locale "^1.1.1"
-    make-event-props "^1.1.0"
-    merge-class-names "^1.1.1"
-    prop-types "^15.6.0"
-    react-calendar "^2.17.4"
-    react-lifecycles-compat "^3.0.4"
-
 react-datepicker@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-2.0.0.tgz#5818edfdd08af1b18cbc02b8a1c842cec906606f"
@@ -5579,22 +5516,6 @@ react-datepicker@^2.0.0:
     prop-types "^15.6.0"
     react-onclickoutside "^6.7.1"
     react-popper "^1.0.2"
-
-react-datetime-picker@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/react-datetime-picker/-/react-datetime-picker-2.1.1.tgz#42eb82f1bbd8493c092c42744a169e6f6dd80799"
-  integrity sha512-HasaNncTuwHJCdj33ysIB+Sr4DmF0/pmBbAsLJdHUsTKEESH54/iT42rzVX6AqBylrGeHw/5Um96nDcFmQdyDw==
-  dependencies:
-    detect-element-overflow "^1.1.1"
-    get-user-locale "^1.1.1"
-    make-event-props "^1.1.0"
-    merge-class-names "^1.1.1"
-    prop-types "^15.6.0"
-    react-calendar "^2.17.4"
-    react-clock "^2.3.0"
-    react-date-picker "^7.1.0"
-    react-lifecycles-compat "^3.0.4"
-    react-time-picker "^3.1.0"
 
 react-dnd-html5-backend@^2.6.0:
   version "2.6.0"
@@ -5676,19 +5597,6 @@ react-router@^4.2.0:
     path-to-regexp "^1.7.0"
     prop-types "^15.5.4"
     warning "^3.0.0"
-
-react-time-picker@^3.1.0, react-time-picker@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/react-time-picker/-/react-time-picker-3.1.1.tgz#66bae9b364a622c0b08cf07280557af053c15247"
-  integrity sha512-ifRByYT1aLWah4hQxIEKdzFJuRs9CLzHPsqTt1MbmEOEY///ip9szR9o1M4tEPCLeZoVLEYbHiROSXO8wf+EuQ==
-  dependencies:
-    detect-element-overflow "^1.1.1"
-    get-user-locale "^1.1.1"
-    make-event-props "^1.1.0"
-    merge-class-names "^1.1.1"
-    prop-types "^15.6.0"
-    react-clock "^2.3.0"
-    react-lifecycles-compat "^3.0.4"
 
 react@^16.3.2:
   version "16.3.2"
