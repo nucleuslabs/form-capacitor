@@ -1,64 +1,54 @@
-import { Fragment } from "react";
 import {
-    Title,
-    Control,
-    FieldBody,
-    FieldLabel,
-    Label,
+    // Title,
+    // Control,
+    // FieldBody,
+    // FieldLabel,
+    // Label,
     Icon,
-    Button,
-    HelpText,
-    RadioMenu,
-    Snippet,
-    SnippetPreview,
-    Content,
-    ExternalLink,
-    Field,
-    Para,
-    Table,
-    TableHead,
-    TableHeadCell,
+    // Button,
+    // HelpText,
+    // Snippet,
+    // SnippetPreview,
+    // Content,
+    // ExternalLink,
+    // Field,
+    // Para,
+    // Table,
+    // TableHead,
+    // TableHeadCell,
     TableRow,
-    TableBody,
+    // TableBody,
     TableCell,
     ActionLink,
-    ActionButton,
-    ButtonBar,
+    // ActionButton,
+    // ButtonBar,
 } from "../bulma";
-// import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import trashIcon from "../../icons/fa/regular/trash-alt.svg";
-// import css from '../bulma/bulma.scss';
 import * as options from "../../options";
-import { appointmentTypes } from "../../../../form-capacitor-examples/src/options";
-import { observer } from "mobx-react";
-import { observable, extendObservable, toJS } from "mobx";
-import shortid from "shortid";
-import connect from "../../form-capacitor/connect";
-import { mount } from "../../form-capacitor";
 
-import { TextBox, Select, EmailInput, TelInput, Radio, TextArea, Checkbox } from "../controls";
+import { Select, RadioMenu, Checkbox, ReactSelect, ReactMultiSelect } from "../controls";
 import { consumeValue } from "../../form-capacitor";
+import * as React from "react";
 
 @consumeValue()
 export default class SchedulingInstruction extends React.Component {
     render() {
         const { doDelete, number, formId, value: instruction } = this.props;
-        // console.log('rerendering',number);
 
         return (
             <TableRow isMiddleAligned id={`instruction-${number}--${formId}`} aria-label={`Instruction ${number}`}>
                 <TableCell>{number}</TableCell>
                 <TableCell>
-                    <Select name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`} options={options.appointmentTypes} />
+                    <ReactSelect name="typeId" isFullWidth aria-labelledby={`instruction-${number}--${formId} appointment-type-header--${formId}`} options={options.appointmentTypes} />
                 </TableCell>
                 <TableCell>
-                    <Select name="teamId" isFullWidth options={options.teams} />
+                    <RadioMenu name="teamId" isFullWidth options={options.teams}/>
                 </TableCell>
                 <TableCell>
-                    <Select name="disciplineId" isFullWidth options={options.disciplines} />
+                    <RadioMenu name="disciplineId" isFullWidth options={options.disciplines} orientation={'horizontal'}/>
                 </TableCell>
                 <TableCell>
-                    <Select name="prefClinicianId" isFullWidth options={options.clinicians} />
+                    <ReactMultiSelect name="prefClinicianId" options={options.clinicians} placeholder="(None Preferred)"/>
                 </TableCell>
                 <TableCell>
                     <Select name="prefTime" isFullWidth options={options.times} />
@@ -76,7 +66,3 @@ export default class SchedulingInstruction extends React.Component {
     }
 }
 
-// export default mount({
-//     defaultValue: {},
-// })(SchedulingInstruction);
-// export default SchedulingInstruction;

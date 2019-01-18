@@ -30,6 +30,7 @@
     "planck-js": "^0.1.43",
     "postcss-loader": "^2.1.1",
     "prettier": "1.13.0",
+    "prop-types": "^15.6.2",
     "raw-loader": "^0.5.1",
     "react": "^16.3.2",
     "react-addons-shallow-compare": "^15.6.2",
@@ -53,11 +54,13 @@
     "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
+    "ajv": "^6.7.0",
     "json-schema-ref-parser": "^5.0.3",
     "jsonschema-nodewalker": "^1.0.4",
     "mobx-state-tree": "^2.0.5",
     "mst-middlewares": "^2.0.5",
     "react-datepicker": "^2.0.0",
+    "react-select": "^2.2.0",
     "remotedev": "^0.2.7",
     "shouldcomponentupdate-children": "^1.1.0",
     "stringz": "^1.0.0"

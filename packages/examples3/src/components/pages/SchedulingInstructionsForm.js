@@ -41,10 +41,14 @@ import SchedulingInstruction from "./SchedulingInstruction";
 import jsonSchema from "../../schemas/scheduling-instructions.json";
 import {TextArea} from "../controls";
 import FormErrors from "./FormErrors";
-import {scuChildren} from '../../lib/react';
+// import {scuChildren} from '../../lib/react';
 import DateSelector from "../controls/DateSelector";
 import TimeSelector from "../controls/TimeSelector";
 import DateTimeSelector from "../controls/DateTimeSelector";
+import NumberBox from "../controls/NumberBox";
+import Ajv from 'ajv';
+import Lo from 'lodash';
+import {getSnapshot} from "mobx-state-tree";
 
 // function Instruction(defaults) {
 //     // Object.assign(this,{
@@ -102,6 +106,7 @@ import DateTimeSelector from "../controls/DateTimeSelector";
 //         // specialInstructions: '',
 //     }
 // })
+
 @schema({
     schema: jsonSchema,
     $ref: "#/definitions/SchedulingInstructions",
@@ -118,6 +123,7 @@ import DateTimeSelector from "../controls/DateTimeSelector";
         deleteInstruction(idx) {
             formData.requiredAssessments.splice(idx, 1);
         },
+
     }),
 })
 // @observer
@@ -126,7 +132,28 @@ import DateTimeSelector from "../controls/DateTimeSelector";
 // })
 export default class SchedulingInstructionsForm extends React.Component {
     formId = shortid();
+    ajv = new Ajv({
+        allErrors: true,
+        $data: true,
+        ownProperties: true,
+        errorDataPath: 'property',
+        jsonPointers: true,
+        schemaId: 'SchedulingInstructions',
+        async: false,
+        verbose: true,
+    });
 
+    constructor (props){
+        super(props);
+        Lo.forEach(jsonSchema.definitions, (val, key) => {
+            console.log("Adding ", key);
+            this.ajv.addSchema(val, key);
+        });
+
+        this.state = {
+            errors: null
+        }
+    }
     // @action.bound
     // addInstruction(ev) {
     //     this.formData.requiredAssessments.push(Instruction());
@@ -141,9 +168,16 @@ export default class SchedulingInstructionsForm extends React.Component {
     //     this.formData.requiredAssessments.splice(idx,1);
     // })
     //
-    // saveState = ev => {
-    //     this.saved = toJS(this.formData);
-    // }
+    saveState = ev => {
+        // this.saved = toJS(this.formData);
+        //add schemas:
+
+        console.log("Validating: ", this.ajv.validate('SchedulingInstructions', getSnapshot(this.props.formData)));
+        console.log(jsonSchema);
+        console.log(getSnapshot(this.props.formData));
+        console.log(this.ajv.errors);
+        this.setState({errors: this.ajv.errors});
+    };
     //
     // @action.bound
     // restoreState(ev) {
@@ -192,7 +226,6 @@ export default class SchedulingInstructionsForm extends React.Component {
                     </TableHead>
                     <TableBody>
                         {formData.requiredAssessments.map((inst, idx) => {
-                            // console.log(inst.key);
                             // console.log(JSON.stringify(inst),inst.key,JSON.stringify(inst.key),toJS(inst.key),toJS(inst).key);
                             return <WrapSchedulingInstruction key={inst.key} index={idx} formData={formData} formId={this.formId}/>;
                         })}
@@ -218,6 +251,14 @@ export default class SchedulingInstructionsForm extends React.Component {
                         {/*<textarea value={formData.specialInstructions} onChange={ev => formData.set('specialInstructions',ev.target.value)}/>*/}
                     </Control>
                 </Field>
+
+                <Field>
+                    <Label htmlFor={`randomNumber--${this.formId}`}>Random Number</Label>
+                    <Control>
+                        <NumberBox id={`randomNumber--${this.formId}`} name="randomNumber" placeholder="Random Number..."/>
+                    </Control>
+                </Field>
+
                 <Field>
                     <Label htmlFor={`startDate--${this.formId}`}>Start Date</Label>
                     <Control>
@@ -253,19 +294,19 @@ export default class SchedulingInstructionsForm extends React.Component {
                     </ActionButton>
                 </ButtonBar>
 
-                <Code>{JSON.stringify(formData, null, 2)}</Code>
-                <Code>{JSON.stringify(errorMap, null, 2)}</Code>
+                <Code>{JSON.stringify(this.state.errors || "Nope",null,2)}</Code>
+                {/*<Code>{JSON.stringify(errorMap, null, 2)}</Code>*/}
             </Fragment>
         );
     }
 }
 
 class WrapSchedulingInstruction extends React.Component {
-    shouldComponentUpdate = scuChildren;
+    // shouldComponentUpdate = scuChildren;
 
     render() {
         const {index, formData, formId} = this.props;
-
+        // console.log("NEXT!", index);
         return <SchedulingInstruction name={["requiredAssessments", index]} doDelete={() => formData.deleteInstruction(index)} formId={formId} number={index + 1}/>;
     }
 }

@@ -18,6 +18,6 @@ export default class DateSelector extends React.Component {
     render() {
         const {setValue,errors,value, ...props} = this.props;
 
-        return <div><DatePicker {...props} selected={value!==undefined && value!==null ? new Date(parseInt(value)) : undefined} onChange={this.handleChange} peekNextMonth showMonthDropdown showYearDropdown dropdownMode="select" className="react-datepicker-date-only" isClearable={true}/></div>
+        return <div><DatePicker awareOfUnicodeTokens {...props} selected={value!==undefined && value!==null ? new Date(parseInt(value)) : undefined} onChange={this.handleChange} peekNextMonth showMonthDropdown showYearDropdown dropdownMode="select" className="react-datepicker-date-only" isClearable={true}/></div>
     }
 }

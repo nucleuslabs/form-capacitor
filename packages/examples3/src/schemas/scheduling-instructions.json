@@ -23,6 +23,15 @@
                     "pattern": "\\w",
                     "default": ""
                 },
+                "randomNumber": {
+                    "title": "Random Number",
+                    "default": null,
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "multipleOf": 2,
+                    "errorMessage": "Enter an even number between 1 and 10"
+                },
                 "startDate": {
                     "title": "Start Date",
                     "default": null,
@@ -93,8 +102,12 @@
                     "title": "Discipline"
                 },
                 "prefClinicianId": {
-                    "$ref": "#/definitions/OptionalID",
-                    "title": "Preferred Clinician"
+                    "type": "array",
+                    "title": "Preferred Clinician",
+                    "items": {
+                        "$ref": "#/definitions/OptionalID"
+                    },
+                    "default": []
                 },
                 "prefTime": {
                     "title": "Preferred Time",

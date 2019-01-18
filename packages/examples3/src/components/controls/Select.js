@@ -1,6 +1,6 @@
 import { Select as Component } from "../bulma";
 import { consumeValue } from "../../form-capacitor";
-import { scuChildren } from "../../lib/react";
+import * as React from "react";
 
 const equalityCheck = Object.is;
 

@@ -127,8 +127,10 @@ export function spliceMap(map,index,count) {
 export function setOrDel(map, condition, path, value) {
     if(condition) {
         setMap(map,path,value);
+        return true;
     } else {
         delMap(map,path);
+        return false;
     }
 }
 
@@ -190,26 +192,26 @@ export function getValue(obj, path, def) {
     let ret = obj;
 
     for(let key of path) {
-        // console.log(obj,ret,key,path);
-        // if(ret == null) {
-        //     // console.log('key not found',ret,key);
-        //     return def;
-        // }
+
         if(isMap(ret)) {
             ret = ret.get(key);
         } else {
-            ret = ret[key];
+            if(isArray(ret) && ret.length <= key){
+                return def;
+            } else {
+                ret = ret[key];
+            }
         }
+
         if(ret === undefined) {
             return def;
         }
-    }
-    // console.log(obj,path);
 
+    }
     return ret;
 }
 
-function isMap(x) {
+export function isMap(x) {
     return isObservableMap(x) || x instanceof Map || x instanceof WeakMap;
 }
 

@@ -1,3 +1,2 @@
-- `<SelectByIndex>`
 - Validation will be given easy-access to everything further down the tree, but how will we get the full tree for validation...?
 - [HMR support](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/boxes/src/stores/domain-state.js#L94-L104)

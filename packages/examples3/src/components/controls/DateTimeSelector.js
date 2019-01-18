@@ -8,7 +8,7 @@ import './DateSelector.less';
 export default class DateTimeSelector extends React.Component {
     static defaultProps = {
         dateFormat: "dd-MMM-YYYY @ h:mm aa",
-    }
+    };
 
     handleChange = date => {
         this.props.setValue(date ? date.getTime().toString() : null);
@@ -17,6 +17,6 @@ export default class DateTimeSelector extends React.Component {
     render() {
         const {setValue, errors,value, ...props} = this.props;
 
-        return <div><DatePicker {...props} selected={value!==undefined && value!==null ? new Date(parseInt(value)) : undefined} onChange={this.handleChange} showTimeSelect={true} dropdownMode="select" className="react-datepicker-date-time" isClearable={true} showMonthDropdown={true} showYearDropdown={true}/></div>
+        return <div><DatePicker awareOfUnicodeTokens {...props} selected={value!==undefined && value!==null ? new Date(parseInt(value)) : undefined} onChange={this.handleChange} showTimeSelect={true} dropdownMode="select" className="react-datepicker-date-time" isClearable={true} showMonthDropdown={true} showYearDropdown={true}/></div>
     }
 }

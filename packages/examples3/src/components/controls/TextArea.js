@@ -1,7 +1,5 @@
 import {TextArea as Component} from '../bulma';
-import connect from '../../form-capacitor/connect';
-import {action} from 'mobx';
-import {consumeValue, mount} from '../../form-capacitor';
+import {consumeValue} from '../../form-capacitor';
 
 // @mount({
 //     defaultValue: p => p.defaultValue !== undefined ? p.defaultValue : '',

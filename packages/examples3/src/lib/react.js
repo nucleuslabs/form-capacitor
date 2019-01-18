@@ -126,20 +126,21 @@ export function scuChildren(nextProps, nextState) {
     if(shouldUpdate) {
         const props = new Set([...Object.keys(this.props),...Object.keys(nextProps)]);
         
-        let id = nextProps.id || nextProps.name || nextProps.key || getDisplayName(this);
-   
-        if(Array.isArray(id)) {
-            id = id.join('.');
-        }
+        // let id = nextProps.id || nextProps.name || nextProps.key || getDisplayName(this);
+        //
+        // if(Array.isArray(id)) {
+        //     id = id.join('.');
+        // }
      
-        console.group(id);
+        // console.group(id);
         for(let p of props) {
             if(this.props[p] !== nextProps[p]) {
                 // console.log(p,this.props[p],'!==',nextProps[p])
-                console.log(`%c${p} %c${this.props[p]} %c!== %c${nextProps[p]}`,'color:green','','color:magenta','');
+                return true;
+                // console.log(`%c${p} %c${this.props[p]} %c!== %c${nextProps[p]}`,'color:green','','color:magenta','');
             }
         }
-        console.groupEnd();
+        // console.groupEnd();
         // console.log(nextProps.name,this.props===nextProps,this.props,nextProps,this.state===nextState,this.state,nextState);
     }
     return shouldUpdate;

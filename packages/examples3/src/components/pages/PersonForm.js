@@ -10,21 +10,20 @@ import {
     HelpText,
     Snippet, 
     SnippetPreview, 
-    Content,
+    // Content,
     ExternalLink,
     Field, 
     Para,
     Code,
     SnippetCode
 } from '../bulma';
-import {TextBox, Select, EmailInput, TelInput, Radio, TextArea,RadioMenu} from '../controls';
+import {TextBox, Select, EmailInput, TelInput, TextArea,RadioMenu} from '../controls';
 
 // import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import user from '../../icons/fa/solid/user.svg';
 import check from '../../icons/fa/solid/check.svg';
 import email from '../../icons/fa/solid/envelope.svg';
 import connect from '../../form-capacitor/connect';
-import {toJS} from 'mobx';
 import {mount} from '../../form-capacitor';
 // import css from '../bulma/bulma.scss';
 import React from 'react';
@@ -118,10 +117,7 @@ export default class HomePage extends React.Component {
                             <FieldBody>
                                 <Field isNarrow>
                                     <Control>
-                                        <RadioMenu name="isMember">
-                                            <Radio value={1}>Yes</Radio>
-                                            <Radio value={0}>No</Radio>
-                                        </RadioMenu>
+                                        <RadioMenu name="isMember" options={[{value: 1,label: 'Yes'}, {value: 0, label: 'No'}]}/>
                                     </Control>
                                 </Field>
                             </FieldBody>

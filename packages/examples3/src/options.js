@@ -48,7 +48,6 @@ export const disciplines = [
 ];
 
 export const clinicians = [
-    {value: null, label: "(None Preferred)"},
     {value: 7, label: "Allan Quick"},
     {value: 6, label: "Jennifer Clark"},
     {value: 1, label: "Laura Neal"},
