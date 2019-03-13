@@ -1,49 +1,76 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.7",
-  "description": "Form manager for React/Redux",
+  "version": "0.2.8",
+  "description": "Form manager for React using json-schema, mobx observables and ajv validation",
   "browser": "web",
-  "main": "node",
+  "main": "dist/form-capacitor.js",
+  "module": "src/index.js",
   "keywords": [
     "form",
+    "state",
     "manager",
+    "validation",
     "react",
-    "redux"
+    "json-schema",
+    "ajv",
+    "mobx",
+    "library"
   ],
-  "author": "Mark Penner <mpenner@nucleuslabs.com>",
+  "contributors": [
+    {
+      "name": "Steve Ramage",
+      "email": "sramage@nucleuslabs.com",
+      "url": "https://nucleuslabs.com"
+    },
+    {
+      "name": "Eric Jackisch",
+      "email": "ejackisch@nucleuslabs.com",
+      "url": "https://nucleuslabs.com"
+    },
+    {
+      "name": "Mark Penner",
+      "email": "mpenner@nucleuslabs.com",
+      "url": "https://nucleuslabs.com"
+    }
+  ],
   "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",
   "license": "MIT",
   "dependencies": {
-    "classnames": "^2.2.5",
-    "lodash": "^4.17.4",
-    "prop-types": "^15.5.10",
-    "react": "^15.5.4",
-    "react-redux": "^5.0.5",
-    "recompose": "^0.21.2",
-    "redux": "^3.6.0",
-    "reselect": "^2.5.4",
-    "shortid": "^2.2.6"
+    "classcat": "^3.0.2",
+    "jsonschema-nodewalker": "^1.0.4",
+    "shortid": "^2.2.8",
+    "shouldcomponentupdate-children": "^1.1.0"
   },
   "peerDependencies": {
-    "react": "^15.4.2",
-    "react-redux": "^5.0.2",
-    "redux": "^3.6.0"
+    "ajv": "^6.7.0",
+    "json-schema-ref-parser": "^5.0.3",
+    "lodash": "^4.17.5",
+    "mobx": "^4.9.2",
+    "mobx-react": "^5.4.3",
+    "mobx-state-tree": "^3.11.0",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-loader": "^7.0.0",
-    "bundilio": "^0.3.4",
-    "concurrently": "^3.1.0",
-    "css-loader": "^0.26.1",
-    "external-svg-sprite-loader": "^2.2.0",
-    "file-loader": "^0.9.0",
-    "http-server": "^0.9.0",
-    "less": "^2.7.2",
-    "less-loader": "^2.2.3",
-    "react-dom": "^15.4.2",
-    "style-loader": "^0.13.1",
-    "url-loader": "^0.5.7",
-    "webpack": "^2.3.3",
-    "why-did-you-update": "0.0.8"
+    "autoprefixer": "^8.0.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.3",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-plugin-syntax-decorators": "^6.13.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "babel-plugin-transform-function-bind": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-display-name": "^6.25.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-plugin-transform-react-jsx-self": "^6.22.0",
+    "babel-plugin-transform-react-jsx-source": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^3.9.1",
+    "eslint-loader": "^1.6.1",
+    "lodash": "^4.17.5",
+    "webpack": "^4.4.1",
+    "webpack-cli": "^3.2.3"
   }
 }
