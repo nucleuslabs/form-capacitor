@@ -15,6 +15,12 @@ form state management and validation.
 
 ## Usage
 
+### Helper methods
+
+ - getValue(obj, path) - gets a value in a mobx state tree or observable map tree based on a path array
+ - setValue(obj, path, value) - sets a value in a mobx state tree or observable map tree based on a path array
+ - errorMapToFlatArray(errorMap) - converts an observable array errorMap to a flat array of error objects
+
 ### json-schema Definition for your form
 Create a definition file for your form including any validation rules.
 ~~~
@@ -50,6 +56,25 @@ Create a definition file for your form including any validation rules.
 }
 ~~~
 ### @schema decorator
+
+The schema decorator wraps the form in a HOC with context provider that feeds 
+FormCapacitor props to your form component.
+
+**Required Settings**
+- schema: /path/to/some-json-schema-file.json,
+- $ref: "#/definitions/FormX",
+
+**Optional Settings**
+- default - The default data to hydrate the form state tree with
+- actions - A function that is passed the mobx state tree and attaches actions to it
+
+**props:**
+
+- FormData - a mobx-state-tree full of observable goodness that you can access all of your form state from the structure is based on your json schema. Import toJS() from mobx to see a snapshot of your form data tree.
+- FormData.set(path, value) - a method that is used to set data within the tree for the supplied path.
+- ErrorMap - a mobx observable map tree
+
+
 A basic form with 2 text inputs and a save button.
 ~~~
 import jsonSchema from "../../schemas/simple-form.json";
@@ -116,24 +141,24 @@ export default class SimpleForm extends React.Component {
 ~~~
 
 ### @consumeValue decorator
-
-The schema decorator wraps the form in a HOC with context provider that feeds 
-FormCapacitor props to your form component.
-
-**@schema Options:**
-
-
+Attach to any control and provide a handle change function to set the fc state for that input. The inputs are passed 
+a name prop that defines what there path is in the tree. 
 
 **props:**
-- FormData - a mobx-state-tree full of observable goodness that you can access all of your form state from the structure is based on your json schema. Import toJS() from mobx to see a snapshot of your form data tree.
-- setFormData() - a method that is used to set data within the tree.
-- clearFormData() - a method to set format
 
+- value - The value from the mobx state tree
+- fc - An object that contains the following methods and properies
+~~~
+{
 
-
-
+	hasErrors: boolean,
+	errors: [{title: string, message: string}],
+	set: function that sets the state for the input
+}
+~~~
 
 This example is a SimpleTextBox Component which is a basic wrapped html text input.
+
 ~~~
 import {consumeValue} from 'form-capacitor';
 import * as React from "react";
@@ -159,6 +184,21 @@ export default class SimpleTextBox extends React.Component {
 ~~~
 
 ### @consumeArray decorator 
+
+**props:**
+
+- value - The value from the mobx state tree
+- fc - An object that contains the following methods and properies
+~~~
+{
+
+	hasErrors: boolean,
+	errors: [{title: string, message: string}],
+	set: function that sets the state for the input,
+	clear: clears the underlying array,
+   	remove(value): removes an item from the underlying array,	
+}
+~~~
 This is for more advanced arrays for inputs like react-select.
 ~~~
 import CreatableSelect from "react-select/lib/Creatable";

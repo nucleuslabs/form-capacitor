@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Form manager for React using json-schema, mobx observables and ajv validation",
   "browser": "web",
   "main": "dist/form-capacitor.js",
