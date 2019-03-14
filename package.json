@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Form manager for React using json-schema, mobx observables and ajv validation",
   "browser": "web",
   "main": "dist/form-capacitor.js",
@@ -36,8 +36,6 @@
   "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",
   "license": "MIT",
   "dependencies": {
-    "classcat": "^3.0.2",
-    "jsonschema-nodewalker": "^1.0.4",
     "shortid": "^2.2.8",
     "shouldcomponentupdate-children": "^1.1.0"
   },

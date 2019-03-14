@@ -1,7 +1,6 @@
 'use strict';
 // https://github.com/ralusek/jsonschema-to-mobx-state-tree/blob/fe76a08ddfae67652d13f62c015b0d9ab4b7df58/index.js
 
-// import walkNodes from 'jsonschema-nodewalker';
 import Lo from 'lodash';
 import shortid from 'shortid';
 import {types} from 'mobx-state-tree';
