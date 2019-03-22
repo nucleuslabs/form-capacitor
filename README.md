@@ -331,7 +331,10 @@ imperative validation on submit or change in focus or whatever.
 
 ### Errors
 
-Will write something here at some point   
+Errors can be managed at the consumer/input level via props.fc.hasErrors/props.fc.errors 
+or at the form provider level via the props.errorMap observable map tree. 
+The`errorMapToFlatArray` function included in form-capacitor will turn errorMap Tree 
+into a flat array of error objects.    
 
 ## Why another form state / validation management library?
 
@@ -342,3 +345,7 @@ too many re-renders so we decided to try to make a form library that could
 handle re-renders using mobx. We also wanted to use standard validation
 syntax between front-end and back-end.       
 
+
+## Testing
+
+Run `make test` to run all the tests and see a coverage report.
