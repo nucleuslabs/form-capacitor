@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "DemoForm": {
+      "title": "Demo Form",
+      "description": "Basic Form to demo core features of FormCapacitor",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "errorMessage": "Please type a name which consists of words",
+          "type": "string",
+          "title": "Name",
+          "pattern": "\\w",
+          "required": [
+            "firstName"
+          ]
+        },
+        "lastName": {
+          "errorMessage": "Please type a name which consists of words",
+          "type": "string",
+          "title": "Last Name",
+          "pattern": "\\w",
+          "default": "Sauce"
+        },
+        "alias": {
+          "type": "array",
+          "title": "Aliases",
+          "errorMessage": "Please type a made up name which consists of words",
+          "items": {
+            "type": "object",
+            "title": "Alias",
+            "properties": {
+              "alias": {
+                "type": "string"
+              }
+            }
+          },
+          "default": []
+        }
+      },
+      "required": [
+        "firstName"
+      ]
+    }
+  }
+}

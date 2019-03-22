@@ -2,7 +2,7 @@ BIN := node_modules/.bin
 SRC_FILES := $(shell find src -name '*.js')
 
 # these are not files
-.PHONY: clean publish
+.PHONY: clean publish test
 
 # disable default suffixes
 .SUFFIXES:
@@ -26,6 +26,9 @@ publish: dist
 	yarn version
 	cp package.json dist/package.json
 	npm publish dist
+
+test: $(SRC_FILES) yarn.lock
+	node_modules/.bin/jest --coverage
 
 clean:
 	rm -rf node_modules dist

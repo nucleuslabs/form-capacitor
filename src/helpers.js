@@ -1,21 +1,20 @@
 import stringToPath from './stringToPath';
 // import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray,isObservableMap, set as mobSet} from 'mobx';
-import {isBoxedObservable, isObservable, observable, isObservableProp, isObservableObject, isObservableArray, isObservableMap, toJS} from 'mobx';
+import {isBoxedObservable, isObservable, observable, isObservableProp, isObservableObject, isObservableArray, isObservableMap, isObservableSet} from 'mobx';
 
-export function setDefaults(obj, defaults, overwrite) {
-    for(let key of Object.keys(defaults)) {
-        if(obj[key] === undefined) {
-            obj[key] = defaults[key];
-        }
-    }
-}
-
+// export function setDefaults(obj, defaults, overwrite) {
+//     for(let key of Object.keys(defaults)) {
+//         if(obj[key] === undefined) {
+//             obj[key] = defaults[key];
+//         }
+//     }
+// }
 
 export const EMPTY_ARRAY = Object.freeze([]);
 export const EMPTY_OBJECT = Object.freeze(Object.create(null));
 export const EMPTY_MAP = Object.freeze(new Map); // warning: this doesn't actually prevent anyone from setting things; see https://stackoverflow.com/a/35776333/65387
 export const EMPTY_SET = Object.freeze(new Set);
-export const NO_OP = Object.freeze(() => {});
+// export const NO_OP = Object.freeze(() => {});
 
 /**
  * Unwraps a value. If passed a function, evaluates that function with the provided args. Otherwise, returns the value as-is.
@@ -61,7 +60,7 @@ export function isDate(obj) {
 }
 
 export function isSet(obj) {
-    return obj instanceof Set;
+    return obj instanceof Set || isObservableSet(obj);
 }
 
 export function isMap(x) {
@@ -108,9 +107,10 @@ export function isError(obj) {
     return obj instanceof Error;
 }
 
+/* istanbul ignore next */
 function isInt(obj) {
     return (typeof obj === 'string' && /^(0|[1-9][0-9]*)$/.test(obj))
-        || (Number.isFinite(obj) && Math.trunc(obj) === obj);
+        || (Number.isFinite(obj) && ~~obj === obj);
 }
 
 export function setValue(obj, path, value) {
@@ -199,18 +199,6 @@ export function getMap(map, path, def) {
     return map;
 }
 
-export function spliceMap(map,index,count) {
-    const end = index+count;
-    for(const [key,val] of Array.from(map)) {
-        if(key >= index) {
-            map.delete(key);
-            if(key >= end) {
-                map.set(key - count, val);
-            }
-        }
-    }
-}
-
 export function setOrDel(map, condition, path, value) {
     if(condition) {
         setMap(map,path,value);
@@ -232,7 +220,7 @@ export function delMap(map, path) {
     return delMapR(map, path);
 }
 
-
+/* istanbul ignore next */
 function delMapR(map, path) {
     if(path.length > 1) {
         const [first, ...rest] = path;
@@ -245,6 +233,7 @@ function delMapR(map, path) {
     return map.delete(path[0]);
 }
 
+/* istanbul ignore next */
 function setProperty(obj, key, value) {
     if(isObservableObject(obj)) {
         if(isObservableProp(obj, key)) {
@@ -297,72 +286,27 @@ export function getValue(obj, path, def) {
     return ret;
 }
 
-
-
-export const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
-
 export function toObservable(obj) {
     return isObject(obj) && !isObservable(obj) ? observable(obj) : (isString(obj) || isNumber(obj) ? observable.box(obj) : obj);
 }
 
-/**
- * Checks if two arrays are equivalent
- *
- * @param {array} arr1 First array
- * @param {array} arr2 Second array
- * @returns {boolean} True if arrays are equivalent, false otherwise
- * @link http://stackoverflow.com/a/14853974/65387
- */
-export function arrayEquals(arr1, arr2) {
-    if(!arr1 || !arr2 || arr1.length !== arr2.length) {
-        return false;
-    }
-
-    for(let i = 0; i < arr1.length; ++i) {
-        if(isArray(arr1[i]) && isArray(arr2[i])) {
-            if(!arrayEquals(arr1[i], arr2[i])) {
-                return false;
-            }
-        } else if(!Object.is(arr1[i], arr2[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-/**
- * map the values in an iterator and return the result
- * @param {Iterator} it
- * @param {function} f
- * @returns {Array}
- */
-export function iteratorMap(it, f){
-    const ret = [];
-    let result = it.next();
-    while (!result.done) {
-        ret.push(f(result.value));
-        result = it.next();
-    }
-    return ret;
-}
-
 export function errorMapToFlatArray(errorMap){
     const arr = observable.array();
-    erroMapToFlatArrayR(errorMap, arr);
+    errorMapToFlatArrayR(errorMap, arr);
     return arr;
 }
 
-function erroMapToFlatArrayR(errorMap, obsArray){
+/* istanbul ignore next */
+function errorMapToFlatArrayR(errorMap, obsArray){
     if(isArray(errorMap)){
         obsArray.push(...errorMap);
         return errorMap;
     } else if (isMap(errorMap)){
         for (let eM of errorMap.values()){
-            erroMapToFlatArrayR(eM, obsArray);
+            errorMapToFlatArrayR(eM, obsArray);
         }
     }
 }
-
 
 // export function mergeSchemaErrorMap(schema, stateTree, errorMap){
 //     return mergeSchemaErrorMapR(schema, stateTree, errorMap, undefined);

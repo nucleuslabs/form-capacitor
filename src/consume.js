@@ -2,9 +2,10 @@ import FormContext from './context';
 import {getValue, toPath, resolveValue, isString, isNumber, EMPTY_ARRAY, EMPTY_MAP} from './helpers';
 import {getDisplayName} from './react';
 import {observer} from 'mobx-react';
-import {computed, action, isObservableArray, toJS, observable} from 'mobx';
+import {computed, action, isObservableArray} from 'mobx';
 import * as React from "react";
 
+/* istanbul ignore next */
 function getErrors(err, path) {
     for(let k of path) {
         if(isString(k)) {

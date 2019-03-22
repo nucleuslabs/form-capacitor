@@ -2,14 +2,14 @@ import {isMap, setValue, toObservable} from './helpers';
 import {observer} from 'mobx-react';
 import {getDisplayName, scuChildren} from './react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
-import jsonSchemaToMST from './jsonschema-to-mobx-state-tree';
+import jsonSchemaToMST from './jsonSchemaToMST';
 import FormContext from './context';
 import {watchForErrors} from './validation';
 import stringToPath from "./stringToPath";
 import * as React from "react";
 import {toJS} from "mobx";
 
-
+/* istanbul ignore next */
 function getObservable(obj, path) {
     if(!obj) return undefined;
     if(!Array.isArray(path)) {
@@ -63,7 +63,6 @@ export default function schema(options) {
                             setValue(self, name, value);
                         },
                         _push(name, value) {
-                            console.log(name, value);
                             getObservable(self, name).push(toObservable(value));
                         },
                         _pop(name) {

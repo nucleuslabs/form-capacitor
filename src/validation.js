@@ -1,9 +1,10 @@
 import {observable, ObservableMap, observe, toJS} from 'mobx';
-import {getValue, getMap, delMap, setMap, isArray} from './helpers';
+import {getValue, getMap, delMap, setMap} from './helpers';
 import Ajv from "ajv";
 
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
+/* istanbul ignore next */
 const errTypeKeywordActions = {
     /**
      * Processes required to see if there are children that need to be targeted
@@ -45,7 +46,7 @@ const errTypeKeywordActions = {
     "anyOf": () => {},
     "allOf": () => {}
 };
-
+/* istanbul ignore next */
 /**
  * This function runs thr ought he error map and transforms the errors into a tree.
  * This is so the errors can be applied to the appropriate observables and be used to highlight fields and stuff
@@ -53,7 +54,8 @@ const errTypeKeywordActions = {
  * @param {ObservableMap} pathMap
  * @returns {ObservableMap}
  */
-export function ajvErrorsToErrorMap(errors, pathMap) {
+/* istanbul ignore next */
+function ajvErrorsToErrorMap(errors, pathMap) {
     const errMap = observable.map();
     const dupeMap = new Map();
     // console.log("pathMap", toJS(pathMap));
@@ -81,6 +83,7 @@ export function ajvErrorsToErrorMap(errors, pathMap) {
     return errMap;
 }
 
+/* istanbul ignore next */
 function setErrMap(errMap, path, error) {
     const errorArray = getValue(errMap, path, undefined);
     if(errorArray !== undefined) {
@@ -89,13 +92,14 @@ function setErrMap(errMap, path, error) {
         setMap(errMap, path, observable.array([error]));
     }
 }
-
+/* istanbul ignore next */
 /**
  * Get the closest path from a map of paths for a string conatined in an ajv Error objects schemaPath
  * @param {string} pathStr
  * @param {Map|ObservableMap} pathMap
  * @returns {*}
  */
+/* istanbul ignore next */
 function getClosestAjvPath(pathStr, pathMap) {
     let pos;
     let checkStr = pathStr.trimLeft();
@@ -111,13 +115,14 @@ function getClosestAjvPath(pathStr, pathMap) {
     }
     return pathMap.get("#");
 }
-
+/* istanbul ignore next */
 /**
  * Converts an array of ajv errors into an array of condensed pretty error objs
  * @param {{}[]} errors
  * @param {string[]} path
  * @returns {{title: {string}, message: {string}, path: {string, ""?}, keyword: {string}}[]}
  */
+/* istanbul ignore next */
 function beautifyAjvErrors(errors, path) {
     // console.warn(errors);
     return errors.map(error => {
@@ -131,10 +136,10 @@ function beautifyAjvErrors(errors, path) {
  * @param {string[]} path
  * @returns {{title: {string}, message: {string}, path: {string[]}, keyword: {string}}}
  */
+/* istanbul ignore next */
 function beautifyAjvError(error, path){
     return createError(error.parentSchema.title, error.parentSchema.errorMessage || error.message, path, error.keyword);
 }
-
 
 /**
  * Creates a basic error obj
@@ -144,17 +149,12 @@ function beautifyAjvError(error, path){
  * @param {string} keyword
  * @returns {{title: {string}, message: {string}, path: {Array}, keyword: {string}}}
  */
+/* istanbul ignore next */
 function createError(title, message, path, keyword) {
     return {title, message, path, keyword};
 }
 
-/**
- * This callback type is called `validateCallback` and is displayed as a global symbol.
- *
- * @callback validateCallback
- * @param {{}} data MobXStateTree object
- * @returns {boolean}
- */
+
 /**
  * watches a MobXStateTree Object for errors using a dereferenced json_schema
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
@@ -179,13 +179,7 @@ export function watchForErrors(schema, data) {
         errors, dispose, validate: (data) => {
             if(!validate(data)) {
                 const ajvErrMap = ajvErrorsToErrorMap(validate.errors, paths, undefined, undefined);
-                // console.warn("Errors");
-                // console.warn(validate.errors);
-                // console.warn("Error Tree");
-                // console.warn(toJS(ajvErrMap));
                 processAjvErrorMapUsingSchemaR(schema, undefined, data, ajvErrMap, errors, undefined);
-                // console.warn("errorMap");
-                // console.log(toJS(errors));
                 return false;
             } else {
                 errors.clear();
@@ -194,7 +188,7 @@ export function watchForErrors(schema, data) {
         }
     };
 }
-
+/* istanbul ignore next */
 /**
  *
  * @param schema
@@ -208,6 +202,7 @@ export function watchForErrors(schema, data) {
  * @param dataPath
  * @returns {function(): *}
  */
+/* istanbul ignore next */
 function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, parentValidator, dataPath) {
     const disposers = [];
     const value = propName === undefined ? obj : getValue(obj, [propName]);
@@ -353,11 +348,7 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
     }
     return () => execAll(disposers);
 }
-
-function getParentPathTransformer(parentPath){
-    return path => isArray(path) ? [...parentPath ,...path] : `${parentPath.join('/')}/${path}`;
-}
-
+/* istanbul ignore next */
 /**
  * Uses json schema and a MobXStateTree to update an errorMap with the errors found in an ajv validation
  *
@@ -368,6 +359,7 @@ function getParentPathTransformer(parentPath){
  * @param {ObservableMap} errors
  * @param {string|number|undefined} propName
  */
+/* istanbul ignore next */
 function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap, errors, propName) {
     const value = propName === undefined ? dataObj : getValue(dataObj, [propName]);
     if(errorPath === undefined) {
@@ -399,7 +391,7 @@ function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap,
         delMap(errors, errorPath);
     }
 }
-
+/* istanbul ignore next */
 /**
  * Builds ajv error/data pathMap for schema recursively
  * @param {{}} schema
@@ -408,6 +400,7 @@ function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap,
  * @param {string[]} dataPath
  * @param {ObservableMap} paths
  */
+/* istanbul ignore next */
 function pathBuilderR(schema, value, errorPath, dataPath, paths){
     paths.set('schema:#/' + errorPath.join("/"), ['#', ...errorPath]);
     paths.set('data:#/' + dataPath.join("/"), ['#', ...errorPath]);
@@ -430,10 +423,12 @@ function pathBuilderR(schema, value, errorPath, dataPath, paths){
     }
 }
 
+/* istanbul ignore next */
 function execAll(arrayOfFuncs) {
     return arrayOfFuncs.forEach(exec);
 }
 
+/* istanbul ignore next */
 function doObserve(mobxStateTree, propName, change) {
 
     if(change === undefined) {
@@ -464,10 +459,12 @@ function doObserve(mobxStateTree, propName, change) {
     }
 }
 
+/* istanbul ignore next */
 function unbox(mstNode) {
     return mstNode.value;
 }
 
+/* istanbul ignore next */
 function exec(f) {
     f();
 }

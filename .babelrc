@@ -1,17 +1,27 @@
 {
   "plugins": [
-    "transform-react-jsx",
-    "transform-class-properties",
-    "syntax-object-rest-spread",
-    "syntax-decorators",
-    "transform-decorators-legacy",
-    "transform-object-rest-spread"
+    "@babel/plugin-transform-react-jsx",
+    "@babel/plugin-syntax-object-rest-spread",
+    [
+      "@babel/plugin-syntax-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-object-rest-spread"
   ],
   "env": {
     "web": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "modules": false,
             "targets": {
@@ -32,10 +42,10 @@
     "node": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "targets": {
-              "node": "7.6"
+              "node": "^8"
             }
           }
         ]
@@ -44,7 +54,7 @@
     "test": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "targets": {
               "node": "current"

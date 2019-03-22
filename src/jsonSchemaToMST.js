@@ -6,12 +6,15 @@ import shortid from 'shortid';
 import {types} from 'mobx-state-tree';
 import {isPlainObject} from './helpers';
 
+/* istanbul ignore next */
 const titleCase = str => Lo.deburr(Lo.upperFirst(Lo.camelCase(str)));
 
+/* istanbul ignore next */
 function hasProp(obj,prop) {
     return Object.hasOwnProperty.call(obj,prop);
 }
 
+/* istanbul ignore next */
 function getDefault(node) {
     if(!hasProp(node,'default')) return undefined;
     if(isPlainObject(node.default)) {
@@ -23,6 +26,7 @@ function getDefault(node) {
     return node.default;
 }
 
+/* istanbul ignore next */
 const defaultKeywords = {
     // should we have resolved all these defaults into functions during the schema resolution phase..?
     $uuid(type) {
@@ -34,7 +38,7 @@ const defaultKeywords = {
     }
 };
 
-
+/* istanbul ignore next */
 const TYPE_MAP = Object.freeze({
     boolean: (node, meta) => types.boolean,
     number: (node, meta) => types.number,
@@ -75,6 +79,7 @@ const TYPE_MAP = Object.freeze({
 });
 
 // https://github.com/mobxjs/mobx-state-tree#types-overview
+/* istanbul ignore next */
 function makeType(node, meta) {
     const typeArr = [];
     if(node.type) {
@@ -121,6 +126,7 @@ function makeType(node, meta) {
     throw new Error(`Could not make type; missing one of "type", "anyOf" or "allOf"`);
 }
 
+/* istanbul ignore next */
 function hasUnionFlag(type, flag) {
     return (type.flags & flag) === flag
         || (
@@ -129,10 +135,15 @@ function hasUnionFlag(type, flag) {
         );
 }
 
+/* istanbul ignore next */
 const UNDEFINED = 1 << 16;
+/* istanbul ignore next */
 const OPTIONAL = 1 << 9;
+/* istanbul ignore next */
 const NULL = 1 << 15;
+/* istanbul ignore next */
 const UNION = 1<<14; // https://github.com/mobxjs/mobx-state-tree/blob/878d7f312d03276304d20af9dc055837666dbc6f/packages/mobx-state-tree/src/core/type/type.ts#L36
+/* istanbul ignore next */
 const OPTIONAL_UNION = OPTIONAL|UNION;
 
 // TODO: scrap walkNodes, roll own
