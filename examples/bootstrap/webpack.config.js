@@ -14,6 +14,12 @@ module.exports = {
         publicPath: '/',
         pathinfo: true,
     },
+    /*
+        "@babel/plugin-transform-react-jsx",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-syntax-object-rest-spread",
+    "@babel/plugin-proposal-object-rest-spread"
+     */
     module: {
         rules: [
             {
@@ -22,7 +28,7 @@ module.exports = {
                 loader: 'babel-loader',
                 options: {
                     // presets: [['env',{target:'last 1 chrome versions'}]],
-                    plugins: ['transform-react-jsx', 'transform-class-properties', 'syntax-object-rest-spread', 'transform-object-rest-spread'],
+                    plugins: ['@babel/plugin-transform-react-jsx', '@babel/plugin-proposal-class-properties', '@babel/syntax-object-rest-spread', '@babel/proposal-object-rest-spread'],
                 },
             },
             {
