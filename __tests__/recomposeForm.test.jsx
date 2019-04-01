@@ -1,7 +1,53 @@
 import * as React from "react";
 import {render, fireEvent, wait} from "react-testing-library";
-import {FormStoreProvider,connectForm, connectField, Rules} from "../src";
+import {FormStoreProvider,connectForm, connectField, Rules, createReducer} from "../src";
+import {compose} from 'recompose';
+import { createStore, combineReducers } from 'redux';
+import {Provider} from 'react-redux';
+import {wrapDisplayName, setDisplayName} from 'recompose';
+import namespace from '../src/namespace';
 
+
+// const reducer = createReducer();
+// console.log("Hi!");
+// console.log(reducer);
+
+const myStore = () =>  createStore(combineReducers({
+    [namespace]: createReducer(),
+}), window.__STATE__, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+
+
+const someStore = myStore();
+console.log("Hi!");
+console.log(someStore.getState());
+
+function createComponent({render, enhancers, displayName, propTypes,defaultProps}) {
+    if(process.env.NODE_ENV !== 'production') {
+        if(!displayName) {
+            console.warn("Don't forget to add a `displayName` to `createComponent`");
+        }
+
+        Object.assign(render,{displayName,propTypes,defaultProps});
+    }
+
+    if(enhancers && enhancers.length) {
+        if(enhancers.length > 1) {
+            render = compose(...enhancers)(render);
+        } else {
+            render = enhancers[0](render);
+        }
+    }
+
+    return render;
+}
+
+function provide(store) {
+    return Component => setDisplayName(wrapDisplayName(Component, 'defaultProps'))(props => (
+        <Provider store={store}>
+            <Component {...props} />
+        </Provider>
+    ));
+}
 
 class StatelessSimpleTextBox extends React.Component {
     inputRef = n => {
@@ -16,12 +62,22 @@ class StatelessSimpleTextBox extends React.Component {
 
 const SimpleTextBox = connectField()(StatelessSimpleTextBox);
 
-class StatelessDemoForm extends React.Component {
-    render() {
-        if(!this.props.data){
+// const PreDemoForm = connectForm({rules: {firstName: [Rules.required]}})(StatelessDemoForm);
+
+
+const DemoForm = createComponent({
+    displayName: "DemoForm",
+    enhancers:
+        [
+            provide(someStore),
+            connectForm({rules: {firstName: [Rules.required]}}),
+        ],
+    render: props => {
+        if(!props.data){
             return null;
         }
-        const {data} = this.props;
+        console.log(props.data);
+        const {setField} = props;
         return (
             <div>
                 <div>
@@ -33,25 +89,36 @@ class StatelessDemoForm extends React.Component {
                     <SimpleTextBox data-testid="lastName" name="lastName"/>
                 </div>
                 <div>
-                    <button onClick={() => this.props.setField("lastName", "Danger")}>+</button>
-                    <button onClick={() => this.props.setField([], {firstName: "Joe", lastName: "Public"})}>-</button>
+                    <button onClick={() => setField("lastName", "Danger")}>+</button>
+                    <button onClick={() => setField([], {firstName: "Joe", lastName: "Public"})}>-</button>
                 </div>
             </div>
         );
     }
-}
-
-const DemoForm = connectForm({rules: {firstName: [Rules.required]}})(StatelessDemoForm);
+});
 
 
 // afterEach(cleanup);
 
 test("Demo Form Should have a lastName text input if we change it to \"Foo\" it should change", async () => {
+    // console.log("Hi!");
+    // console.log(store);
+
     let {getByTestId} = render(<FormStoreProvider><DemoForm/></FormStoreProvider>);
     await wait(() => getByTestId("firstName"));
     let input = getByTestId("firstName");
     expect(input.value).toBeEmpty();
     fireEvent.change(input, {target: {value: 'Foo'}});
+    console.debug(someStore.getState());
+    const state  = someStore.getState()[namespace][namespace];
+    for (let stuff in state){
+        console.debug(stuff, state[stuff]);
+    }
+    fireEvent.change(input, {target: {value: 'Bar'}});
+    const state2  = someStore.getState()[namespace][namespace];
+    for (let stuff in state2){
+        console.debug(stuff, state2[stuff]);
+    }
     expect(input.value).toBe('Foo');
 });
 

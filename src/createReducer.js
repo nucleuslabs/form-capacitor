@@ -6,15 +6,19 @@ const toPath = require('lodash/toPath');
 
 module.exports = function createReducer(data) {
     let initialState = {};
-    
-    for(let formId of Object.keys(data)) {
-        initialState[formId] = {
-            data: data[formId],
-            initial: data[formId],
+
+    if(data !== undefined) {
+        for(let formId of Object.keys(data)) {
+            initialState[formId] = {
+                data: data[formId],
+                initial: data[formId],
+            }
         }
     }
     
     return (state = {[namespace]: initialState}, action) => {
+        console.log('Michael!!')
+        console.debug(action);
         let {payload} = action;
         switch(action.type) {
             case actionTypes.CHANGE:
