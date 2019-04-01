@@ -1,5 +1,5 @@
 const React = require('react');
-const {PropTypes} = React;
+const PropTypes = require('prop-types');
 const _ = require('lodash');
 const css = require('./ValueField.less');
 const {connectField,util} = require('form-capacitor');

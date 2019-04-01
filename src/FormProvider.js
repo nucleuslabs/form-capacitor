@@ -1,5 +1,5 @@
 const React = require('react');
-const {PropTypes} = React;
+const PropTypes = require('prop-types');
 // const XPropTypes = require('./XPropTypes');
 const util = require('./util');
 

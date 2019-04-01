@@ -1,4 +1,4 @@
-const {PropTypes} = require('react');
+const PropTypes = require('prop-types');
 const _ = require('lodash');
 
 function Svg(props) {

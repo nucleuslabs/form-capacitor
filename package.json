@@ -4,7 +4,7 @@
   "description": "Form manager for React/Redux",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node_modules/.bin/jest --coverage",
     "build": "rm -rf dist/* && babel src --out-dir dist",
     "prepublish": "yarn run build",
     "dev": "concurrently -k -n \"http,wp\" -c \"bgGreen.bold.white,bgBlue.bold.white\" -p \"{name}\" \"http-server -p 8456 ./examples/bootstrap\" \"webpack --config examples/bootstrap/webpack.config.js --watch\""
@@ -29,12 +29,14 @@
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-redux": "^5.1.1",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "prop-types": "^15.7.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-transform-object-assign": "^7.0.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-react-jsx": "^7.0.0",
@@ -48,11 +50,19 @@
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "react": "^16.8.5",
+    "prop-types": "^15.7.2",
     "react-dom": "^16.8.5",
     "react-redux": "^5.1.1",
     "redux": "^3.7.2",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
+    "jest": "^24.5.0",
+    "jest-extended": "^0.11.1",
+    "react-testing-library": "^6.0.2",
     "webpack": "^2.3.3"
+  },
+  "jest": {
+    "setupFilesAfterEnv": ["jest-extended"],
+    "collectCoverageFrom": ["**/src/*.js*"]
   }
 }

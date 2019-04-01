@@ -1,5 +1,5 @@
 const React = require('react');
-const {PropTypes} = React;
+const PropTypes = require('prop-types');
 const {connect, connectAdvanced} = require('react-redux');
 const util = require('./util');
 const _ = require('lodash');
@@ -90,7 +90,8 @@ function selectorFactory(dispatch, factoryOptions) {
             }, 0);
         }
     });
-    const data = Object.assign({}, ...state => _.get(state, 'data', emptyObject));
+
+    const data = Object.assign({}, ({...state}) => _.get(state, 'data', emptyObject));
     const saveState = defaultMemoize((dispatch, form, data) => () => {
         dispatch(actions.saveState(form.id, data));
     });

@@ -21,7 +21,7 @@ function custom(validateFn, options) {
     }
 }
 
-function async(validateFn, options) {
+function asyncRule(validateFn, options) {
     return custom(validateFn, {isAsync: true, ...options});
 }
 
@@ -73,4 +73,4 @@ function realNumber(negative = false, message = (value) => `Please enter a valid
 
 // TODO: add rest from https://jqueryvalidation.org/documentation/#link-list-of-built-in-validation-methods
 
-module.exports = {required, minLength, maxLength, email, custom, async, min, max, range, digits, realNumber};
+module.exports = {required, minLength, maxLength, email, custom, asyncRule, min, max, range, digits, realNumber};

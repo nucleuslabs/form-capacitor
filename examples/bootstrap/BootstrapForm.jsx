@@ -124,9 +124,9 @@ const rules = {
     email: [
         Rules.required, 
         Rules.email, 
-        Rules.async(email => sleep(1000).then(() => email !== 'mpenner@nucleuslabs.com'), {message: "That email address is already registered"}),
+        Rules.asyncRule(email => sleep(1000).then(() => email !== 'mpenner@nucleuslabs.com'), {message: "That email address is already registered"}),
     ],
-    serverField: Rules.async(email => sleep(250).then(() => {
+    serverField: Rules.asyncRule(email => sleep(250).then(() => {
         let atk = getRandomInt(1,20);
         let def = getRandomInt(1,20);
         let errors = [];
