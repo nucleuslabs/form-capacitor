@@ -20,14 +20,14 @@ import {shallowEqual} from 'shouldcomponentupdate-children';
 export function getDisplayName(Component) {
     // https://github.com/acdlite/recompose/blob/929decab9e5babda15e388bbb3bc25f81371b32e/src/packages/recompose/getDisplayName.js
     if(typeof Component === 'string') {
-        return Component
+        return Component;
     }
 
     if(!Component) {
-        return undefined
+        return undefined;
     }
 
-    return Component.displayName || Component.name || 'Component'
+    return Component.displayName || Component.name || 'Component';
 }
 
 export function scuChildren(nextProps, nextState) {
