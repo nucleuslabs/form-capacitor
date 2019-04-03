@@ -1,15 +1,15 @@
 const React = require('react');
-const {PropTypes} = React;
-const {connect, connectAdvanced} = require('react-redux');
+const PropTypes = require('prop-types');
+const {connectAdvanced} = require('react-redux');
 const util = require('./util');
 const _ = require('lodash');
-const {compose, mapProps, getContext, withContext, lifecycle} = require('recompose');
+const {compose, getContext, withContext} = require('recompose');
 const namespace = require('./namespace');
 const actions = require('./actionCreators');
 const ShortId = require('shortid');
 const { createSelector,defaultMemoize } = require('reselect');
 const shallowEqual = require('./shallowEqual');
-const {emptyObject, emptyArray} = require('./consts');
+const {emptyObject} = require('./consts');
 
 const stateGetter = (s,p) => _.get(s, [namespace, p.id], emptyObject);
 
@@ -47,7 +47,7 @@ function connectForm(options) {
 }
 
 
-function selectorFactory(dispatch, factoryOptions) {
+function selectorFactory(dispatch) {
     const dataSelector = createSelector(stateGetter, state => _.get(state, 'data', emptyObject));
     const initialSelector = createSelector(stateGetter, state => _.get(state, 'initial', emptyObject));
     const dirtySelector = defaultMemoize((d,i) => !_.isEqual(d,i));
@@ -90,7 +90,7 @@ function selectorFactory(dispatch, factoryOptions) {
             }, 0);
         }
     });
-    const data = Object.assign({}, ...state => _.get(state, 'data', emptyObject));
+    // const data = Object.assign({}, state => _.get({...state}, 'data', emptyObject));
     const saveState = defaultMemoize((dispatch, form, data) => () => {
         dispatch(actions.saveState(form.id, data));
     });

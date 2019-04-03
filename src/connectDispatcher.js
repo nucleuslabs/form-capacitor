@@ -1,10 +1,7 @@
 const React = require('react');
-const {PropTypes} = React;
-const { connect, connectAdvanced } = require('react-redux');
-const util = require('./util');
-const _ = require('lodash');
-const {compose, mapProps, getContext} = require('recompose');
-const namespace = require('./namespace');
+const PropTypes = require('prop-types');
+const {connect} = require('react-redux');
+const {compose, getContext} = require('recompose');
 
 // TODO: you can't get the form data for submission with this...
 function connectDispatcher() {

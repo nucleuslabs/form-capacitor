@@ -87,7 +87,7 @@ exports.mergeAttrs = function mergeAttrs(merged, ...attrDicts) {
         if(funcs.length === 1) {
             merged[attr] = funcs[0];
         } else {
-            merged[attr] = (...args) => {
+            merged[attr] = (args) => {
                 let result = undefined;
                 for(let func of funcs) {
                     result = func(...args, result);

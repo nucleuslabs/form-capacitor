@@ -1,13 +1,13 @@
 const React = require('react');
-const {PropTypes} = React;
-const { connect, connectAdvanced } = require('react-redux');
+const PropTypes = require('prop-types');
+const {connectAdvanced} = require('react-redux');
 const util = require('./util');
 const _ = require('lodash');
 const getOr = require('lodash/fp/getOr');
 const {toPath} = _;
-const {compose, mapProps, getContext, toClass, withProps, withPropsOnChange, pure, shouldUpdate} = require('recompose');
+const {compose, getContext, toClass, withPropsOnChange} = require('recompose');
 const namespace = require('./namespace');
-const { createSelector, defaultMemoize, createSelectorCreator } = require('reselect');
+const {createSelector, defaultMemoize} = require('reselect');
 const shallowEqual = require('./shallowEqual');
 const actions = require('./actionCreators');
 const DeepMap = require('./DeepMap');
@@ -48,7 +48,7 @@ function getErrorMessages(result, rule, args) {
     return emptyArray;
 }
 
-function getErrors(value, rules, formData, dispatch,formId, name, pendingValidations) {
+function getErrors(value, rules, formData, dispatch,formId, name) {
     const getValue = f => _.get(formData, f);
     
     // console.log(formId,name,pendingValidations);
@@ -217,7 +217,7 @@ function connectField() {
     );
 }
 
-function selectorFactory(dispatch, factoryOptions) {
+function selectorFactory(dispatch) {
     let dispatchSelector = defaultMemoize(mapDispatchToProps);
     let prevProps = emptyObject;
 

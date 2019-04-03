@@ -1,26 +1,56 @@
 {
-  "presets": [
-    [
-      "env",
-      {
-        "targets": {
-          "browsers": [
-            "> 1%",
-            "last 2 Firefox versions",
-            "last 2 Chrome versions",
-            "last 2 Edge versions",
-            "last 2 Safari versions",
-            "Firefox ESR",
-            "IE >= 8"
-          ]
-        }
-      }
-    ]
-  ],
   "plugins": [
-    "transform-react-jsx",
-    "transform-class-properties",
-    "syntax-object-rest-spread",
-    "transform-object-rest-spread"
-  ]
+    "@babel/plugin-transform-react-jsx",
+    "@babel/plugin-transform-object-assign",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-syntax-object-rest-spread",
+    "@babel/plugin-proposal-object-rest-spread"
+  ],
+  "env": {
+    "web": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "modules": false,
+            "targets": {
+              "browsers": [
+                "> 1%",
+                "last 2 Firefox versions",
+                "last 2 Chrome versions",
+                "last 2 Edge versions",
+                "last 2 Safari versions",
+                "Firefox ESR",
+                "IE >= 8"
+              ]
+            }
+          }
+        ]
+      ]
+    },
+    "node": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "^8"
+            }
+          }
+        ]
+      ]
+    },
+    "test": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
+      ]
+    }
+  }
 }
