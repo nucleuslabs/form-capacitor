@@ -46,8 +46,8 @@
     "mobx": "^4.9.2",
     "mobx-react": "^5.4.3",
     "mobx-state-tree": "^3.11.0",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
