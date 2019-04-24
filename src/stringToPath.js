@@ -1,5 +1,7 @@
 // https://github.com/lodash/lodash/blob/c1f805f4972843b675056b2786f1165f7db81737/.internal/stringToPath.js
 
+import {isNumber} from "./helpers";
+
 const charCodeOfDot = '.'.charCodeAt(0);
 const reEscapeChar = /\\(\\)?/g;
 const rePropName = RegExp(
@@ -24,6 +26,9 @@ const rePropName = RegExp(
  * @returns {Array} Returns the property path array.
  */
 export default function stringToPath(string) {
+    if(isNumber(string)){
+        string = `${string}`;
+    }
     const result = [];
     if (string.charCodeAt(0) === charCodeOfDot) {
         result.push('');
