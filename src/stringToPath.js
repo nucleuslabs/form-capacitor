@@ -13,7 +13,7 @@ const rePropName = RegExp(
     '([^"\'].*)' + '|' +
     // Or match strings (supports escaping characters).
     '(["\'])((?:(?!\\2)[^\\\\]|\\\\.)*?)\\2' +
-    ')\\]'+ '|' +
+    ')\\]' + '|' +
     // Or match "" as the space between consecutive dots or empty brackets.
     '(?=(?:\\.|\\[\\])(?:\\.|\\[\\]|$))'
     , 'g');
@@ -26,19 +26,16 @@ const rePropName = RegExp(
  * @returns {Array} Returns the property path array.
  */
 export default function stringToPath(string) {
-    if(isNumber(string)){
-        string = `${string}`;
-    }
     const result = [];
-    if (string.charCodeAt(0) === charCodeOfDot) {
+    const convertedString = isNumber(string) ? `${string}` : string;
+    if(convertedString.charCodeAt(0) === charCodeOfDot) {
         result.push('');
     }
-    string.replace(rePropName, (match, expression, quote, subString) => {
+    convertedString.replace(rePropName, (match, expression, quote, subString) => {
         let key = match;
-        if (quote) {
+        if(quote) {
             key = subString.replace(reEscapeChar, '$1');
-        }
-        else if (expression) {
+        } else if(expression) {
             key = expression.trim();
         }
         result.push(key);
