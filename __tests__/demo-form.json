@@ -36,11 +36,40 @@
             }
           },
           "default": []
+        },
+        "contacts": {
+          "type": "array",
+          "title": "Contacts",
+          "description": "List of appointments that need to be booked",
+          "items": {
+            "$ref": "#/definitions/Contact"
+          },
+          "default": [
+            {}
+          ]
         }
       },
       "required": [
         "firstName"
       ]
+    },
+    "Contact": {
+      "title": "Contact",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "title": "First Name"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name"
+        },
+        "phone": {
+          "type": "string",
+          "title": "Phone #"
+        }
+      }
     }
   }
 }
