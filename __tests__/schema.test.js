@@ -55,8 +55,9 @@ class DemoForm extends React.Component {
                     {formData.alias.map((obj,idx)=> <li key={idx}>{obj.alias}</li>)}
                 </ul>
                 <div>
-                    <button onClick={() => formData.addAlias("Joe")}>+</button>
-                    <button onClick={() => formData.alias.length > 0 && formData.spliceAlias(formData.alias.length-1)}>-</button>
+                    <button data-testid="bfn" onClick={() => formData.set("firstName", "Joe")}>Set First Name</button>
+                    <button data-testid="bln" onClick={() => formData.set("lastName", "Dirt")}>Set Last Name</button>
+                    <button data-testid="ba" onClick={() => formData.set("alias",[{alias: 'Charlie'},{alias:'Roger'}])}>Set Aliases</button>
                 </div>
             </div>
         );
@@ -65,37 +66,25 @@ class DemoForm extends React.Component {
 
 afterEach(cleanup);
 
-test("Demo Form Should have Form-Capacitor backed firstName and LastName inputs and a list of aliases along with a button to add 'Joe' to the list and a button to remove an alias.", async () => {
-    //render form
-    const {getByTestId, getByText} = render(<DemoForm/>);
-
-    //wait for inputs
+test("The Set First Name button should set the first name to \"Joe\"", async () => {
+    let {getByTestId} = render(<DemoForm/>);
     await wait(() => getByTestId("lastName"));
 
-    //Test Last Name
-    let inputL = getByTestId("lastName");
-    expect(inputL.value).toBe('Bar');
-    fireEvent.change(inputL, {target: {value: 'Baracus'}});
-    expect(inputL.value).toBe('Baracus');
+    const inputFN = getByTestId("firstName");
+    expect(inputFN.value).toBe('');
+    const buttonFN = getByTestId("bfn");
+    fireEvent.click(buttonFN);
+    expect(inputFN.value).toBe('Joe');
 
-    //Test First Name
-    const inputF = getByTestId("firstName");
-    fireEvent.change(inputF, {target: {value: 'B.A.'}});
-    expect(inputF.value).toBe('B.A.');
-    fireEvent.change(inputF, {target: {value: ''}});
-    expect(inputF.className).toBe('error');
+    const buttonLN = getByTestId("bln");
+    fireEvent.click(buttonLN);
+    expect(inputFN.value).toBe('Joe');
+    const inputLN = getByTestId("lastName");
+    const buttonA = getByTestId("ba");
+    expect(inputLN.value).toBe('Dirt');
 
-    //Test Alias Array
     const aliasUl = getByTestId("alias");
     expect(aliasUl.childNodes.length).toBe(0);
-    fireEvent.click(getByText("+"));
-    expect(aliasUl.childNodes.length).toBe(1);
-    expect(aliasUl.childNodes[0].textContent).toBe('Joe');
-    fireEvent.click(getByText("+"));
+    fireEvent.click(buttonA);
     expect(aliasUl.childNodes.length).toBe(2);
-    expect(aliasUl.childNodes[1].textContent).toBe('Joe');
-    fireEvent.click(getByText("-"));
-    expect(aliasUl.childNodes.length).toBe(1);
-    fireEvent.click(getByText("-"));
-    expect(aliasUl.childNodes.length).toBe(0);
 });

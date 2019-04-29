@@ -80,7 +80,11 @@ test("Demo Form Should have buttons that use schema actions to make aliases call
 @consumeValue()
 class SimpleTextBox extends React.Component {
     handleChange = ev => {
-        this.props.fc.set(ev.target.value || undefined);
+        if(isNaN(ev.target.value)) {
+            this.props.fc.set(ev.target.value || undefined);
+        } else {
+            this.props.fc.set(parseInt(ev.target.value, 10));
+        }
     };
 
     render() {
@@ -93,16 +97,20 @@ class SimpleTextBox extends React.Component {
 @consumeArrayValue()
 class Contacts extends React.Component {
     render() {
-        let {value, removeContact} = this.props;
+        let {value, removeContact, fc} = this.props;
 
-        return value.map((contact, idx) => <Contact key={idx} number={idx+1} name={idx} removeHandler={() => removeContact(idx)}/>);    }
+        return <div>
+
+            {value.map((contact, idx) => <Contact key={idx} number={idx + 1} name={idx} removeHandler={() => removeContact(idx)} contact={contact}/>)}
+        </div>;
+    }
 }
 
 @consumeValue()
 class Contact extends React.Component {
     contactId = shortid();
     render() {
-        let {number, name} = this.props;
+        let {number, name, contact} = this.props;
         return <div>
             <div style={{float: "right"}}>
                 Contact #{number}
@@ -118,8 +126,9 @@ class Contact extends React.Component {
             </div>
             <div>
                 <label htmlFor={`phone--${this.contactId}`}>Phone</label>
-                <SimpleTextBox data-testid={`contact.${name}.phone`} id={`phone--${this.contactId}`} name="phone" placeholder="Phone"/>
+                <SimpleTextBox data-testid={`contact.${name}.phone`} id={`phone--${this.contactId}`} name="phone" placeholder={1234567}/>
             </div>
+            <div data-testid={`contact.${name}.phoneTest`}>{contact.phone === parseInt(contact.phone) && "Yas"}</div>
         </div>;
     }
 }
@@ -153,6 +162,7 @@ class AdvancedDemoForm extends React.Component {
                 <hr/>
                 <Contacts name={'contacts'} removeContact={this.props.formData.removeContact}/>
                 <button data-testid={`contacts.add`} onClick={this.props.formData.addContact}>+</button>
+                <button data-testid={`contacts.phoneTestButton`} onClick={this.props.formData.set("contacts.0.phone", 5555555)}>Test Phone Data Type</button>
             </div>
         );
     }
@@ -166,12 +176,12 @@ test("Advanced Demo Form Should have buttons that use schema actions to add and 
     const first = getByTestId("contact.0.first");
     const last = getByTestId("contact.0.last");
     const phone = getByTestId("contact.0.phone");
+    const phoneTest = getByTestId("contact.0.phoneTest");
     fireEvent.change(first, {target: {value: 'BA'}});
     fireEvent.change(last, {target: {value: 'Baracus'}});
-    fireEvent.change(phone, {target: {value: '1-800-MO-HAWK'}});
     expect(first.value).toBe('BA');
     expect(last.value).toBe('Baracus');
-    expect(phone.value).toBe('1-800-MO-HAWK');
+    // expect(phoneTest.innerHTML).toBe('');
     fireEvent.click(getByTestId("contacts.add"));
     await wait(() => getByTestId("contact.1.first"));
     const first1 = getByTestId("contact.1.first");
@@ -184,4 +194,6 @@ test("Advanced Demo Form Should have buttons that use schema actions to add and 
     fireEvent.click(remove);
     const countSpan = getByTestId("contacts.count");
     expect(countSpan.innerHTML).toBe("1");
+    fireEvent.click(getByTestId("contacts.phoneTestButton"));
+    expect(phoneTest.innerHTML).toBe('Yas');//testing data type... should be an integer
 });
