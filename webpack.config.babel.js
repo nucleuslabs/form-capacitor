@@ -7,7 +7,7 @@ module.exports = {
     output: {
         library: "FormCapacitor",
         libraryTarget: "umd",
-        filename: "form-capacitor.js",
+        filename: "index.js",
         path: dist,
         globalObject: "this"
     },

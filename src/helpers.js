@@ -108,9 +108,14 @@ export function isError(obj) {
 }
 
 /* istanbul ignore next */
-function isInt(obj) {
+export function isIntLoose(obj) {
     return (typeof obj === 'string' && /^(0|[1-9][0-9]*)$/.test(obj))
         || (Number.isFinite(obj) && ~~obj === obj);
+}
+
+/* istanbul ignore next */
+export function isInt(obj) {
+    return (typeof obj === 'number') && (Number.isFinite(obj) && ~~obj === obj);
 }
 
 export function setValue(obj, path, value) {
@@ -136,7 +141,7 @@ export function setValue(obj, path, value) {
             // because they can't be extended. frozen or sealed objects will also be
             // overwritten. Objets, arrays, functions, regexes, Dates and more will
             // have new properties added.
-        } else if(isInt(path1)) {
+        } else if(isIntLoose(path1)) {
             setProperty(obj, key, new Array(parseInt(path1,10)+1));
         } else {
             setProperty(obj, key, Object.create(null));

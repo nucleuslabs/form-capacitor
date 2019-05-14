@@ -30,7 +30,8 @@ import {
     isWeakMap,
     isNull,
     isUndefined,
-    setOrDel
+    setOrDel,
+    isInt
 } from "../src/helpers";
 import {ObservableMap, observable, isObservable, ObservableSet} from "mobx";
 import {errorMapToFlatArray} from "../src";
@@ -130,6 +131,19 @@ describe('isNumber', function() {
         expect(isNumber(() => "beef")).toBeFalse();
         expect(isNumber({})).toBeFalse();
         expect(isNumber(`6335`)).toBeFalse();
+    });
+});
+
+describe('isInt', function() {
+    it('Should be true if it is a 32 bit Integer or false if it is not', function() {
+        expect(isInt(6335)).toBeTrue();
+        expect(isInt(6335.99394)).toBeFalse();
+        expect(isInt(10e+8)).toBeTrue();
+        expect(isInt(10e+12)).toBeFalse();
+        expect(isInt(String('beef'))).toBeFalse();
+        expect(isInt(() => "beef")).toBeFalse();
+        expect(isInt({})).toBeFalse();
+        expect(isInt(`6335`)).toBeFalse();
     });
 });
 

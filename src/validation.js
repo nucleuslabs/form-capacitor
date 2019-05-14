@@ -1,5 +1,5 @@
 import {observable, ObservableMap, observe, toJS} from 'mobx';
-import {getValue, getMap, delMap, setMap} from './helpers';
+import {getValue, getMap, delMap, setMap, isInt} from './helpers';
 import Ajv from "ajv";
 
 
@@ -199,7 +199,7 @@ export function watchForErrors(schema, data) {
  * @param ajv
  * @param paths
  * @param parentValidator
- * @param dataPath
+ * @param {string[]} dataPath
  * @returns {function(): *}
  */
 /* istanbul ignore next */
@@ -218,47 +218,48 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
     switch(schema.type) {
         case 'object':
             if(schema.properties) {
-                const needsValidator = propName !== undefined && (schema.required || schema.dependencies || schema.if || schema.anyOf || schema.allOf);
-                if(needsValidator && parentValidator === undefined){
-                    pathBuilderR(schema, value, [...errorPath], [...dataPath], paths);
+                let objValidator = parentValidator;
+                if(propName !== undefined && (schema.required || schema.dependencies || schema.if || schema.anyOf || schema.allOf)) {
+                    objValidator = buildValidator(ajv, schema, obj, propName, errorPath, dataPath);
+                    if(parentValidator === undefined) {
+                        pathBuilderR(schema, value, [...errorPath], [...dataPath], paths);
+                    }
                 }
                 for(let p of Object.keys(schema.properties)) {
                     // console.log(`Watching ${propName} prop`, p);
-
-                    const dispose = watchForErrorsR(schema.properties[p], value, p, errors, [...errorPath, 'properties', p], ajv, paths, needsValidator ? {validate: ajv.compile(schema), data: () => getValue(obj, [propName]), schema,  errorPath: [...errorPath], dataPath: [...dataPath], propName} : parentValidator, [...dataPath, p]);
+                    const dispose = watchForErrorsR(schema.properties[p], value, p, errors, [...errorPath, 'properties', p], ajv, paths, objValidator, [...dataPath, p]);
                     disposers.push(dispose);
                 }
             }
             break;
         case 'array':
             const rowDisposers = [];
-            const needsValidator = schema.maxItems || schema.minItems|| schema.uniqueItems || schema.contains;
-
-            if(needsValidator && parentValidator === undefined){
-                pathBuilderR(schema, value, [...errorPath], [...dataPath], paths);
+            let arrValidator = parentValidator;
+            //Check to see if schema needs to create a specific parentValidator to build errors for any array items
+            if(schema.maxItems || schema.minItems|| schema.uniqueItems || schema.contains) {
+                arrValidator = buildValidator(ajv, schema, obj, propName, errorPath, dataPath);
+                if(parentValidator === undefined) {
+                    pathBuilderR(schema, value, [...errorPath], [...dataPath], paths);
+                }
             }
 
             for(let i = 0; i < value.length; ++i) {
-                rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, needsValidator ? {validate: ajv.compile(schema), data: () => getValue(obj, [propName]),  schema, errorPath: [...errorPath], dataPath: [...dataPath], propName} : parentValidator, [...dataPath, i]);
+                rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, arrValidator, [...dataPath, i]);
             }
 
             disposers.push(doObserve(value, change => {
-                // console.log('arrchange',change);
                 if(change.addedCount) {
                     const end = change.index + change.addedCount;
                     for(let i = change.index; i < end; ++i) {
-                        rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, needsValidator ? {validate: ajv.compile(schema), data: () => getValue(obj, [propName]),  schema, errorPath: [...errorPath], dataPath: [...dataPath], propName} : parentValidator, [...dataPath, i]);
+                        rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, arrValidator, [...dataPath, i]);
                     }
                 } else if(change.removedCount) {
-
                     const itemErrors = getMap(errors, [...errorPath, 'items']);
-
                     if(itemErrors) {
                         const lastKey = Math.max(...itemErrors.keys());
                         const end = change.index + change.removedCount;
                         // console.log(change.index,end,lastKey);
                         for(let i = change.index; i <= lastKey; ++i) {
-                            // console.log('disposing',i);
                             rowDisposers[i]();
                             const err = itemErrors.get(i);
                             if(err) {
@@ -266,11 +267,10 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
                                 if(i >= end) {
                                     const newIdx = i - change.removedCount;
                                     err.set(newIdx, err);
-                                    rowDisposers[newIdx] = watchForErrorsR(schema.items, value, newIdx, errors, [...errorPath, 'items', newIdx], ajv, paths, needsValidator ? {validate: ajv.compile(schema), data: () => getValue(obj, [propName]), schema, errorPath: [...errorPath], dataPath: [...dataPath], propName} : parentValidator, [...dataPath, newIdx]);
+                                    rowDisposers[newIdx] = watchForErrorsR(schema.items, value, newIdx, errors, [...errorPath, 'items', newIdx], ajv, paths, arrValidator, [...dataPath, newIdx]);
                                 }
                             }
                         }
-
                         // spliceMap(itemErrors,change.index,change.removedCount);
                     }
                     // const del = rowDisposers.splice(change.index, change.removedCount);
@@ -287,9 +287,11 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
         case 'number':
         case 'integer':
         case 'boolean':
-            if(!propName) throw new Error(`Cannot watch primitive ${schema.type}`);
+            if(propName === undefined) {
+                throw new Error(`Cannot watch primitive ${schema.type}`);
+            }
             if(parentValidator !== undefined) {
-                disposers.push(doObserve(obj, propName, value => {
+                disposers.push(doObserve(obj, propName, () => {
                     const parentValue = toJS(parentValidator.data());
                     //console.log("Change ",new Date().toUTCString(),propName, value, toJS(parentValue));
                     const subPaths = new ObservableMap();
@@ -316,11 +318,20 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
                     }
                 }));
             } else {
+                //We don't want to watch primitives for arrays
+                if(isInt(propName)){
+                    // console.log(propName, value);
+                    break;
+                }
                 const validate = ajv.compile(schema);
-                disposers.push(doObserve(obj, propName, value => {
+                disposers.push(doObserve(obj, propName, change => {
+                    // let value = input;
+                    // if(input && input.get !== undefined){
+                    //     value = input.get();
+                    // }
                     let errs = [];
-                    let valid = validate(value);
-                    if(value === undefined) {
+                    let valid = validate(toJS(change));
+                    if(change === undefined) {
                         if(schema.required) {
                             errs = [createError(schema.title, `is a required field`, errorPath, "required")];
                             valid = false;
@@ -347,6 +358,17 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
         //     throw new Error(`'${schema.type}' not supported`);
     }
     return () => execAll(disposers);
+}
+
+function buildValidator(ajv, schema, obj, propName, errorPath, dataPath) {
+    return {
+        validate: ajv.compile(schema),
+        data: () => getValue(obj, [propName]),
+        schema,
+        errorPath: [...errorPath],
+        dataPath: [...dataPath],
+        propName
+    }
 }
 /* istanbul ignore next */
 /**

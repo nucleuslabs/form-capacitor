@@ -37,6 +37,15 @@
           },
           "default": []
         },
+        "alias2": {
+          "type": "array",
+          "title": "Aliases Part Deux",
+          "errorMessage": "Please type a made up name which consists of words",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
         "contacts": {
           "type": "array",
           "title": "Contacts",
@@ -48,11 +57,11 @@
             {}
           ]
         }
-      },
-      "required": [
-        "firstName"
-      ]
+      }
     },
+    "required": [
+      "firstName"
+    ],
     "Contact": {
       "title": "Contact",
       "type": "object",

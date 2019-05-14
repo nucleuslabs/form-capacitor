@@ -1,4 +1,4 @@
-import {isMap, setValue, toObservable} from './helpers';
+import {isArray, isMap, isObject, setValue} from './helpers';
 import {observer} from 'mobx-react';
 import {getDisplayName, scuChildren} from './react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
@@ -7,7 +7,7 @@ import FormContext from './context';
 import {watchForErrors} from './validation';
 import stringToPath from "./stringToPath";
 import * as React from "react";
-import {toJS} from "mobx";
+import {isObservable, observable, toJS} from "mobx";
 
 /* istanbul ignore next */
 function getObservable(obj, path) {
@@ -63,7 +63,7 @@ export default function schema(options) {
                             setValue(self, name, value);
                         },
                         _push(name, value) {
-                            getObservable(self, name).push(toObservable(value));
+                            getObservable(self, name).push((isObject(value) || isArray(value)) && !isObservable(value) ? observable(value) : value);//toObservable(value));
                         },
                         _pop(name) {
                             getObservable(self, name).pop();

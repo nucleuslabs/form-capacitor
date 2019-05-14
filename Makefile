@@ -26,9 +26,9 @@ publish: dist
 	yarn version
 	cp package.json dist/package.json
 	cp README.md dist/README.md
-	npm publish dist
+	yarn publish dist --tag latest
 
-test: $(SRC_FILES) yarn.lock
+test: $(SRC_FILES) yarn.lock dist
 	node_modules/.bin/jest --coverage
 
 clean:
