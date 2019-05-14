@@ -31,7 +31,7 @@ import {
     isNull,
     isUndefined,
     setOrDel,
-    isInt
+    isInt, isIntLoose
 } from "../src/helpers";
 import {ObservableMap, observable, isObservable, ObservableSet} from "mobx";
 import {errorMapToFlatArray} from "../src";
@@ -135,7 +135,7 @@ describe('isNumber', function() {
 });
 
 describe('isInt', function() {
-    it('Should be true if it is a 32 bit Integer or false if it is not', function() {
+    it('Should be true if it is a 32 bit integer or false if it is not', function() {
         expect(isInt(6335)).toBeTrue();
         expect(isInt(6335.99394)).toBeFalse();
         expect(isInt(10e+8)).toBeTrue();
@@ -144,6 +144,19 @@ describe('isInt', function() {
         expect(isInt(() => "beef")).toBeFalse();
         expect(isInt({})).toBeFalse();
         expect(isInt(`6335`)).toBeFalse();
+    });
+});
+
+describe('isIntLoose', function() {
+    it('Should be true if it is a 32 bit integer/a string containing a 32 bit integer or false if it is not', function() {
+        expect(isIntLoose(6335)).toBeTrue();
+        expect(isIntLoose(6335.99394)).toBeFalse();
+        expect(isIntLoose(10e+8)).toBeTrue();
+        expect(isIntLoose(10e+12)).toBeFalse();
+        expect(isIntLoose(String('beef'))).toBeFalse();
+        expect(isIntLoose(() => "beef")).toBeFalse();
+        expect(isIntLoose({})).toBeFalse();
+        expect(isIntLoose(`6335`)).toBeTrue();
     });
 });
 

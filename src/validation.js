@@ -360,6 +360,7 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
     return () => execAll(disposers);
 }
 
+/* istanbul ignore next */
 function buildValidator(ajv, schema, obj, propName, errorPath, dataPath) {
     return {
         validate: ajv.compile(schema),
@@ -370,6 +371,7 @@ function buildValidator(ajv, schema, obj, propName, errorPath, dataPath) {
         propName
     }
 }
+
 /* istanbul ignore next */
 /**
  * Uses json schema and a MobXStateTree to update an errorMap with the errors found in an ajv validation
