@@ -8,6 +8,7 @@ import {watchForErrors} from './validation';
 import stringToPath from "./stringToPath";
 import * as React from "react";
 import {isObservable, observable, toJS} from "mobx";
+import {getSnapshot, applySnapshot} from "mobx-state-tree";
 
 /* istanbul ignore next */
 function getObservable(obj, path) {
@@ -58,26 +59,46 @@ export default function schema(options) {
                 schemaPromise.then(schema => {
                     let Model = jsonSchemaToMST(schema);
 
-                    Model = Model.actions(self => ({
-                        set(name, value) {
-                            setValue(self, name, value);
-                        },
-                        _push(name, value) {
-                            getObservable(self, name).push((isObject(value) || isArray(value)) && !isObservable(value) ? observable(value) : value);//toObservable(value));
-                        },
-                        _pop(name) {
-                            getObservable(self, name).pop();
-                        },
-                        _clear(name) {
-                            getObservable(self, name).clear();
-                        },
-                        _replace(name, arr) {
-                            getObservable(self, name).replace(arr);
-                        },
-                        _remove(name, value) {
-                            getObservable(self, name).remove(value);
-                        }
-                    }));
+                    Model = Model.actions(self => {
+                        let initialSnapshot = {};
+                        return {
+                            set(name, value) {
+                                setValue(self, name, value);
+                            },
+                            _afterCreate() {
+                                initialSnapshot = getSnapshot(self);
+                            },
+                            reset() {
+                                applySnapshot(self, initialSnapshot);
+                            },
+                            replace(value) {
+                                if(!isObject(value)) {
+                                    throw new Error("Replace must be sent some form of javascript object");
+                                } else {
+                                    applySnapshot(self, initialSnapshot);
+                                    const props = Object.keys(value);
+                                    props.forEach(prop => {
+                                        setValue(self, prop, value[prop]);
+                                    });
+                                }
+                            },
+                            _push(name, value) {
+                                getObservable(self, name).push((isObject(value) || isArray(value)) && !isObservable(value) ? observable(value) : value);//toObservable(value));
+                            },
+                            _pop(name) {
+                                getObservable(self, name).pop();
+                            },
+                            _clear(name) {
+                                getObservable(self, name).clear();
+                            },
+                            _replace(name, arr) {
+                                getObservable(self, name).replace(arr);
+                            },
+                            _remove(name, value) {
+                                getObservable(self, name).remove(value);
+                            }
+                        };
+                    });
                     if(options.views) {
                         Model = Model.views(options.views);
                     }
@@ -86,6 +107,8 @@ export default function schema(options) {
                     }
 
                     const formData = Model.create(options.default);
+
+                    formData._afterCreate();
 
                     const {errors, dispose, validate} = watchForErrors(schema, formData);
 
@@ -123,7 +146,7 @@ export default function schema(options) {
                         path: [],
                     }}>
 
-                        {React.createElement(observer(Component), {...this.state,...this.props, validate: this.validate})}
+                        {React.createElement(observer(Component), {...this.state, ...this.props, validate: this.validate})}
                     </FormContext.Provider>
                 )
             }

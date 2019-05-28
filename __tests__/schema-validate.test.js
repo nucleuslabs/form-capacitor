@@ -1,8 +1,10 @@
 import {default as schema} from '../src/schema';
 import {default as consumeValue} from '../src/consume';
+import {errorMapToFlatArray} from "../src";
 import * as React from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "react-testing-library";
+import {toJS} from "mobx";
 
 @consumeValue()
 class SimpleTextBox extends React.Component {
@@ -36,6 +38,13 @@ class SimpleTextBox extends React.Component {
     }),
 })
 class DemoForm extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            valid: 'Unknown',
+            errors: []
+        };
+    }
     render() {
         if(!this.props.formData){
             return null;
@@ -57,10 +66,16 @@ class DemoForm extends React.Component {
                 <div>
                     <button data-testid="bfn" onClick={() => formData.set("firstName", "Joe")}>Set First Name</button>
                     <button data-testid="bln" onClick={() => formData.set("lastName", "Dirt")}>Set Last Name</button>
-                    <button data-testid="ba" onClick={() => formData.set("alias",[{alias: 'Charlie'},{alias:'Roger'}])}>Set Aliases</button>
-                    <button data-testid="breset" onClick={() => formData.reset()}>Reset</button>
-                    <button data-testid="breplace" onClick={() => formData.replace({firstName: "Doge"})}>Replace</button>
+                    <button data-testid="v" onClick={() => {
+                        if(this.props.validate()) {
+                            this.setState({valid: "VALID", errors: []});
+                        } else {
+                            this.setState({valid: "INVALID", errors: toJS(errorMapToFlatArray(this.props.errorMap))});
+                        }
+                    }}>Validate</button>
                 </div>
+                <div data-testid="valid">{this.state.valid}</div>
+                <div data-testid="errors">{this.state.errors && this.state.errors.map(e => <div>{e.message}</div>)}</div>
             </div>
         );
     }
@@ -68,9 +83,15 @@ class DemoForm extends React.Component {
 
 afterEach(cleanup);
 
-test("The Set First Name button should set the first name to \"Joe\"", async () => {
+test("The imperative schema validation function should behave itself", async () => {
     let {getByTestId} = render(<DemoForm/>);
     await wait(() => getByTestId("lastName"));
+    const buttonV = getByTestId("v");
+    const valid  = getByTestId("valid");
+    const errors  = getByTestId("errors");
+    expect(valid.innerHTML).toBe('Unknown');
+    fireEvent.click(buttonV);
+    expect(valid.innerHTML).toBe('INVALID');
 
     const inputFN = getByTestId("firstName");
     expect(inputFN.value).toBe('');
@@ -82,21 +103,11 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
     fireEvent.click(buttonLN);
     expect(inputFN.value).toBe('Joe');
     const inputLN = getByTestId("lastName");
-    const buttonA = getByTestId("ba");
     expect(inputLN.value).toBe('Dirt');
 
     const aliasUl = getByTestId("alias");
     expect(aliasUl.childNodes.length).toBe(0);
-    fireEvent.click(buttonA);
-    expect(aliasUl.childNodes.length).toBe(2);
-
-    const buttonReplace = getByTestId("breplace");
-    fireEvent.click(buttonReplace);
-    expect(aliasUl.childNodes.length).toBe(0);
-    expect(inputFN.value).toBe('Doge');
-
-    const buttonReset = getByTestId("breset");
-    fireEvent.click(buttonReset);
-    expect(inputLN.value).toBe('Bar');
-
+    fireEvent.click(buttonV);
+    expect(errors.innerHTML).toBe('');
+    expect(valid.innerHTML).toBe('VALID');
 });
