@@ -58,6 +58,10 @@ class DemoForm extends React.Component {
                     <button onClick={() => formData.addAlias("Joe")}>+</button>
                     <button onClick={() => formData.alias.length > 0 && formData.spliceAlias(formData.alias.length-1)}>-</button>
                 </div>
+                <div>
+                    <span>Multiple Types</span>
+                    <SimpleTextBox data-testid="multiple" name="multiple"/>
+                </div>
             </div>
         );
     }
@@ -98,4 +102,13 @@ test("Demo Form Should have Form-Capacitor backed firstName and LastName inputs 
     expect(aliasUl.childNodes.length).toBe(1);
     fireEvent.click(getByText("-"));
     expect(aliasUl.childNodes.length).toBe(0);
+
+    //Test Multiple types using anyOf
+    let inputM = getByTestId("multiple");
+    fireEvent.change(inputM, {target: {value: 'Found'}});
+    expect(inputM.className).toBe('error');
+    fireEvent.change(inputM, {target: {value: null}});
+    expect(inputM.className).toBe('');
+    fireEvent.change(inputM, {target: {value: 12}});
+    expect(inputM.className).toBe('');
 });

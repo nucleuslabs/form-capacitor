@@ -131,7 +131,7 @@ function hasUnionFlag(type, flag) {
     return (type.flags & flag) === flag
         || (
             (type.flags & UNION) === UNION
-            && type.types.some(t => (t.flags & flag) === flag)
+            && type._types.some(t => (t.flags & flag) === flag)
         );
 }
 

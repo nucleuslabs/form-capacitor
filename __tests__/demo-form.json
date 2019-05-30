@@ -46,6 +46,13 @@
           },
           "default": []
         },
+        "multiple": {
+          "title": "Multiple Types",
+          "anyOf": [
+            {"type": "integer"},
+            {"type": "null"}
+          ]
+        },
         "contacts": {
           "type": "array",
           "title": "Contacts",
