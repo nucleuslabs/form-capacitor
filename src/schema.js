@@ -4,11 +4,13 @@ import {getDisplayName, scuChildren} from './react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
 import jsonSchemaToMST from './jsonSchemaToMST';
 import FormContext from './context';
-import {watchForErrors} from './validation';
+import {createAjvObject, checkSchemaPathForErrors, watchForErrors} from './validation';
 import stringToPath from "./stringToPath";
 import * as React from "react";
 import {isObservable, observable, toJS} from "mobx";
 import {getSnapshot, applySnapshot} from "mobx-state-tree";
+import SchemaAssignmentError from "./SchemaAssignmentError";
+import SchemaDataReplaceError from "./SchemaDataReplaceError";
 
 /* istanbul ignore next */
 function getObservable(obj, path) {
@@ -51,19 +53,25 @@ export default function schema(options) {
 
             constructor(props, context) {
                 super(props, context);
-
                 this.state = {
                     formData: null,
                     errorMap: null
                 };
                 schemaPromise.then(schema => {
+                    const ajv = createAjvObject();
                     let Model = jsonSchemaToMST(schema);
-
                     Model = Model.actions(self => {
                         let initialSnapshot = {};
                         return {
                             set(name, value) {
-                                setValue(self, name, value);
+                                try {
+                                    setValue(self, name, value);
+                                } catch (err){
+                                    //
+                                    const path = isArray(name) ? name: stringToPath(name);
+                                    const validationErrors = checkSchemaPathForErrors(ajv, schema, path, value);
+                                    throw new SchemaAssignmentError(err, "Could not assign a value in the form-capacitor schema", path, value, validationErrors);
+                                }
                             },
                             _afterCreate() {
                                 initialSnapshot = getSnapshot(self);
@@ -77,9 +85,20 @@ export default function schema(options) {
                                 } else {
                                     applySnapshot(self, initialSnapshot);
                                     const props = Object.keys(value);
+                                    let errs = [];
+                                    let propMap = new Map();
                                     props.forEach(prop => {
-                                        setValue(self, prop, value[prop]);
+                                        try {
+                                            setValue(self, prop, value[prop]);
+                                        } catch (err) {
+                                            errs.push(err);
+                                            propMap.set(prop, value);
+                                        }
                                     });
+                                    if(errs.length > 0 ){
+                                        const validationErrors = checkSchemaPathForErrors(ajv, schema, path, value);
+                                        throw new SchemaDataReplaceError(errs, "Error replacing some root form-capacitor props", propMap, validationErrors);
+                                    }
                                 }
                             },
                             _push(name, value) {
@@ -110,10 +129,10 @@ export default function schema(options) {
 
                     formData._afterCreate();
 
-                    const {errors, dispose, validate} = watchForErrors(schema, formData);
+                    const {errors, dispose, validate} = watchForErrors(schema, formData, ajv);
 
                     this.validate = () => {
-                        validate(toJS(this.state.formData));
+                        return validate(toJS(this.state.formData));
                     };
                     this._dispose = dispose;
 

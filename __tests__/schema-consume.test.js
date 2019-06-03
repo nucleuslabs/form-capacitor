@@ -6,13 +6,28 @@ import {render, fireEvent, wait, cleanup} from "react-testing-library";
 
 @consumeValue()
 class SimpleTextBox extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            errs: []
+        };
+    }
     handleChange = ev => {
-        this.props.fc.set(ev.target.value || undefined);
+        try {
+            this.props.fc.set(ev.target.value || undefined);
+            this.setState({errs: []});
+        } catch (err) {
+            if(err.type === "SchemaAssignmentError"){
+                this.props.fc.set(undefined);
+                this.setState({errs: err.validationErrors || [err.message, err.originalMessage]});
+            } else {
+                throw err;
+            }
+        }
     };
-
     render() {
         const {fc, value, ...props} = this.props;
-        return <input type="text" {...props} className={fc.hasErrors ? "error" : null} value={value || ""} onChange={this.handleChange}/>;
+        return <span><input type="text" {...props} className={fc.hasErrors ? "error" : null} value={value || ""} onChange={this.handleChange}/> <span data-testid={`${props.name}_err`}>{this.state.errs.map(err => err.message)}</span></span>;
     }
 }
 
@@ -105,10 +120,11 @@ test("Demo Form Should have Form-Capacitor backed firstName and LastName inputs 
 
     //Test Multiple types using anyOf
     let inputM = getByTestId("multiple");
+    let mErrs = getByTestId("multiple_err");
     fireEvent.change(inputM, {target: {value: 'Found'}});
-    expect(inputM.className).toBe('error');
-    fireEvent.change(inputM, {target: {value: null}});
-    expect(inputM.className).toBe('');
+    expect(mErrs.innerHTML).not.toBe('');
     fireEvent.change(inputM, {target: {value: 12}});
-    expect(inputM.className).toBe('');
+    expect(mErrs.innerHTML).toBe('');
+    fireEvent.change(inputM, {target: {value: null}});
+    expect(mErrs.innerHTML).toBe('');
 });

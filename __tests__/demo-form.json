@@ -64,11 +64,20 @@
             {}
           ]
         }
-      }
+      },
+      "anyOf": [
+        {
+          "required": ["firstName"],
+          "errorMessage": " "
+        },
+        {"required": ["lastName"],
+          "errorMessage": "Please enter a value in Either First Name or Last Name to save"
+        }
+      ],
+      "required": [
+        "firstName"
+      ]
     },
-    "required": [
-      "firstName"
-    ],
     "Contact": {
       "title": "Contact",
       "type": "object",

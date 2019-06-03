@@ -1,6 +1,7 @@
 import {observable, ObservableMap, observe, toJS} from 'mobx';
 import {getValue, getMap, delMap, setMap, isInt} from './helpers';
 import Ajv from "ajv";
+import stringToPath from "./stringToPath";
 
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
@@ -115,6 +116,36 @@ function getClosestAjvPath(pathStr, pathMap) {
     }
     return pathMap.get("#");
 }
+
+/**
+ *
+ * @param {{}} schema
+ * @param {[]} path
+ */
+/* istanbul ignore next */
+function getSchemaNodeFromPath(schema, path){
+    if(!Array.isArray(path)) {
+        path = stringToPath(path);
+    }
+    let ret = schema;
+
+    for(let key of path) {
+        switch(ret.type) {
+            case 'object':
+                if(ret.properties) {
+                    ret = ret.properties[key];
+                }
+                break;
+            case 'array':
+                if(ret.items) {
+                    ret = ret.items[key];
+                }
+                break;
+        }
+    }
+    return ret;
+}
+
 /* istanbul ignore next */
 /**
  * Converts an array of ajv errors into an array of condensed pretty error objs
@@ -154,18 +185,8 @@ function createError(title, message, path, keyword) {
     return {title, message, path, keyword};
 }
 
-
-/**
- * watches a MobXStateTree Object for errors using a dereferenced json_schema
- * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
- * @param {{}} data MobXStateTree object
- * @returns {{dispose: *, errors: ObservableMap<any, any> validate: {validateCallback} }}
- */
-export function watchForErrors(schema, data) {
-    const errors = observable.map();
-    const paths = observable.map();
-    //build root avj schema
-    const ajv = new Ajv(Object.assign({
+export function createAjvObject(){
+    return new Ajv(Object.assign({
         allErrors: true,
         $data: true,
         ownProperties: true,
@@ -173,6 +194,28 @@ export function watchForErrors(schema, data) {
         async: false,
         verbose: true,
     }));
+}
+
+export function checkSchemaPathForErrors(ajv, schema, path, value){
+    const subValidator = ajv.compile(getSchemaNodeFromPath(schema, path));
+    if(subValidator(value)){
+        return [];
+    } else {
+        return beautifyAjvErrors(subValidator.errors, path);
+    }
+}
+
+/**
+ * watches a MobXStateTree Object for errors using a dereferenced json_schema
+ * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
+ * @param {{}} data {MobXStateTree} object
+ * @param {Ajv} ajv {Ajv} object
+ * @returns {{dispose: *, errors: ObservableMap<any, any> validate: {validateCallback} }}
+ */
+export function watchForErrors(schema, data, ajv) {
+    const errors = observable.map();
+    const paths = observable.map();
+    //build root avj schema
     const dispose = watchForErrorsR(schema, data, undefined, errors, [], ajv, paths);
     const validate = ajv.compile(schema);
     return {

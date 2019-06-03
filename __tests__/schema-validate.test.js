@@ -70,7 +70,7 @@ class DemoForm extends React.Component {
                         if(this.props.validate()) {
                             this.setState({valid: "VALID", errors: []});
                         } else {
-                            this.setState({valid: "INVALID", errors: toJS(errorMapToFlatArray(this.props.errorMap))});
+                            this.setState({valid: "INVALID", errors: this.props.errorMap.length >0 ? toJS(errorMapToFlatArray(this.props.errorMap)) : []});
                         }
                     }}>Validate</button>
                 </div>
@@ -89,13 +89,13 @@ test("The imperative schema validation function should behave itself", async () 
     const buttonV = getByTestId("v");
     const valid  = getByTestId("valid");
     const errors  = getByTestId("errors");
-    expect(valid.innerHTML).toBe('Unknown');
-    fireEvent.click(buttonV);
-    expect(valid.innerHTML).toBe('INVALID');
 
     const inputFN = getByTestId("firstName");
     expect(inputFN.value).toBe('');
     const buttonFN = getByTestId("bfn");
+    expect(valid.innerHTML).toBe('Unknown');
+    fireEvent.click(buttonV);
+    expect(valid.innerHTML).toBe('INVALID');
     fireEvent.click(buttonFN);
     expect(inputFN.value).toBe('Joe');
 

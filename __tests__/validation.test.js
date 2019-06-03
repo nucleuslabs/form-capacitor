@@ -3,7 +3,7 @@ import jsonSchemaToMST from "../src/jsonSchemaToMST";
 import $RefParser from 'json-schema-ref-parser';
 import {setValue} from "../src";
 import {toJS,observable} from "mobx";
-import {watchForErrors, ajvErrorsToErrorMap} from "../src/validation";
+import {watchForErrors, ajvErrorsToErrorMap, createAjvObject} from "../src/validation";
 
 //tests requiring mobx state tree
 describe('watchForErrors', function() {
@@ -18,8 +18,9 @@ describe('watchForErrors', function() {
                 setValue(self, name, value);
             }
         }));
+        const ajv = createAjvObject();
         let mobxStateTree = Model.create({});
-        const {errors, validate} = watchForErrors(schema, mobxStateTree);
+        const {errors, validate} = watchForErrors(schema, mobxStateTree, ajv);
         mobxStateTree.set("firstName", undefined);
         expect(errors.get("properties").get("firstName")[0].keyword).toEqual('required');
         mobxStateTree.set("firstName", "Hello");
