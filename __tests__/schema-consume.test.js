@@ -14,7 +14,8 @@ class SimpleTextBox extends React.Component {
     }
     handleChange = ev => {
         try {
-            this.props.fc.set(ev.target.value || undefined);
+            console.log("hi", ev.target.value, typeof ev.target.value);
+            this.props.fc.set((isNaN(ev.target.value) ? (ev.target.value === '' ? null : ev.target.value) : ~~ev.target.value) || undefined);
             this.setState({errs: []});
         } catch (err) {
             if(err.type === "SchemaAssignmentError"){
