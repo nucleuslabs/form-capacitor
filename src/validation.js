@@ -453,7 +453,7 @@ function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap,
                     setMap(errors, errorPath, [createError(schema.title, schema.errorMessage, [...errorPath], 'custom')]);
                 } else {
                     setMap(errors, errorPath, beautifyAjvErrors(Array.from(ajvErrors).map(errorObj => {
-                        if(errorObj.keyword === 'required'){
+                        if(errorObj.keyword === 'required' && schema.title){
                             return Object.assign(errorObj, {message: errorObj.message.replace(errorObj.params.missingProperty, schema.title)});
                         } else {
                             return errorObj;
