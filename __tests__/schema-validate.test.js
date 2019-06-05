@@ -57,6 +57,10 @@ class DemoForm extends React.Component {
                     <SimpleTextBox data-testid="firstName" name="firstName"/>
                 </div>
                 <div>
+                    <span>Middle Name</span>
+                    <SimpleTextBox data-testid="middleName" name="middleName"/>
+                </div>
+                <div>
                     <span>Last Name</span>
                     <SimpleTextBox data-testid="lastName" name="lastName"/>
                 </div>
@@ -70,12 +74,12 @@ class DemoForm extends React.Component {
                         if(this.props.validate()) {
                             this.setState({valid: "VALID", errors: []});
                         } else {
-                            this.setState({valid: "INVALID", errors: this.props.errorMap.length >0 ? toJS(errorMapToFlatArray(this.props.errorMap)) : []});
+                            this.setState({valid: "INVALID", errors: toJS(errorMapToFlatArray(this.props.errorMap)) || []});
                         }
                     }}>Validate</button>
                 </div>
                 <div data-testid="valid">{this.state.valid}</div>
-                <div data-testid="errors">{this.state.errors && this.state.errors.map(e => <div>{e.message}</div>)}</div>
+                <div data-testid="errors">{this.state.errors.length > 0 && this.state.errors.map(e => e.message)}</div>
             </div>
         );
     }
@@ -88,26 +92,37 @@ test("The imperative schema validation function should behave itself", async () 
     await wait(() => getByTestId("lastName"));
     const buttonV = getByTestId("v");
     const valid  = getByTestId("valid");
-    const errors  = getByTestId("errors");
+    const errorContainer  = getByTestId("errors");
 
     const inputFN = getByTestId("firstName");
+    const inputMN = getByTestId("middleName");
+    const inputLN = getByTestId("lastName");
     expect(inputFN.value).toBe('');
     const buttonFN = getByTestId("bfn");
     expect(valid.innerHTML).toBe('Unknown');
+    fireEvent.change(inputLN, {target: {value: undefined}});
     fireEvent.click(buttonV);
     expect(valid.innerHTML).toBe('INVALID');
+    expect(errorContainer.innerHTML).not.toBe('');
+    expect(errorContainer.innerHTML).toContain('Please type a name which consists of words');
     fireEvent.click(buttonFN);
     expect(inputFN.value).toBe('Joe');
 
     const buttonLN = getByTestId("bln");
     fireEvent.click(buttonLN);
     expect(inputFN.value).toBe('Joe');
-    const inputLN = getByTestId("lastName");
     expect(inputLN.value).toBe('Dirt');
 
+    //Middle Name test
+    fireEvent.click(buttonV);
+    expect(valid.innerHTML).toBe('INVALID');
+    expect(errorContainer.innerHTML).toContain('Middle Name');
     const aliasUl = getByTestId("alias");
     expect(aliasUl.childNodes.length).toBe(0);
+    fireEvent.change(inputMN, {target: {value: 'Kim'}});
+
+    //Valid Test
     fireEvent.click(buttonV);
-    expect(errors.innerHTML).toBe('');
+    expect(errorContainer.innerHTML).toBe('');
     expect(valid.innerHTML).toBe('VALID');
 });

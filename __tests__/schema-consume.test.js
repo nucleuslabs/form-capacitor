@@ -14,7 +14,6 @@ class SimpleTextBox extends React.Component {
     }
     handleChange = ev => {
         try {
-            console.log("hi", ev.target.value, typeof ev.target.value);
             this.props.fc.set((isNaN(ev.target.value) ? (ev.target.value === '' ? null : ev.target.value) : ~~ev.target.value) || undefined);
             this.setState({errs: []});
         } catch (err) {

@@ -449,7 +449,17 @@ function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap,
                 break;
             default:
                 // console.log(errorPath.join('.'), "Added", toJS(ajvErrors), Array.from(ajvErrors));
-                setMap(errors, errorPath, beautifyAjvErrors(Array.from(ajvErrors), errorPath));
+                if(schema.errorMessage !== undefined){
+                    setMap(errors, errorPath, [createError(schema.title, schema.errorMessage, [...errorPath], 'custom')]);
+                } else {
+                    setMap(errors, errorPath, beautifyAjvErrors(Array.from(ajvErrors).map(errorObj => {
+                        if(errorObj.keyword === 'required'){
+                            return Object.assign(errorObj, {message: errorObj.message.replace(errorObj.params.missingProperty, schema.title)});
+                        } else {
+                            return errorObj;
+                        }
+                    } ), errorPath));
+                }
                 break;
         }
     } else {

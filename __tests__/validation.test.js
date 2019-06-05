@@ -24,6 +24,7 @@ describe('watchForErrors', function() {
         mobxStateTree.set("firstName", undefined);
         expect(errors.get("properties").get("firstName")[0].keyword).toEqual('required');
         mobxStateTree.set("firstName", "Hello");
+        mobxStateTree.set("middleName", "MF");
         for(let i=0;i<100;i++){
             //here to give a few cycles for stuff to happen
         }

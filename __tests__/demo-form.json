@@ -9,10 +9,18 @@
         "firstName": {
           "errorMessage": "Please type a name which consists of words",
           "type": "string",
-          "title": "Name",
+          "title": "First Name",
           "pattern": "\\w",
           "required": [
             "firstName"
+          ]
+        },
+        "middleName": {
+          "type": "string",
+          "title": "Middle Name",
+          "pattern": "\\w",
+          "required": [
+            "middleName"
           ]
         },
         "lastName": {
@@ -75,7 +83,7 @@
         }
       ],
       "required": [
-        "firstName"
+        "firstName", "middleName"
       ]
     },
     "Contact": {
