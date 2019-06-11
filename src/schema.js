@@ -1,4 +1,4 @@
-import {isArray, isMap, isObject, setValue} from './helpers';
+import {isArray, isMap, isObject, resolveValue, setValue} from './helpers';
 import {observer} from 'mobx-react';
 import {getDisplayName, scuChildren} from './react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
@@ -46,17 +46,26 @@ export default function schema(options) {
     if(options.$ref) {
         schemaPromise = schemaPromise.then(() => parser.$refs.get(options.$ref));
     }
-
     return Component => {
 
         const WrappedComponent = class extends Component {
 
             constructor(props, context) {
+
+
+                // let schemaPromise = parser.dereference(resolveValue(options.schema, props));
+                //
+                // if(options.$ref) {
+                //     schemaPromise = schemaPromise.then(() => parser.$refs.get(options.$ref));
+                // }
+
                 super(props, context);
+
                 this.state = {
                     formData: null,
                     errorMap: null
                 };
+
                 schemaPromise.then(schema => {
                     const ajv = createAjvObject();
                     let Model = jsonSchemaToMST(schema);
@@ -125,7 +134,7 @@ export default function schema(options) {
                         Model = Model.actions(options.actions);
                     }
 
-                    const formData = Model.create(options.default);
+                    const formData = Model.create(resolveValue(options.default, props));
 
                     formData._afterCreate();
 

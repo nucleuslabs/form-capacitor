@@ -8,15 +8,16 @@ import shortid from "shortid";
 @consumeArrayValue()
 class TextBoxArray extends React.Component {
     handleChange = idx => ev => {
-        const lenDif = (this.props.value.length -1) - idx;
-        this.props.fc.set(this.props.value.slice(0, idx).concat([{alias: ev.target.value}], lenDif > 0 ? this.props.value.slice(idx, lenDif): []));
+        const lenDif = (this.props.value.length - 1) - idx;
+        this.props.fc.set(this.props.value.slice(0, idx).concat([{alias: ev.target.value}], lenDif > 0 ? this.props.value.slice(idx, lenDif) : []));
     };
 
     render() {
         const {fc, value, name, ...props} = this.props;
         return <div>
             <div data-testid="alias">
-            {value.map((inst, key) => <input key={key} type="text" {...props} className={fc.hasErrors ? "error" : null} name={`${name}.${key}`} value={inst.alias || ""} onChange={this.handleChange(key)}/>)}
+                {value.map((inst, key) => <input key={key} type="text" {...props} className={fc.hasErrors ? "error" : null} name={`${name}.${key}`} value={inst.alias || ""}
+                                                 onChange={this.handleChange(key)}/>)}
             </div>
             <button onClick={() => fc.push({alias: "Joe"})}>+</button>
             <button onClick={() => value.length > 0 && fc.remove(value[value.length - 1])}>-</button>
@@ -79,17 +80,17 @@ test("Demo Form Should have buttons that use schema actions to make aliases call
 @consumeArrayValue()
 class TextBoxArray2 extends React.Component {
     handleChange = idx => ev => {
-        const lenDif = (this.props.value.length -1) - idx;
-        this.props.fc.set(this.props.value.slice(0, idx).concat([{alias: ev.target.value}], lenDif > 0 ? this.props.value.slice(idx, lenDif): []));
+        const lenDif = (this.props.value.length - 1) - idx;
+        this.props.fc.set(this.props.value.slice(0, idx).concat([{alias: ev.target.value}], lenDif > 0 ? this.props.value.slice(idx, lenDif) : []));
     };
 
     render() {
         const {fc, value, name, ...props} = this.props;
         return <div>
             <div data-testid="alias">
-            {value.map((inst, key) => {
-                return <input key={key} type="text" {...props} className={fc.hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""} onChange={this.handleChange(key)}/>;
-            })}
+                {value.map((inst, key) => {
+                    return <input key={key} type="text" {...props} className={fc.hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""} onChange={this.handleChange(key)}/>;
+                })}
             </div>
             <button onClick={() => fc.push("Joe")}>+</button>
             <button onClick={() => {
@@ -100,7 +101,8 @@ class TextBoxArray2 extends React.Component {
                         fc.push("Jordan");
                     }
                 }
-            }}>x</button>
+            }}>x
+            </button>
             <button onClick={() => {
                 try {
                     fc.push({alias: 'wut?'});
@@ -109,7 +111,8 @@ class TextBoxArray2 extends React.Component {
                         fc.push("Tyson");
                     }
                 }
-            }}>!</button>
+            }}>!
+            </button>
             <button onClick={() => value.length > 0 && fc.remove(value[value.length - 1])}>-</button>
             <button onClick={() => fc.clear()}>clear</button>
             <button onClick={() => fc.replace(["NOT JOE"])}>replace</button>
@@ -181,8 +184,6 @@ test("Demo Form 2 Should have buttons that use schema actions to make aliases ca
 });
 
 
-
-
 @consumeValue()
 class SimpleTextBox extends React.Component {
     handleChange = ev => {
@@ -214,6 +215,7 @@ class Contacts extends React.Component {
 @consumeValue()
 class Contact extends React.Component {
     contactId = shortid();
+
     render() {
         let {number, name, contact} = this.props;
         return <div>
@@ -253,7 +255,7 @@ class Contact extends React.Component {
             formData.contacts.push({});
         },
         removeContact(idx) {
-            formData.contacts.splice(idx,1);
+            formData.contacts.splice(idx, 1);
         },
     }),
 })
@@ -273,7 +275,6 @@ class AdvancedDemoForm extends React.Component {
         );
     }
 }
-
 
 
 test("Advanced Demo Form Should have buttons that use schema actions to add and remove contacts.", async () => {
@@ -302,4 +303,55 @@ test("Advanced Demo Form Should have buttons that use schema actions to add and 
     expect(countSpan.innerHTML).toBe("1");
     fireEvent.click(getByTestId("contacts.phoneTestButton"));
     expect(phoneTest.innerHTML).toBe('Yas');//testing data type... should be an integer
+});
+
+
+@schema({
+    schema: jsonSchema,
+    $ref: "#/definitions/DemoForm",
+    default: props => ({
+        firstName: "Foo",
+        lastName: "Bar",
+        alias: props.alias
+    })
+})
+class FunctionalDefaultsForm extends React.Component {
+    render() {
+        if(!this.props.formData) {
+            return null;
+        }
+        return (
+            <div>
+                <TextBoxArray name="alias"/>
+            </div>
+        );
+    }
+}
+
+test("FunctionalDefaultsForm Form Should have defaults set for aliases and it should still function normally after defaults are set.", async () => {
+    let {getByTestId, getByText} = render(<FunctionalDefaultsForm alias={[{alias: "Mubarak"}, {alias: "Anthony"}, {alias: "Jughead"}]}/>);
+    await wait(() => getByText("+"));
+    let aliasUl = getByTestId("alias");
+    expect(aliasUl.childNodes.length).toBe(3);
+    fireEvent.click(getByText("clear"));
+    expect(aliasUl.childNodes.length).toBe(0);
+    fireEvent.click(getByText("+"));
+    expect(aliasUl.childNodes.length).toBe(1);
+    expect(aliasUl.childNodes[0].value).toBe('Joe');
+    fireEvent.click(getByText("+"));
+    expect(aliasUl.childNodes.length).toBe(2);
+    expect(aliasUl.childNodes[1].value).toBe('Joe');
+    fireEvent.click(getByText("-"));
+    expect(aliasUl.childNodes.length).toBe(1);
+    fireEvent.click(getByText("-"));
+    expect(aliasUl.childNodes.length).toBe(0);
+    fireEvent.click(getByText("+"));
+    fireEvent.click(getByText("+"));
+    fireEvent.click(getByText("+"));
+    expect(aliasUl.childNodes.length).toBe(3);
+    fireEvent.click(getByText("clear"));
+    expect(aliasUl.childNodes.length).toBe(0);
+    fireEvent.click(getByText("replace"));
+    expect(aliasUl.childNodes.length).toBe(1);
+    expect(aliasUl.childNodes[0].value).toBe('NOT JOE');
 });
