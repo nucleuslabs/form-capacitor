@@ -40,26 +40,18 @@ export default function schema(options) {
         default: undefined,
     }, options);
 
-    const parser = new $RefParser();
-    let schemaPromise = parser.dereference(options.schema);
 
-    if(options.$ref) {
-        schemaPromise = schemaPromise.then(() => parser.$refs.get(options.$ref));
-    }
+
     return Component => {
 
         const WrappedComponent = class extends Component {
 
             constructor(props, context) {
-
-
-                // let schemaPromise = parser.dereference(resolveValue(options.schema, props));
-                //
-                // if(options.$ref) {
-                //     schemaPromise = schemaPromise.then(() => parser.$refs.get(options.$ref));
-                // }
-
                 super(props, context);
+
+                const parser = new $RefParser();
+
+                const schemaPromise = options.$ref ? parser.dereference(resolveValue(options.schema, props)).then(() => parser.$refs.get(options.$ref)) : parser.dereference(resolveValue(options.schema, props));
 
                 this.state = {
                     formData: null,

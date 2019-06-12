@@ -1,8 +1,8 @@
-import {default as schema} from '../src/schema';
-import {consumeArrayValue} from '../src/consume';
 import * as React from "react";
-import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "react-testing-library";
+import {default as schema} from "../src/schema";
+import jsonSchema from "./demo-form";
+import {render, wait, fireEvent} from "react-testing-library";
+import {consumeArrayValue} from "../src";
 
 @consumeArrayValue()
 class TextBoxArray extends React.Component {
@@ -27,15 +27,15 @@ class TextBoxArray extends React.Component {
 }
 
 @schema({
-    schema: jsonSchema,
+    schema: props => props.jsonSchema,
     $ref: "#/definitions/DemoForm",
-    default: {
+    default: props => ({
         firstName: "Foo",
         lastName: "Bar",
-        alias: []
-    }
+        alias: props.alias
+    })
 })
-class DemoForm extends React.Component {
+class PropsSchemaForm extends React.Component {
     render() {
         if(!this.props.formData) {
             return null;
@@ -48,10 +48,8 @@ class DemoForm extends React.Component {
     }
 }
 
-afterEach(cleanup);
-
-test("Demo Form Should have buttons that use schema actions to make aliases called 'Joe' and other buttons with actions to remove them.", async () => {
-    let {getByTestId, getByText} = render(<DemoForm/>);
+test("PropsSchemaForm Form Should have defaults set for aliases and it should still function normally after defaults are set.", async () => {
+    let {getByTestId, getByText} = render(<PropsSchemaForm jsonSchema={jsonSchema}/>);
     await wait(() => getByText("+"));
     let aliasUl = getByTestId("alias");
     expect(aliasUl.childNodes.length).toBe(0);
