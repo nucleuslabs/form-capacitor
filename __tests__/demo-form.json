@@ -30,6 +30,13 @@
           "pattern": "\\w",
           "default": "Sauce"
         },
+        "aka": {
+          "errorMessage": "Please type an AKA which consists of words",
+          "type": "string",
+          "title": "AKA",
+          "pattern": "\\w",
+          "default": "Sauce"
+        },
         "alias": {
           "type": "array",
           "title": "Aliases",
@@ -75,7 +82,7 @@
       },
       "anyOf": [
         {
-          "required": ["firstName"],
+          "required": ["aka"],
           "errorMessage": " "
         },
         {"required": ["lastName"],

@@ -1,22 +1,15 @@
-import FormContext from './context';
-import {getValue, toPath, resolveValue, isString, isNumber, EMPTY_ARRAY, EMPTY_MAP} from './helpers';
+import FormContext from './FormContext';
+import {getValue, toPath, resolveValue, EMPTY_ARRAY, getErrorsByPath} from './helpers';
 import {getDisplayName} from './react';
 import {observer} from 'mobx-react';
 import {computed, action, isObservableArray} from 'mobx';
 import * as React from "react";
 
-/* istanbul ignore next */
-function getErrors(err, path) {
-    for(let k of path) {
-        if(isString(k)) {
-            err = getValue(err,['properties',k]);
-        } else if(isNumber(k)) {
-            err = getValue(err,['items',k]);
-        }
-    }
-    return err;
-}
-
+/**
+ * @deprecated use useConsume Hook instead
+ * @param options
+ * @returns {function(*=): function(*): *}
+ */
 export default function consumeValue(options) {
     options = Object.assign({
         path: p => p.name,
@@ -38,6 +31,11 @@ export default function consumeValue(options) {
     }
 }
 
+/**
+ * @deprecated use useConsumeArray Hook instead
+ * @param options
+ * @returns {function(*=): function(*): *}
+ */
 export function consumeArrayValue(options) {
     options = Object.assign({
         path: p => p.name,
@@ -84,7 +82,7 @@ class Consumed extends React.Component {
         // const errs = getErrors(this.props.context.errorMap, this.path);
         // console.warn(this.path);
         // console.warn(errs);
-        return getErrors(this.props.context.errorMap, this.path) || []
+        return getErrorsByPath(this.props.context.errorMap, this.path) || []
     }
 
     @computed get hasErrors(){
@@ -138,7 +136,7 @@ class ConsumedArray extends React.Component {
     }
 
     @computed get errors() {
-        return getErrors(this.props.context.errorMap, this.path) || EMPTY_ARRAY
+        return getErrorsByPath(this.props.context.errorMap, this.path) || EMPTY_ARRAY
     }
 
     @computed get hasErrors(){

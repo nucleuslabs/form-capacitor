@@ -1,9 +1,9 @@
-import {isArray, isMap, isObject, resolveValue, setValue} from './helpers';
+import {isArray, isObject, resolveValue, setValue, getObservable} from './helpers';
 import {observer} from 'mobx-react';
 import {getDisplayName, scuChildren} from './react';
 import $RefParser from 'json-schema-ref-parser'; // https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/refs.md#getref
 import jsonSchemaToMST from './jsonSchemaToMST';
-import FormContext from './context';
+import FormContext from './FormContext';
 import {createAjvObject, checkSchemaPathForErrors, watchForErrors} from './validation';
 import stringToPath from "./stringToPath";
 import * as React from "react";
@@ -12,25 +12,11 @@ import {getSnapshot, applySnapshot} from "mobx-state-tree";
 import SchemaAssignmentError from "./SchemaAssignmentError";
 import SchemaDataReplaceError from "./SchemaDataReplaceError";
 
-/* istanbul ignore next */
-function getObservable(obj, path) {
-    if(!obj) return undefined;
-    if(!Array.isArray(path)) {
-        path = stringToPath(path);
-    }
-    let ret = obj;
-
-    for(let key of path) {
-        if(isMap(ret)) {
-            ret = ret.get(key);
-        } else {
-            ret = ret[key];
-        }
-    }
-
-    return ret;
-}
-
+/**
+ * @deprecated use useSchema Hook instead
+ * @param options
+ * @returns {function(*=): {new(*=, *=): WrappedComponent, state, validate, _dispose: *, displayName: string, prototype: WrappedComponent}}
+ */
 export default function schema(options) {
     options = Object.assign({
         schema: undefined,
@@ -39,8 +25,6 @@ export default function schema(options) {
         views: undefined,
         default: undefined,
     }, options);
-
-
 
     return Component => {
 
@@ -67,9 +51,9 @@ export default function schema(options) {
                             set(name, value) {
                                 try {
                                     setValue(self, name, value);
-                                } catch (err){
+                                } catch(err) {
                                     //
-                                    const path = isArray(name) ? name: stringToPath(name);
+                                    const path = isArray(name) ? name : stringToPath(name);
                                     const validationErrors = checkSchemaPathForErrors(ajv, schema, path, value);
                                     throw new SchemaAssignmentError(err, "Could not assign a value in the form-capacitor schema", path, value, validationErrors);
                                 }
@@ -91,12 +75,12 @@ export default function schema(options) {
                                     props.forEach(prop => {
                                         try {
                                             setValue(self, prop, value[prop]);
-                                        } catch (err) {
+                                        } catch(err) {
                                             errs.push(err);
                                             propMap.set(prop, value);
                                         }
                                     });
-                                    if(errs.length > 0 ){
+                                    if(errs.length > 0) {
                                         const validationErrors = checkSchemaPathForErrors(ajv, schema, path, value);
                                         throw new SchemaDataReplaceError(errs, "Error replacing some root form-capacitor props", propMap, validationErrors);
                                     }
@@ -116,6 +100,9 @@ export default function schema(options) {
                             },
                             _remove(name, value) {
                                 getObservable(self, name).remove(value);
+                            },
+                            _splice(name, idx, length = 1) {
+                                getObservable(self, name).splice(idx, length);
                             }
                         };
                     });

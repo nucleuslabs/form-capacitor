@@ -1,6 +1,6 @@
 import stringToPath from './stringToPath';
 // import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray,isObservableMap, set as mobSet} from 'mobx';
-import {isBoxedObservable, isObservable, observable, isObservableProp, isObservableObject, isObservableArray, isObservableMap, isObservableSet} from 'mobx';
+import {isBoxedObservable, isObservable, observable, isObservableProp, isObservableObject, isObservableArray, isObservableMap, isObservableSet, toJS} from 'mobx';
 
 // export function setDefaults(obj, defaults, overwrite) {
 //     for(let key of Object.keys(defaults)) {
@@ -298,7 +298,7 @@ export function toObservable(obj) {
 export function errorMapToFlatArray(errorMap){
     const arr = observable.array();
     errorMapToFlatArrayR(errorMap, arr);
-    return arr;
+    return toJS(arr);
 }
 
 /* istanbul ignore next */
@@ -313,6 +313,34 @@ function errorMapToFlatArrayR(errorMap, obsArray){
     }
 }
 
+export function getObservable(obj, path) {
+    if(!obj) return undefined;
+    if(!Array.isArray(path)) {
+        path = stringToPath(path);
+    }
+    let ret = obj;
+
+    for(let key of path) {
+        if(isMap(ret)) {
+            ret = ret.get(key);
+        } else {
+            ret = ret[key];
+        }
+    }
+
+    return ret;
+}
+
+export function getErrorsByPath(err, path) {
+    for(let k of path) {
+        if(isString(k)) {
+            err = getValue(err,['properties',k]);
+        } else if(isNumber(k)) {
+            err = getValue(err,['items',k]);
+        }
+    }
+    return err;
+}
 // export function mergeSchemaErrorMap(schema, stateTree, errorMap){
 //     return mergeSchemaErrorMapR(schema, stateTree, errorMap, undefined);
 // }

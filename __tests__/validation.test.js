@@ -3,7 +3,7 @@ import jsonSchemaToMST from "../src/jsonSchemaToMST";
 import $RefParser from 'json-schema-ref-parser';
 import {setValue} from "../src";
 import {toJS,observable} from "mobx";
-import {watchForErrors, ajvErrorsToErrorMap, createAjvObject} from "../src/validation";
+import {watchForErrors, createAjvObject} from "../src/validation";
 
 //tests requiring mobx state tree
 describe('watchForErrors', function() {

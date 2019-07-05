@@ -16,6 +16,7 @@ form state management and validation.
 ## Usage
 
 ### Helper methods
+These are the core methods that are used to interact with the underlying mobx-state-tree. Also a function that can help formating error messages.  
 
  - getValue(obj, path) - gets a value in a mobx state tree or observable map tree based on a path array
  - setValue(obj, path, value) - sets a value in a mobx state tree or observable map tree based on a path array
@@ -55,7 +56,117 @@ Create a definition file for your form including any validation rules.
   }
 }
 ~~~
-### @schema decorator
+
+## Hooks
+Use this API for functional components
+
+### `useSchema` Hook 
+
+The schema decorator wraps the form in a HOC with context provider that feeds 
+FormCapacitor props to your form component.
+
+**params**
+
+- schema: /path/to/some-json-schema-file.json `required`
+- $ref: "#/definitions/FormX" `required`
+- default - The default data to hydrate the form state tree with `optional`
+- actions - A function that is passed the mobx state tree and attaches actions to it `optional`
+
+**returns:**
+{
+ - ready - boolean - a boolean which is set to true once all promises have been resolved in the initialization process
+ - FormData - MST - a mobx-state-tree full of observable goodness that you can access all of your form state from the structure is based on your json schema. Import toJS() from mobx to see a snapshot of your form data tree.
+ - set(path, value) - func - Used to set data within the MST for the supplied path.
+ - set(object) - func - set is overloaded if you pass a POJO to it as the first parameter the whole state tree will be replaced
+ - reset() - func -resets the mobx state tree to the initial state
+ - validate() - func - imperative validate function which returns true or false and also activates the error states and seeds the errorMap with errors for anything that is invalid 
+ - ErrorMap - ObservableMap - a mobx observable map tree 
+}
+
+
+A basic form with 2 text inputs and a save button.
+~~~
+function SimpleForm(props) {
+    const [SchemaProvider, context] = useSchema({
+        schema: jsonSchema,
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar"
+        }
+    });
+    const {formData, set, reset, ready} = context;
+    if(!ready) {
+        return <div>Loading...</div>;
+    }
+    return <SchemaProvider>
+		<div>
+			<h1>Simple HTML Form</h1>
+
+			<div>
+				<label htmlFor={`firstName`}>First Name</label>
+				<SimpleTextBox id={`firstName`} name="name" placeholder="a Name..."/>
+			</div>
+
+			<div>
+				<label htmlFor={`lastName`}>Last Name</label>
+				<SimpleTextBox id={`lastName`} name="name" placeholder="a Last Name..."/>
+			</div>
+
+			<FormErrors schema={schema} errors={this.state.validationErrors}/>
+
+			<div>
+				<button onClick={this.saveState}>Save</button>
+			</div>
+
+			<textarea>{JSON.stringify(this.state.formState, null, 2)}</textarea>
+		</div>
+    </SchemaProvider>
+}
+~~~
+
+
+### `useConsume` Hook
+Use within any control and provide a handle change function to set the state for that input in the mobx state tree. The inputs are passed 
+a name prop that defines what there path is in the tree. 
+
+
+**args:**
+
+path: path to observable in the state tree within the current context 
+
+**returns:**
+
+~~~
+[
+	value: {any}, //Value for the supplied path within the tree which is usually prop.name
+	change: func, //Setter function
+]
+~~~
+
+This example is a SimpleTextBox Component which is a basic wrapped html text input.
+
+~~~
+import React from "react";
+import useSchema from "../src/useSchema";
+import useConsume from "../src/useConsume";
+import useConsumeErrors from "../src/useConsumeErrors";
+
+function SimpleTextBox(props) {
+    const [value, change] = useConsume(props.name);
+    const [hasErrors, errors] = useConsumeErrors(props.name);
+    return <span>
+        <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
+            change(ev.target.value || '');
+        }}/>
+        {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
+    </span>;
+}
+~~~
+
+#Decorators
+Use this API for HOC's and classes.
+
+### `@schema` decorator 
 
 The schema decorator wraps the form in a HOC with context provider that feeds 
 FormCapacitor props to your form component.
@@ -140,7 +251,7 @@ export default class SimpleForm extends React.Component {
 }
 ~~~
 
-### @consumeValue decorator
+### `@consumeValue` decorator
 Attach to any control and provide a handle change function to set the fc state for that input. The inputs are passed 
 a name prop that defines what there path is in the tree. 
 
@@ -148,6 +259,7 @@ a name prop that defines what there path is in the tree.
 
 - value - The value from the mobx state tree
 - fc - An object that contains the following methods and properies
+
 ~~~
 {
 
@@ -183,7 +295,7 @@ export default class SimpleTextBox extends React.Component {
 }
 ~~~
 
-### @consumeArray decorator 
+### `@consumeArray` decorator 
 
 **props:**
 

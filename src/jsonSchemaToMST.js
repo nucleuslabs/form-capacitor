@@ -5,6 +5,7 @@ import Lo from 'lodash';
 import shortid from 'shortid';
 import {types} from 'mobx-state-tree';
 import {isPlainObject} from './helpers';
+import MstTypeError from "./MstTypeError";
 
 /* istanbul ignore next */
 const titleCase = str => Lo.deburr(Lo.upperFirst(Lo.camelCase(str)));
@@ -83,8 +84,13 @@ const TYPE_MAP = Object.freeze({
 function makeType(node, meta) {
     const typeArr = [];
     if(node.type) {
-        typeArr.push(TYPE_MAP[node.type](node, meta));
+        try {
+            typeArr.push(TYPE_MAP[node.type](node, meta));
+        } catch(err) {
+            throw new MstTypeError(err.message, err, node.type, node);
+        }
     }
+
     if(node.anyOf) {
         const anyOftypes = node.anyOf.filter(x => x.type !== undefined).map(x => makeType(x, {
             parent: node,
@@ -101,27 +107,31 @@ function makeType(node, meta) {
     if(node.oneOf) {
         throw new Error(`JsonSchema "oneOf" is presently not supported`); // I guess it would be identical to node.anyOf for the purposes of MST no?
     }
-    if(typeArr.length) {
-        let type = types.length > 1
-            ? types.compose(...typeArr)
-            : typeArr[0];
 
-        if(node.default !== undefined) {
-            if(node.default === null) {
-                if(hasUnionFlag(type,NULL)) {
-                    return types.optional(type, null);
+    if(typeArr.length) {
+        try{
+            let type = types.length > 1
+                ? types.compose(...typeArr)
+                : typeArr[0];
+            if(node.default !== undefined) {
+                if(node.default === null) {
+                    if(hasUnionFlag(type,NULL)) {
+                        return types.optional(type, null);
+                    }
+                    return types.maybe(type);
                 }
-                return types.maybe(type);
+                return types.optional(type, getDefault(node));
             }
-            return types.optional(type, getDefault(node));
-        }
-        if(meta.parent && meta.key !== undefined) {
-            if(hasUnionFlag(type,UNDEFINED)) {
-                return types.optional(type, undefined);
+            if(meta.parent && meta.key !== undefined) {
+                if(hasUnionFlag(type,UNDEFINED)) {
+                    return types.optional(type, undefined);
+                }
+                return types.optional(types.union(type, types.undefined), undefined);
             }
-            return types.optional(types.union(type, types.undefined), undefined);
+            return type;
+        } catch(err) {
+            throw new MstTypeError(err.message, err, "union", node);
         }
-        return type;
     }
     throw new Error(`Could not make type; missing one of "type", "anyOf" or "allOf"`);
 }

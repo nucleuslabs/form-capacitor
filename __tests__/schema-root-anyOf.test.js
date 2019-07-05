@@ -60,6 +60,10 @@ class DemoForm extends React.Component {
                     <SimpleTextBox data-testid="middleName" name="middleName"/>
                 </div>
                 <div>
+                    <span>AKA</span>
+                    <SimpleTextBox data-testid="aka" name="aka"/>
+                </div>
+                <div>
                     <span>Last Name</span>
                     <SimpleTextBox data-testid="lastName" name="lastName"/>
                 </div>
@@ -86,7 +90,7 @@ class DemoForm extends React.Component {
 
 afterEach(cleanup);
 
-test("The imperative schema validation function should behave itself", async () => {
+test("The root anyOf keyword should be valid if anyOf the items match and invalid if they don't", async () => {
     let {getByTestId} = render(<DemoForm/>);
     await wait(() => getByTestId("lastName"));
     const buttonV = getByTestId("v");
@@ -96,29 +100,21 @@ test("The imperative schema validation function should behave itself", async () 
     const inputFN = getByTestId("firstName");
     const inputMN = getByTestId("middleName");
     const inputLN = getByTestId("lastName");
-    expect(inputFN.value).toBe('');
-    const buttonFN = getByTestId("bfn");
-    expect(valid.innerHTML).toBe('Unknown');
+    const inputAKA = getByTestId("aka");
+    fireEvent.change(inputFN, {target: {value: "Fred"}});
+    fireEvent.change(inputMN, {target: {value: "Chico"}});
     fireEvent.change(inputLN, {target: {value: undefined}});
+    fireEvent.change(inputAKA, {target: {value: undefined}});
+
+    expect(valid.innerHTML).toBe('Unknown');
     fireEvent.click(buttonV);
     expect(valid.innerHTML).toBe('INVALID');
     expect(errorContainer.innerHTML).not.toBe('');
     expect(errorContainer.innerHTML).toContain('Please type a name which consists of words');
-    fireEvent.click(buttonFN);
-    expect(inputFN.value).toBe('Joe');
 
     const buttonLN = getByTestId("bln");
     fireEvent.click(buttonLN);
-    expect(inputFN.value).toBe('Joe');
     expect(inputLN.value).toBe('Dirt');
-
-    //Middle Name test
-    fireEvent.click(buttonV);
-    expect(valid.innerHTML).toBe('INVALID');
-    expect(errorContainer.innerHTML).toContain('Middle Name');
-    const aliasUl = getByTestId("alias");
-    expect(aliasUl.childNodes.length).toBe(0);
-    fireEvent.change(inputMN, {target: {value: 'Kim'}});
 
     //Valid Test
     fireEvent.click(buttonV);
