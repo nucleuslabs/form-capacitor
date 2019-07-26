@@ -205,6 +205,151 @@ export function checkSchemaPathForErrors(ajv, schema, path, value){
     }
 }
 
+
+/**
+ * Recursive function that generates a map of json-schemas. It takes in a global json-schema and creates sub json-schema files for each "scalar" field and adds any external
+ * references to the sub schema including any required, anyOf, allOf keywords that reference the field
+ * @param {{}|undefined} schema
+ * @param {String|undefined} propName
+ * @param {Map|undefined} fieldSchemaMap This is a map that will be mutated and will be set in tree form setting a schema for each scalar field (leaf of the tree)
+ * @param {[]} path
+ */
+/* istanbul ignore next */
+function buildFieldSchemaMapR(schema, propName, path = [], fieldSchemaMap = new Map()){
+    if (propName !== undefined) {
+        path.push(propName);
+    }
+
+    if (schema.required && schema.required.length > 0) {
+        assignFieldSchemas(new Set(schema.required.map(stringToPath)), fieldSchemaMap, buildSchemaTree(path, {required: [...schema.required]}));
+    }
+
+    if (schema.dependencies && schema.dependencies.length > 0) {
+        assignFieldSchemas(new Set(schema.dependencies.map(stringToPath)), fieldSchemaMap, buildSchemaTree(path, {dependencies: [...schema.dependencies]}));
+    }
+
+    if(schema.anyOf) {
+        assignFieldSchemas(getFieldReferencesR(schema.anyOf, propName), fieldSchemaMap, buildSchemaTree(path, {anyOf: {...schema.anyOf}}));
+    }
+
+    if(schema.allOf) {
+        assignFieldSchemas(getFieldReferencesR(schema.allOf, propName), fieldSchemaMap, buildSchemaTree(path, {allOf: {...schema.allOf}}));
+    }
+
+    switch(schema.type) {
+        case 'object':
+            if(schema.properties) {
+                const propPath = path.concat(['properties']);
+                for(let p of Object.keys(schema.properties)) {
+                    buildFieldSchemaMapR(schema.properties[p], p, propPath, fieldSchemaMap);
+                }
+            }
+            break;
+        case 'array':
+            buildFieldSchemaMapR(schema.items, "items", path, fieldSchemaMap);
+            break;
+    }
+
+    return fieldSchemaMap;
+}
+
+/**
+ *
+ * @param {[]} path
+ * @param {{}} leafValue
+ */
+/* istanbul ignore next */
+function buildSchemaTree(path, leafValue = {}){
+    if(path.length > 0) {
+        let schema = {};
+        const end = path.length - 1;
+        for(let i = 0; i < end; i++) {
+            schema[path[i]] = {};
+            schema = schema[path[i]];
+        }
+        schema[end] = leafValue;
+        return schema;
+    } else {
+        return leafValue;
+    }
+}
+
+/**
+ *
+ * @param {Set} refs
+ * @param {Map} fieldSchemaMap
+ * @param {{}} mergeSchema
+ * @param {[]} path
+ */
+/* istanbul ignore next */
+function assignFieldSchemas(refs, fieldSchemaMap, mergeSchema, path = []){
+    for(let fieldPath of refs){
+        const fieldPathId = path.join('.') + `.${fieldPath.join('.')}`;
+        if(fieldSchemaMap.has(fieldPathId)) {
+            fieldSchemaMap.set(fieldPathId, Object.assign({}, fieldSchemaMap.get(fieldPathId), mergeSchema));
+        } else {
+            fieldSchemaMap.set(fieldPathId, Object.assign({}, mergeSchema));
+        }
+    }
+}
+
+/**
+ *
+ * @param {{}} schema
+ * @param {String} propName
+ * @param {[]} path
+ * @returns {Set<any>}
+ */
+/* istanbul ignore next */
+function getFieldReferencesR(schema, propName, path = []){
+    let refs = new Set();
+    for(let schemaProp of Object.keys(schema)) {
+        switch(schemaProp){
+            case 'required':
+            case 'dependencies':
+                if(schema[schemaProp].length > 0){
+                    refs = new Set([...refs, ...schema[schemaProp].map(field => path.concat(stringToPath(field.replace(/[\/\\]/gi, "."))))]);
+                }
+                break;
+            case 'anyOf':
+            case 'allOf':
+                const subRefSets = schema[schemaProp].map(anyOf => getFieldReferencesR(anyOf, path, propName)).filter(ref => ref.length > 0);
+                for(let i = 0; i < subRefSets.length; ++i) {
+                    refs = new Set([...refs, ...subRefSets[i]]);
+                }
+                break;
+            case 'type':
+                switch(schemaProp){
+                    case 'object':
+                        for(let p of Object.keys(schema.properties)) {
+                            const objSubSet = getFieldReferencesR(schema.properties[p], path.concat('properties', p), p);
+                            for(let i = 0; i < objSubSet.length; ++i) {
+                                refs = new Set([...refs, ...objSubSet[i]]);
+                            }
+                        }
+                        break;
+                    case 'array':
+                        const arrSubSet = getFieldReferencesR(schema.items, path.concat('items'), propName);
+                        for(let i = 0; i < arrSubSet.length; ++i) {
+                            refs = new Set([...refs, ...arrSubSet[i]]);
+                        }
+                        break;
+                    case 'string':
+                    case 'number':
+                    case 'integer':
+                    case 'boolean':
+                        refs.add(path.concat([propName]));
+                        break;
+                }
+                break;
+            case 'if':
+                console.warn("The 'if' keyword is not currently fully supported so you may get some differences between imperative and declarative validation");
+        }
+    }
+
+    return refs;
+}
+
 /**
  * watches a MobXStateTree Object for errors using a dereferenced json_schema
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
@@ -215,8 +360,10 @@ export function checkSchemaPathForErrors(ajv, schema, path, value){
 export function watchForErrors(schema, data, ajv) {
     const errors = observable.map();
     const paths = observable.map();
+    //build field validators
+    const fieldSchemaMap = buildFieldSchemaMapR(schema);
     //build root avj schema
-    const dispose = watchForErrorsR(schema, data, undefined, errors, [], ajv, paths);
+    const dispose = watchForErrorsR(schema, data, undefined, errors, [], ajv, paths, fieldSchemaMap);
     const validate = ajv.compile(schema);
     return {
         errors, dispose, validate: (data) => {
@@ -231,7 +378,8 @@ export function watchForErrors(schema, data, ajv) {
         }
     };
 }
-/* istanbul ignore next */
+
+
 /**
  *
  * @param schema
@@ -241,12 +389,12 @@ export function watchForErrors(schema, data, ajv) {
  * @param {string[]} errorPath
  * @param ajv
  * @param paths
- * @param parentValidator
+ * @param fieldSchemaMap
  * @param {string[]} dataPath
  * @returns {function(): *}
  */
 /* istanbul ignore next */
-function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, parentValidator, dataPath) {
+function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, fieldSchemaMap, dataPath) {
     const disposers = [];
     const value = propName === undefined ? obj : getValue(obj, [propName]);
     if(dataPath === undefined){
@@ -261,40 +409,33 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
     switch(schema.type) {
         case 'object':
             if(schema.properties) {
-                let objValidator = parentValidator;
-                if(propName !== undefined && (schema.required || schema.dependencies || schema.if || schema.anyOf || schema.allOf)) {
-                    objValidator = buildValidator(ajv, schema, obj, propName, errorPath, dataPath);
-                    if(parentValidator === undefined) {
-                        pathBuilderR(schema, value, [...errorPath], [...dataPath], paths);
-                    }
-                }
                 for(let p of Object.keys(schema.properties)) {
                     // console.log(`Watching ${propName} prop`, p);
-                    const dispose = watchForErrorsR(schema.properties[p], value, p, errors, [...errorPath, 'properties', p], ajv, paths, objValidator, [...dataPath, p]);
+                    const dispose = watchForErrorsR(schema.properties[p], value, p, errors, [...errorPath, 'properties', p], ajv, paths, fieldSchemaMap, [...dataPath, p]);
                     disposers.push(dispose);
                 }
             }
             break;
         case 'array':
             const rowDisposers = [];
-            let arrValidator = parentValidator;
-            //Check to see if schema needs to create a specific parentValidator to build errors for any array items
-            if(schema.maxItems || schema.minItems|| schema.uniqueItems || schema.contains) {
-                arrValidator = buildValidator(ajv, schema, obj, propName, errorPath, dataPath);
-                if(parentValidator === undefined) {
-                    pathBuilderR(schema, value, [...errorPath], [...dataPath], paths);
-                }
-            }
+            // let arrValidator = parentValidator;
+            // //Check to see if schema needs to create a specific parentValidator to build errors for any array items
+            // if(schema.maxItems || schema.minItems|| schema.uniqueItems || schema.contains) {
+            //     arrValidator = buildValidator(ajv, schema, obj, propName, errorPath, dataPath);
+            //     if(parentValidator === undefined) {
+            //         pathBuilderR(schema, value, [...errorPath], [...dataPath], paths);
+            //     }
+            // }
 
             for(let i = 0; i < value.length; ++i) {
-                rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, arrValidator, [...dataPath, i]);
+                rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, fieldSchemaMap, [...dataPath, i]);
             }
 
             disposers.push(doObserve(value, change => {
                 if(change.addedCount) {
                     const end = change.index + change.addedCount;
                     for(let i = change.index; i < end; ++i) {
-                        rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, arrValidator, [...dataPath, i]);
+                        rowDisposers[i] = watchForErrorsR(schema.items, value, i, errors, [...errorPath, 'items', i], ajv, paths, fieldSchemaMap, [...dataPath, i]);
                     }
                 } else if(change.removedCount) {
                     const itemErrors = getMap(errors, [...errorPath, 'items']);
@@ -310,7 +451,7 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
                                 if(i >= end) {
                                     const newIdx = i - change.removedCount;
                                     err.set(newIdx, err);
-                                    rowDisposers[newIdx] = watchForErrorsR(schema.items, value, newIdx, errors, [...errorPath, 'items', newIdx], ajv, paths, arrValidator, [...dataPath, newIdx]);
+                                    rowDisposers[newIdx] = watchForErrorsR(schema.items, value, newIdx, errors, [...errorPath, 'items', newIdx], ajv, paths, fieldSchemaMap, [...dataPath, newIdx]);
                                 }
                             }
                         }
@@ -333,86 +474,50 @@ function watchForErrorsR(schema, obj, propName, errors, errorPath, ajv, paths, p
             if(propName === undefined) {
                 throw new Error(`Cannot watch primitive ${schema.type}`);
             }
-            if(parentValidator !== undefined) {
-                disposers.push(doObserve(obj, propName, () => {
-                    const parentValue = toJS(parentValidator.data());
-                    //console.log("Change ",new Date().toUTCString(),propName, value, toJS(parentValue));
-                    const subPaths = new ObservableMap();
-                    pathBuilderR(parentValidator.schema, parentValue, [], [], subPaths);
-                    if(!parentValidator.validate(parentValue)) {
-                        // console.warn("Paths");
-                        // console.warn(toJS(subPaths));
-                        const ajvErrMap = ajvErrorsToErrorMap(parentValidator.validate.errors, subPaths, undefined, undefined, undefined);
-                        // console.warn("Errors");
-                        // console.warn(parentValidator.validate.errors);
-                        // console.warn("Error Tree");
-                        // console.warn(toJS(ajvErrMap));
-                        let subErrMap = getMap(errors,[...parentValidator.errorPath]);
-                        if(subErrMap === undefined){
-                            subErrMap = new observable.map();
-                            setMap(errors,[...parentValidator.errorPath], subErrMap);
-                        }
-                        processAjvErrorMapUsingSchemaR(parentValidator.schema, undefined, parentValue, ajvErrMap, subErrMap, undefined);
-                        // console.warn("Error Map");
-                        // console.warn(toJS(errors));
-                        // processAjvErrorMapR(parentValidator.schema, parentValidator.errorPath, data, ajvErrMap, errors, undefined);
-                    } else {
-                        delMap(errors, [...parentValidator.errorPath]);
-                    }
-                }));
-            } else {
-                //We don't want to watch primitives for arrays
-                if(isInt(propName)){
-                    // console.log(propName, value);
-                    break;
-                }
-                const validate = ajv.compile(schema);
-                disposers.push(doObserve(obj, propName, change => {
-                    // let value = input;
-                    // if(input && input.get !== undefined){
-                    //     value = input.get();
-                    // }
-                    let errs = [];
-                    let valid = validate(toJS(change));
-                    if(change === undefined) {
-                        if(schema.required) {
-                            errs = [createError(schema.title, `is a required field`, errorPath, "required")];
-                            valid = false;
-                        } else {
-                            valid = true;
-                        }
-                    } else if(!valid) {
-                        if(schema.errorMessage) {
-                            errs = [createError(schema.title, schema.errorMessage, errorPath, "custom")];
-                        } else {
-                            errs = beautifyAjvErrors(Array.from(validate.errors), errorPath);
-                        }
-                    }
-                    if(valid) {
-                        delMap(errors, [...errorPath]);
-                    } else {
-                        setMap(errors, [...errorPath], observable.array(errs));
-                    }
-                }));
+
+            //We don't want to watch primitives for arrays
+            if(isInt(propName)){
+                // console.log(propName, value);
+                break;
             }
+
+            //Create a validator for this field
+            const schemaPathId = errorPath.join('.');
+            const validate = ajv.compile(fieldSchemaMap.has(schemaPathId) ? Object.assign({}, schema, fieldSchemaMap.get(schemaPathId) ): schema);
+
+            disposers.push(doObserve(obj, propName, change => {
+                // let value = input;
+                // if(input && input.get !== undefined){
+                //     value = input.get();
+                // }
+                let errs = [];
+                let valid = validate(toJS(change));
+                if(change === undefined) {
+                    if(schema.required) {
+                        errs = [createError(schema.title, `is a required field`, errorPath, "required")];
+                        valid = false;
+                    } else {
+                        valid = true;
+                    }
+                } else if(!valid) {
+                    if(schema.errorMessage) {
+                        errs = [createError(schema.title, schema.errorMessage, errorPath, "custom")];
+                    } else {
+                        errs = beautifyAjvErrors(Array.from(validate.errors), errorPath);
+                    }
+                }
+                if(valid) {
+                    delMap(errors, [...errorPath]);
+                } else {
+                    setMap(errors, [...errorPath], observable.array(errs));
+                }
+            }));
             break;
         default:
             // paths.delete("#/" + errorPath.join("/"));
         //     throw new Error(`'${schema.type}' not supported`);
     }
     return () => execAll(disposers);
-}
-
-/* istanbul ignore next */
-function buildValidator(ajv, schema, obj, propName, errorPath, dataPath) {
-    return {
-        validate: ajv.compile(schema),
-        data: () => getValue(obj, [propName]),
-        schema,
-        errorPath: [...errorPath],
-        dataPath: [...dataPath],
-        propName
-    }
 }
 
 /* istanbul ignore next */
@@ -466,37 +571,6 @@ function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap,
         // console.log(errorPath.join('.'), "Deleted");
         // console.log(errors);
         delMap(errors, errorPath);
-    }
-}
-/* istanbul ignore next */
-/**
- * Builds ajv error/data pathMap for schema recursively
- * @param {{}} schema
- * @param {{}} value
- * @param {string[]} errorPath
- * @param {string[]} dataPath
- * @param {ObservableMap} paths
- */
-/* istanbul ignore next */
-function pathBuilderR(schema, value, errorPath, dataPath, paths){
-    paths.set('schema:#/' + errorPath.join("/"), ['#', ...errorPath]);
-    paths.set('data:#/' + dataPath.join("/"), ['#', ...errorPath]);
-    switch(schema.type) {
-        case 'object':
-            if(schema.properties) {
-                for(let p of Object.keys(schema.properties)) {
-                    pathBuilderR(schema.properties[p], value[p], [...errorPath, 'properties', p], [...dataPath, p], paths);
-                }
-            }
-            break;
-        case 'array':
-            for(let i = 0; i < value.length; ++i) {
-                pathBuilderR(schema.items, value[i], [...errorPath, 'properties', i], [...dataPath, i], paths);
-            }
-            break;
-        default:
-            // paths.delete("#/" + errorPath.join("/"));
-            break;
     }
 }
 

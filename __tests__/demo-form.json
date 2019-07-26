@@ -27,15 +27,13 @@
           "errorMessage": "Please type a name which consists of words",
           "type": "string",
           "title": "Last Name",
-          "pattern": "\\w",
-          "default": "Sauce"
+          "pattern": "\\w"
         },
         "aka": {
           "errorMessage": "Please type an AKA which consists of words",
           "type": "string",
           "title": "AKA",
-          "pattern": "\\w",
-          "default": "Sauce"
+          "pattern": "\\w"
         },
         "alias": {
           "type": "array",

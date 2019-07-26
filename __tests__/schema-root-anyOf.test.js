@@ -20,10 +20,6 @@ class SimpleTextBox extends React.Component {
 @schema({
     schema: jsonSchema,
     $ref: "#/definitions/DemoForm",
-    default: {
-        lastName: "Bar",
-        alias: []
-    },
     actions: formData => ({
         addAlias(alias) {
             formData.alias.push({alias: alias});
@@ -93,31 +89,21 @@ afterEach(cleanup);
 test("The root anyOf keyword should be valid if anyOf the items match and invalid if they don't", async () => {
     let {getByTestId} = render(<DemoForm/>);
     await wait(() => getByTestId("lastName"));
-    const buttonV = getByTestId("v");
-    const valid  = getByTestId("valid");
-    const errorContainer  = getByTestId("errors");
 
-    const inputFN = getByTestId("firstName");
-    const inputMN = getByTestId("middleName");
-    const inputLN = getByTestId("lastName");
-    const inputAKA = getByTestId("aka");
-    fireEvent.change(inputFN, {target: {value: "Fred"}});
-    fireEvent.change(inputMN, {target: {value: "Chico"}});
-    fireEvent.change(inputLN, {target: {value: undefined}});
-    fireEvent.change(inputAKA, {target: {value: undefined}});
+    fireEvent.change(getByTestId("firstName"), {target: {value: "Fred"}});
+    fireEvent.change(getByTestId("middleName"), {target: {value: "Chico"}});
 
-    expect(valid.innerHTML).toBe('Unknown');
-    fireEvent.click(buttonV);
-    expect(valid.innerHTML).toBe('INVALID');
-    expect(errorContainer.innerHTML).not.toBe('');
-    expect(errorContainer.innerHTML).toContain('Please type a name which consists of words');
+    expect(getByTestId("valid").innerHTML).toBe('Unknown');
+    fireEvent.click(getByTestId("v"));
+    expect(getByTestId("valid").innerHTML).toBe('INVALID');
+    expect(getByTestId("errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("errors").innerHTML).toContain('Please type a name which consists of words');
 
-    const buttonLN = getByTestId("bln");
-    fireEvent.click(buttonLN);
-    expect(inputLN.value).toBe('Dirt');
+    fireEvent.change(getByTestId("lastName"), {target: {value: "Dirt"}});
+    expect(getByTestId("lastName").value).toBe('Dirt');
 
     //Valid Test
-    fireEvent.click(buttonV);
-    expect(errorContainer.innerHTML).toBe('');
-    expect(valid.innerHTML).toBe('VALID');
+    fireEvent.click(getByTestId("v"));
+    expect(getByTestId("errors").innerHTML).toBe('');
+    expect(getByTestId("valid").innerHTML).toBe('VALID');
 });

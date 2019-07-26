@@ -20,14 +20,14 @@ describe('jsonSchemaToMST', function() {
         }));
         let mobxStateTree = Model.create({});
         mobxStateTree.set(["firstName"], "Awesome");
-        // mobxStateTree.set(["lastName"], "sauce");
         // setValue(mobxStateTree, ["alias", 0], "awesome");
         expect(mobxStateTree.firstName).toEqual('Awesome');
-        expect(mobxStateTree.lastName).toEqual('Sauce');
+        expect(mobxStateTree.lastName).toEqual(undefined);
+        mobxStateTree.set(["lastName"], "sauce");
         expect(mobxStateTree.alias).toEqual([]);
         expect(toJS(mobxStateTree)).toMatchObject({
             firstName: "Awesome",
-            lastName: "Sauce",
+            lastName: 'sauce',
             alias: []
         });
         // expect(mobxStateTree.alias[0].alias).toEqual('awesome');

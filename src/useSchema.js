@@ -45,6 +45,7 @@ export default function useSchema(options) {
             let Model = jsonSchemaToMST(jsonSchema);
             Model = Model.actions(self => {
                 let initialSnapshot = {};
+                let defaultSnapshot = {};
                 return {
                     _set(name, value) {
                         try {
@@ -58,14 +59,20 @@ export default function useSchema(options) {
                     _afterCreate() {
                         initialSnapshot = getSnapshot(self);
                     },
+                    _afterDefaults() {
+                        defaultSnapshot = getSnapshot(self);
+                    },
                     _reset() {
-                        applySnapshot(self, initialSnapshot);
+                        applySnapshot(self, defaultSnapshot);
                     },
                     _replaceAll(value) {
+                        applySnapshot(self, initialSnapshot);
+                        this._setRoot(value);
+                    },
+                    _setRoot(value){
                         if(!isObject(value)) {
                             throw new Error("Replace must be passed a javascript object");
                         } else {
-                            applySnapshot(self, initialSnapshot);
                             const props = Object.keys(value);
                             let errs = [];
                             let propMap = new Map();
@@ -114,20 +121,23 @@ export default function useSchema(options) {
             if(options.views) {
                 Model = Model.views(options.views);
             }
+
             if(options.actions) {
                 Model = Model.actions(options.actions);
             }
 
-            const formData = Model.create(options.default);
+            const formData = Model.create();
 
             formData._afterCreate();
 
+            if (options.default) {
+                formData._setRoot(options.default);
+            }
+
+            formData._afterDefaults();
+
             const {errors, dispose, validate} = watchForErrors(jsonSchema, formData, ajv);
 
-            // //set all the hooks
-            // setSchemaData(formData);
-            // setErrorMap(errors);
-            // setValidate();
             setContext({
                 formData: formData,
                 errorMap: errors,
