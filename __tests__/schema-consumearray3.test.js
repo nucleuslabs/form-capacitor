@@ -3,7 +3,7 @@ import {consumeArrayValue, default as consumeValue} from "../src/consume";
 import shortid from "shortid";
 import {default as schema} from "../src/schema";
 import jsonSchema from "./demo-form";
-import {render, wait, fireEvent} from "react-testing-library";
+import {render, wait, fireEvent} from "@testing-library/react";
 
 @consumeValue()
 class SimpleTextBox extends React.Component {

@@ -3,7 +3,7 @@ import {default as consumeValue} from '../src/consume';
 import {errorMapToFlatArray} from "../src";
 import * as React from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "react-testing-library";
+import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 
 @consumeValue()
 class SimpleTextBox extends React.Component {

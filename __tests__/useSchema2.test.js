@@ -1,11 +1,12 @@
 import useSchema from "../src/useSchema";
 import jsonSchema from "./demo-form";
 import {errorMapToFlatArray} from "../src";
-import {render, fireEvent, wait, cleanup} from "react-testing-library";
+import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import React, {useState} from "react";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
+import {act} from ''
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
@@ -56,9 +57,7 @@ function DemoForm() {
                     <span>Last Name</span>
                     <SimpleTextBox data-testid="lastName" name="lastName"/>
                 </div>
-                <ul data-testid="alias">
-                    <Alias name={"alias"}/>
-                </ul>
+                <Alias name={"alias"}/>
                 <div>
                     <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
                     <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>

@@ -1,7 +1,7 @@
 import * as React from "react";
 import {default as schema} from "../src/schema";
 import jsonSchema from "./demo-form";
-import {render, wait, fireEvent} from "react-testing-library";
+import {render, wait, fireEvent} from "@testing-library/react";
 import {consumeArrayValue} from "../src";
 
 @consumeArrayValue()

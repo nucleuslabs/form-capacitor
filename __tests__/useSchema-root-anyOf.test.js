@@ -1,7 +1,7 @@
 import {errorMapToFlatArray} from "../src";
 import React, {useState} from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "react-testing-library";
+import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
