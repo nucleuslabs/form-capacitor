@@ -6,7 +6,6 @@ import React, {useState} from "react";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
-import {act} from ''
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
