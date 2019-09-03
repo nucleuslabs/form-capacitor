@@ -6,6 +6,7 @@ import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 
 import useConsumeArray from "../src/useConsumeArray";
+import {useObserver} from "mobx-react-lite";
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
@@ -15,8 +16,7 @@ function SimpleTextBox(props) {
             change(ev.target.value || '');
         }}/>
         {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
-    </span>
-        ;
+    </span>;
 }
 
 function Alias(props) {
@@ -26,8 +26,45 @@ function Alias(props) {
     </ul>;
 }
 
+
+function Name(props) {
+    const [name] = useConsume(props.name);
+    return <div data-testid={`${props.name}Display`}>{name}</div>;
+}
+
 function DemoForm() {
-    const [SchemaProvider, context] = useSchema({
+    return useSchema(props => {
+        const {formData, set, reset, ready} = props;
+
+        if(!ready) {
+            return <div>Loading...</div>;
+        }
+        console.log("Okay!",formData.firstName);
+
+        return useObserver(() => <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+            <div>
+                <span>Last Name</span>
+                <SimpleTextBox data-testid="lastName" name="lastName"/>
+            </div>
+            <Alias name={"alias"}/>
+            <div data-testid="pepsi">{formData.firstName}</div>
+            <div data-testid="coke">{formData.lastName}</div>
+            <Name name={'lastName'}/>
+            <Name name={'firstName'}/>
+            <div>
+                <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
+                <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
+                <button data-testid="ba" onClick={() => set("alias", [{alias: 'Charlie'}, {alias: 'Roger'}])}>Set Aliases</button>
+                <button data-testid="ba2" onClick={() => formData.addAlias('Jack')}>Set Aliases</button>
+                <button data-testid="breset" onClick={() => reset()}>Reset</button>
+                <button data-testid="breplace" onClick={() => set({firstName: "Doge"})}>Replace</button>
+            </div>
+        </div>);
+    }, {
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",
         default: {
@@ -46,31 +83,6 @@ function DemoForm() {
             },
         }),
     });
-    const {formData, set, reset, ready} = context;
-    if(!ready) {
-        return <div>Loading...</div>;
-    }
-    return <SchemaProvider>
-        <div>
-            <div>
-                <span>First Name</span>
-                <SimpleTextBox data-testid="firstName" name="firstName"/>
-            </div>
-            <div>
-                <span>Last Name</span>
-                <SimpleTextBox data-testid="lastName" name="lastName"/>
-            </div>
-            <Alias name={"alias"}/>
-            <div>
-                <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
-                <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
-                <button data-testid="ba" onClick={() => set("alias", [{alias: 'Charlie'}, {alias: 'Roger'}])}>Set Aliases</button>
-                <button data-testid="ba2" onClick={() => formData.addAlias('Jack')}>Set Aliases</button>
-                <button data-testid="breset" onClick={() => reset()}>Reset</button>
-                <button data-testid="breplace" onClick={() => set({firstName: "Doge"})}>Replace</button>
-            </div>
-        </div>
-    </SchemaProvider>
 }
 
 afterEach(cleanup);
@@ -79,20 +91,22 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
     let {getByTestId} = render(<DemoForm/>);
 
     await wait(() => getByTestId("lastName"));
-    const inputFN = getByTestId("firstName");
-    expect(inputFN.value).toBe('');
-    const buttonFN = getByTestId("bfn");
-    fireEvent.click(buttonFN);
+    expect(getByTestId("firstName").value).toBe('');
 
-    expect(inputFN.value).toBe('Joe');
+    fireEvent.click(getByTestId("bfn"));
+
+    expect(getByTestId("firstName").value).toBe('Joe');
+
+    expect(getByTestId("firstNameDisplay").innerHTML).toBe('Joe');
+    expect(getByTestId("pepsi").innerHTML).toBe('Joe');
+
     const buttonLN = getByTestId("bln");
     fireEvent.click(buttonLN);
-    expect(inputFN.value).toBe('Joe');
-    const inputLN = getByTestId("lastName");
+    expect(getByTestId("firstName").value).toBe('Joe');
     const buttonA = getByTestId("ba");
     const buttonA2 = getByTestId("ba2");
 
-    expect(inputLN.value).toBe('Dirt');
+    expect(getByTestId("lastName").value).toBe('Dirt');
     const aliasUl = getByTestId("alias");
     expect(aliasUl.childNodes.length).toBe(0);
     fireEvent.click(buttonA);
@@ -103,11 +117,11 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
     fireEvent.click(buttonReplace);
     expect(aliasUl.childNodes.length).toBe(0);
 
-    expect(inputFN.value).toBe('Doge');
+    expect(getByTestId("firstName").value).toBe('Doge');
     const buttonReset = getByTestId("breset");
     fireEvent.click(buttonReset);
 
-    expect(inputLN.value).toBe('Bar');
+    expect(getByTestId("lastName").value).toBe('Bar');
 
 
 });

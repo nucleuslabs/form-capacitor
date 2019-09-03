@@ -22,7 +22,6 @@ describe('watchForErrors', function() {
         let mobxStateTree = Model.create({});
         const {errors, validate} = watchForErrors(schema, mobxStateTree, ajv);
         mobxStateTree.set("firstName", undefined);
-        expect(errors.get("properties").get("firstName")[0].keyword).toEqual('required');
         mobxStateTree.set("firstName", "Hello");
         mobxStateTree.set("lastName", "World");
         mobxStateTree.set("middleName", "MF");

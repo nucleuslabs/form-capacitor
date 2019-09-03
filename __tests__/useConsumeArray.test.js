@@ -28,7 +28,15 @@ function TextBoxArray({name}) {
 }
 
 function DemoForm() {
-    const [SchemaProvider, context] = useSchema({
+    return useSchema(props => {
+        const {ready} = props;
+        if(!ready) {
+            return <div>Loading...</div>;
+        }
+        return <div>
+            Aliases: <TextBoxArray name="alias"/>
+        </div>;
+    }, {
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",
         default: {
@@ -37,15 +45,6 @@ function DemoForm() {
             alias: []
         }
     });
-    const {ready} = context;
-    if(!ready) {
-        return <div>Loading...</div>;
-    }
-    return <SchemaProvider>
-        <div>
-           Aliases: <TextBoxArray name="alias"/>
-        </div>
-    </SchemaProvider>
 }
 
 afterEach(cleanup);

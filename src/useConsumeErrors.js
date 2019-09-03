@@ -1,5 +1,5 @@
 import FormContext from './FormContext';
-import {toPath, getErrorsByPath} from './helpers';
+import {toPath, getValue} from './helpers';
 import {useObserver} from "mobx-react-lite";
 import {useContext} from "react";
 
@@ -11,9 +11,7 @@ import {useContext} from "react";
 export default function useConsumeErrors(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
-    return useObserver(() => {
-        const errors = getErrorsByPath(context.errorMap, fullPath);
-        return [errors && errors.length > 0, errors];
-    }
-    );
+    const errors = getValue(context.errorMap, fullPath);//getErrorsByPath(context.errorMap, fullPath);
+    // console.log(fullPath, context.errorMap, errors);
+    return useObserver(() => [errors && errors.length > 0, errors]);
 };

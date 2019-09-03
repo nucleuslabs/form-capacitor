@@ -10,18 +10,12 @@
           "errorMessage": "Please type a name which consists of words",
           "type": "string",
           "title": "First Name",
-          "pattern": "\\w",
-          "required": [
-            "firstName"
-          ]
+          "pattern": "\\w"
         },
         "middleName": {
           "type": "string",
           "title": "Middle Name",
-          "pattern": "\\w",
-          "required": [
-            "middleName"
-          ]
+          "pattern": "\\w"
         },
         "lastName": {
           "errorMessage": "Please type a name which consists of words",

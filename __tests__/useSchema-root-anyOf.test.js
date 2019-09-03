@@ -6,6 +6,7 @@ import useSchema from "../src/useSchema";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
+import {useObserver} from "mobx-react-lite";
 
 
 function SimpleTextBox(props) {
@@ -30,30 +31,14 @@ function Alias(props) {
  * @return {null|{}}
  */
 function DemoForm() {
-    const [valid, setValid] = useState('Unknown');
-    const [errs, setErrors] = useState([]);
-
-    const [SchemaProvider, context] = useSchema({
-        schema: jsonSchema,
-        $ref: "#/definitions/DemoForm",
-        actions: formData => ({
-            addAlias(alias) {
-                formData.alias.push({alias: alias});
-            },
-            clearAliases() {
-                formData.alias.length = 0;
-            },
-            spliceAlias(idx) {
-                formData.alias.splice(idx, 1);
-            },
-        })
-    });
-    const {validate, set, ready, errorMap} = context;
-    if(!ready) {
-        return null;
-    }
-    return (
-        <SchemaProvider>
+    return useSchema(props => {
+        const [valid, setValid] = useState('Unknown');
+        const [errs, setErrors] = useState([]);
+        const {validate, set, ready, errorMap} = props;
+        if(!ready) {
+            return null;
+        }
+        return useObserver(() =>
             <div>
                 <div>
                     <span>First Name</span>
@@ -82,7 +67,8 @@ function DemoForm() {
                             lastName: undefined,
                             aka: undefined
                         })
-                    }}>Set All The Things</button>
+                    }}>Set All The Things
+                    </button>
                     <button data-testid="v" onClick={() => {
                         if(validate()) {
                             setValid("VALID");
@@ -97,8 +83,22 @@ function DemoForm() {
                 <div data-testid="valid">{valid}</div>
                 <div data-testid="errors">{errs.length > 0 && errs.map(e => e.message)}</div>
             </div>
-        </SchemaProvider>
-    );
+        );
+    }, {
+        schema: jsonSchema,
+        $ref: "#/definitions/DemoForm",
+        actions: formData => ({
+            addAlias(alias) {
+                formData.alias.push({alias: alias});
+            },
+            clearAliases() {
+                formData.alias.length = 0;
+            },
+            spliceAlias(idx) {
+                formData.alias.splice(idx, 1);
+            },
+        })
+    });
 }
 
 afterEach(cleanup);

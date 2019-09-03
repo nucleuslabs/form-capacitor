@@ -6,6 +6,7 @@ import React, {useState} from "react";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
+import {useObserver} from "mobx-react-lite";
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
@@ -26,57 +27,52 @@ function Alias(props) {
 }
 
 function DemoForm() {
-    const [valid, setValid] = useState('Unknown');
-    const [errors, setErrors] = useState([]);
-
-    const [SchemaProvider, context] = useSchema({
+    return useSchema(props => {
+        const [valid, setValid] = useState('Unknown');
+        const {set, ready, validate, errorMap} = props;
+        if(!ready) {
+            return <div>Loading...</div>;
+        }
+        return useObserver(() => <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+            <div>
+                <span>Middle Name</span>
+                <SimpleTextBox data-testid="middleName" name="middleName"/>
+            </div>
+            <div>
+                <span>Last Name</span>
+                <SimpleTextBox data-testid="lastName" name="lastName"/>
+            </div>
+            <Alias name={"alias"}/>
+            <div>
+                <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
+                <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
+                <button data-testid="v" onClick={() => {
+                    if(validate()) {
+                        setValid("VALID");
+                        // setErrors([]);
+                    } else {
+                        setValid("INVALID");
+                        // setErrors(errorMapToFlatArray(errorMap));
+                    }
+                }}>Validate
+                </button>
+            </div>
+            {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
+            <div data-testid="valid">{valid}</div>
+            {valid !== 'Unknown' && <ul data-testid="errors">{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}
+        </div>)
+    }, {
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",
         default: {
             lastName: "Bar",
             alias: [{}]
-        }
+        },
     });
-    const {set, ready, validate, errorMap} = context;
-    if(!ready) {
-        return <div>Loading...</div>;
-    }
-    return (
-        <SchemaProvider>
-            <div>
-                <div>
-                    <span>First Name</span>
-                    <SimpleTextBox data-testid="firstName" name="firstName"/>
-                </div>
-                <div>
-                    <span>Middle Name</span>
-                    <SimpleTextBox data-testid="middleName" name="middleName"/>
-                </div>
-                <div>
-                    <span>Last Name</span>
-                    <SimpleTextBox data-testid="lastName" name="lastName"/>
-                </div>
-                <Alias name={"alias"}/>
-                <div>
-                    <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
-                    <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
-                    <button data-testid="v" onClick={() => {
-                        if(validate()) {
-                            setValid("VALID");
-                            setErrors([]);
-                        } else {
-                            setValid("INVALID");
-                            setErrors(errorMapToFlatArray(errorMap));
-                        }
-                    }}>Validate
-                    </button>
-                </div>
-                {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
-                <div data-testid="valid">{valid}</div>
-                {valid !== 'Unknown' && <ul data-testid="errors">{errors.length > 0 && errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}
-            </div>
-        </SchemaProvider>
-    );
 }
 
 afterEach(cleanup);

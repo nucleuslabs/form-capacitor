@@ -126,6 +126,7 @@ function makeType(node, meta) {
                 if(hasUnionFlag(type,UNDEFINED)) {
                     return types.optional(type, undefined);
                 }
+                //Added null in here due to challenges with MST undefined and to allow json schema to validate
                 return types.optional(types.union(type, types.undefined), undefined);
             }
             return type;

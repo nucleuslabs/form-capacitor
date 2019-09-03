@@ -11,5 +11,6 @@ import {useContext} from "react";
 export default function useConsume(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
-    return useObserver(() => [getValue(context.formData, fullPath), v => context.set(fullPath,v)]);
+    // console.log("useConsume", fullPath, getValue(context.formData, fullPath));
+    return useObserver(() => [getValue(context.formData, fullPath), v => context.set(fullPath, v)]);
 };

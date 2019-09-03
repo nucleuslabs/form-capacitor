@@ -158,7 +158,7 @@ export function setValue(obj, path, value) {
         obj = obj[key];
     }
     // console.log('setting',obj,'@',path[end],'to',value);
-    setProperty(obj, path[end], typeof value === 'function' ? value(obj[path[end]]) : value)
+    setProperty(obj, path[end], typeof value === 'function' ? value(obj[path[end]]) : value);
 }
 
 export function setMap(map, path, value) {

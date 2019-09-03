@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {checkSchemaPathForErrors, createAjvObject, watchForErrors} from "./validation";
+import {checkSchemaPathForErrors, createAjvObject, watchForErrorsPatch} from "./validation";
 import jsonSchemaToMST from "./jsonSchemaToMST";
 import {getObservable, isArray, isObject, isPlainObject, setValue} from "./helpers";
 import stringToPath from "./stringToPath";
@@ -8,26 +8,47 @@ import {applySnapshot, getSnapshot} from "mobx-state-tree";
 import SchemaDataReplaceError from "./SchemaDataReplaceError";
 import {isObservable, observable, toJS} from "mobx";
 import $RefParser from "json-schema-ref-parser";
-import FormContext from "./FormContext";
-
-function Provider(context) {
-    return props => <FormContext.Provider value={context}>{props.children}</FormContext.Provider>;
-}
+import FormContext from './FormContext';
 
 /**
  *
- * @param options
+ * @param {function} FunctionalComponent
+ * @param {{}} options
  * @returns {*[]}
  */
 
-export default function useSchema(options) {
+export default function useSchema(FunctionalComponent, options) {
     // const [schemaData, setSchemaData] = useState({});
     // const [errorMap, setErrorMap] = useState({});
     // const [imperativeValidate, setValidate] = useState(() => {
     //     return undefined;
     // });
-    let [context, setContext] = useState({});
-    let [disposeEffect, setDisposeEffect] = useState(() => () => null);
+
+    // const context = useLocalStore(() => ({
+    //     _init: ({formData, errorMap, set, reset, validate, path}) => {
+    //         if(!context.ready) {
+    //             context.formData = formData;
+    //             context.errorMap = errorMap;
+    //             context.set = set;
+    //             context.reset = reset;
+    //             context.validate = validate;
+    //             context.path = path;
+    //             context.ready = true;
+    //         }
+    //     },
+    //     formData: undefined,
+    //     errorMap: undefined,
+    //     set: undefined,
+    //     reset: undefined,
+    //     validate: undefined,
+    //     path: [],
+    //     ready: false,
+    // }));
+    let [context, setContext] = useState({
+            ready: false,
+    });
+
+    // let [disposeEffect, setDisposeEffect] = useState(() => () => {} );
 
     useEffect(() => {
         options = Object.assign({
@@ -136,22 +157,20 @@ export default function useSchema(options) {
 
             formData._afterDefaults();
 
-            const {errors, dispose, validate} = watchForErrors(jsonSchema, formData, ajv);
+            const {errors, validate} = watchForErrorsPatch(jsonSchema, formData, ajv);
 
             setContext({
                 formData: formData,
                 errorMap: errors,
-                ready: true,
                 set: (path, value) => isPlainObject(path) ? formData._replaceAll({...path}) : formData._set(path, value),
-                reset: () => formData._reset(),
+                reset: formData._reset,
                 validate: () => {
                     return validate(toJS(formData));
                 },
                 path: [],
+                ready: true
             });
-            setDisposeEffect(dispose);
         });
-        return disposeEffect;
     }, []);
 
     // FormContext.Provider({
@@ -160,6 +179,12 @@ export default function useSchema(options) {
     //     validate: imperativeValidate,
     //     path: [],
     // });
-
-    return [Provider(context), context];
+    if(context.ready){
+        return <FormContext.Provider value={context}>
+            <FunctionalComponent {...context}/>
+        </FormContext.Provider>;
+    } else {
+        return <span/>;
+    }
+    // return [Provider(context), context];
 }
