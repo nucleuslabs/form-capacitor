@@ -58,20 +58,22 @@ Create a definition file for your form including any validation rules.
 ~~~
 
 ## Hooks
+
 Use this API for functional components
 
 ### `useSchema` Hook 
 
-The schema decorator wraps the form in a HOC with context provider that feeds 
-FormCapacitor props to your form component.
+useSchema uses context to pass FormCapacitor props to your form component.
 
 **params**
+- FunctionalComponent
+- options
+  - schema: /path/to/some-json-schema-file.json `required`
+  - $ref: "#/definitions/SimpleForm" `required`
+  - default - The default data to hydrate the form state tree with `optional`
+  - actions - A function that is passed the mobx state tree and attaches actions to it `optional`
 
-- schema: /path/to/some-json-schema-file.json `required`
-- $ref: "#/definitions/FormX" `required`
-- default - The default data to hydrate the form state tree with `optional`
-- actions - A function that is passed the mobx state tree and attaches actions to it `optional`
-
+}
 **returns:**
 {
  - ready - boolean - a boolean which is set to true once all promises have been resolved in the initialization process
@@ -86,48 +88,47 @@ FormCapacitor props to your form component.
 
 A basic form with 2 text inputs and a save button.
 ~~~
-function SimpleForm(props) {
-    const [SchemaProvider, context] = useSchema({
-        schema: jsonSchema,
-        $ref: "#/definitions/DemoForm",
-        default: {
-            lastName: "Bar"
+import jsonSchema from './SimpleForm.json';
+
+function SimpleForm() {
+    return useSchema(({set, ready, validate, formData, errorMap}) => {
+        if(!ready) {
+            return <div>Loading...</div>;
         }
+        return useObserver(() => <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox name="firstName"/>
+            </div>
+            <div>
+                <span>Last Name</span>
+                <SimpleTextBox name="lastName"/>
+            </div>
+            <div>
+                <button onClick={() => validate() ? console.log("Passed", formData) : console.error("Failed", formData)}>Save</button>
+            </div>
+            {<ul>{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}
+        </div>)
+    }, {
+        schema: jsonSchema,
+        $ref: "#/definitions/SimpleForm",
+        default: {
+            lastName: "Bar",
+        },
     });
-    const {formData, set, reset, ready} = context;
-    if(!ready) {
-        return <div>Loading...</div>;
-    }
-    return <SchemaProvider>
-		<div>
-			<h1>Simple HTML Form</h1>
-
-			<div>
-				<label htmlFor={`firstName`}>First Name</label>
-				<SimpleTextBox id={`firstName`} name="name" placeholder="a Name..."/>
-			</div>
-
-			<div>
-				<label htmlFor={`lastName`}>Last Name</label>
-				<SimpleTextBox id={`lastName`} name="name" placeholder="a Last Name..."/>
-			</div>
-
-			<FormErrors schema={schema} errors={this.state.validationErrors}/>
-
-			<div>
-				<button onClick={this.saveState}>Save</button>
-			</div>
-
-			<textarea>{JSON.stringify(this.state.formState, null, 2)}</textarea>
-		</div>
-    </SchemaProvider>
 }
 ~~~
 
 
 ### `useConsume` Hook
-Use within any control and provide a handle change function to set the state for that input in the mobx state tree. The inputs are passed 
-a name prop that defines what there path is in the tree. 
+
+Use within any control to get and set a value in the mobx state tree.
+
+This hook functions similar to how the buitin `useState` hook works on call it passes back an array containing a getter and a setter.
+
+The setter is a change function to set the state for that input in the mobx state tree.
+ 
+The `path` argument is a string that corresponds to a path in the tree if it is a root input the name might be "phoneNumber" if it is a deeper value the name amy be "person.0.phoneNumber".
 
 
 **args:**
@@ -138,7 +139,7 @@ path: path to observable in the state tree within the current context
 
 ~~~
 [
-	value: {any}, //Value for the supplied path within the tree which is usually prop.name
+	value: {any}, //Observable value within the underlying mobx state tree
 	change: func, //Setter function
 ]
 ~~~
@@ -147,7 +148,6 @@ This example is a SimpleTextBox Component which is a basic wrapped html text inp
 
 ~~~
 import React from "react";
-import useSchema from "../src/useSchema";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 
@@ -163,7 +163,103 @@ function SimpleTextBox(props) {
 }
 ~~~
 
+### `useConsumeErrors` Hook
+
+Use within any control to get the error state for the current path for an input control.
+
+**args:**
+
+path: path to observable in the state tree within the current context 
+
+**returns:**
+
+~~~
+[
+	hasErrors: {boolean}, //returns `true` if this field is invalid otherwise it returns false
+	errors: [{path: [],message: string}],
+]
+~~~
+
+This example is a SimpleTextBox Component which is a basic wrapped html text input.
+
+~~~
+import React from "react";
+import useConsume from "../src/useConsume";
+import useConsumeErrors from "../src/useConsumeErrors";
+
+function SimpleTextBox(props) {
+    const [value, change] = useConsume(props.name);
+    const [hasErrors, errors] = useConsumeErrors(props.name);
+    return <span>
+        <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
+            change(ev.target.value || '');
+        }}/>
+        {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
+    </span>;
+}
+~~~
+
+
+
+### `useConsumeArray` Hook
+
+Use within any control and provide a handle change function to set the state for that input in the mobx state tree. The inputs are passed 
+a name prop that defines what there path is in the tree. 
+
+**args:**
+
+path: path to observable in the state tree within the current context 
+
+**returns:**
+
+~~~
+    const [value, set, {push, remove, slice, clear, replace}] = useConsumeArray(name);
+
+[
+	value: {any}, //Value for the supplied path within the tree which is usually prop.name
+	set: {func}, //Setter function
+	arrayMutators: {{
+        push: {func(value)}, //Pushes `value` onto the end of the array
+        remove: {func(value)}, //Removes elements from the array that match value 
+        slice: {func(idx, length)}, //Slices `length` elements from the array starting at index `idx` 
+        clear: {func}, //Removes all elements from the array by value 
+        replace: {func}, //Replace what is within the array with new elements  
+    }}
+]
+~~~
+
+This example is a TextBoxArray Component which is a bunch of basic wrapped html text input.
+
+~~~
+import React from "react";
+import useSchema from "../src/useSchema";
+import useConsumeArray from "../src/useConsumeArray";
+import useConsumeErrors from "../src/useConsumeErrors";
+
+function TextBoxArray({name}) {
+    const [value, set, {push, remove, slice, clear, replace}] = useConsumeArray(name);
+    const [hasErrors] = useConsumeErrors(name);
+
+    const handleChange = idx => ev => {
+        const lenDif = (value.length - 1) - idx;
+        set(slice(0, idx).concat([{alias: ev.target.value}], lenDif > 0 ? slice(idx, lenDif) : []));
+    };
+    return <div>
+        <div data-testid="alias">
+            {value.map((inst, key) => <input key={key} type="text" className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst.alias || ""}
+                                             onChange={handleChange(key)}/>)}
+        </div>
+        <button onClick={() => push({alias: "Joe"})}>+</button>
+        <button onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
+        <button onClick={() => clear()}>clear</button>
+        <button onClick={() => replace([{alias: "NOT JOE"}])}>replace</button>
+    </div>;
+}
+
+~~~
+
 #Decorators
+
 Use this API for HOC's and classes.
 
 ### `@schema` decorator 
@@ -453,10 +549,9 @@ into a flat array of error objects.
 We have used formik and redux-forms which are great form state 
 management libraries with many features and they make managing forms 
 much easier but the complexity and amount of fields in our forms caused 
-too many re-renders so we decided to try to make a form library that could 
-handle re-renders using mobx. We also wanted to use standard validation
-syntax between front-end and back-end.       
-
+too performance issues including many re-renders so we decided 
+to try to make a generic form library that could handle re-renders using a mobx-state-tree.
+We also wanted to use standard validation syntax between front-end and back-end using json-schema.       
 
 ## Testing
 
