@@ -39,7 +39,6 @@ function DemoForm() {
         if(!ready) {
             return <div>Loading...</div>;
         }
-        console.log("Okay!",formData.firstName);
 
         return useObserver(() => <div>
             <div>

@@ -258,6 +258,87 @@ function TextBoxArray({name}) {
 
 ~~~
 
+
+### `useSchemaPath` Hook
+
+This hook works much like useSchema in that it wraps `component` in context 
+and then passes `compoonent` back so that any children of the component that 
+use the useConsume hooks will have the desired context path. You can use this component
+for nesting complex or inputs 
+
+**args:**
+component: Component that you want to wrap so that the context path gets updated 
+path: path to append in the current context 
+
+**returns:**
+
+~~~
+[
+	<FunctionalComponent/> wrapped in context
+]
+~~~
+
+This example is a SimpleTextBox Component which is a basic wrapped html text input.
+
+~~~
+import React from "react";
+import jsonSchema from "./demo-form.json";
+import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import useSchema from "../src/useSchema";
+import useConsumeArray from "../src/useConsumeArray";
+import useConsumeErrors from "../src/useConsumeErrors";
+import useConsume from "../src/useConsume";
+import {useObserver} from "mobx-react-lite";
+import useSchemaPath from "../src/useSchemaPath";
+
+function SimpleTextBox(props) {
+    const [value, change] = useConsume(props.name);
+    const [hasErrors, errors] = useConsumeErrors(props.name);
+    return <span>
+        <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
+            change(ev.target.value || '');
+        }}/>
+        {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
+    </span>;
+}
+
+function TextBoxContainer({name}){
+    return useSchemaPath(props => <SimpleTextBox name={'alias'}/>, name);
+}
+
+function TextBoxArray({name}) {
+    const [value, set, {push, remove, slice, clear, replace}] = useConsumeArray(name);
+
+    return useSchemaPath(props => <div>
+            <div>
+                {value.map((inst, key) => <TextBoxContainer key={key} name={`${key}`}/>)}
+            </div>
+            <button onClick={() => push({alias: "Joe"})}>+</button>
+       </div>, name);
+}
+
+function DemoForm() {
+    return useSchema(props => {
+        const {ready} = props;
+        if(!ready) {
+            return <div>Loading...</div>;
+        }
+        return useObserver(() => <div>
+            Aliases: <TextBoxArray name="alias"/>
+        </div>);
+    }, {
+        schema: jsonSchema,
+        $ref: "#/definitions/DemoForm",
+        default: {
+            firstName: "Foo",
+            lastName: "Bar",
+            alias: []
+        }
+    });
+}
+~~~
+
+
 #Decorators
 
 Use this API for HOC's and classes.

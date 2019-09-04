@@ -27,7 +27,6 @@ class SimpleTextBox extends React.Component {
     };
     render() {
         const {fc, value, name, ...props} = this.props;
-        console.log(name, value, fc.hasErrors);
         return <span><input type="text" {...props} className={fc.hasErrors ? "error" : null} value={value || ""} onChange={this.handleChange}/> <span data-testid={`${props.name}_err`}>{this.state.errs.map(err => err.message)}</span></span>;
     }
 }

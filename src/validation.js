@@ -694,7 +694,7 @@ function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap,
                 }
                 break;
             default:
-                 console.log(errorPath.join('.'), "Added", toJS(ajvErrors), Array.from(ajvErrors));
+                 // console.log(errorPath.join('.'), "Added", toJS(ajvErrors), Array.from(ajvErrors));
                 if(schema.errorMessage !== undefined) {
                     setMap(errors, errorPath, [createError(schema.title, schema.errorMessage, [...errorPath], 'custom')]);
                 } else {
@@ -709,7 +709,7 @@ function processAjvErrorMapUsingSchemaR(schema, errorPath, dataObj, ajvErrorMap,
                 break;
         }
     } else {
-        console.log(errorPath.join('.'), "Deleted");
+        // console.log(errorPath.join('.'), "Deleted");
         // console.log(errors);
         delMap(errors, errorPath);
     }
