@@ -280,6 +280,120 @@ path: path to append in the current context
 
 This example is a SimpleTextBox Component which is a basic wrapped html text input.
 
+
+**json-schema (demo-form.json)**
+~~~
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "DemoForm": {
+      "title": "Demo Form",
+      "description": "Basic Form to demo core features of FormCapacitor",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "errorMessage": "Please type a name which consists of words",
+          "type": "string",
+          "title": "First Name",
+          "pattern": "\\w"
+        },
+        "middleName": {
+          "type": "string",
+          "title": "Middle Name",
+          "pattern": "\\w"
+        },
+        "lastName": {
+          "errorMessage": "Please type a name which consists of words",
+          "type": "string",
+          "title": "Last Name",
+          "pattern": "\\w"
+        },
+        "aka": {
+          "errorMessage": "Please type an AKA which consists of words",
+          "type": "string",
+          "title": "AKA",
+          "pattern": "\\w"
+        },
+        "alias": {
+          "type": "array",
+          "title": "Aliases",
+          "errorMessage": "Please type a made up name which consists of words",
+          "items": {
+            "type": "object",
+            "title": "Alias",
+            "properties": {
+              "alias": {
+                "type": "string"
+              }
+            }
+          },
+          "default": []
+        },
+        "alias2": {
+          "type": "array",
+          "title": "Aliases Part Deux",
+          "errorMessage": "Please type a made up name which consists of words",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "multiple": {
+          "title": "Multiple Types",
+          "anyOf": [
+            {"type": "integer"},
+            {"type": "null"}
+          ]
+        },
+        "contacts": {
+          "type": "array",
+          "title": "Contacts",
+          "description": "List of appointments that need to be booked",
+          "items": {
+            "$ref": "#/definitions/Contact"
+          },
+          "default": [
+            {}
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["aka"],
+          "errorMessage": " "
+        },
+        {"required": ["lastName"],
+          "errorMessage": "Please enter a value in Either First Name or Last Name to save"
+        }
+      ],
+      "required": [
+        "firstName", "middleName"
+      ]
+    },
+    "Contact": {
+      "title": "Contact",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "title": "First Name"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name"
+        },
+        "phone": {
+          "type": "integer",
+          "title": "Phone #"
+        }
+      }
+    }
+  }
+}
+~~~
+
+**React:**
+
 ~~~
 import React from "react";
 import jsonSchema from "./demo-form.json";
