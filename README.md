@@ -228,7 +228,7 @@ path: path to observable in the state tree within the current context
 ]
 ~~~
 
-This example is a TextBoxArray Component which is a bunch of basic wrapped html text input.
+This example is a TextBoxArray Component which is an array of basic wrapped html text inputs.
 
 ~~~
 import React from "react";
@@ -236,13 +236,13 @@ import useSchema from "../src/useSchema";
 import useConsumeArray from "../src/useConsumeArray";
 import useConsumeErrors from "../src/useConsumeErrors";
 
+
 function TextBoxArray({name}) {
-    const [value, set, {push, remove, slice, clear, replace}] = useConsumeArray(name);
+    const [value, set, {push, remove, slice, splice, clear, replace}] = useConsumeArray(name);
     const [hasErrors] = useConsumeErrors(name);
 
     const handleChange = idx => ev => {
-        const lenDif = (value.length - 1) - idx;
-        set(slice(0, idx).concat([{alias: ev.target.value}], lenDif > 0 ? slice(idx, lenDif) : []));
+        splice(idx, 1, {alias: ev.target.value});
     };
     return <div>
         <div data-testid="alias">
@@ -251,6 +251,7 @@ function TextBoxArray({name}) {
         </div>
         <button onClick={() => push({alias: "Joe"})}>+</button>
         <button onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
+        <button onClick={() => value.length > 0 && set(slice(0, value.length - 1))}>--</button>
         <button onClick={() => clear()}>clear</button>
         <button onClick={() => replace([{alias: "NOT JOE"}])}>replace</button>
     </div>;

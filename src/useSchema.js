@@ -126,15 +126,16 @@ export default function useSchema(FunctionalComponent, options) {
                     _remove(name, value) {
                         getObservable(self, name).remove(value);
                     },
-                    _splice(name, idx, length = 1, insert = undefined) {
+                    _splice(name, idx, deleteCount = 1, insert = undefined) {
                         if(insert !== undefined) {
-                            getObservable(self, name).splice(idx, length, insert);
+                            getObservable(self, name).splice(idx, deleteCount, insert);
                         } else {
-                            getObservable(self, name).splice(idx, length);
+                            getObservable(self, name).splice(idx, deleteCount);
                         }
                     },
                     _slice(name, idx, length = 1) {
-                        getObservable(self, name).slice(idx, length);
+                        const arr = getObservable(self, name);
+                        return arr.slice(idx, length);
                     }
                 };
             });

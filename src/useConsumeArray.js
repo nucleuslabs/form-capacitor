@@ -11,14 +11,14 @@ import {useContext} from "react";
 export default function useConsumeArray(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
-    const {_push, _pop, _splice, _clear, _replace, _remove} = context.formData;
+    const {_push, _pop, _slice, _splice, _clear, _replace, _remove} = context.formData;
     return useObserver(() => [
         getValue(context.formData, fullPath).slice(),
         v => context.set(fullPath, v),
         {
             push: v => _push(fullPath, v),
             pop: () => _pop(fullPath),
-            splice: (idx, length) => _splice(fullPath, idx, length),
+            splice: (idx, length, insert) => _splice(fullPath, idx, length, insert),
             slice: (idx, length) => _slice(fullPath, idx, length),
             clear: () => _clear(fullPath),
             replace: arr => _replace(fullPath, arr),
