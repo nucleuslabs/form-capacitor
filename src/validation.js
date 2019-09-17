@@ -266,8 +266,8 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
         }
     }
 
-    if(schema.allOf) {
-        for(let allOfSchema of schema.anyOf) {
+    if(schema.allOf && schema.allOf.length > 0) {
+        for(let allOfSchema of schema.allOf) {
             assignFieldSchemas(getFieldReferencesR(allOfSchema, propName, path, patchPath, patchPathToSchemaPathMap), buildSchemaTree(path, {allOf: [...schema.allOf]}), fieldSchemaMap);
         }
     }
@@ -431,7 +431,6 @@ export function watchForErrorsPatch(schema, data, ajv) {
     //build field validators
     const [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap] = buildFieldSchemaMapR(schema);
 
-    console.debug(fieldSchemaMap.get("/properties/aka").anyOf);
 
     for (let [path ,fieldSchema] of fieldSchemaMap) {
         // console.debug(path);
