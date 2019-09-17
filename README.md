@@ -1,17 +1,29 @@
 # form-capacitor - 
 
-**!!!Highly Experimental Project!!!**
+**!!!Experimental Project!!!**
 
 Form manager for [`react`](https://github.com/facebook/react) that makes 
-use of mobx for state and ajv for validation.
+use of mobx & mobx-state-tree for state management  and AJV for validation.
 
 
-Form capacitor is a set of Higher Order Components that help you manage the 
-state, validation and errors for react forms that are defined using json-schema. 
+Form capacitor is a set of React Hooks that help you manage the state, 
+validation and errors for react forms. 
 
 
-With form-capacitor you can use 1 json-schema and 2 or 3 decorators to setup your 
-form state management and validation.  
+Use json-schema to define the state and validation rules for your form then use a few Hooks to setup your form state management and validation. 
+
+**Pros:**
+1. Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields.
+2. Using Json-schema allows you to validate in the browser and server using the same ruleset.
+3. The API can be used with a minimum hooks so it works great with functional components.
+4. It isn't difficult to build most forms with this library even very complex forms can be created
+
+
+**W:**
+1. Doesn't work with classes :(
+3. 2 of the hook functions `useSchema` and `useSchemaPath` are actually Hook + HOC hybrids which may seem weird but it is because they use Context Providers which need to wrap components
+4. For complex state with deep tree structures you have to either know the full path for each input or wrap them in a `useSchemaPath` HookHOC to set the proper paths in context
+
 
 ## Usage
 
@@ -453,222 +465,6 @@ function DemoForm() {
 }
 ~~~
 
-
-#Decorators
-
-Use this API for HOC's and classes.
-
-### `@schema` decorator 
-
-The schema decorator wraps the form in a HOC with context provider that feeds 
-FormCapacitor props to your form component.
-
-**Required Settings**
-- schema: /path/to/some-json-schema-file.json,
-- $ref: "#/definitions/FormX",
-
-**Optional Settings**
-- default - The default data to hydrate the form state tree with
-- actions - A function that is passed the mobx state tree and attaches actions to it
-
-**props:**
-
-- FormData - a mobx-state-tree full of observable goodness that you can access all of your form state from the structure is based on your json schema. Import toJS() from mobx to see a snapshot of your form data tree.
-- FormData.set(path, value) - a method that is used to set data within the tree for the supplied path.
-- ErrorMap - a mobx observable map tree
-
-
-A basic form with 2 text inputs and a save button.
-~~~
-import jsonSchema from "../../schemas/simple-form.json";
-import {schema} from "../../form-capacitor";
-import SimpleTextBox from "../controls/SimpleTextBox";
-import {toJS} from "mobx";
-import * as React from "react";
-import FormErrors from '../FormErrors'
-import {errorMapToFlatArray} from "../../form-capacitor/helpers";
-
-@schema({
-    schema: jsonSchema,
-    $ref: "#/definitions/SimpleForm",
-    default: {
-        "lastName": "Bar"
-    }
-})
-export default class SimpleForm extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            formState: undefined,
-            validationErrors: undefined
-        }
-    }
-
-    saveState = () => {
-        if(this.props.validate()) {
-            this.setState({formState: toJS(this.props.formData), validationErrors: undefined});
-        } else {
-            this.setState({formState: toJS(this.props.formData), validationErrors: errorMapToFlatArray(this.props.errorMap)});
-        }
-    };
-
-    render() {
-        const {formData, schema} = this.props;
-        if(!formData) return <p>Loading schema...</p>;
-        return (
-            <div>
-                <h1>Simple HTML Form</h1>
-
-                <div>
-                    <label htmlFor={`firstName`}>First Name</label>
-                    <SimpleTextBox id={`firstName`} name="name" placeholder="a Name..."/>
-                </div>
-
-                <div>
-                    <label htmlFor={`lastName`}>Last Name</label>
-                    <SimpleTextBox id={`lastName`} name="name" placeholder="a Last Name..."/>
-                </div>
-
-                <FormErrors schema={schema} errors={this.state.validationErrors}/>
-
-                <div>
-                    <button onClick={this.saveState}>Save</button>
-                </div>
-
-                <textarea>{JSON.stringify(this.state.formState, null, 2)}</textarea>
-            </div>
-        );
-    }
-}
-~~~
-
-### `@consumeValue` decorator
-Attach to any control and provide a handle change function to set the fc state for that input. The inputs are passed 
-a name prop that defines what there path is in the tree. 
-
-**props:**
-
-- value - The value from the mobx state tree
-- fc - An object that contains the following methods and properies
-
-~~~
-{
-
-	hasErrors: boolean,
-	errors: [{title: string, message: string}],
-	set: function that sets the state for the input
-}
-~~~
-
-This example is a SimpleTextBox Component which is a basic wrapped html text input.
-
-~~~
-import {consumeValue} from 'form-capacitor';
-import * as React from "react";
-import FieldErrors from "./FieldErrors";
-
-
-@consumeValue()
-export default class SimpleTextBox extends React.Component {
-    handleChange = ev => {
-        this.props.fc.set(ev.target.value || undefined);
-    };
-
-    render() {
-        const {fc, value, ...props} = this.props;
-        const errors = fc.errors;
-        return <div>
-            <input type="text" {...props} style={fc.hasErrors ? {border: "1px solid red"} : {}} value={value || ""} onChange={this.handleChange}/>
-            <FieldErrors errors={errors}/>
-        </div>;
-    }
-
-}
-~~~
-
-### `@consumeArray` decorator 
-
-**props:**
-
-- value - The value from the mobx state tree
-- fc - An object that contains the following methods and properies
-~~~
-{
-
-	hasErrors: boolean,
-	errors: [{title: string, message: string}],
-	set: function that sets the state for the input,
-	clear: clears the underlying array,
-   	remove(value): removes an item from the underlying array,	
-}
-~~~
-This is for more advanced arrays for inputs like react-select.
-~~~
-import CreatableSelect from "react-select/lib/Creatable";
-import {consumeArrayValue} from "form-capacitor";
-import * as React from "react";
-import css from "./ReactSelect.less";
-import * as PropTypes from "prop-types";
-
-
-@consumeArrayValue()
-export default class ReactMultiSelect extends React.Component {
-    static propTypes = {
-        value: PropTypes.arrayOf(PropTypes.string, PropTypes.number),
-        options: PropTypes.arrayOf(PropTypes.shape(
-            {
-                value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-                label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-            }
-        ))
-    };
-
-    removeValue = options => {
-        if(options.length > 0) {
-            this.props.fc.set(options.map(opt => opt.value));
-        } else {
-            this.clear();
-        }
-    };
-
-    popValue = () => {
-        this.props.fc.pop();
-    };
-
-    setValue = options => {
-        //Shallow compare that ensures that the values is not in the array before pushing
-        this.props.fc.set(options.map(opt => opt.value));
-        // options.map(opt => (!this.props.value.includes(opt.value) && this.props.fc.push(opt.value)));
-    };
-
-    clear = () => {
-        this.props.fc.clear();
-    };
-
-    changeActions = {
-        "remove-value": this.removeValue,
-        "pop-value": this.popValue,
-        "set-value": this.setValue,
-        "create-option": this.setValue,
-        "select-option": this.setValue,
-        "clear": this.clear,
-    };
-
-    handleChange = (options, type) => {
-        this.changeActions[type.action.toString()](options);
-    };
-
-    render() {
-        const {name, value, errors, options, fc, ...props} = this.props;
-        const filtered = options === undefined ? value.map(v => ({label: v, value: v})) : value.map(v => options.find(opt => v === opt.value) || {label: v, value: v});
-        return (
-            <CreatableSelect isMulti {...props} value={filtered} options={options} className={errors && errors.size > 0 ? css["is-danger"] : undefined} onChange={this.handleChange}/>
-        );
-    }
-}
-
-~~~
 ### FieldErrors 
 A simple component for displaying errors in the example above. 
 ~~~

@@ -237,8 +237,8 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
                 for(let p of Object.keys(schema.properties)) {
                     buildFieldSchemaMapR(schema.properties[p], p, [...path, 'properties'], [...patchPath, p], fieldSchemaMap, patchPathToSchemaPathMap);
                     patchPathToSchemaPathMap.set("/" + [...patchPath, p].join("/"), [...path, 'properties', p]);
-                    subSchemaMap.set("/" + [...path, 'properties', p].join("/"), {...schema.properties[p]});
                     assignFieldSchema(buildSchemaTree([...path, 'properties', p], {...schema.properties[p]}), fieldSchemaMap, [...path, 'properties', p]);
+                    subSchemaMap.set("/" + [...path, 'properties', p].join("/"), {...schema.properties[p]});
                 }
             }
             break;
@@ -260,12 +260,16 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
         throw new Error("form-capacitor does not support dependency validation yet");
     }
 
-    if(schema.anyOf) {
-        assignFieldSchemas(getFieldReferencesR(schema.anyOf, propName), buildSchemaTree(path, {anyOf: {...schema.anyOf}}), fieldSchemaMap);
+    if(schema.anyOf && schema.anyOf.length > 0) {
+        for(let anyOfSchema of schema.anyOf){
+            assignFieldSchemas(getFieldReferencesR(anyOfSchema, propName, path, patchPath, patchPathToSchemaPathMap), buildSchemaTree(path, {anyOf: [...schema.anyOf]}), fieldSchemaMap);
+        }
     }
 
     if(schema.allOf) {
-        assignFieldSchemas(getFieldReferencesR(schema.allOf, propName), buildSchemaTree(path, {allOf: {...schema.allOf}}), fieldSchemaMap);
+        for(let allOfSchema of schema.anyOf) {
+            assignFieldSchemas(getFieldReferencesR(allOfSchema, propName, path, patchPath, patchPathToSchemaPathMap), buildSchemaTree(path, {allOf: [...schema.allOf]}), fieldSchemaMap);
+        }
     }
 
     return [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap];
@@ -337,19 +341,21 @@ function pathToPatchString(path, sep = "/") {
  */
 
 /* istanbul ignore next */
-function getFieldReferencesR(schema, propName, path = []) {
+function getFieldReferencesR(schema, propName, path = [], patchPath, patchPathToSchemaPathMap = new Map()) {
     let refs = new Set();
     for(let schemaProp of Object.keys(schema)) {
         switch (schemaProp) {
             case 'required':
             case 'dependencies':
                 if (schema[schemaProp].length > 0) {
-                    refs = new Set([...refs, ...(schema[schemaProp].map(field => [...path, ...(stringToPath(field.replace(/[\/\\]/gi, ".")))]))]);
+                    refs = new Set([...refs, ...schema[schemaProp].map(p => {
+                        return patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p]));
+                    })]);
                 }
                 break;
             case 'anyOf':
             case 'allOf':
-                const subRefSets = schema[schemaProp].map(anyOf => getFieldReferencesR(anyOf, propName)).filter(ref => ref.length > 0);
+                const subRefSets = schema[schemaProp].map(anyOf => getFieldReferencesR(anyOf, propName, path, patchPath, patchPathToSchemaPathMap)).filter(ref => ref.length > 0);
                 for (let i = 0; i < subRefSets.length; ++i) {
                     refs = new Set([...refs, ...subRefSets[i]]);
                 }
@@ -358,12 +364,12 @@ function getFieldReferencesR(schema, propName, path = []) {
                 switch(schemaProp) {
                     case 'object':
                         for(let p of Object.keys(schema.properties)) {
-                            const objSubSet = getFieldReferencesR(schema.properties[p], propName, [...path, 'properties', p]);
+                            const objSubSet = getFieldReferencesR(schema.properties[p], propName, [...path, 'properties', p], [...patchPath, p], patchPathToSchemaPathMap);
                             refs = new Set([...refs, ...objSubSet]);
                         }
                         break;
                     case 'array':
-                        const arrSubSet = getFieldReferencesR(schema.items, propName, [...path, 'items']);
+                        const arrSubSet = getFieldReferencesR(schema.items, propName, [...path, 'items'], patchPath, patchPathToSchemaPathMap);
                         refs = new Set([...refs, ...arrSubSet]);
                         break;
                     case 'string':
@@ -425,6 +431,8 @@ export function watchForErrorsPatch(schema, data, ajv) {
     //build field validators
     const [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap] = buildFieldSchemaMapR(schema);
 
+    console.debug(fieldSchemaMap.get("/properties/aka").anyOf);
+
     for (let [path ,fieldSchema] of fieldSchemaMap) {
         // console.debug(path);
         // console.debug(fieldSchema);
@@ -451,6 +459,7 @@ export function watchForErrorsPatch(schema, data, ajv) {
                     case 'replace':
                     case 'remove':
                         // console.log(toJS(data));
+                        // console.log("OP detected", schemaPathStr, toJS((data)));
                         if(validate(toJS((data)))) {
                             delMap(errors, [...errorPath]);
                         } else {

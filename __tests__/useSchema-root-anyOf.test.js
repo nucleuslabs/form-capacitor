@@ -14,9 +14,9 @@ function SimpleTextBox(props) {
     const [hasErrors, errors] = useConsumeErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
-            change(ev.target.value || '');
+            change(ev.target.value === '' ? undefined : ev.target.value);
         }}/>
-        {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
+        {hasErrors && <ul data-testid={`E-${props.name}`}>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
     </span>;
 }
 
@@ -34,7 +34,7 @@ function DemoForm() {
     return useSchema(props => {
         const [valid, setValid] = useState('Unknown');
         const [errs, setErrors] = useState([]);
-        const {validate, set, ready, errorMap} = props;
+        const {validate, set, ready, errorMap, formData} = props;
         if(!ready) {
             return null;
         }
@@ -82,6 +82,8 @@ function DemoForm() {
                 </div>
                 <div data-testid="valid">{valid}</div>
                 <div data-testid="errors">{errs.length > 0 && errs.map(e => e.message)}</div>
+                <div data-testid="weird">{typeof formData.lastName}</div>
+                <div data-testid="science">{formData.lastName}</div>
             </div>
         );
     }, {
@@ -123,4 +125,11 @@ test("The root anyOf keyword should be valid if anyOf the items match and invali
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("errors").innerHTML).toBe('');
     expect(getByTestId("valid").innerHTML).toBe('VALID');
+
+    //More anyOf Invalid Tests
+    fireEvent.click(getByTestId("v"));
+    fireEvent.change(getByTestId("lastName"), {target: {value: ''}});
+    fireEvent.change(getByTestId("aka"), {target: {value: ''}});
+    expect(getByTestId("E-lastName").childNodes.length).toBeGreaterThan(0);
+
 });
