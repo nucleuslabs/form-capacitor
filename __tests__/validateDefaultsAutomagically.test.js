@@ -100,8 +100,8 @@ describe('When do defaults get validated?', function() {
         expect(getByTestId("lastName").value).toBe('Bar');
         // fireEvent.click(getByTestId("v"));
 
-        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
         expect(getByTestId("firstNameErrors").childNodes.length).toBeGreaterThan(0);
+        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
         fireEvent.change(getByTestId("firstName"), {target: {value: "Frank"}});
         fireEvent.change(getByTestId("middleName"), {target: {value: "Lloyd"}});

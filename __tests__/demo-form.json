@@ -75,10 +75,10 @@
       "anyOf": [
         {
           "required": ["aka"],
-          "errorMessage": " "
+          "errorMessage": "Please enter a value in Either AKA or Last Name to save"
         },
         {"required": ["lastName"],
-          "errorMessage": "Please enter a value in Either First Name or Last Name to save"
+          "errorMessage": "Please enter a value in Either AKA or Last Name to save"
         }
       ],
       "required": [

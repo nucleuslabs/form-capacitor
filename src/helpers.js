@@ -331,16 +331,16 @@ export function getObservable(obj, path) {
     return ret;
 }
 
-export function getErrorsByPath(err, path) {
-    for(let k of path) {
-        if(isString(k)) {
-            err = getValue(err,['properties',k]);
-        } else if(isNumber(k)) {
-            err = getValue(err,['items',k]);
-        }
-    }
-    return err;
-}
+// export function getErrorsByPath(err, path) {
+//     for(let k of path) {
+//         if(isString(k)) {
+//             err = getValue(err,['properties',k]);
+//         } else if(isNumber(k)) {
+//             err = getValue(err,['items',k]);
+//         }
+//     }
+//     return err;
+// }
 // export function mergeSchemaErrorMap(schema, stateTree, errorMap){
 //     return mergeSchemaErrorMapR(schema, stateTree, errorMap, undefined);
 // }

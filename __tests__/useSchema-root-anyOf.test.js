@@ -7,6 +7,7 @@ import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
 import {useObserver} from "mobx-react-lite";
+import {toJS} from "mobx";
 
 
 function SimpleTextBox(props) {
@@ -82,6 +83,7 @@ function DemoForm() {
                 </div>
                 <div data-testid="valid">{valid}</div>
                 <div data-testid="errors">{errs.length > 0 && errs.map(e => e.message)}</div>
+                <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="emap">{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
                 <div data-testid="weird">{typeof formData.lastName}</div>
                 <div data-testid="science">{formData.lastName}</div>
             </div>
@@ -131,5 +133,6 @@ test("The root anyOf keyword should be valid if anyOf the items match and invali
     fireEvent.change(getByTestId("lastName"), {target: {value: ''}});
     fireEvent.change(getByTestId("aka"), {target: {value: ''}});
     expect(getByTestId("E-lastName").childNodes.length).toBeGreaterThan(0);
-
+    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("E-aka").childNodes.length).toBeGreaterThan(0);
 });
