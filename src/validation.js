@@ -251,9 +251,15 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
     }
 
     if(schema.required && schema.required.length > 0) {
-        assignFieldSchemas(new Set(schema.required.map(p => {
-            return patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p]));
-        })), buildSchemaTree(path, {required: [...schema.required]}), fieldSchemaMap);
+        // Going to assign each root object/field level required to itself unlike anyOf or allOf
+        // because each field can decide whether it is required on its own unless they are in a
+        // codependent anyOf or allOf validation
+        schema.required.map(p => {
+            assignFieldSchema(buildSchemaTree(path, {required: [p]}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+        });
+        // assignFieldSchemas(new Set(schema.required.map(p => {
+        //      return patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p]));
+        //  })), buildSchemaTree(path, {required: [p]}), fieldSchemaMap);
     }
 
     if(schema.dependencies) {
