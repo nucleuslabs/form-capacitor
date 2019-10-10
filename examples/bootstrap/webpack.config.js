@@ -20,10 +20,10 @@ module.exports = {
                 test: /\.jsx?$/,
                 include: [__dirname,srcDir],
                 loader: 'babel-loader',
-                options: {
-                    // presets: [['env',{target:'last 1 chrome versions'}]],
-                    plugins: ['transform-react-jsx', 'transform-class-properties', 'syntax-object-rest-spread', 'transform-object-rest-spread'],
-                },
+                // options: {
+                //     presets: [['env',{target:'last 1 chrome versions'}], 'react'],
+                //     plugins: ['transform-react-jsx', 'transform-class-properties', 'syntax-object-rest-spread', 'transform-object-rest-spread'],
+                // },
             },
             {
                 test: /\.(jpe?g|png|gif)($|\?)/i,

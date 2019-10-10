@@ -1,13 +1,13 @@
 {
   "name": "form-capacitor",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "Form manager for React/Redux",
   "main": "dist/index.js",
   "scripts": {
     "test": "node_modules/.bin/jest --coverage",
     "build": "rm -rf dist/* && babel src --out-dir dist",
     "prepublish": "yarn run build",
-    "dev": "concurrently -k -n \"http,wp\" -c \"bgGreen.bold.white,bgBlue.bold.white\" -p \"{name}\" \"http-server -p 8456 ./examples/bootstrap\" \"webpack --config examples/bootstrap/webpack.config.js --watch\""
+    "dev": "concurrently -k -n \"http,wp\" -c \"bgGreen.bold.white,bgBlue.bold.white\" -p \"{name}\" \"http-server -p 8456 ./examples/bootstrap\" \"webpack --mode development --config examples/bootstrap/webpack.config.js --watch\""
   },
   "keywords": [
     "form",
@@ -26,40 +26,41 @@
     "shortid": "^2.2.6"
   },
   "peerDependencies": {
-    "react": "^16.8.5",
-    "react-dom": "^16.8.5",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-redux": "^5.1.1",
-    "redux": "^3.7.2",
-    "prop-types": "^15.7.2"
+    "redux": "^3.7.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/plugin-transform-object-assign": "^7.0.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
+    "@babel/plugin-transform-object-assign": "^7.0.0",
     "@babel/plugin-transform-react-jsx": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
+    "@testing-library/react": "^9.3.0",
     "babel-loader": "^8.0.0",
     "concurrently": "^3.1.0",
-    "css-loader": "^0.28.11",
+    "css-loader": "^3.2.0",
     "external-svg-sprite-loader": "^2.2.0",
     "file-loader": "^0.9.0",
     "http-server": "^0.9.0",
-    "less": "^2.7.2",
-    "less-loader": "^2.2.3",
-    "react": "^16.8.5",
+    "jest": "^24.9.0",
+    "jest-extended": "^0.11.2",
+    "less": "^3.10.3",
+    "less-loader": "^5.0.0",
     "prop-types": "^15.7.2",
-    "react-dom": "^16.8.5",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-redux": "^5.1.1",
     "redux": "^3.7.2",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
-    "jest": "^24.5.0",
-    "jest-extended": "^0.11.1",
-    "react-testing-library": "^6.0.2",
-    "webpack": "^2.3.3"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   },
   "jest": {
     "setupFilesAfterEnv": [

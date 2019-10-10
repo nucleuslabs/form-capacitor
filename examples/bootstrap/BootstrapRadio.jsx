@@ -1,5 +1,5 @@
 const React = require('react');
-const {PropTypes} = React;
+const PropTypes = require('prop-types');
 const _ = require('lodash');
 const css = require('./ValueField.less');
 const {connectField,util} = require('form-capacitor');
@@ -14,7 +14,7 @@ class StatelessBootstrapRadio extends React.PureComponent {
     }
 
     render() {
-        const {value, children, dispatch, ui, errors, rules, name, options} = this.props;
+        const {value, ui, errors, rules, options} = this.props;
 
 
         let wrapClassName, inputClassName;

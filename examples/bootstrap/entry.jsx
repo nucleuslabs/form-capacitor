@@ -1,9 +1,9 @@
 const React = require('react');
 
-if (process.env.NODE_ENV !== 'production') {
-    const {whyDidYouUpdate} = require('why-did-you-update');
-    whyDidYouUpdate(React)
-}
+// if (process.env.NODE_ENV !== 'production') {
+//     const {whyDidYouUpdate} = require('why-did-you-update');
+//     whyDidYouUpdate(React)
+// }
 
 const ReactDOM = require('react-dom');
 const BootstrapForm = require('./BootstrapForm');

@@ -1,5 +1,5 @@
 const React = require('react');
-const {PropTypes} = React;
+const PropTypes = require('prop-types');
 const util = require('form-capacitor/util');
 const css = require('./ValueField.less');
 const connectField = require('form-capacitor/connectField');
@@ -12,7 +12,7 @@ class StatelessValueField extends React.PureComponent {
     // };
 
     render() {
-        const {value, children, dispatch, ui, errors, rules, name, valueGetter} = this.props;
+        const {value, children, ui, errors, rules, valueGetter} = this.props;
         // console.log('FORM ID',this.context.formId);
         // console.log(this.props);
         
@@ -28,7 +28,7 @@ class StatelessValueField extends React.PureComponent {
         };
 
         let wrapClassName;
-        let myClassNames = []
+        let myClassNames = [];
         if(rules.length && (ui.wasFocused || ui.formValidated)) {
             if(errors.length === 0) {
                 myClassNames.push(css.fieldValid);

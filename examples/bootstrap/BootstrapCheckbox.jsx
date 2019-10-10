@@ -1,15 +1,13 @@
 const React = require('react');
-const {PropTypes} = React;
-const _ = require('lodash');
+const PropTypes = require('prop-types');
 const css = require('./ValueField.less');
 const {connectField,util} = require('form-capacitor');
-const ShortId = require('shortid');
 const classNames = require('classnames');
 
 class StatelessBootstrapCheckbox extends React.PureComponent {
 
     render() {
-        const {value, children, dispatch, ui, errors, rules, name, options, disabled} = this.props;
+        const {value, children, ui, errors, rules, disabled} = this.props;
 
 
         let wrapClassName, inputClassName;
