@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.1.34",
+  "version": "0.1.35",
   "description": "Form manager for React/Redux",
   "main": "dist/index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "recompose": "^0.30.0",
-    "reselect": "^2.5.4",
+    "reselect": "^4.0.0",
     "shortid": "^2.2.6"
   },
   "peerDependencies": {
@@ -32,14 +32,15 @@
     "redux": "^3.7.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-object-assign": "^7.0.0",
-    "@babel/plugin-transform-react-jsx": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/cli": "^7.6",
+    "@babel/core": "^7.6",
+    "@babel/plugin-proposal-class-properties": "^7.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.6",
+    "@babel/plugin-syntax-object-rest-spread": "^7.2",
+    "@babel/plugin-transform-object-assign": "^7.2",
+    "@babel/plugin-transform-react-jsx": "^7.3",
+    "@babel/preset-env": "^7.6",
+    "@babel/preset-react": "^7.6",
     "@testing-library/react": "^9.3.0",
     "babel-loader": "^8.0.0",
     "concurrently": "^3.1.0",
@@ -54,6 +55,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-fast-compare": "^2.0.4",
     "react-redux": "^5.1.1",
     "redux": "^3.7.2",
     "style-loader": "^0.13.1",

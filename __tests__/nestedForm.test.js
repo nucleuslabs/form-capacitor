@@ -1,5 +1,5 @@
 import * as React from "react";
-import {render, fireEvent, wait, cleanup} from "react-testing-library";
+import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import {FormStoreProvider,connectForm, connectField, Rules, createReducer} from "../src";
 import {compose} from 'recompose';
 import { createStore, combineReducers } from 'redux';
@@ -68,17 +68,16 @@ class StatelessSubForm extends React.Component {
         if(!this.props.data) {
             return null;
         }
-        const {setField} = this.props;
         return (
             <div>
                 <div>
                     <span>Colour</span>
                     <SimpleTextBox data-testid="colour" name="colour"/>
                 </div>
-                <div>
-                    <button onClick={() => setField("colour", "Blue")}>+</button>
-                    <button onClick={() => setField([], {colour: "Red"})}>-</button>
-                </div>
+                {/*<div>*/}
+                {/*    <button onClick={() => setField("colour", "Blue")}>+</button>*/}
+                {/*    <button onClick={() => setField([], {colour: "Red"})}>-</button>*/}
+                {/*</div>*/}
             </div>
         );
     }
@@ -100,6 +99,7 @@ const DemoForm = createComponent({
         const {setField} = props;
         return (
             <div>
+                <div data-testid="title">{props.data.firstName || ''}{' '}{props.data.lastName || ''}</div>
                 <div>
                     <span>First Name</span>
                     <SimpleTextBox data-testid="firstName" name="firstName"/>
@@ -132,7 +132,7 @@ test("Demo Form Should have a lastName text input if we change it to \"Foo\" it 
     expect(input.value).toBeEmpty();
     fireEvent.change(input, {target: {value: 'Foo'}});
     expect(input.value).toBe('Foo');
-    fireEvent.change(input, {target: {value: 'Foo'}});
+    expect(getByTestId("title").innerHTML).toBe("Foo ");
 });
 
 test("Demo Form Should have a firstName text input that has a className of error if it is empty. ", async () => {
@@ -141,28 +141,30 @@ test("Demo Form Should have a firstName text input that has a className of error
     let input = getByTestId("firstName");
     fireEvent.change(input, {target: {value: 'B.A.'}});
     expect(input.value).toBe('B.A.');
+    expect(getByTestId("title").innerHTML).toBe("B.A. ");
     fireEvent.change(input, {target: {value: ''}});
     expect(input.value).toBeEmpty();
     expect(input.className).toBe('error');
 });
 
 test("Demo Form Should have buttons that use schema actions to make aliases called 'Joe' and other buttons with actions to remove them.", async () => {
-    let {getByTestId, getByText} = render(<DemoForm/>);
+    let {getByTestId, getAllByText} = render(<DemoForm/>);
     await wait(() => getByTestId("firstName"));
     let inputF = getByTestId("firstName");
     let inputL = getByTestId("lastName");
     expect(inputF.value).toBeEmpty();
     fireEvent.change(inputF, {target: {value: 'Foo'}});
     expect(inputF.value).toBe('Foo');
-    await wait(() => getByText("+"));
-    await wait(() => getByText("-"));
+    await wait(() => getAllByText("+"));
+    await wait(() => getAllByText("-"));
     expect(inputL.value).toBeEmpty();
-    fireEvent.click(getByText("+"));
+    fireEvent.click(getAllByText("+")[0]);
     expect(inputL.value).toBe("Danger");
-    fireEvent.click(getByText("-"));
+    fireEvent.click(getAllByText("-")[0]);
     expect(inputF.value).toBe("Joe");
     expect(inputL.value).toBe("Public");
-    fireEvent.click(getByText("+"));
+    expect(getByTestId("title").innerHTML).toBe("Joe Public");
+    fireEvent.click(getAllByText("+")[0]);
     expect(inputF.value).toBe("Joe");
     expect(inputL.value).toBe("Danger");
 });

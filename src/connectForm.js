@@ -7,11 +7,13 @@ const {compose, getContext, withContext} = require('recompose');
 const namespace = require('./namespace');
 const actions = require('./actionCreators');
 const ShortId = require('shortid');
-const { createSelector,defaultMemoize } = require('reselect');
+const { createSelector, defaultMemoize } = require('reselect');
 const shallowEqual = require('./shallowEqual');
 const {emptyObject} = require('./consts');
+// const reactFastCompare = require('react-fast-compare');
+// const createDeepEqualSelector = createSelectorCreator(defaultMemoize, reactFastCompare);
 
-const stateGetter = (s,p) => _.get(s, [namespace, p.id], emptyObject);
+const stateGetter = (s,p) => _.get(s, [namespace, p.form.id], emptyObject);
 
 function focusInput(input) {
     input.focus(); // TODO: check if input is an element, otherwise throw warning if it's a React component
@@ -48,7 +50,7 @@ function connectForm(options) {
 
 
 function selectorFactory(dispatch) {
-    const dataSelector = createSelector(stateGetter, state => _.get(state, 'data', emptyObject));
+    const dataSelector = createSelector(stateGetter, state =>_.get(state, 'data', emptyObject));
     const initialSelector = createSelector(stateGetter, state => _.get(state, 'initial', emptyObject));
     const dirtySelector = defaultMemoize((d,i) => !_.isEqual(d,i));
     const dirtyDirtySelector = createSelector(dataSelector, initialSelector, (d, i) => () => dirtySelector(d,i));
