@@ -70,7 +70,6 @@ const DemoForm = createComponent({
             connectForm({rules: {firstName: [Rules.required]}}),
         ],
     render: props => {
-        console.log(props.data);
         if(!props.data){
             return null;
         }
