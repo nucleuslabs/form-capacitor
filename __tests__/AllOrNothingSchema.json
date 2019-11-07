@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "AonForm": {
+      "title": "All Or Nothing Test Form",
+      "description": "All or Nothing Test Cases for FormCapacitor",
+      "type": "object",
+      "properties": {
+        "people": {
+          "type": "object",
+          "title": "Important People",
+          "errorMessage": "Please Fill out all the important people or leave them blank",
+          "items": {
+            "type": "object",
+            "title": "Alias",
+            "properties": {
+              "alias": {
+                "type": "string"
+              }
+            }
+          },
+          "default": []
+        },
+        "alias2": {
+          "type": "array",
+          "title": "Aliases Part Deux",
+          "errorMessage": "Please type a made up name which consists of words",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "multiple": {
+          "title": "Multiple Types",
+          "anyOf": [
+            {"type": "integer"},
+            {"type": "null"}
+          ]
+        },
+        "contacts": {
+          "type": "array",
+          "title": "Contacts",
+          "description": "List of appointments that need to be booked",
+          "items": {
+            "$ref": "#/definitions/Contact"
+          },
+          "default": [
+            {}
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["aka"],
+          "errorMessage": "Please enter a value in Either AKA or Last Name to save"
+        },
+        {"required": ["lastName"],
+          "errorMessage": "Please enter a value in Either AKA or Last Name to save"
+        }
+      ],
+      "required": [
+        "firstName", "middleName"
+      ]
+    },
+    "Contact": {
+      "title": "Contact",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "title": "First Name"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name"
+        },
+        "phone": {
+          "type": "integer",
+          "title": "Phone #"
+        }
+      }
+    }
+  }
+}
