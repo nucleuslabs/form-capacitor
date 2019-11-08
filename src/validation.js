@@ -3,6 +3,7 @@ import {getValue, delMap, setMap} from './helpers';
 import Ajv from "ajv";
 import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
+import UndefinedPropertyError from "./UndefinedPropertyError";
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
 /* istanbul ignore next */
@@ -40,6 +41,15 @@ const errTypeKeywordActions = {
             dupeMap.set(checkKey, error);
         }
     },
+    /*
+    "dependencies": (errMap, path, error, dupeMap) => {
+        //check keyword, missingProperty and  path so we don't have duplicate errors
+        const checkKey = `.dependencies-${error.params.missingProperty}. ${path.join(".")}`;
+        if(!dupeMap.has(checkKey)) {
+            setErrMap(errMap, [...path, 'properties', error.params.missingProperty], error);
+            dupeMap.set(checkKey, error);
+        }
+    },*/
     "required": (errMap, path, error) => {
         setErrMap(errMap, [...path, 'properties', error.params.missingProperty], error);
     },
@@ -140,7 +150,11 @@ function getSchemaNodeFromPath(schema, path) {
         switch(ret.type) {
             case 'object':
                 if(ret.properties) {
-                    ret = ret.properties[key];
+                    if(ret.properties[key] !== undefined){
+                        ret = ret.properties[key];
+                    } else {
+                        throw new UndefinedPropertyError(key, ret);
+                    }
                 }
                 break;
             case 'array':
@@ -263,7 +277,14 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
     }
 
     if(schema.dependencies) {
-        throw new Error("form-capacitor does not support dependency validation yet");
+        mapObject(schema.dependencies, (dependency, p) => {
+            if(Array.isArray(dependency)){
+                assignFieldSchema(buildSchemaTree(path, {dependencies: dependency}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+            } else if(dependency && dependency.properties){
+                assignFieldSchema(buildSchemaTree(path, {dependencies: dependency}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+            }
+        });
+        // throw new Error("form-capacitor does not support dependency validation yet");
     }
 
     let refCollection = [];
@@ -291,6 +312,20 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
     relatedRefMap.set([...relatedRefMap], refCollection);
 
     return [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap, relatedRefMap];//ADD A REFMAP HERE THAT WILL hold refs to fields so that you can fire related validators based on that if they exist!
+}
+
+/**
+ *
+ * @param {*} obj
+ * @param {Function} mapFunction
+ */
+function mapObject(obj, mapFunction) {
+    const keys = Object.keys(obj);
+    if(keys.length > 0) {
+        keys.map(key => {
+            mapFunction(obj[key], key);
+        });
+    }
 }
 
 /**

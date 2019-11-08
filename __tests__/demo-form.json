@@ -70,6 +70,39 @@
           "default": [
             {}
           ]
+        },
+        "allOrNothing": {
+          "title": "AoN 1",
+          "type": "object",
+          "properties": {
+            "aonthing1": {
+              "type": "string",
+              "title": "Thing 1"
+            },
+            "aonthing2": {
+              "type": "string",
+              "title": "Thing 2"
+            },
+            "aonthing3": {
+              "type": "string",
+              "title": "Thing 3"
+            }
+          },
+          "dependencies": {
+            "aonthing1": [
+              "aonthing2",
+              "aonthing3"
+            ],
+            "aonthing2": [
+              "aonthing1",
+              "aonthing3"
+            ],
+            "aonthing3": [
+              "aonthing1",
+              "aonthing2"
+            ]
+          },
+          "default": {}
         }
       },
       "anyOf": [
