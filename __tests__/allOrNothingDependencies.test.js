@@ -126,9 +126,10 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 
     fireEvent.change(getByTestId("aonthing1"), {target: {value: "Cheese"}});
-    fireEvent.click(getByTestId("v"));
+    // fireEvent.click(getByTestId("v"));
 
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
+    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.change(getByTestId("aonthing2"), {target: {value: "Fart"}});
     fireEvent.click(getByTestId("v"));
@@ -138,6 +139,9 @@ test("Test the base All or Nothing validation using dependencies keyword", async
 
     fireEvent.change(getByTestId("aonthing3"), {target: {value: "Time"}});
 
+    console.log(getByTestId("errorMapContainer").innerHTML);
+
+    expect(getByTestId("valid").innerHTML).toBe('VALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 
     fireEvent.click(getByTestId("v"));

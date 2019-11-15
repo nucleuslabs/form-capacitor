@@ -235,7 +235,10 @@ function delMapR(map, path) {
         if(!next.size) map.delete(first);
         return deleted;
     }
-    return map.delete(path[0]);
+    if(path.length > 0) {
+        return map.delete(path[0]);
+    }
+    return false;
 }
 
 /* istanbul ignore next */

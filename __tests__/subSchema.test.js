@@ -24,7 +24,7 @@ function TextBoxContainer({name}) {
 }
 
 function TextBoxArray({name}) {
-    const [value, set, {push}] = useConsumeArray(name);
+    const [value, {push}] = useConsumeArray(name);
 
     return <SubSchema path={name}>
         <div>
@@ -67,6 +67,11 @@ test("Demo Form Should have buttons that use schema actions to make aliases call
     expect(getByTestId("alias0").value).toBe('Joe');
     fireEvent.click(getByText("+"));
     expect(getByTestId("alias").childNodes.length).toBe(2);
+    fireEvent.click(getByText("+"));
     fireEvent.change(getByTestId("alias0"), {target: {value: 'Kim'}});
     expect(getByTestId("alias0").value).toBe('Kim');
+    fireEvent.change(getByTestId("alias2"), {target: {value: 'Chi'}});
+    expect(getByTestId("alias2").value).toBe('Chi');
+    fireEvent.change(getByTestId("alias2"), {target: {value: ''}});
+    expect(getByTestId("alias2").value).toBe('');
 });
