@@ -7,9 +7,11 @@
       "type": "object",
       "properties": {
         "firstName": {
-          "errorMessage": "Please type a name which consists of words",
+          "errorMessage": "Please type a name which consists of words, that is less than 20 characters and greater than 1 characters",
           "type": "string",
           "title": "First Name",
+          "maxLength": 20,
+          "minLength": 2,
           "pattern": "\\w"
         },
         "middleName": {

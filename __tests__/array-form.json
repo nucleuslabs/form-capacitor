@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "ArrayForm": {
+      "title": "Array Form",
+      "description": "Basic Form to demo array validation features of FormCapacitor",
+      "type": "object",
+      "properties": {
+        "alias2": {
+          "type": "array",
+          "title": "Aliases Part Deux",
+          "errorMessage": "Please type a made up name which consists of words",
+          "maxItems": 3,
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "title": "Alias",
+            "properties": {
+              "alias": {
+                "type": "string"
+              }
+            }
+          },
+          "default": []
+        },
+        "alias": {
+          "type": "array",
+          "title": "Aliases",
+          "errorMessage": "Please type a made up name which consists of words",
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 10
+          },
+          "default": []
+        }
+      }
+    },
+    "Contact": {
+      "title": "Contact",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "title": "First Name"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name"
+        },
+        "phone": {
+          "type": "integer",
+          "title": "Phone #"
+        }
+      }
+    }
+  }
+}

@@ -279,7 +279,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldSchemaMap, patchPat
     const patchPathStr = pathToPatchString([...patchPath]);
     setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'items'], [...patchPath], 0);
     assignFieldSchema(buildSchemaTree([...path], {...schema}), fieldSchemaMap, [...path]);
-    assignFieldSchema(buildSchemaTree([...path, 'items'], {...schema.items}), fieldSchemaMap, [...path, 'items']);
+    assignFieldSchema(buildSchemaTree([...path], {...schema}), fieldSchemaMap, [...path, 'items']);
     buildFieldSchemaMapR(schema.items, "items", [...path], [...patchPath, '0'], fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap, '0');
     subSchemaMap.set(patchPathStr, {...schema});
 }

@@ -24,7 +24,7 @@ function TextBoxContainer({name}) {
 }
 
 function TextBoxArray({name}) {
-    const [value, {push}] = useConsumeArray(name);
+    const [value, set, {push}] = useConsumeArray(name);
 
     return <SubSchema path={name}>
         <div>
