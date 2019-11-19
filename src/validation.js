@@ -37,8 +37,11 @@ const errTypeKeywordActions = {
     "object-dependencies": (errMap, path, error, dupeMap) => {
         //Object dependencies go deeper so append the proper schema path to the final path
         const finalPath = ajvStringToPath(error.schemaPath);
-        //pop off the trailing dependencies keyword
+        //Start Shifty Bit of code that shifts off /#/properties then pops off the trailing dependencies keyword
+        finalPath.shift();
+        finalPath.shift();
         finalPath.pop();
+        //End Shifty bit of Code
         //check keyword, missingProperty and  path so we don't have duplicate errors
         const checkKey = `.object-dependencies-${finalPath.join("-")}-${error.params.missingProperty}`;
         if(!dupeMap.has(checkKey)) {
@@ -258,9 +261,31 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldSchemaMap, patchPa
             const patchPathStr = pathToPatchString([...patchPath, p]);
             buildFieldSchemaMapR(schema.properties[p], p, [...path, 'properties'], [...patchPath, p], fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap);
             setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'properties', p], patchPath, p);
-            assignFieldSchema(buildSchemaTree([...path, 'properties', p], {...schema.properties[p]}), fieldSchemaMap, [...path, 'properties', p]);
+            assignFieldSchema(buildSchemaTree([...path, 'properties', p], {...schema.properties[p]}), fieldSchemaMap, [...path, 'properties', p], schema.dependencies !== undefined ? getDependencyRefs(schema.dependencies, p, path, patchPath, patchPathToSchemaPathMap) : []);
             subSchemaMap.set(patchPathStr, {...schema.properties[p]});
         }
+    }
+    if(schema.required && schema.required.length > 0) {
+        // Going to assign each root object/field level required to itself unlike anyOf or allOf
+        // because each field can decide whether it is required on its own unless they are in a
+        // codependent anyOf or allOf validation
+        schema.required.map(p => {
+            assignFieldSchema(buildSchemaTree(path, {required: [p]}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+        });
+        // assignFieldSchemas(new Set(schema.required.map(p => {
+        //      return patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p]));
+        //  })), buildSchemaTree(path, {required: [p]}), fieldSchemaMap);
+    }
+    if(schema.dependencies) {
+        mapObject(schema.dependencies, (dependency, p) => {
+            if(Array.isArray(dependency)){
+                patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
+                assignFieldSchema(buildSchemaTree(path, {dependencies: {[p]: dependency}}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+            } else if(dependency && dependency.properties) {
+                patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
+                assignFieldSchema(buildSchemaTree(path, {dependencies: {[p]: dependency}}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+            }
+        });
     }
 }
 
@@ -307,31 +332,6 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
             break;
     }
 
-    if(schema.required && schema.required.length > 0) {
-        // Going to assign each root object/field level required to itself unlike anyOf or allOf
-        // because each field can decide whether it is required on its own unless they are in a
-        // codependent anyOf or allOf validation
-        schema.required.map(p => {
-            assignFieldSchema(buildSchemaTree(path, {required: [p]}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
-        });
-        // assignFieldSchemas(new Set(schema.required.map(p => {
-        //      return patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p]));
-        //  })), buildSchemaTree(path, {required: [p]}), fieldSchemaMap);
-    }
-
-    if(schema.dependencies) {
-        mapObject(schema.dependencies, (dependency, p) => {
-            if(Array.isArray(dependency)){
-                patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
-                assignFieldSchema(buildSchemaTree(path, {dependencies: {[p]: dependency}}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
-            } else if(dependency && dependency.properties) {
-                patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
-                assignFieldSchema(buildSchemaTree(path, {dependencies: {[p]: dependency}}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
-            }
-        });
-        // throw new Error("form-capacitor does not support dependency validation yet");
-    }
-
     let refCollection = [];
 
     if(schema.anyOf && schema.anyOf.length > 0) {
@@ -368,10 +368,11 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
 function mapObject(obj, mapFunction) {
     const keys = Object.keys(obj);
     if(keys.length > 0) {
-        keys.map(key => {
-            mapFunction(obj[key], key);
+        return keys.map(key => {
+            return mapFunction(obj[key], key);
         });
     }
+    return [];
 }
 
 /**
@@ -459,23 +460,7 @@ function getFieldReferencesR(schema, propName, path = [], patchPath, patchPathTo
                 }
                 break;
             case 'dependencies':
-                if (schema[schemaProp].length > 0) {
-                    refs = new Set([...refs, ...mapObject(schema[schemaProp], (dependency, p) => {
-                        if(Array.isArray(dependency)){
-                            refs = new Set([...refs, ...dependency.reduce(
-                                (acc, depArray,  depPropName) => {
-                                    return [...acc, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, depPropName])), ...depArray.map((subDepName) => patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, subDepName])))];
-                                },
-                                []
-                            )]);
-                        } else if (dependency && dependency.properties){
-                            for(let targetPropName of Object.keys(dependency.properties)) {
-                                const objSubSet = getFieldReferencesR(dependency.properties[targetPropName], targetPropName, [...path, 'properties', targetPropName], [...patchPath, targetPropName], patchPathToSchemaPathMap);
-                                refs = new Set([...refs, [...path, 'properties', p] ,...objSubSet]);
-                            }
-                        }
-                    })]);
-                }
+                //skip these are processed separately
                 break;
             case 'anyOf':
             case 'allOf':
@@ -510,6 +495,21 @@ function getFieldReferencesR(schema, propName, path = [], patchPath, patchPathTo
     }
 
     return refs;
+}
+
+function getDependencyRefs(dependencySchema, propName, path, patchPath, patchPathToSchemaPathMap){
+    return new Set([...mapObject(dependencySchema, (dependency, p) => {
+        if(Array.isArray(dependency) && dependency.includes(propName)){
+            return [...path, 'properties', p];
+        } else if (dependency && dependency.properties){
+            for(let targetPropName of Object.keys(dependency.properties)) {
+                const objSubSet = getFieldReferencesR(dependency.properties[targetPropName], targetPropName, [...path, 'properties', targetPropName], [...patchPath, targetPropName], patchPathToSchemaPathMap);
+                if(objSubSet.has(propName)){
+                    return [...path, 'properties', targetPropName];
+                }
+            }
+        }
+    }).filter(x => x)]);
 }
 
 /**
@@ -609,9 +609,9 @@ export function watchForErrorsPatch(schema, data, ajv) {
 
 function validateRefs(refs, validators, data, errors, skipPaths = []){
     for(let refPath of refs){
-        // @todo: Filter out recursive refs... Once they are filtered this may not be necessary...
+        // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
         if(!skipPaths.includes(refPath)){
-            runValidator(refPath, validators, data, errors,[...refs]);
+            runValidator(refPath, validators, data, errors,[...skipPaths, ...refs]);
         }
     }
 }
