@@ -116,41 +116,32 @@ function DemoForm() {
 
 afterEach(cleanup);
 
-test("Test the base All or Nothing validation using dependencies keyword", async () => {
+test("Test basic root level dependencies keyword", async () => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("aonthing1"));
+    await wait(() => getByTestId("dep1"));
     //Check to make sure everything is nothing
-    expect(getByTestId("aonthing1").value).toBe('');
-    expect(getByTestId("aonthing2").value).toBe('');
-    expect(getByTestId("aonthing3").value).toBe('');
-
+    expect(getByTestId("dep1").value).toBe('');
+    expect(getByTestId("dep2").value).toBe('');
     expect(getByTestId("valid").innerHTML).toBe('Unknown');
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 
     fireEvent.click(getByTestId("v"));
-
     expect(getByTestId("valid").innerHTML).toBe('VALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 
-    fireEvent.change(getByTestId("aonthing1"), {target: {value: "Cheese"}});
-    // fireEvent.click(getByTestId("v"));
-
+    fireEvent.change(getByTestId("dep1"), {target: {value: "Cheese"}});
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
-    fireEvent.change(getByTestId("aonthing2"), {target: {value: "Fart"}});
     fireEvent.click(getByTestId("v"));
-
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
-    fireEvent.change(getByTestId("aonthing3"), {target: {value: "Time"}});
+    fireEvent.change(getByTestId("dep2"), {target: {value: "Fart"}});
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
-    fireEvent.click(getByTestId("v"));
-    expect(getByTestId("valid").innerHTML).toBe('VALID');
 
     fireEvent.click(getByTestId("v"));
-
     expect(getByTestId("valid").innerHTML).toBe('VALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 });
+

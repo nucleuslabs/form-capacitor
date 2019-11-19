@@ -73,6 +73,16 @@
             {}
           ]
         },
+        "dep1": {
+          "type": "string",
+          "title": "Other",
+          "pattern": "\\w"
+        },
+        "dep2": {
+          "type": "string",
+          "title": "Other",
+          "pattern": "\\w"
+        },
         "allOrNothing": {
           "title": "AoN 1",
           "type": "object",
@@ -118,7 +128,12 @@
       ],
       "required": [
         "firstName", "middleName"
-      ]
+      ],
+      "dependencies": {
+        "dep1": [
+          "dep2"
+        ]
+      }
     },
     "Contact": {
       "title": "Contact",
