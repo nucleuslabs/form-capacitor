@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {checkSchemaPathForErrors, createAjvObject, watchForErrorsPatch} from "./validation";
+import {checkSchemaPathForErrors, createAjvObject, watchForPatches} from "./validation";
 import jsonSchemaToMST from "./jsonSchemaToMST";
 import {getObservable, isArray, isObject, isPlainObject, setValue} from "./helpers";
 import stringToPath from "./stringToPath";
@@ -158,10 +158,13 @@ export default function useSchema(FunctionalComponent, options) {
 
             formData._afterDefaults();
 
-            const {errors, validate} = watchForErrorsPatch(jsonSchema, formData, ajv);
+            const {errors, metaDataMap, validate} = watchForPatches(jsonSchema, formData, ajv);
+
+
 
             setContext({
                 formData: formData,
+                metaDataMap: metaDataMap,
                 errorMap: errors,
                 set: (path, value) => isPlainObject(path) ? formData._replaceAll({...path}) : formData._set(path, value),
                 reset: formData._reset,

@@ -244,6 +244,17 @@ function setPatchPathSchema(patchPathToSchemaPathMap, schemaPath, rootPatchPath,
     patchPathToSchemaPathMap.set(pathToPatchString([...rootPatchPath, leafName]), [...schemaPath]);
 }
 
+function assignMetaData(metaData, path, metaDataMap) {
+    // @todo: Filter out recursive refs...
+    const fieldPathId = pathToPatchString(path);
+    if (metaDataMap.has(fieldPathId)) {
+        const mapInst = metaDataMap.get(fieldPathId);
+        Object.assign(mapInst, metaData);
+    } else {
+        metaDataMap.set(fieldPathId, {...metaData});
+    }
+}
+
 /**
  *
  * @param schema
@@ -255,7 +266,7 @@ function setPatchPathSchema(patchPathToSchemaPathMap, schemaPath, rootPatchPath,
  * @param subSchemaMap
  */
 /* istanbul ignore next */
-function buildFieldObjectSchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap) {
+function buildFieldObjectSchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap, metaDataMap) {
     if(schema.properties) {
         for(let p of Object.keys(schema.properties)) {
             const patchPathStr = pathToPatchString([...patchPath, p]);
@@ -271,7 +282,9 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldSchemaMap, patchPa
         // codependent anyOf or allOf validation
         schema.required.map(p => {
             assignFieldSchema(buildSchemaTree(path, {required: [p]}), fieldSchemaMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+            assignMetaData({required: true}, [...patchPath, p], metaDataMap);
         });
+
         // assignFieldSchemas(new Set(schema.required.map(p => {
         //      return patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p]));
         //  })), buildSchemaTree(path, {required: [p]}), fieldSchemaMap);
@@ -300,12 +313,12 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldSchemaMap, patchPa
  * @param subSchemaMap
  */
 /* istanbul ignore next */
-function buildFieldArraySchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap) {
+function buildFieldArraySchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap, metaDataMap) {
     const patchPathStr = pathToPatchString([...patchPath]);
     setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'items'], [...patchPath], 0);
     assignFieldSchema(buildSchemaTree([...path], {...schema}), fieldSchemaMap, [...path]);
     assignFieldSchema(buildSchemaTree([...path], {...schema}), fieldSchemaMap, [...path, 'items']);
-    buildFieldSchemaMapR(schema.items, "items", [...path], [...patchPath, '0'], fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap, '0');
+    buildFieldSchemaMapR(schema.items, "items", [...path], [...patchPath, '0'], fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap, metaDataMap);
     subSchemaMap.set(patchPathStr, {...schema});
 }
 
@@ -318,17 +331,17 @@ function buildFieldArraySchema(schema, path, patchPath, fieldSchemaMap, patchPat
  * @param {Map|undefined} fieldSchemaMap This is a map that will be mutated and will be set in tree form setting a schema for each scalar field (leaf of the tree)
  */
 /* istanbul ignore next */
-function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], fieldSchemaMap = new Map(), patchPathToSchemaPathMap = new Map(), relatedRefMap = new Map(), subSchemaMap = new Map()) {
+function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], fieldSchemaMap = new Map(), patchPathToSchemaPathMap = new Map(), relatedRefMap = new Map(), subSchemaMap = new Map(), metaDataMap = new Map()) {
     if(propName !== undefined) {
         path.push(propName);
     }
 
     switch(schema.type) {
         case 'object':
-            buildFieldObjectSchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap);
+            buildFieldObjectSchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap, metaDataMap);
             break;
         case 'array':
-            buildFieldArraySchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap);
+            buildFieldArraySchema(schema, path, patchPath, fieldSchemaMap, patchPathToSchemaPathMap, relatedRefMap, subSchemaMap, metaDataMap);
             break;
     }
 
@@ -356,7 +369,7 @@ function buildFieldSchemaMapR(schema, propName, path = [], patchPath = [], field
 
     relatedRefMap.set([...relatedRefMap], refCollection);
 
-    return [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap, relatedRefMap];//ADD A REFMAP HERE THAT WILL hold refs to fields so that you can fire related validators based on that if they exist!
+    return [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap, metaDataMap, relatedRefMap];//ADD A REFMAP HERE THAT WILL hold refs to fields so that you can fire related validators based on that if they exist!
 }
 
 
@@ -434,8 +447,7 @@ function mergeObjects(...schemas) {
     return Object.assign({}, ...schemas);
 }
 
-/* istanbul ignore next */
-function pathToPatchString(path, sep = "/") {
+export function pathToPatchString(path, sep = "/") {
     return sep + path.join(sep);
 }
 
@@ -513,18 +525,18 @@ function getDependencyRefs(dependencySchema, propName, path, patchPath, patchPat
 }
 
 /**
- * watches a MobXStateTree Object for errors using a dereferenced json_schema
+ * watches a MobXStateTree Object for patches then updates which a map of which fields are required and runs validation for errors using a dereferenced json_schema
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
  * @param {{}} data {MobXStateTree} object
  * @param {{}} ajv {Ajv} object
  * @returns {{errors: ObservableMap<any, any>, validate: validate}}
  */
-export function watchForErrorsPatch(schema, data, ajv) {
+export function watchForPatches(schema, data, ajv) {
     const errors = observable.map();
     const paths = observable.map();
     const validators = new Map();
     //build field validators
-    const [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap] = buildFieldSchemaMapR(schema);
+    const [fieldSchemaMap, patchPathToSchemaPathMap, subSchemaMap, metaDataMap] = buildFieldSchemaMapR(schema);
 
     for (let [path ,{schema:fieldSchema, refs}] of fieldSchemaMap) {
         // console.debug(path);
@@ -593,7 +605,7 @@ export function watchForErrorsPatch(schema, data, ajv) {
 
     const validate = ajv.compile(schema);
     return {
-        errors, validate: (data) => {
+        errors, metaDataMap, validate: (data) => {
             if(!validate(data)) {
                 const ajvErrMap = ajvErrorsToErrorMap(validate.errors, paths, undefined, undefined);
                 processAjvErrorMapUsingSchemaR(schema, undefined, data, ajvErrMap, errors, undefined);
@@ -602,7 +614,7 @@ export function watchForErrorsPatch(schema, data, ajv) {
                 errors.clear();
                 return true;
             }
-        }
+        },
     };
 }
 

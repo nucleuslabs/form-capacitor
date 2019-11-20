@@ -3,10 +3,10 @@ import jsonSchemaToMST from "../src/jsonSchemaToMST";
 import $RefParser from 'json-schema-ref-parser';
 import {setValue} from "../src";
 import {toJS,observable} from "mobx";
-import {watchForErrorsPatch, createAjvObject} from "../src/validation";
+import {watchForPatches, createAjvObject, pathToPatchString} from "../src/validation";
 
 //tests requiring mobx state tree
-describe('watchForErrorsPatch', function() {
+describe('watchForPatches', function() {
     it('Should watch a mobx state tree for validation errors and catch observable changes etc.', async function() {
         const parser = new $RefParser();
         let schemaPromise = parser.dereference(testSchema);
@@ -20,7 +20,7 @@ describe('watchForErrorsPatch', function() {
         }));
         const ajv = createAjvObject();
         let mobxStateTree = Model.create({});
-        const {errors, validate} = watchForErrorsPatch(schema, mobxStateTree, ajv);
+        const {errors, validate} = watchForPatches(schema, mobxStateTree, ajv);
         mobxStateTree.set("firstName", undefined);
         mobxStateTree.set("firstName", "Hello");
         mobxStateTree.set("lastName", "World");
@@ -31,5 +31,12 @@ describe('watchForErrorsPatch', function() {
         expect(errors).toEqual(observable.map());
         const passed = validate(toJS(mobxStateTree));
         expect(passed).toBeTrue();
+    });
+});
+
+describe('pathToPatchString', function() {
+    it('Should convert a path array to a mobx-state-tree style patchString.', async function() {
+        const path = ['path', 'to', 'data'];
+        expect(pathToPatchString(path)).toEqual("/path/to/data");
     });
 });
