@@ -6,9 +6,10 @@ import stringToPath from "./stringToPath";
 import SchemaAssignmentError from "./SchemaAssignmentError";
 import {applySnapshot, getSnapshot} from "mobx-state-tree";
 import SchemaDataReplaceError from "./SchemaDataReplaceError";
-import {isObservable, observable, toJS} from "mobx";
+import {isObservable, observable} from "mobx";
 import $RefParser from "json-schema-ref-parser";
 import FormContext from './FormContext';
+import mobxStateTreeToAjvFriendlyJs from "./mobxStateTreeToAjvFriendlyJs";
 
 /**
  *
@@ -169,7 +170,8 @@ export default function useSchema(FunctionalComponent, options) {
                 set: (path, value) => isPlainObject(path) ? formData._replaceAll({...path}) : formData._set(path, value),
                 reset: formData._reset,
                 validate: () => {
-                    return validate(toJS(formData));
+                    //need to preprocess the underlying state tree before validation to convert it to js and replace all empty arrays with undefined
+                    return validate(mobxStateTreeToAjvFriendlyJs(formData));
                 },
                 path: [],
                 ready: true

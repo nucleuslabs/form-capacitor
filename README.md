@@ -15,14 +15,14 @@ Use json-schema to define the state and validation rules for your form then use 
 **Pros:**
 1. Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields.
 2. Using Json-schema allows you to validate in the browser and server using the same ruleset.
-3. The API can be used with a minimum hooks so it works great with functional components.
+3. The API is hooks and the hooks for use with inputs work similar to `useState` works well with functional components.
 4. It isn't difficult to build most forms with this library even very complex forms can be created
+5. Works well with popular UI components like react-select and react-date-picker and would pair nicely with material UI   
 
-
-**W:**
-1. Doesn't work with classes :(
-3. 2 of the hook functions `useSchema` and `useSchemaPath` are actually Hook + HOC hybrids which may seem weird but it is because they use Context Providers which need to wrap components
-4. For complex state with deep tree structures you have to either know the full path for each input or wrap them in a `useSchemaPath` HookHOC to set the proper paths in context
+**Cons:**
+1. Isn't designed to work well with classes because it uses Hooks :(
+3. 1 of the hook functions `useSchema` is actually Hook + HOC hybrids which may seem weird but it is because it uses a Context Provider which need to wrap components
+4. For complex state with deep tree structures you have to either specificy the full path in the name which employs path separation using the '.' character i.e "demographicInfo.homeAddress.postalCode" for each input or wrap them in a `<SubScehma path={name}>` set the proper paths in context
 
 
 ## Usage
@@ -32,7 +32,14 @@ These are the core methods that are used to interact with the underlying mobx-st
 
  - getValue(obj, path) - gets a value in a mobx state tree or observable map tree based on a path array
  - setValue(obj, path, value) - sets a value in a mobx state tree or observable map tree based on a path array
- - errorMapToFlatArray(errorMap) - converts an observable array errorMap to a flat array of error objects
+ 
+### Error Map  Methods
+
+- getFlattenedErrors(ErrorMap, path = []) 
+- getErrors(ErrorMap, path = [])
+- getErrorNode(ErrorMap, path = [])
+- setError(ErrorMap, path = [], errorObj) 
+- setErrors(ErrorMap, path = [], errorObj)
 
 ### json-schema Definition for your form
 Create a definition file for your form including any validation rules.
@@ -153,6 +160,7 @@ path: path to observable in the state tree within the current context
 [
 	value: {any}, //Observable value within the underlying mobx state tree
 	change: func, //Setter function
+    metaData: {required: boolean} //meta data currently only holds whether or not the field is required but will be expanded in the future
 ]
 ~~~
 
@@ -272,26 +280,13 @@ function TextBoxArray({name}) {
 ~~~
 
 
-### `useSchemaPath` Hook
+### `SubSchema` Tag
 
-This hook works much like useSchema in that it wraps `component` in context 
-and then passes `compoonent` back so that any children of the component that 
-use the useConsume hooks will have the desired context path. You can use this component
-for nesting complex or inputs 
+This tag wraps its children in a context provider and sets the contextual path. The path will automatically be set for any child components for useConsume* hooks. You can use this component
+for nesting inputs so that you don't have to prepend a path on each input. This Tag is designed to be used recursively so that wrap each level of your tree in this tag so that your inputs only need there local path in the the `name` attribute.
 
-**args:**
-component: Component that you want to wrap so that the context path gets updated 
+**attributes:**
 path: path to append in the current context 
-
-**returns:**
-
-~~~
-[
-	<FunctionalComponent/> wrapped in context
-]
-~~~
-
-This example is a SimpleTextBox Component which is a basic wrapped html text input.
 
 
 **json-schema (demo-form.json)**
@@ -416,7 +411,7 @@ import useConsumeArray from "../src/useConsumeArray";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsume from "../src/useConsume";
 import {useObserver} from "mobx-react-lite";
-import useSchemaPath from "../src/useSchemaPath";
+import SubSchema from "../src/SubSchema";
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
@@ -430,18 +425,20 @@ function SimpleTextBox(props) {
 }
 
 function TextBoxContainer({name}){
-    return useSchemaPath(props => <SimpleTextBox name={'alias'}/>, name);
+    return <SubSchema path={name}><SimpleTextBox name={'alias'}/></SubSchema>;
 }
 
 function TextBoxArray({name}) {
     const [value, set, {push, remove, slice, clear, replace}] = useConsumeArray(name);
 
-    return useSchemaPath(props => <div>
-            <div>
-                {value.map((inst, key) => <TextBoxContainer key={key} name={`${key}`}/>)}
-            </div>
-            <button onClick={() => push({alias: "Joe"})}>+</button>
-       </div>, name);
+    return <SubSchema path={name}>
+               <div>
+                   <div>
+                       {value.map((inst, key) => <TextBoxContainer key={key} name={`${key}`}/>)}
+                   </div>
+                   <button onClick={() => push({alias: "Joe"})}>+</button>
+               </div>
+           </SubSchema>;
 }
 
 function DemoForm() {
@@ -498,7 +495,7 @@ export default function FormErrors(props) {
 
 Form-capacitor uses mobx 4 (for IE support) and a mobx-state-tree to manage 
 form state. This style of observable based state management allows you to 
-develop forms that only re-render components where the state has changed for 
+develop forms that only re-render input components where the state has changed for 
 the inputs affected by the User interactions. The data for the form is pre
 generated into a mobx state tree from the json-schema and then 
 
@@ -522,7 +519,7 @@ renders the error state for fields who's error state has changed due to
 a change in the underlying data which triggers a change in the validity 
 of the field.
 
-### onEvent Validation
+### onEvent Imperative Validation
 
 The schema decorator passes a validation function as a prop to a form 
 component decorated with the schema decorator that will fully 
@@ -536,15 +533,20 @@ or at the form provider level via the props.errorMap observable map tree.
 The`errorMapToFlatArray` function included in form-capacitor will turn errorMap Tree 
 into a flat array of error objects.    
 
-## Why another form state / validation management library?
+## Why did we develop another form state / validation management library?
 
 We have used formik and redux-forms which are great form state 
 management libraries with many features and they make managing forms 
-much easier but the complexity and amount of fields in our forms caused 
-too performance issues including many re-renders so we decided 
-to try to make a generic form library that could handle re-renders using a mobx-state-tree.
+much easier but the complexity and amount of fields in the forms we were using for medical applications
+caused too many performance issues due to the fact that full form state updates were causing re-renders 
+as you type in text areas and text inputs.
+We decided to make a generic form library that could handle re-renders using a mobx-state-tree.
 We also wanted to use standard validation syntax between front-end and back-end using json-schema.       
 
 ## Testing
 
 Run `make test` to run all the tests and see a coverage report.
+
+
+### JSON Schema 'As You Type' validation todos:
+- Support array type **Tuple Validation** (https://json-schema.org/understanding-json-schema/reference/array.html#tuple-validation)

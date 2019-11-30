@@ -1,12 +1,12 @@
 import useSchema from "../src/useSchema";
 import jsonSchema from "./demo-form";
-import {errorMapToFlatArray} from "../src";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import React, {useState} from "react";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
 import {useObserver} from "mobx-react-lite";
+import {getFlattenedErrors} from "../src/errorMapping";
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
@@ -63,7 +63,7 @@ function DemoForm() {
             </div>
             {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
             <div data-testid="valid">{valid}</div>
-            {valid !== 'Unknown' && <ul data-testid="errors">{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}
+            {valid !== 'Unknown' && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.title} - {e.message}</li>)}</ul>}
         </div>)
     }, {
         schema: jsonSchema,

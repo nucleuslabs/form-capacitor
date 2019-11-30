@@ -1,4 +1,3 @@
-import {errorMapToFlatArray} from "../src";
 import React, {useState} from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
@@ -8,6 +7,7 @@ import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
 import {useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
+import {getFlattenedErrors} from "../src/errorMapping";
 
 
 function SimpleTextBox(props) {
@@ -76,14 +76,14 @@ function DemoForm() {
                             setErrors([]);
                         } else {
                             setValid("INVALID");
-                            setErrors(errorMapToFlatArray(errorMap));
+                            setErrors(getFlattenedErrors(errorMap));
                         }
                     }}>Validate
                     </button>
                 </div>
                 <div data-testid="valid">{valid}</div>
                 <div data-testid="errors">{errs.length > 0 && errs.map(e => e.message)}</div>
-                <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="emap">{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+                <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="emap">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
                 <div data-testid="weird">{typeof formData.lastName}</div>
                 <div data-testid="science">{formData.lastName}</div>
             </div>

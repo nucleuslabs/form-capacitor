@@ -88,7 +88,18 @@
           "type": "object",
           "properties": {
             "aonthing1": {
-              "type": "string",
+              "type": "array",
+              "default": [],
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
               "title": "Thing 1"
             },
             "aonthing2": {

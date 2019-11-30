@@ -4,12 +4,33 @@ import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
-
 import useConsumeArray from "../src/useConsumeArray";
 import {useObserver} from "mobx-react-lite";
 import SubSchema from "../src/SubSchema";
-import {errorMapToFlatArray} from "../src";
 import {toJS} from "mobx";
+import {getFlattenedErrors} from "../src/errorMapping";
+
+
+
+function TextBoxArray({name}) {
+    const [value, set, {push, remove, slice, splice, clear, replace}] = useConsumeArray(name);
+    const [hasErrors] = useConsumeErrors(name);
+
+    const handleChange = idx => ev => {
+        splice(idx, 1, ev.target.value);
+    };
+    return <div>
+        <div data-testid={name}>
+            {value.map((inst, key) => <div key={key}><input type="text" className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""}
+                                                  onChange={handleChange(key)}/></div>)}
+        </div>
+        <button data-testid={`${name}_add`} onClick={() => push("Cheese")}>+</button>
+        <button onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
+        <button onClick={() => value.length > 0 && set(slice(0, value.length - 1))}>--</button>
+        <button data-testid={`${name}_kill`} onClick={() => set(undefined)}>clear</button>
+        <button onClick={() => replace(["NOT CHEESE"])}>replace</button>
+    </div>;
+}
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
@@ -33,7 +54,7 @@ function AllOrNothing ({name}){
     return <SubSchema path={name}>
         <div>
             <span>Thing 1</span>
-            <SimpleTextBox data-testid="aonthing1" name="aonthing1"/>
+            <TextBoxArray data-testid="aonthing1" name="aonthing1"/>
         </div>
         <div>
             <span>Thing 2</span>
@@ -89,7 +110,7 @@ function DemoForm() {
             </div>
             {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
             <div data-testid="valid">{valid}</div>
-            <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="errors">{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+            <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
         </div>);
     }, {
         schema: jsonSchema,
@@ -121,7 +142,7 @@ test("Test the base All or Nothing validation using dependencies keyword", async
 
     await wait(() => getByTestId("aonthing1"));
     //Check to make sure everything is nothing
-    expect(getByTestId("aonthing1").value).toBe('');
+    expect(getByTestId("aonthing1").innerHTML).toBe('');
     expect(getByTestId("aonthing2").value).toBe('');
     expect(getByTestId("aonthing3").value).toBe('');
 
@@ -133,9 +154,13 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("valid").innerHTML).toBe('VALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 
-    fireEvent.change(getByTestId("aonthing1"), {target: {value: "Cheese"}});
-    // fireEvent.click(getByTestId("v"));
+    // fireEvent.change(getByTestId("aonthing2"), {target: {value: "Fart"}});
 
+    fireEvent.click(getByTestId("aonthing1_add"));
+    // fireEvent.change(getByTestId("aonthing1"), {target: {value: "Cheese"}});
+    fireEvent.click(getByTestId("v"));
+
+    expect(getByTestId("valid").innerHTML).toBe('INVALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.change(getByTestId("aonthing2"), {target: {value: "Fart"}});
@@ -145,9 +170,12 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.change(getByTestId("aonthing3"), {target: {value: "Time"}});
-    expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
+    // console.log(getByTestId("errorMapContainer").innerHTML);
+     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
+
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("valid").innerHTML).toBe('VALID');
+    expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 
     fireEvent.click(getByTestId("v"));
 

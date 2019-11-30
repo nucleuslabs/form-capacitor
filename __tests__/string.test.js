@@ -1,12 +1,12 @@
 import useSchema from "../src/useSchema";
 import jsonSchema from "./demo-form";
-import {errorMapToFlatArray} from "../src";
 import {render, fireEvent, wait} from "@testing-library/react";
 import React, {useState} from "react";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import {useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
+import {getFlattenedErrors} from "../src/errorMapping";
 
 function SimpleTextBox(props) {
     const [value, change] = useConsume(props.name);
@@ -57,7 +57,7 @@ function DemoForm() {
                 {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
                 <div data-testid="valid">{valid}</div>
                 {/*<div data-testid="errorContainer">{valid !== 'Unknown' && <ul data-testid="errors">{errors.length > 0 && errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}</div>*/}
-                <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="errors">{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+                <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
             </div>
         );
     }, {
@@ -98,6 +98,7 @@ describe('When do defaults get validated?', function() {
         fireEvent.change(getByTestId("firstName"), {target: {value: "Zaboomafoo"}});
         expect(getByTestId("firstName").value).toBe('Zaboomafoo');
         expect(getByTestId("firstNameErrors").childNodes.length).toBe(0);
+        // console.log(getByTestId("errorMapContainer").innerHTML);
         expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
 
         fireEvent.change(getByTestId("firstName"), {target: {value: "X"}});

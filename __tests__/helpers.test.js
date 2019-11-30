@@ -34,7 +34,7 @@ import {
     isInt, isIntLoose
 } from "../src/helpers";
 import {ObservableMap, observable, isObservable, ObservableSet} from "mobx";
-import {errorMapToFlatArray} from "../src";
+
 
 describe('EMPTY_ARRAY', function() {
     it('Should be a frozen Array', function() {
@@ -439,27 +439,3 @@ describe('toObservable', function() {
         expect(isObservable(toObservable({beef: {"cake": "isGood"}}))).toBeTrue();
     });
 });
-
-describe('errorMapToFlatArray', function() {
-    it('Should covert an observable map of errors to a flat array of errors', function() {
-        const errorMap = observable.map({
-            "properties": observable.map({
-                "f1": observable.array([
-                    {title: "Field 1", message: "Error in Field one.", keyword: "required"},
-                    {title: "Field 1", message: "Field one required baby.", keyword: "required"},
-                ]), "f2": observable.array([
-                    {title: "Field 2", message: "Error in Field 2.", keyword: "required"},
-                    {title: "Field 2", message: "Field 2 required baby.", keyword: "required"},
-                ])
-            })
-        });
-        const expectedErrs = [
-            {title: "Field 1", message: "Error in Field one.", keyword: "required"},
-            {title: "Field 1", message: "Field one required baby.", keyword: "required"},
-            {title: "Field 2", message: "Error in Field 2.", keyword: "required"},
-            {title: "Field 2", message: "Field 2 required baby.", keyword: "required"}
-        ];
-        expect(errorMapToFlatArray(errorMap)).toEqual(expectedErrs);
-    });
-});
-
