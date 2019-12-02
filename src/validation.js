@@ -275,7 +275,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
                 errorPathMaps: errorPathMaps
 
             });
-            setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'properties', p], patchPath, p);
+            setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'properties', p], [...patchPath], p);
             assignFieldDefinition(buildSchemaTree([...path, 'properties', p], {...schema.properties[p]}), fieldDefinitionMap, [...path, 'properties', p], schema.dependencies !== undefined ? getDependencyRefs(schema.dependencies, p, path, patchPath, patchPathToSchemaPathMap) : []);
         }
     }
@@ -351,13 +351,13 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
             errorDataPathMap.set(pathToPatchString(additionalItemsPath) , additionalItemsPath);
             subSchemaPathMap.set(pathToPatchString([...additionalItemsPath]), schema.additionalItems);
             if(!isBoolean(schema.additionalItems)) {
-                setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'additionalItems'], [...patchPath], 0);
+                setPatchPathSchema(patchPathToSchemaPathMap, [...path], [...patchPath], 'additionalItems');
                 assignFieldDefinition(fieldDefinitionMap.get(pathToPatchString(path)).schema, fieldDefinitionMap, [...path, 'additionalItems'], [[...path]]);
                 buildFieldDefinitionMapR({
                     schema: schema.items,
                     propName: "additionalItems",
                     path: [...path],
-                    patchPath: [...patchPath],
+                    patchPath: [...patchPath, "additionalItems"],
                     fieldDefinitionMap: fieldDefinitionMap,
                     patchPathToSchemaPathMap: patchPathToSchemaPathMap,
                     relatedRefMap: relatedRefMap,
@@ -368,17 +368,20 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
         }
     } else {
         const errorSchemaPathMap = errorPathMaps.get('schema');
-        // const errorDataPathMap = errorPathMaps.get('data');
+        const errorDataPathMap = errorPathMaps.get('data');
         const subSchemaPathMap = errorPathMaps.get('subSchema');
-        errorSchemaPathMap.set(pathToPatchString([...path, "items"]), [...patchPath]);
-        subSchemaPathMap.set(pathToPatchString([...patchPath]), schema.items);
+        const subPatchPath = [...patchPath, "0"];
+        const patchPathStr = pathToPatchString(subPatchPath);
+        errorSchemaPathMap.set(pathToPatchString([...path, "items", "0"]), [...subPatchPath]);
+        errorDataPathMap.set(patchPathStr, subPatchPath);
+        subSchemaPathMap.set(patchPathStr, schema.items);
         setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'items'], [...patchPath], 0);
         assignFieldDefinition(buildSchemaTree([...path, "items", '0'], {...schema.items}), fieldDefinitionMap, [...path, "items", '0'], [[...path]]);
         buildFieldDefinitionMapR({
             schema: schema.items,
             propName: "0",
             path: [...path, 'items'],
-            patchPath: [...patchPath],
+            patchPath: [...subPatchPath],
             fieldDefinitionMap: fieldDefinitionMap,
             patchPathToSchemaPathMap: patchPathToSchemaPathMap,
             relatedRefMap: relatedRefMap,
@@ -616,10 +619,10 @@ export function watchForPatches(schema, data, ajv) {
     for (let [path ,{schema:fieldDefinition, refs}] of fieldDefinitionMap) {
         // console.debug(path);
         // console.debug(fieldDefinition);
-        const errorPath = schemaErrorPathMap.has(path) ? schemaErrorPathMap.get(path) : ajvStringToPath(fieldDefinition.errorPath || path).filter((_, idx) => (idx > 1));
+        const errorPath = schemaErrorPathMap.has(path) ? schemaErrorPathMap.get(path) : ajvStringToPath(fieldDefinition.errorPath || path).filter((_, idx) => (idx > 0));
         validators.set(path, {
             validate: ajv.compile(fieldDefinition),
-            subSchema: subSchemaPathMap.get(errorPath),
+            subSchema: subSchemaPathMap.get(pathToPatchString(errorPath)),
             errorPath: errorPath,
             refs: refs
         });
@@ -767,7 +770,10 @@ function filterJsonSchemaErrors(err, errorPath, cache = {}){
  * @returns {string[]}
  */
 function ajvStringToPath(pathStr, sep = "/"){
-    return pathStr.split(sep);
+    const pathArr = pathStr.split(sep);
+    //shift off the first element as AJV paths always start with a leading slash '/some/ajv/path'
+    pathArr.shift();
+    return pathArr;
 }
 
 /**
@@ -776,7 +782,6 @@ function ajvStringToPath(pathStr, sep = "/"){
  * @returns {string}
  */
 function rebuildPatchPath(pathStr, sep = "/"){
-    const re = /^\d+$/;
-    const path = ajvStringToPath(pathStr, sep).map(node => node.match(re) ? "0" : node);
-    return path.join(sep);
+    const path = ajvStringToPath(pathStr, sep).map(node => node.match(/^\d+$/) ? "0" : node);
+    return pathToPatchString(path, sep);
 }

@@ -14,7 +14,7 @@ export default function useConsumeArray(path) {
     const {_push, _pop, _slice, _splice, _clear, _replace, _remove} = context.formData;
     const value = getValue(context.formData, fullPath);
     return useObserver(() => [
-        value.slice ? value.slice() : [] ,
+        (value && value.slice) ? value.slice() : [] ,
         v => context.set(fullPath, v),
         {
             push: v => _push(fullPath, v),
