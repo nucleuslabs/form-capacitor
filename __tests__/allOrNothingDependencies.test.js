@@ -12,7 +12,7 @@ import {getFlattenedErrors} from "../src/errorMapping";
 
 
 
-function TextBoxArray({name}) {
+function TextBoxArray({name, buttonId}) {
     const [value, set, {push, remove, slice, splice, clear, replace}] = useConsumeArray(name);
     const [hasErrors] = useConsumeErrors(name);
 
@@ -20,14 +20,14 @@ function TextBoxArray({name}) {
         splice(idx, 1, ev.target.value);
     };
     return <div>
-        <div data-testid={name}>
+        <div data-testid={name} className={hasErrors ? "error" : null}>
             {value.map((inst, key) => <div key={key}><input type="text" className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""}
                                                   onChange={handleChange(key)}/></div>)}
         </div>
-        <button data-testid={`${name}_add`} onClick={() => push("Cheese")}>+</button>
-        <button onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
+        <button data-testid={`${buttonId}_add`} onClick={() => push("Cheese")}>+</button>
+        <button data-testid={`${buttonId}_remove`} onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
         <button onClick={() => value.length > 0 && set(slice(0, value.length - 1))}>--</button>
-        <button data-testid={`${name}_kill`} onClick={() => set(undefined)}>clear</button>
+        <button data-testid={`${buttonId}_kill`} onClick={() => set(undefined)}>clear</button>
         <button onClick={() => replace(["NOT CHEESE"])}>replace</button>
     </div>;
 }
@@ -39,7 +39,7 @@ function SimpleTextBox(props) {
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || '');
         }}/>
-        {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
+        <span data-testid={`${props.name}_errors`}>{hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}</span>
     </span>;
 }
 
@@ -54,7 +54,7 @@ function AllOrNothing ({name}){
     return <SubSchema path={name}>
         <div>
             <span>Thing 1</span>
-            <TextBoxArray data-testid="aonthing1" name="aonthing1"/>
+            <TextBoxArray data-testid="aonthing1" name="aonthing1" buttonId="aonthing1"/>
         </div>
         <div>
             <span>Thing 2</span>
@@ -63,6 +63,29 @@ function AllOrNothing ({name}){
         <div>
             <span>Thing 3</span>
             <SimpleTextBox data-testid="aonthing3" name="aonthing3"/>
+        </div>
+    </SubSchema>;
+}
+
+function DeepAllOrNothing({name}) {
+    const [items] = useConsumeArray(name);
+
+    return <SubSchema path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</SubSchema>;
+}
+
+function DeepAllOrNothingItem ({name}){
+    return <SubSchema path={name}>
+        <div>
+            <span>Thing 1</span>
+            <TextBoxArray data-testid={`daonthing1_${name}`} name="daonthing1" buttonId={`daonthing1_${name}`}/>
+        </div>
+        <div>
+            <span>Thing 2</span>
+            <SimpleTextBox data-testid={`daonthing2_${name}`} name="daonthing2"/>
+        </div>
+        <div>
+            <span>Thing 3</span>
+            <SimpleTextBox data-testid={`daonthing3_${name}`} name="daonthing3"/>
         </div>
     </SubSchema>;
 }
@@ -86,6 +109,7 @@ function DemoForm() {
             </div>
             <Alias name={"alias"}/>
             <AllOrNothing name="allOrNothing"/>
+            <DeepAllOrNothing name="deepAllOrNothing"/>
             <div>
                 <span>Other</span>
                 <SimpleTextBox data-testid="dep1" name="dep1"/>
@@ -100,10 +124,8 @@ function DemoForm() {
                 <button data-testid="v" onClick={() => {
                     if(validate()) {
                         setValid("VALID");
-                        // setErrors([]);
                     } else {
                         setValid("INVALID");
-                        // setErrors(errorMapToFlatArray(errorMap));
                     }
                 }}>Validate
                 </button>
@@ -119,7 +141,8 @@ function DemoForm() {
             firstName: "Foo",
             middleName: "J",
             lastName: "Bar",
-            alias: []
+            alias: [],
+            deepAllOrNothing: [{}]
         },
         actions: formData => ({
             addAlias(alias) {
@@ -181,4 +204,36 @@ test("Test the base All or Nothing validation using dependencies keyword", async
 
     expect(getByTestId("valid").innerHTML).toBe('VALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
+
+
+    //Deep all or nothing dependecies
+    fireEvent.click(getByTestId("daonthing1_0_add"));
+    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_errors").childNodes.length).toBeGreaterThan(0);
+
+    fireEvent.click(getByTestId("v"));
+    expect(getByTestId("valid").innerHTML).toBe('INVALID');
+    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+
+    fireEvent.click(getByTestId("daonthing1_0_remove"));
+    expect(getByTestId("daonthing2_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_errors").childNodes.length).toBe(0);
+    fireEvent.click(getByTestId("v"));
+    expect(getByTestId("valid").innerHTML).toBe('VALID');
+
+    fireEvent.change(getByTestId("daonthing2_0"), {target: {value: "Fart"}});
+
+    expect(getByTestId("daonthing1").className).toBe('error');
+    expect(getByTestId("daonthing3_errors").childNodes.length).toBeGreaterThan(0);
+
+    fireEvent.change(getByTestId("daonthing3_0"), {target: {value: "Time"}});
+
+    expect(getByTestId("daonthing1").className).toBe('error');
+
+    fireEvent.click(getByTestId("daonthing1_0_add"));
+
+    expect(getByTestId("daonthing1").className).toBe('');
+    expect(getByTestId("daonthing2_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_errors").childNodes.length).toBe(0);
 });

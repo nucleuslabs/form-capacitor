@@ -126,6 +126,54 @@
             ]
           },
           "default": {}
+        },
+        "deepAllOrNothing": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "title": "AoN 1",
+            "type": "object",
+            "properties": {
+              "daonthing1": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "title": "Deep Thing 1"
+              },
+              "daonthing2": {
+                "type": "string",
+                "title": "Deep Thing 2"
+              },
+              "daonthing3": {
+                "type": "string",
+                "title": "Deep Thing 3"
+              }
+            },
+            "dependencies": {
+              "daonthing1": [
+                "daonthing2",
+                "daonthing3"
+              ],
+              "daonthing2": [
+                "daonthing1",
+                "daonthing3"
+              ],
+              "daonthing3": [
+                "daonthing1",
+                "daonthing2"
+              ]
+            },
+            "default": {}
+          }
         }
       },
       "anyOf": [
