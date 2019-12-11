@@ -300,7 +300,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
     }
     if(schema.dependencies) {
         mapObject(schema.dependencies, (dependency, p) => {
-            const depSchema = {properties: baseProperties, dependencies: {[p]: dependency}};
+            const depSchema = {properties: baseProperties, dependencies: {...schema.dependencies}};
             if(Array.isArray(dependency)){
                 patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
                 assignFieldDefinition(buildSchemaTree(path, depSchema, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
@@ -647,14 +647,13 @@ export function watchForPatches(schema, data, ajv) {
     }
     //build root avj schema
     onPatch(data, patch => {
-        const genericPath = rebuildPatchPath(patch.path);
-        // console.log("Some kind of OP", patch.op, genericPath);
-        if(patchPathToSchemaPathMap.has(genericPath)) {
-            const schemaPath = [...patchPathToSchemaPathMap.get(genericPath)];
+        const schemaPath = getSchemaPathFromPatchPath(patch.path, patchPathToSchemaPathMap, subSchemaPathMap);
+        // console.log("Some kind of OP", patch.op, normalizedPatchPath);
+        if(schemaPath) {
             const schemaPathStr = pathToPatchString(schemaPath);
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
-                // console.log(`Observable Patch Detected for ${genericPath}`, patch.path, patch.op, patch.value);
+                // console.log(`Observable Patch Detected for ${normalizedPatchPath}`, patch.path, patch.op, patch.value);
                 switch(patch.op) {
                     case 'add':
                     case 'replace':
@@ -662,7 +661,7 @@ export function watchForPatches(schema, data, ajv) {
                         // console.log(toJS(data));
                         // console.log("OP was definitely detected", schemaPathStr, toJS((data)));
 
-                        runValidator(schemaPath, validators, data, errors, paths, errorPathMaps, [[...schemaPath]]);
+                        runValidator([...schemaPath], validators, data, errors, paths, errorPathMaps, [[...schemaPath]]);
 
                         break;
                     default:
@@ -673,7 +672,7 @@ export function watchForPatches(schema, data, ajv) {
 
             }
         } else {
-            console.warn(`COULD NOT FIND PATH FOR`, patch.path, patch.op, patch.value);
+            console.warn(`COULD NOT FIND PATH FOR`, patch.path, testPath, patch.op, patch.value);
         }
     });
 
@@ -797,10 +796,38 @@ function ajvStringToPath(pathStr, sep = "/"){
 
 /**
  * @param {string} pathStr
- * @param {string} sep
  * @returns {string}
  */
-function rebuildPatchPath(pathStr, sep = "/"){
-    const path = ajvStringToPath(pathStr, sep).map(node => node.match(/^\d+$/) ? "0" : node);
-    return pathToPatchString(path, sep);
+function normalizePatchPath(pathStr){
+    return pathStr.replace(/(\/)([1-9]+[0-9]*)(\/|$)/,"$10$3");
+}
+
+/**
+ *
+ * @param {string} patchPath
+ * @param {Map} patchPathMap
+ */
+function getSchemaPathFromPatchPath(patchPath, patchPathMap, schemaMap){
+    if(patchPathMap.has(patchPath)){
+        return patchPathMap.get(patchPath);
+    }
+    const path = ajvStringToPath(patchPath);
+    let normalizedPatchPath = "";
+    let testPath = [];
+    for(let key of path) {
+        if (testPath.length > 0 && /^\d+$/.test(key)) {
+            const testPatchString = pathToPatchString([...testPath]);
+            if(schemaMap.has(testPatchString)) {
+                const schema = schemaMap.get(testPatchString);
+                if(schema.type === 'array' && !schemaMap.has(pathToPatchString([...testPath, key]))) {
+                    normalizedPatchPath += "/0";
+                    testPath.push('0');
+                    continue;
+                }
+            }
+        }
+        normalizedPatchPath += `/${key}`;
+        testPath.push(key);
+    }
+    return patchPathMap.has(normalizedPatchPath) ? patchPathMap.get(normalizedPatchPath) : null;
 }

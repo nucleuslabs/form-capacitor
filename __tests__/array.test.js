@@ -100,17 +100,37 @@ describe('When do defaults get validated?', function() {
         expect(getByTestId("valid").innerHTML).toBe('Unknown');
         expect(getByTestId("alias_0").value).toBe('Frank');
 
+
         fireEvent.click(getByText("++"));
+
+        expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
+        expect(getByTestId("alias_errors").childNodes.length).toBe(0);
 
         fireEvent.click(getByText("+"));
         expect(getByTestId("alias_1").value).toBe('Joe');
 
+        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+        expect(getByTestId("alias_errors").childNodes.length).toBeGreaterThan(0);
+
         fireEvent.click(getByText("+"));
         expect(getByTestId("alias_2").value).toBe('Joe');
 
-        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan((0));
+
+        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
         expect(getByTestId("alias_errors").childNodes.length).toBeGreaterThan(0);
+
+        fireEvent.click(getByText("-"));
+        fireEvent.click(getByText("-"));
+        fireEvent.click(getByText("++"));
+
+        expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
+        expect(getByTestId("alias_errors").childNodes.length).toBe(0);
         //@todo add validation for the format keyword including email, ip address, uri, dates/times and hostnames
+        fireEvent.click(getByText("++"));
+        fireEvent.click(getByText("++"));
+
+        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+        expect(getByTestId("alias2_errors").childNodes.length).toBeGreaterThan(0);
 
 
     });

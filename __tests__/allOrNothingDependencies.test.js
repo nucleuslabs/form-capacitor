@@ -181,16 +181,19 @@ test("Test the base All or Nothing validation using dependencies keyword", async
 
     fireEvent.click(getByTestId("aonthing1_add"));
     // fireEvent.change(getByTestId("aonthing1"), {target: {value: "Cheese"}});
+    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+
     fireEvent.click(getByTestId("v"));
 
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.change(getByTestId("aonthing2"), {target: {value: "Fart"}});
+    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+
     fireEvent.click(getByTestId("v"));
 
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
-    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.change(getByTestId("aonthing3"), {target: {value: "Time"}});
     // console.log(getByTestId("errorMapContainer").innerHTML);
@@ -236,4 +239,13 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("daonthing1").className).toBe('');
     expect(getByTestId("daonthing2_errors").childNodes.length).toBe(0);
     expect(getByTestId("daonthing3_errors").childNodes.length).toBe(0);
+
+    fireEvent.change(getByTestId("daonthing2_0"), {target: {value: undefined}});
+    fireEvent.change(getByTestId("daonthing3_0"), {target: {value: undefined}});
+
+    console.log(getByTestId("errorMapContainer").innerHTML);
+
+    expect(getByTestId("daonthing1").className).toBe('');
+    expect(getByTestId("daonthing2_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_errors").childNodes.length).toBeGreaterThan(0);
 });
