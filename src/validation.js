@@ -57,15 +57,15 @@ const errTypeKeywordActions = {
     "allOf": () => {
     }
 };
-/* istanbul ignore next */
+
 /**
+ * @todo #SmartErrorsChallenge make this function better... it is very weak in how it slices and dices ajv errors...it can be better... if you are reading this maybe you can make it better ;)
  * This function runs through the error map and transforms the errors into a tree.
  * This is so the errors can be applied to the appropriate observables and be used to highlight inputs
  * @param {array} errors
  * @param {ObservableMap} pathMap
  * @returns {ObservableMap}
  */
-
 /* istanbul ignore next */
 function processAjvErrors(errors, pathMap, errorPathMaps, errCallback) {
     const dupeMap = new Map();
@@ -243,6 +243,7 @@ function assignMetaData(metaData, path, metaDataMap) {
 }
 
 /**
+ * @todo #DependencyChallenge . There is an opportunity for performance enhancement by either getting rid of the dependency Refs (Part 1) or by limiting the scope of the dependency validation (Part 2)
  *
  * @param {{}} schema
  * @param {Array} path
@@ -281,6 +282,9 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
                 skeletonSchemaMap: skeletonSchemaMap
             });
             setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'properties', p], [...patchPath], p);
+            /* @todo #DependencyChallenge Part 1 we technically shouldn't need these dependency refs with the way Part 1 is handled currently,
+                 however in an AllOrNothing logic situation containing inter-dependencies validations can clear or exist in situations where they shouldn't
+            */
             assignFieldDefinition(buildSchemaTree([...path, 'properties', p], {...property}, skeletonSchemaMap), fieldDefinitionMap, [...path, 'properties', p], schema.dependencies !== undefined ? getDependencyRefs(schema.dependencies, p, path, patchPath, patchPathToSchemaPathMap) : []);
             baseProperties[p] = {type: property.type, anyOf: property.anyOf, allOf: property.allOf};
         }
@@ -300,6 +304,10 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
     }
     if(schema.dependencies) {
         mapObject(schema.dependencies, (dependency, p) => {
+            /*@todo Part 2 of #DependencyChallenge the code for this element should look like the line before and only assign directly relevant dependencies but,
+                for this to work need to solve #DependencyChallenge.
+            */
+            // const depSchema = {properties: baseProperties, dependencies: {[p] : dependency}};
             const depSchema = {properties: baseProperties, dependencies: {...schema.dependencies}};
             if(Array.isArray(dependency)){
                 patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
@@ -653,7 +661,7 @@ export function watchForPatches(schema, data, ajv) {
             const schemaPathStr = pathToPatchString(schemaPath);
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
-                // console.log(`Observable Patch Detected for ${normalizedPatchPath}`, patch.path, patch.op, patch.value);
+                // console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, patch.op, patch.value);
                 switch(patch.op) {
                     case 'add':
                     case 'replace':
@@ -661,7 +669,7 @@ export function watchForPatches(schema, data, ajv) {
                         // console.log(toJS(data));
                         // console.log("OP was definitely detected", schemaPathStr, toJS((data)));
 
-                        runValidator([...schemaPath], validators, data, errors, paths, errorPathMaps, [[...schemaPath]]);
+                        runValidatorR([...schemaPath], validators, data, errors, paths, errorPathMaps);
 
                         break;
                     default:
@@ -694,14 +702,14 @@ export function watchForPatches(schema, data, ajv) {
 }
 
 
-function validateRefs(refs, validators, data, errors, paths, errorPathMaps, skipPaths = []){
-    for(let refPath of refs){
-        // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
-        if(!skipPaths.includes(refPath)){
-            runValidator(refPath, validators, data, errors, paths, errorPathMaps,[...skipPaths, refPath]);
-        }
-    }
-}
+// function validateRefs(refs, validators, data, errors, paths, errorPathMaps, skipPaths = []){
+//     for(let refPath of refs){
+//         // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
+//         if(!skipPaths.includes(refPath)){
+//             runValidatorR(refPath, validators, data, errors, paths, errorPathMaps,[...skipPaths, refPath]);
+//         }
+//     }
+// }
 
 // /**
 //  *
@@ -724,26 +732,33 @@ function validateRefs(refs, validators, data, errors, paths, errorPathMaps, skip
  * @param {{}} validators
  * @param data
  * @param errors
- * @param skipPaths
  * @param paths
  * @param errorPathMaps
+ * @param {Set} skipPaths
  */
-function runValidator(path, validators, data, errors, paths, errorPathMaps, skipPaths){
+function runValidatorR(path, validators, data, errors, paths, errorPathMaps, skipPaths = new Set()){
     const pathStr = pathToPatchString(path);
-    if(validators.has(pathStr)){
+    if(!skipPaths.has(pathStr) && validators.has(pathStr)){
+        skipPaths.add(pathStr);
         //validate refs first then run my validation
         const {validate, refs, errorPath} = validators.get(pathStr);
-        validateRefs(refs, validators, data, errors, paths, errorPathMaps, [...skipPaths]);
+        //Validate References
+        for(let refPath of refs){
+            // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
+            runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, skipPaths);
+        }
+        // validateRefs(refs, validators, data, errors, paths, errorPathMaps, [...skipPaths]);
         // const x = validate(toJS(data));
         // console.log("NOPE");
         const theRealJs = mobxStateTreeToAjvFriendlyJs(data);
+        // console.log(pathStr, validate.schema, theRealJs);
         if(validate(theRealJs)) {
             // console.log("PASSED");
             // console.debug(JSON.stringify(toJS(errors),null,2));
             delErrorNode(errors, [...errorPath]);
         } else {
-            // console.log("FAILED", subSchema);
-            //Todo: Build an algorithm here that makes user friendly errors out of the base AJV errors probably better to replace the filteredErrors stuff below with a reduce that sanitises and formats the AJV errors
+            // console.log("FAILED");
+            // console.log(validate.errors);
             try{
                 processAjvErrors(validate.errors, paths, errorPathMaps, (errorPath, error, subSchema)=> {
                     setError(errors, [...errorPath], beautifyAjvError(error, errorPath, subSchema));
@@ -795,17 +810,10 @@ function ajvStringToPath(pathStr, sep = "/"){
 }
 
 /**
- * @param {string} pathStr
- * @returns {string}
- */
-function normalizePatchPath(pathStr){
-    return pathStr.replace(/(\/)([1-9]+[0-9]*)(\/|$)/,"$10$3");
-}
-
-/**
  *
  * @param {string} patchPath
  * @param {Map} patchPathMap
+ * @param {ObservableMap|Map} schemaMap
  */
 function getSchemaPathFromPatchPath(patchPath, patchPathMap, schemaMap){
     if(patchPathMap.has(patchPath)){
