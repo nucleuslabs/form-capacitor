@@ -9,12 +9,14 @@ import mobxStateTreeToAjvFriendlyJs from "./mobxStateTreeToAjvFriendlyJs";
 import {delErrorNode, setError} from "./errorMapping";
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
-/* istanbul ignore next */
 
+/* istanbul ignore next */
 function defaultActionCallBack(errCallback, path, error, subSchemaPathMap){
     const fullPath  = [...path, error.params.missingProperty];
     errCallback(fullPath, error, subSchemaPathMap.get(pathToPatchString(fullPath)));
 }
+
+/* istanbul ignore next */
 const errTypeKeywordActions = {
     /**
      * Processes required to see if there are children that need to be targeted
@@ -79,40 +81,38 @@ function processAjvErrors(errors, pathMap, errorPathMaps, errCallback) {
         if(error.parentSchema !== false) {
             const dataStr = `data:#${error.dataPath}`;
             const schemaStr = `schema:${error.schemaPath}`;
-            let path = [];
+            let validationPath = [];
             if (error.dataPath !== undefined) {
                 if (error.dataPath) {
-                    path = dataErrorPathMap.has(error.dataPath) ? dataErrorPathMap.get(error.dataPath) : toJS(getClosestAjvPath(dataStr, pathMap)).slice(1) || [];
+                    validationPath = dataErrorPathMap.has(error.dataPath) ? dataErrorPathMap.get(error.dataPath) : toJS(getClosestAjvPath(dataStr, pathMap)).slice(1) || [];
                 }
             } else  {
                 const testPath = error.schemaPath.substr(1, error.schemaPath.length - 1);
-                path = schemaErrorPathMap.has(testPath) ? schemaErrorPathMap.get(testPath) : toJS(getClosestAjvPath(schemaStr, pathMap)).slice(1) || [];
+                validationPath = schemaErrorPathMap.has(testPath) ? schemaErrorPathMap.get(testPath) : toJS(getClosestAjvPath(schemaStr, pathMap)).slice(1) || [];
             }
             //shift off first element
-            // path.shift();
-            //Check error message to process complex errors to see if we need to add more to the path or more errors
+            // validationPath.shift();
+            //Check error message to process complex errors to see if we need to add more to the validationPath or more errors
             const actionKey =`${error.parentSchema.type}-${error.keyword}`;
-            // console.log(path, error.dataPath ? dataStr : schemaStr);
+            // console.log(validationPath, error.dataPath ? dataStr : schemaStr);
             // console.log(error);
-            if(path.length > 0 && error.parentSchema.type && errTypeKeywordActions[actionKey]) {
-                errTypeKeywordActions[actionKey](errCallback, path, error, subSchemaPathMap, dupeMap);
+            if(validationPath.length > 0 && error.parentSchema.type && errTypeKeywordActions[actionKey]) {
+                errTypeKeywordActions[actionKey](errCallback, validationPath, error, subSchemaPathMap, dupeMap);
             } else if(errTypeKeywordActions[error.keyword]) {
-                errTypeKeywordActions[error.keyword](errCallback, path, error, subSchemaPathMap, dupeMap);
+                errTypeKeywordActions[error.keyword](errCallback, validationPath, error, subSchemaPathMap, dupeMap);
             } else {
-                errCallback(path, error, subSchemaPathMap.get(path));
+                errCallback(validationPath, error, subSchemaPathMap.get(validationPath));
             }
         }
     });
 }
 
-/* istanbul ignore next */
 /**
  * Get the closest path from a map of paths for a string conatined in an ajv Error objects schemaPath
  * @param {string} pathStr
  * @param {Map|ObservableMap} pathMap
  * @returns {*}
  */
-
 /* istanbul ignore next */
 function getClosestAjvPath(pathStr, pathMap) {
     let pos;
@@ -164,14 +164,12 @@ function getSchemaNodeFromPath(schema, path) {
     return ret;
 }
 
-/* istanbul ignore next */
 /**
  * Converts an array of ajv errors into an array of condensed pretty error objs
  * @param {{}[]} errors
  * @param {string[]} path
  * @returns {{title: {string}, message: {string}, path: {string, ""?}, keyword: {string}}[]}
  */
-
 /* istanbul ignore next */
 function beautifyAjvErrors(errors, path) {
     // console.warn(errors);
@@ -227,10 +225,12 @@ export function checkSchemaPathForErrors(ajv, schema, path, value) {
     }
 }
 
+/* istanbul ignore next */
 function setPatchPathSchema(patchPathToSchemaPathMap, schemaPath, rootPatchPath, leafName){
     patchPathToSchemaPathMap.set(pathToPatchString([...rootPatchPath, leafName]), [...schemaPath]);
 }
 
+/* istanbul ignore next */
 function assignMetaData(metaData, path, metaDataMap) {
     // @todo: Filter out recursive refs...
     const fieldPathId = pathToPatchString(path);
@@ -307,8 +307,8 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
             /*@todo Part 2 of #DependencyChallenge the code for this element should look like the line before and only assign directly relevant dependencies but,
                 for this to work need to solve #DependencyChallenge.
             */
-            // const depSchema = {properties: baseProperties, dependencies: {[p] : dependency}};
-            const depSchema = {properties: baseProperties, dependencies: {...schema.dependencies}};
+            // const depSchema = {properties: baseProperties, dependencies: {[p] : dependency}}
+            const depSchema = {type: schema.type, properties: baseProperties, dependencies: {...schema.dependencies}};
             if(Array.isArray(dependency)){
                 patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
                 assignFieldDefinition(buildSchemaTree(path, depSchema, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
@@ -337,7 +337,8 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
 function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, relatedRefMap, metaDataMap, errorPathMaps, skeletonSchemaMap) {
     assignFieldDefinition(buildSchemaTree([...path], {...schema}, skeletonSchemaMap), fieldDefinitionMap, [...path], []);
     if(isArray(schema.items)) {
-        schema.items.forEach((item,itemIdx) => {
+        schema.items.forEach((item, itemIdx) => {
+            skeletonSchemaMap.set(pathToPatchString([...path, 'items', itemIdx]), {type: item.type});
             const errorSchemaPathMap = errorPathMaps.get('schema');
             const errorDataPathMap = errorPathMaps.get('data');
             const subSchemaPathMap = errorPathMaps.get('subSchema');
@@ -345,11 +346,11 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
             const patchPathStr = pathToPatchString(subPatchPath);
             errorSchemaPathMap.set(pathToPatchString([...path, "items", itemIdx]), subPatchPath);
             errorDataPathMap.set(patchPathStr, subPatchPath);
-            subSchemaPathMap.set(patchPathStr, schema.items[itemIdx]);
+            subSchemaPathMap.set(patchPathStr, item);
             setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'items'], [...patchPath], itemIdx);
-            assignFieldDefinition(buildSchemaTree([...path, "items", itemIdx], {...schema.items[itemIdx]}, skeletonSchemaMap), fieldDefinitionMap, [...path, "items", itemIdx], [[...path]]);
+            assignFieldDefinition(buildSchemaTree([...path, "items", itemIdx], {...item}, skeletonSchemaMap), fieldDefinitionMap, [...path, "items", itemIdx], [[...path]]);
             buildFieldDefinitionMapR({
-                schema: schema.items[itemIdx],
+                schema: item,
                 propName: itemIdx,
                 path: [...path, 'items'],
                 patchPath: [...subPatchPath],
@@ -362,6 +363,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
             });
         });
         if(schema.additionalItems){
+            skeletonSchemaMap.set(pathToPatchString([...path, 'additionalItems']), {type: schema.additionalItems.type});
             const additionalItemsPath = [...patchPath, "additionalItems"];
             const errorSchemaPathMap = errorPathMaps.get('schema');
             const errorDataPathMap = errorPathMaps.get('data');
@@ -387,6 +389,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
             }
         }
     } else {
+        skeletonSchemaMap.set(pathToPatchString([...path, 'items']), {type: schema.items.type});
         const errorSchemaPathMap = errorPathMaps.get('schema');
         const errorDataPathMap = errorPathMaps.get('data');
         const subSchemaPathMap = errorPathMaps.get('subSchema');
@@ -472,6 +475,7 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
  * @param {*} obj
  * @param {Function} mapFunction
  */
+/* istanbul ignore next */
 function mapObject(obj, mapFunction) {
     const keys = Object.keys(obj);
     if(keys.length > 0) {
@@ -517,7 +521,6 @@ function buildSchemaTree(path, leafValue = {}, basicSchemaMap = new Map()) {
  * @param {{}} mergeSchema
  * @param {[]} path
  */
-
 /* istanbul ignore next */
 function assignFieldDefinitions(refs, schema, fieldDefinitionMap) {
     // const refPatchPaths = [...refs].map(pathArr => pathToPatchString(pathArr));
@@ -551,7 +554,6 @@ export function pathToPatchString(path, sep = "/") {
     return sep + path.join(sep);
 }
 
-
 /**
  *
  * @param {{}} schema
@@ -559,7 +561,6 @@ export function pathToPatchString(path, sep = "/") {
  * @param {[]} path
  * @returns {Set<any>}
  */
-
 /* istanbul ignore next */
 function getFieldReferencesR(schema, propName, path = [], patchPath, patchPathToSchemaPathMap = new Map()) {
     let refs = new Set();
@@ -610,6 +611,7 @@ function getFieldReferencesR(schema, propName, path = [], patchPath, patchPathTo
     return refs;
 }
 
+/* istanbul ignore next */
 function getDependencyRefs(dependencySchema, propName, path, patchPath, patchPathToSchemaPathMap){
     return new Set([...mapObject(dependencySchema, (dependency, p) => {
         if(Array.isArray(dependency) && dependency.includes(propName)){
@@ -661,7 +663,7 @@ export function watchForPatches(schema, data, ajv) {
             normalizedPatchPath = getNormalizedPathFromPatchPath(patch.path, subSchemaPathMap);
             schemaPath = patchPathToSchemaPathMap.get(normalizedPatchPath);
             patchPathToSchemaPathMap.set(patch.path, schemaPath);
-            dataErrorPathMap.set(patch.path, dataErrorPathMap.get(normalizedPatchPath));
+            dataErrorPathMap.set(patch.path, ajvStringToPath(patch.path));
         } else{
             normalizedPatchPath = patch.path;
             schemaPath = patchPathToSchemaPathMap.get(patch.path);
@@ -671,23 +673,20 @@ export function watchForPatches(schema, data, ajv) {
             const schemaPathStr = pathToPatchString(schemaPath);
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
-                console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, normalizedPatchPath, patch.op, patch.value);
+                // console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, normalizedPatchPath, patch.op, patch.value);
                 switch(patch.op) {
                     case 'add':
                     case 'replace':
                     case 'remove':
                         // console.log(toJS(data));
                         // console.log("OP was definitely detected", schemaPathStr, toJS((data)));
-
                         runValidatorR([...schemaPath], validators, data, errors, paths, errorPathMaps);
-
                         break;
                     default:
                         console.warn(`Couldn't handle patch operation ${patch.op} for ${patch.path}.`);
                 }
             } else {
                 console.warn(`COULD NOT FIND VALIDATOR FOR`, schemaPath, patch.path, patch.op, patch.value);
-
             }
         } else {
             console.warn(`COULD NOT FIND PATH FOR`, patch.path, normalizedPatchPath, patch.op, patch.value);
@@ -711,31 +710,6 @@ export function watchForPatches(schema, data, ajv) {
     };
 }
 
-
-// function validateRefs(refs, validators, data, errors, paths, errorPathMaps, skipPaths = []){
-//     for(let refPath of refs){
-//         // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
-//         if(!skipPaths.includes(refPath)){
-//             runValidatorR(refPath, validators, data, errors, paths, errorPathMaps,[...skipPaths, refPath]);
-//         }
-//     }
-// }
-
-// /**
-//  *
-//  * @param {Object[]} ajvErrors
-//  * @param {string[]} errorPath
-//  * @param {{}} subSchema
-//  * @param {ObservableMap} errorMap
-//  */
-// function mapAjvErrorSet(ajvErrors, errorPath, subSchema, errorMap) {
-//     if(ajvErrors.length > 0) {
-//         ajvErrors.map(error => setError(errorMap, [...errorPath], beautifyAjvError(error, errorPath, subSchema)));
-//     } else {
-//         delErrorNode(errorMap, [...errorPath]);
-//     }
-// }
-
 /**
  *
  * @param path
@@ -746,6 +720,7 @@ export function watchForPatches(schema, data, ajv) {
  * @param errorPathMaps
  * @param {Set} skipPaths
  */
+/* istanbul ignore next */
 function runValidatorR(path, validators, data, errors, paths, errorPathMaps, skipPaths = new Set()){
     const pathStr = pathToPatchString(path);
     if(!skipPaths.has(pathStr) && validators.has(pathStr)){
@@ -780,38 +755,13 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, ski
         }
     }
 }
-// /**
-//  * This is a filtering function which will return true if an error is valid and relates to the current path or false if it is not
-//  * @param {{}} err
-//  * @param {string} errorPath
-//  * @param {{}} cache used for caching dependencies so that only 1 error message triggers
-//  * @returns {boolean}
-//  */
-// function filterJsonSchemaErrors(err, errorPath, cache = {}){
-//     //@todo: flesh this out more as required
-//     switch(err.keyword) {
-//         case "required":
-//             return err.params.missingProperty === errorPath;
-//         case "dependency":
-//             if(cache.dependencies === undefined){
-//                 cache.dependencies = new Map();
-//             }
-//             if(cache.dependencies.get(errorPath)){
-//                 return false;
-//             } else {
-//                 cache.dependencies.set(errorPath, error);
-//                 return true;
-//             }
-//         default:
-//             return true;
-//     }
-// }
 
 /**
  * @param {string} pathStr
  * @param {string} sep
  * @returns {string[]}
  */
+/* istanbul ignore next */
 function ajvStringToPath(pathStr, sep = "/"){
     const pathArr = pathStr.split(sep);
     //shift off the first element as AJV paths always start with a leading slash '/some/ajv/path'
@@ -825,6 +775,7 @@ function ajvStringToPath(pathStr, sep = "/"){
  * @param {ObservableMap|Map} schemaMap
  * @returns {string}
  */
+/* istanbul ignore next */
 function getNormalizedPathFromPatchPath(patchPath, schemaMap){
     const path = ajvStringToPath(patchPath);
     let normalizedPatchPath = "";
