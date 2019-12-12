@@ -12,7 +12,7 @@ import {getFlattenedErrors} from "../src/errorMapping";
 
 
 
-function TextBoxArray({name, buttonId}) {
+function TextBoxArray({dataTestId,name}) {
     const [value, set, {push, remove, slice, splice, clear, replace}] = useConsumeArray(name);
     const [hasErrors] = useConsumeErrors(name);
 
@@ -20,26 +20,26 @@ function TextBoxArray({name, buttonId}) {
         splice(idx, 1, ev.target.value);
     };
     return <div>
-        <div data-testid={name} className={hasErrors ? "error" : null}>
-            {value.map((inst, key) => <div key={key}><input type="text" className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""}
+        <div data-testid={`${dataTestId}_errors`} className={hasErrors ? "error" : null}>
+            {value.map((inst, key) => <div key={key}><input type="text" data-testid={dataTestId} className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""}
                                                   onChange={handleChange(key)}/></div>)}
         </div>
-        <button data-testid={`${buttonId}_add`} onClick={() => push("Cheese")}>+</button>
-        <button data-testid={`${buttonId}_remove`} onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
+        <button data-testid={`${dataTestId}_add`} onClick={() => push("Cheese")}>+</button>
+        <button data-testid={`${dataTestId}_remove`} onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
         <button onClick={() => value.length > 0 && set(slice(0, value.length - 1))}>--</button>
-        <button data-testid={`${buttonId}_kill`} onClick={() => set(undefined)}>clear</button>
+        <button data-testid={`${dataTestId}_kill`} onClick={() => set(undefined)}>clear</button>
         <button onClick={() => replace(["NOT CHEESE"])}>replace</button>
     </div>;
 }
 
-function SimpleTextBox(props) {
+function SimpleTextBox({errorTestId, ...props}) {
     const [value, change] = useConsume(props.name);
     const [hasErrors, errors] = useConsumeErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
         }}/>
-        <span data-testid={`${props.name}_errors`}>{hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}</span>
+        <span data-testid={errorTestId || `${props.name}_errors`}>{hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}</span>
     </span>;
 }
 
@@ -54,7 +54,7 @@ function AllOrNothing ({name}){
     return <SubSchema path={name}>
         <div>
             <span>Thing 1</span>
-            <TextBoxArray data-testid="aonthing1" name="aonthing1" buttonId="aonthing1"/>
+            <TextBoxArray dataTestId="aonthing1" name="aonthing1" buttonId="aonthing1"/>
         </div>
         <div>
             <span>Thing 2</span>
@@ -68,24 +68,23 @@ function AllOrNothing ({name}){
 }
 
 function DeepAllOrNothing({name}) {
-    const [items] = useConsumeArray(name);
-
-    return <SubSchema path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</SubSchema>;
+    const [items, set, {push}] = useConsumeArray(name);
+    return <span><SubSchema path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</SubSchema><button data-testid="deepAllOrNothing_add" onClick={() => push({})}>add DAON</button></span>;
 }
 
 function DeepAllOrNothingItem ({name}){
     return <SubSchema path={name}>
         <div>
             <span>Thing 1</span>
-            <TextBoxArray data-testid={`daonthing1_${name}`} name="daonthing1" buttonId={`daonthing1_${name}`}/>
+            <TextBoxArray dataTestId={`daonthing1_${name}`} name="daonthing1"/>
         </div>
         <div>
             <span>Thing 2</span>
-            <SimpleTextBox data-testid={`daonthing2_${name}`} name="daonthing2"/>
+            <SimpleTextBox data-testid={`daonthing2_${name}`} errorTestId={`daonthing2_${name}_errors`} name="daonthing2"/>
         </div>
         <div>
             <span>Thing 3</span>
-            <SimpleTextBox data-testid={`daonthing3_${name}`} name="daonthing3"/>
+            <SimpleTextBox data-testid={`daonthing3_${name}`} errorTestId={`daonthing3_${name}_errors`} name="daonthing3"/>
         </div>
     </SubSchema>;
 }
@@ -163,9 +162,9 @@ afterEach(cleanup);
 test("Test the base All or Nothing validation using dependencies keyword", async () => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("aonthing1"));
+    await wait(() => getByTestId("aonthing1_errors"));
     //Check to make sure everything is nothing
-    expect(getByTestId("aonthing1").innerHTML).toBe('');
+    expect(getByTestId("aonthing1_errors").innerHTML).toBe('');
     expect(getByTestId("aonthing2").value).toBe('');
     expect(getByTestId("aonthing3").value).toBe('');
 
@@ -212,40 +211,64 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     //Deep all or nothing dependecies
     fireEvent.click(getByTestId("daonthing1_0_add"));
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
-    expect(getByTestId("daonthing2_errors").childNodes.length).toBeGreaterThan(0);
-    expect(getByTestId("daonthing3_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.click(getByTestId("daonthing1_0_remove"));
-    expect(getByTestId("daonthing2_errors").childNodes.length).toBe(0);
-    expect(getByTestId("daonthing3_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBe(0);
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("valid").innerHTML).toBe('VALID');
 
     fireEvent.change(getByTestId("daonthing2_0"), {target: {value: "Fart"}});
 
-    expect(getByTestId("daonthing1").className).toBe('error');
-    expect(getByTestId("daonthing3_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing1_0_errors").className).toBe('error');
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.change(getByTestId("daonthing3_0"), {target: {value: "Time"}});
 
-    expect(getByTestId("daonthing1").className).toBe('error');
+    expect(getByTestId("daonthing1_0_errors").className).toBe('error');
 
     fireEvent.click(getByTestId("daonthing1_0_add"));
 
-    expect(getByTestId("daonthing1").className).toBe('');
-    expect(getByTestId("daonthing2_errors").childNodes.length).toBe(0);
-    expect(getByTestId("daonthing3_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing1_0_errors").className).toBe('');
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBe(0);
 
     fireEvent.change(getByTestId("daonthing2_0"), {target: {value: ''}});
     fireEvent.change(getByTestId("daonthing3_0"), {target: {value: ''}});
 
     // console.log(getByTestId("errorMapContainer").innerHTML);
 
-    expect(getByTestId("daonthing1").className).toBe('');
-    expect(getByTestId("daonthing2_errors").childNodes.length).toBeGreaterThan(0);
-    expect(getByTestId("daonthing3_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing1_0_errors").className).toBe('');
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+
+    fireEvent.click(getByTestId("deepAllOrNothing_add"));
+
+    expect(getByTestId("daonthing1_0_errors").className).toBe('');
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_1_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_1_errors").childNodes.length).toBe(0);
+
+    fireEvent.click(getByTestId("daonthing1_0_add"));
+
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+    // expect(getByTestId("daonthing2_1_errors").childNodes.length).toBeGreaterThan(0);
+    // expect(getByTestId("daonthing3_1_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_1_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_1_errors").childNodes.length).toBe(0);
+
+    fireEvent.click(getByTestId("daonthing1_1_add"));
+
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_1_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_1_errors").childNodes.length).toBeGreaterThan(0);
 });

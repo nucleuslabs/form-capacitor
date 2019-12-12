@@ -640,6 +640,7 @@ export function watchForPatches(schema, data, ajv) {
     const [fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps] = buildFieldDefinitionMapR({schema: schema});
 
     const schemaErrorPathMap = errorPathMaps.get('schema');
+    const dataErrorPathMap = errorPathMaps.get('data');
     const subSchemaPathMap = errorPathMaps.get('subSchema');
 
     for (let [path ,{schema:fieldDefinition, refs}] of fieldDefinitionMap) {
@@ -655,13 +656,22 @@ export function watchForPatches(schema, data, ajv) {
     }
     //build root avj schema
     onPatch(data, patch => {
-        const schemaPath = getSchemaPathFromPatchPath(patch.path, patchPathToSchemaPathMap, subSchemaPathMap);
+        let schemaPath, normalizedPatchPath;
+        if(!patchPathToSchemaPathMap.has(patch.path)){
+            normalizedPatchPath = getNormalizedPathFromPatchPath(patch.path, subSchemaPathMap);
+            schemaPath = patchPathToSchemaPathMap.get(normalizedPatchPath);
+            patchPathToSchemaPathMap.set(patch.path, schemaPath);
+            dataErrorPathMap.set(patch.path, dataErrorPathMap.get(normalizedPatchPath));
+        } else{
+            normalizedPatchPath = patch.path;
+            schemaPath = patchPathToSchemaPathMap.get(patch.path);
+        }
         // console.log("Some kind of OP", patch.op, normalizedPatchPath);
         if(schemaPath) {
             const schemaPathStr = pathToPatchString(schemaPath);
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
-                // console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, patch.op, patch.value);
+                console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, normalizedPatchPath, patch.op, patch.value);
                 switch(patch.op) {
                     case 'add':
                     case 'replace':
@@ -680,7 +690,7 @@ export function watchForPatches(schema, data, ajv) {
 
             }
         } else {
-            console.warn(`COULD NOT FIND PATH FOR`, patch.path, testPath, patch.op, patch.value);
+            console.warn(`COULD NOT FIND PATH FOR`, patch.path, normalizedPatchPath, patch.op, patch.value);
         }
     });
 
@@ -812,13 +822,10 @@ function ajvStringToPath(pathStr, sep = "/"){
 /**
  *
  * @param {string} patchPath
- * @param {Map} patchPathMap
  * @param {ObservableMap|Map} schemaMap
+ * @returns {string}
  */
-function getSchemaPathFromPatchPath(patchPath, patchPathMap, schemaMap){
-    if(patchPathMap.has(patchPath)){
-        return patchPathMap.get(patchPath);
-    }
+function getNormalizedPathFromPatchPath(patchPath, schemaMap){
     const path = ajvStringToPath(patchPath);
     let normalizedPatchPath = "";
     let testPath = [];
@@ -837,5 +844,5 @@ function getSchemaPathFromPatchPath(patchPath, patchPathMap, schemaMap){
         normalizedPatchPath += `/${key}`;
         testPath.push(key);
     }
-    return patchPathMap.has(normalizedPatchPath) ? patchPathMap.get(normalizedPatchPath) : null;
+    return normalizedPatchPath;
 }
