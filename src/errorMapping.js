@@ -33,22 +33,11 @@ export function getErrors(errorNode, path = []) {
  * @param {ObservableMap} errorNode
  * @param {string[]} path
  * @param {{}} error
- * @param {{}} schema
- * @returns {*}
+  * @returns {*}
  */
-export function setError(errorNode, path = [], error, schema){
+export function setError(errorNode, path = [], error){
     const node = setErrorNode(errorNode, path);
-    if(node.has('errors')) {
-        node.get('errors').push(error);
-        if(schema){
-            node.set('schema', schema);
-        }
-    } else {
-        node.set('errors', observable.array([error]));
-        if(schema){
-            node.set('schema', schema);
-        }
-    }
+    _setError(node, path, error);
 }
 
 /**
@@ -60,10 +49,26 @@ export function setError(errorNode, path = [], error, schema){
  */
 export function setErrors(errorNode, path = [], errors){
     const node = setErrorNode(errorNode, path);
+    errors.forEach((error) => _setError(node, path, error));
+}
+
+/**
+ *
+ * @param {ObservableMap} node
+ * @param {string[]} path
+ * @param {{}} error
+  * @returns {*}
+ */
+function _setError(node, path = [], error){
     if(node.has('errors')) {
-        node.get('errors').push(...errors);
+        const errorSet = node.get('_errorSet');
+        if(!errorSet.has(error)) {
+            errorSet.add(error);
+            node.get('errors').push(error);
+        }
     } else {
-        node.set('errors', observable.array(errors));
+        node.set('errors', observable.array([error]));
+        node.set('_errorSet', observable(new Set([error])));
     }
 }
 
@@ -108,17 +113,31 @@ function delErrorNodeR(map, path) {
     return false;
 }
 
-/* istanbul ignore next */
-function cleanNode(node){
+export function cleanNode(errorNode, path = []){
+    const node = getErrorNode(errorNode, path);
     let result = true;
-    if(node.has("errors") && node.get("errors").size === 0){
-        result = node.delete("errors") && result;
+    if(node.has("errors") && node.get("errors").length === 0){
+        result = node.delete("errors") && node.delete("_errorSet") && result;
     }
     if(node.has("children") && node.get("children").size === 0){
         result = node.delete("children") && result;
     }
-    if(node.has("schema") && node.get("schema").size === 0){
-        result = node.delete("schema") && result;
+    return result;
+}
+
+export function cleanNodeR(errorNode, path = []){
+    const node = getErrorNode(errorNode, path);
+    let result = true;
+    if(node.has("errors") && node.get("errors").length === 0){
+        result = node.delete("errors") && node.delete("_errorSet") && result;
+    }
+    if(node.has("children")){
+        const children = node.get("children");
+        if(children.size === 0) {
+            result = node.delete("children") && result;
+        } else {
+            children.forEach(cleanNodeR);
+        }
     }
     return result;
 }

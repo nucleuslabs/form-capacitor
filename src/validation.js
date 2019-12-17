@@ -285,7 +285,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
             /* @todo #DependencyChallenge Part 1 we technically shouldn't need these dependency refs with the way Part 1 is handled currently,
                  however in an AllOrNothing logic situation containing inter-dependencies validations can clear or exist in situations where they shouldn't
             */
-            assignFieldDefinition(buildSchemaTree([...path, 'properties', p], {...property}, skeletonSchemaMap), fieldDefinitionMap, [...path, 'properties', p], schema.dependencies !== undefined ? getDependencyRefs(schema.dependencies, p, path, patchPath, patchPathToSchemaPathMap) : []);
+            assignFieldDefinition(buildSchemaTree([...path, 'properties', p], {...property}, skeletonSchemaMap), fieldDefinitionMap, [...path, 'properties', p], [], schema.dependencies !== undefined ? getDependencyRefs(schema.dependencies, p, path, patchPath, patchPathToSchemaPathMap) : []);
             baseProperties[p] = {type: property.type, anyOf: property.anyOf, allOf: property.allOf};
         }
     }
@@ -418,9 +418,31 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
 }
 
 /**
+ *
+ * @param {[]} axxOfSchema
+ * @param {string} axxOfPropType
+ * @param propName
+ * @param path
+ * @param patchPath
+ * @param patchPathToSchemaPathMap
+ * @param skeletonSchemaMap
+ * @param fieldDefinitionMap
+ * @param refCollection
+ */
+function buildAxxOfRefs(refCollection, axxOfSchema, axxOfPropType, propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap) {
+    const aOfRefCollection = new Set(axxOfSchema.reduce((acc, anyOfSchema) => {
+        return [...acc, ...getFieldReferencesR(anyOfSchema, propName, [...path], patchPath, patchPathToSchemaPathMap)];
+    }, []));
+    if(aOfRefCollection && aOfRefCollection.size > 0) {
+        assignFieldDefinitions([...aOfRefCollection], buildSchemaTree([...path], {[axxOfPropType]: [...axxOfSchema]}, skeletonSchemaMap), fieldDefinitionMap);
+        refCollection.push(...aOfRefCollection);
+    }
+}
+
+/**
  * Recursive function that generates a map of json-schemas. It takes in a global json-schema and creates sub json-schema files for each "scalar" field and adds any external
  * references to the sub schema including any required, anyOf, allOf keywords that reference the field
- * @param {{}|undefined} schema
+ * @param {[]} refProp
  * @param {String|undefined} propName
  * @param {[]} path
  * @param {Map|undefined} fieldDefinitionMap This is a map that will be mutated and will be set in tree form setting a schema for each scalar field (leaf of the tree)
@@ -445,24 +467,12 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
     let refCollection = [];
 
     if(schema.anyOf && schema.anyOf.length > 0) {
-        const anyOfRefCollection = new Set(schema.anyOf.reduce((acc, anyOfSchema) => {
-            return [...acc, ...getFieldReferencesR(anyOfSchema, propName,[...path], patchPath, patchPathToSchemaPathMap)];
-        },[]));
-        if(anyOfRefCollection && anyOfRefCollection.size > 0) {
-            assignFieldDefinitions(anyOfRefCollection, buildSchemaTree([...path], {anyOf: [...schema.anyOf]}, skeletonSchemaMap), fieldDefinitionMap);
-            refCollection = [...anyOfRefCollection];
-        }
-     }
-    
+        buildAxxOfRefs(refCollection, schema.anyOf, "anyOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
+    }
+
     if(schema.allOf && schema.allOf.length > 0) {
-        const allOfRefCollection = new Set(schema.allOf.reduce((acc, allOfSchema) => {
-            return [...acc, ...getFieldReferencesR(allOfSchema, propName,[...path], patchPath, patchPathToSchemaPathMap)];
-        },[]));
-        if(allOfRefCollection && allOfRefCollection.size > 0) {
-            assignFieldDefinitions(allOfRefCollection, buildSchemaTree([...path], {allOf: [...schema.allOf]}, skeletonSchemaMap), fieldDefinitionMap);
-            refCollection = [...refCollection, ...allOfRefCollection];
-        }
-     }
+        buildAxxOfRefs(refCollection, schema.allOf, "allOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
+    }
 
     relatedRefMap.set([...relatedRefMap], refCollection);
 
@@ -530,24 +540,19 @@ function assignFieldDefinitions(refs, schema, fieldDefinitionMap) {
 }
 
 /* istanbul ignore next */
-function assignFieldDefinition(schema, fieldDefinitionMap, path = [], refs = [], errorPath = undefined) {
+function assignFieldDefinition(schema, fieldDefinitionMap, path = [], refs = [], passRefs = [], failRefs = []) {
     // @todo: Filter out recursive refs...
     const fieldPathId = pathToPatchString(path);
     if (fieldDefinitionMap.has(fieldPathId)) {
-        updateFieldDefinition(fieldDefinitionMap.get(fieldPathId), {schema: {...schema}, refs: new Set([...refs])});
+        const fDef = fieldDefinitionMap.get(fieldPathId);
+        Object.assign(fDef.schema, {...schema});
+        refs.map(refPath  => fDef.refs.add(refPath));
+        passRefs.map(refPath  => fDef.passRefs.add(refPath));
+        failRefs.map(refPath  => fDef.failRefs.add(refPath));
+        // updateFieldDefinition(fDef, {schema: {...schema}, refs: new Set([...refs, ...fDef.refs]), passRefs: new Set([...passRefs, ...fDef.passRefs]), failRefs: new Set([...failRefs, ...fDef.failRefs)});
     } else {
-        fieldDefinitionMap.set(fieldPathId, {schema: {...schema}, refs: new Set([...refs]), path: [...path], errorPath: errorPath });
+        fieldDefinitionMap.set(fieldPathId, {schema: {...schema}, refs: new Set([...refs]), path: [...path], passRefs: new Set([...passRefs]), failRefs: new Set([...failRefs])});
     }
-}
-
-/* istanbul ignore next */
-function updateFieldDefinition(fieldDefinition ,...fieldDefinitions){
-    fieldDefinitions.forEach(({schema, refs}) => Object.assign(fieldDefinition, {schema: schema ? mergeObjects(fieldDefinition.schema, schema) : fieldDefinition.schema, refs: refs ? new Set([...refs, ...fieldDefinition.refs]) : fieldDefinition.refs}));
-}
-
-/* istanbul ignore next */
-function mergeObjects(...schemas) {
-    return Object.assign({}, ...schemas);
 }
 
 export function pathToPatchString(path, sep = "/") {
@@ -613,7 +618,7 @@ function getFieldReferencesR(schema, propName, path = [], patchPath, patchPathTo
 
 /* istanbul ignore next */
 function getDependencyRefs(dependencySchema, propName, path, patchPath, patchPathToSchemaPathMap){
-    return new Set([...mapObject(dependencySchema, (dependency, p) => {
+    return mapObject(dependencySchema, (dependency, p) => {
         if(Array.isArray(dependency) && dependency.includes(propName)){
             return [...path, 'properties', p];
         } else if (dependency && dependency.properties){
@@ -624,7 +629,7 @@ function getDependencyRefs(dependencySchema, propName, path, patchPath, patchPat
                 }
             }
         }
-    }).filter(x => x)]);
+    }).filter(x => x);
 }
 
 /**
@@ -645,15 +650,17 @@ export function watchForPatches(schema, data, ajv) {
     const dataErrorPathMap = errorPathMaps.get('data');
     const subSchemaPathMap = errorPathMaps.get('subSchema');
 
-    for (let [path ,{schema:fieldDefinition, refs}] of fieldDefinitionMap) {
+    for (let [path ,{schema:fieldDefinition, refs, passRefs, failRefs}] of fieldDefinitionMap) {
         // console.debug(path);
         // console.debug(fieldDefinition);
-        const errorPath = schemaErrorPathMap.has(path) ? schemaErrorPathMap.get(path) : ajvStringToPath(fieldDefinition.errorPath || path).filter((_, idx) => (idx > 0));
+        const errorPath = schemaErrorPathMap.get(path);//ajvStringToPath(fieldDefinition.errorPath || path).filter((_, idx) => (idx > 0))
         validators.set(path, {
             validate: ajv.compile(fieldDefinition),
             subSchema: subSchemaPathMap.get(pathToPatchString(errorPath)),
             errorPath: errorPath,
-            refs: refs
+            refs: refs,
+            passRefs: passRefs,
+            failRefs: failRefs
         });
     }
     //build root avj schema
@@ -726,21 +733,22 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, ski
     if(!skipPaths.has(pathStr) && validators.has(pathStr)){
         skipPaths.add(pathStr);
         //validate refs first then run my validation
-        const {validate, refs, errorPath} = validators.get(pathStr);
-        //Validate References
-        for(let refPath of refs){
-            // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
-            runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, skipPaths);
-        }
+        const {validate, refs, passRefs, failRefs, errorPath} = validators.get(pathStr);
         // validateRefs(refs, validators, data, errors, paths, errorPathMaps, [...skipPaths]);
         // const x = validate(toJS(data));
         // console.log("NOPE");
         const theRealJs = mobxStateTreeToAjvFriendlyJs(data);
         // console.log(pathStr, validate.schema, theRealJs);
+        //@todo Create smart Error handling so that creation of errors where errors get cleared based on the the source validation being cleared
         if(validate(theRealJs)) {
             // console.log("PASSED");
             // console.debug(JSON.stringify(toJS(errors),null,2));
             delErrorNode(errors, [...errorPath]);
+            //Validate references that should run only if validation passes
+            for(let refPath of passRefs){
+                // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
+                runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, skipPaths);
+            }
         } else {
             // console.log("FAILED");
             // console.log(validate.errors);
@@ -752,6 +760,16 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, ski
             } catch(err) {
                 throw new SchemaValidationError();
             }
+            //Validate references that should run only if validation fails
+            for(let refPath of failRefs){
+                // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
+                runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, skipPaths);
+            }
+        }
+        //Validate References
+        for(let refPath of refs){
+            // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
+            runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, skipPaths);
         }
     }
 }
