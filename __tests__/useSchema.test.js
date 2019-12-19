@@ -52,6 +52,8 @@ function DemoForm() {
             <Alias name={"alias"}/>
             <div data-testid="pepsi">{formData.firstName}</div>
             <div data-testid="coke">{formData.lastName}</div>
+            <div data-testid="dirty">{formData.isDirty() && 'dirty'}</div>
+            <div data-testid="changed">{formData.isChanged() && 'changed'}</div>
             <Name name={'lastName'}/>
             <Name name={'firstName'}/>
             <div>
@@ -90,11 +92,17 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
     let {getByTestId} = render(<DemoForm/>);
 
     await wait(() => getByTestId("lastName"));
+
+    expect(getByTestId("dirty").innerHTML).toBe('');
+    expect(getByTestId("changed").innerHTML).toBe('');
     expect(getByTestId("firstName").value).toBe('');
 
     fireEvent.click(getByTestId("bfn"));
 
     expect(getByTestId("firstName").value).toBe('Joe');
+
+    expect(getByTestId("dirty").innerHTML).toBe('dirty');
+    expect(getByTestId("changed").innerHTML).toBe('changed');
 
     expect(getByTestId("firstNameDisplay").innerHTML).toBe('Joe');
     expect(getByTestId("pepsi").innerHTML).toBe('Joe');

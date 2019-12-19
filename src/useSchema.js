@@ -10,6 +10,7 @@ import {isObservable, observable} from "mobx";
 import $RefParser from "json-schema-ref-parser";
 import FormContext from './FormContext';
 import mobxStateTreeToAjvFriendlyJs from "./mobxStateTreeToAjvFriendlyJs";
+import equal from 'fast-deep-equal';
 
 /**
  *
@@ -68,10 +69,12 @@ export default function useSchema(FunctionalComponent, options) {
             Model = Model.actions(self => {
                 let initialSnapshot = {};
                 let defaultSnapshot = {};
+                let isDirty = false;
                 return {
                     _set(name, value) {
                         try {
                             setValue(self, name, value);
+                            isDirty = true;
                         } catch(err) {
                             const path = isArray(name) ? name : stringToPath(name);
                             const validationErrors = checkSchemaPathForErrors(ajv, jsonSchema, path, value);
@@ -80,12 +83,15 @@ export default function useSchema(FunctionalComponent, options) {
                     },
                     _afterCreate() {
                         initialSnapshot = getSnapshot(self);
+                        isDirty = false;
                     },
                     _afterDefaults() {
                         defaultSnapshot = getSnapshot(self);
+                        isDirty = false;
                     },
                     _reset() {
                         applySnapshot(self, defaultSnapshot);
+                        isDirty = false;
                     },
                     _replaceAll(value) {
                         applySnapshot(self, initialSnapshot);
@@ -111,21 +117,27 @@ export default function useSchema(FunctionalComponent, options) {
                                 throw new SchemaDataReplaceError(errs, `Error replacing some root form-capacitor props (${errProps})`, propMap);
                             }
                         }
+                        isDirty = true;
                     },
                     _push(name, value) {
                         getObservable(self, name).push(((isObject(value) || isArray(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
+                        isDirty = true;
                     },
                     _pop(name) {
                         getObservable(self, name).pop();
+                        isDirty = true;
                     },
                     _clear(name) {
                         getObservable(self, name).clear();
+                        isDirty = true;
                     },
                     _replace(name, arr) {
                         getObservable(self, name).replace(arr);
+                        isDirty = true;
                     },
                     _remove(name, value) {
                         getObservable(self, name).remove(value);
+                        isDirty = true;
                     },
                     _splice(name, idx, deleteCount = 1, insert = undefined) {
                         if(insert !== undefined) {
@@ -133,10 +145,18 @@ export default function useSchema(FunctionalComponent, options) {
                         } else {
                             getObservable(self, name).splice(idx, deleteCount);
                         }
+                        isDirty = true;
                     },
                     _slice(name, idx, length = 1) {
                         const arr = getObservable(self, name);
+                        isDirty = true;
                         return arr.slice(idx, length);
+                    },
+                    isDirty(){
+                        return isDirty;
+                    },
+                    isChanged(){
+                        return !equal(getSnapshot(self), defaultSnapshot);
                     }
                 };
             });

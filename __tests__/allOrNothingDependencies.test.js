@@ -39,7 +39,7 @@ function SimpleTextBox({errorTestId, ...props}) {
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
         }}/>
-        <span data-testid={errorTestId || `${props.name}_errors`}>{hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}</span>
+        <ul data-testid={errorTestId || `${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>
     </span>;
 }
 
@@ -131,7 +131,7 @@ function DemoForm() {
             </div>
             {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
             <div data-testid="valid">{valid}</div>
-            <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+            <ul data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>
         </div>);
     }, {
         schema: jsonSchema,
@@ -155,6 +155,12 @@ function DemoForm() {
             },
         }),
     });
+}
+
+function oneCharAtATime(text, event){
+    for(let i=1;i<=text.length;i++){
+        event(text.substring(0,i));
+    }
 }
 
 afterEach(cleanup);
@@ -181,6 +187,7 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     fireEvent.click(getByTestId("aonthing1_add"));
     // fireEvent.change(getByTestId("aonthing1"), {target: {value: "Cheese"}});
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("aonthing1_errors").className).toBe('');
 
     fireEvent.click(getByTestId("v"));
 
@@ -188,15 +195,12 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.change(getByTestId("aonthing2"), {target: {value: "Fart"}});
-    expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
 
     fireEvent.click(getByTestId("v"));
-
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
 
     fireEvent.change(getByTestId("aonthing3"), {target: {value: "Time"}});
-    // console.log(getByTestId("errorMapContainer").innerHTML);
-     expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
+    console.log(getByTestId("errorMapContainer").innerHTML);
 
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("valid").innerHTML).toBe('VALID');
@@ -214,9 +218,41 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
 
+
+    oneCharAtATime("Flower Sniffers United is Your Favourite Charity!", (text) => {
+        fireEvent.change(getByTestId("daonthing2_0"), {target: {value: text}});
+        console.log(getByTestId("daonthing2_0").value);
+        console.log(getByTestId("daonthing2_0_errors").innerHTML);
+        expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
+        expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+        // expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeLessThan(2);
+        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+        fireEvent.click(getByTestId("daonthing1_0_remove"));
+        expect(getByTestId("daonthing1_0_errors").className).toBe('error');
+        fireEvent.click(getByTestId("daonthing1_0_add"));
+        expect(getByTestId("daonthing1_0_errors").className).toBe("");
+    });
+
+    expect(getByTestId("daonthing2_0").value).toBe("Flower Sniffers United is Your Favourite Charity!");
+
+
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+
+    oneCharAtATime("Flower Sniffers United is Your Favourite Charity!", (text) => {
+        fireEvent.change(getByTestId("daonthing2_0"), {target: {value: text}});
+        expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
+        expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+        // expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeLessThan(2);
+        expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
+        fireEvent.click(getByTestId("daonthing1_0_remove"));
+        expect(getByTestId("daonthing1_0_errors").className).toBe('error');
+        fireEvent.click(getByTestId("daonthing1_0_add"));
+        expect(getByTestId("daonthing1_0_errors").className).toBe("");
+    });
+
+    expect(getByTestId("daonthing2_0").value).toBe("Flower Sniffers United is Your Favourite Charity!");
 
     fireEvent.click(getByTestId("daonthing1_0_remove"));
     expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
@@ -271,4 +307,31 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
     expect(getByTestId("daonthing2_1_errors").childNodes.length).toBeGreaterThan(0);
     expect(getByTestId("daonthing3_1_errors").childNodes.length).toBeGreaterThan(0);
+    fireEvent.click(getByTestId("daonthing1_1_remove"));
+
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_1_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_1_errors").childNodes.length).toBe(0);
+
+    fireEvent.click(getByTestId("deepAllOrNothing_add"));
+
+    fireEvent.change(getByTestId("daonthing2_0"), {target: {value: "Fart"}});
+
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+    // expect(getByTestId("daonthing2_1_errors").childNodes.length).toBeGreaterThan(0);
+    // expect(getByTestId("daonthing3_1_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_1_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_1_errors").childNodes.length).toBe(0);
+
+    fireEvent.click(getByTestId("deepAllOrNothing_add"));
+    fireEvent.click(getByTestId("deepAllOrNothing_add"));
+
+    expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
+    // expect(getByTestId("daonthing2_1_errors").childNodes.length).toBeGreaterThan(0);
+    // expect(getByTestId("daonthing3_1_errors").childNodes.length).toBeGreaterThan(0);
+    expect(getByTestId("daonthing2_1_errors").childNodes.length).toBe(0);
+    expect(getByTestId("daonthing3_1_errors").childNodes.length).toBe(0);
 });

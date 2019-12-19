@@ -104,6 +104,11 @@ useSchema uses context to pass FormCapacitor props to your form component.
  - ErrorMap - ObservableMap - a mobx observable map tree 
 }
 
+**Special Actions:**
+
+- `FormData.isDirty()` - Returns `true` if FormData was changed at some point even if all data is returned to the original values.  
+- `FormData.isChanged()` - Returns `true` if the current data is not the same as the original data.
+
 
 A basic form with 2 text inputs and a save button.
 ~~~
