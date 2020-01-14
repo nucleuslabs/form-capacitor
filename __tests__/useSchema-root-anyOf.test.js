@@ -130,8 +130,8 @@ test("The root anyOf keyword should be valid if anyOf the items match and invali
 
     //More anyOf Invalid Tests
     fireEvent.click(getByTestId("v"));
-    fireEvent.change(getByTestId("lastName"), {target: {value: ''}});
     fireEvent.change(getByTestId("aka"), {target: {value: ''}});
+    fireEvent.change(getByTestId("lastName"), {target: {value: ''}});
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
     await wait(() => getByTestId("E-lastName"));
     expect(getByTestId("E-lastName").childNodes.length).toBeGreaterThan(0);

@@ -1,4 +1,4 @@
-import {isObservableMap, observable, ObservableMap, toJS} from "mobx";
+import {isObservableMap, observable, ObservableMap, ObservableSet, IObservableArray} from "mobx";
 import {pathToPatchString, ajvStringToPath} from "./validation";
 
 export function getErrorNode(errorNode, path = []) {
@@ -261,7 +261,7 @@ function _deleteErrorsThatAreNotInMap(errorMap, pathMap, mapOfErrorsByPathStr){
 function deleteNodeErrors(errorNode, destPathString, errors) {
     const destPath = ajvStringToPath(destPathString);
     const node = getErrorNode(errorNode, destPath);
-    if(node.has('errors')) {
+    if(node && node.has('errors')) {
         const nodeErrors = node.get('_errorMap');
         errors.forEach(message => {
             nodeErrors.delete(message);

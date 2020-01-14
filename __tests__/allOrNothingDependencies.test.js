@@ -221,14 +221,10 @@ test("Test the base All or Nothing validation using dependencies keyword", async
 
     oneCharAtATime("Flower Sniffers United is Your Favourite Charity!", (text) => {
         fireEvent.change(getByTestId("daonthing2_0"), {target: {value: text}});
-        console.log(getByTestId("daonthing2_0").value);
-        console.log(getByTestId("daonthing2_0_errors").innerHTML);
+        // console.log(getByTestId("daonthing2_0").value);
+        // console.log(getByTestId("daonthing2_0_errors").innerHTML);
         expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
-        try {
-            expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
-        } catch(err){
-            console.log(err);
-        }
+        expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
         // expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeLessThan(2);
         expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
         fireEvent.click(getByTestId("daonthing1_0_remove"));
@@ -257,14 +253,15 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     });
 
     expect(getByTestId("daonthing2_0").value).toBe("Flower Sniffers United is Your Favourite Charity!");
+
     fireEvent.change(getByTestId("daonthing2_0"), {target: {value: ''}});
     fireEvent.click(getByTestId("daonthing1_0_remove"));
     expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBe(0);
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("valid").innerHTML).toBe('VALID');
-
     fireEvent.change(getByTestId("daonthing2_0"), {target: {value: "Fart"}});
+
 
     expect(getByTestId("daonthing1_0_errors").className).toBe('error');
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
@@ -316,13 +313,14 @@ test("Test the base All or Nothing validation using dependencies keyword", async
 
     expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
-    console.log(getByTestId("daonthing3_1_errors").innerHTML);
+    // console.log(getByTestId("daonthing3_1_errors").innerHTML);
     expect(getByTestId("daonthing2_1_errors").childNodes.length).toBe(0);
     expect(getByTestId("daonthing3_1_errors").childNodes.length).toBe(0);
 
     fireEvent.click(getByTestId("deepAllOrNothing_add"));
 
     fireEvent.change(getByTestId("daonthing2_0"), {target: {value: "Fart"}});
+    // console.log(getByTestId("daonthing3_1_errors").innerHTML);
 
     expect(getByTestId("daonthing2_0_errors").childNodes.length).toBe(0);
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
