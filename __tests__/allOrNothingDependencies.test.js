@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {oneCharAtATime} from "../src/testHelper";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
@@ -155,12 +156,6 @@ function DemoForm() {
             },
         }),
     });
-}
-
-function oneCharAtATime(text, event){
-    for(let i=1;i<=text.length;i++){
-        event(text.substring(0,i));
-    }
 }
 
 afterEach(cleanup);

@@ -30,7 +30,7 @@ describe('In Regards to data converted by mobxStateTreeToAjvFriendlyJs', functio
         for(let i=0;i<100;i++){
             //here to give a few cycles for stuff to happen
         }
-        expect(mobxStateTreeToAjvFriendlyJs(mobxStateTree.contacts[0])).toBeUndefined();
+        expect(mobxStateTreeToAjvFriendlyJs(mobxStateTree.contacts[0])).toEqual({});
         expect(testTree.firstName).toEqual("Hello");
         expect(testTree.alias).toBeUndefined();
         expect(testTree.alias2).toBeUndefined();
@@ -39,5 +39,10 @@ describe('In Regards to data converted by mobxStateTreeToAjvFriendlyJs', functio
 
         const passed = validate(mobxStateTreeToAjvFriendlyJs(mobxStateTree));
         expect(passed).toBeTrue();
+
+        mobxStateTree.set("firstName", undefined);
+        mobxStateTree.set("lastName", undefined);
+        mobxStateTree.set("middleName", undefined);
+        expect(mobxStateTreeToAjvFriendlyJs(mobxStateTree)).toEqual({});
     });
 });

@@ -6,9 +6,15 @@
  */
 import {toJS} from "mobx";
 
+/**
+ * This will recursively trim undefined branches and return a trimmed tree or an empty object
+ *
+ * @param mst
+ * @returns {Map<any, any> | Set<unknown> | * | {}}
+ */
 export default function mobxStateTreeToAjvFriendlyJs(mst) {
     const js = toJS(mst);
-    return replaceEmptyObjectsAndArraysWithUndefinedR(js);
+    return replaceEmptyObjectsAndArraysWithUndefinedR(js) || {};
 }
 
 function replaceEmptyObjectsAndArraysWithUndefinedR(obj) {

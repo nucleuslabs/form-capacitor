@@ -66,6 +66,9 @@ export default function useSchema(FunctionalComponent, options) {
         schemaPromise.then(jsonSchema => {
             const ajv = createAjvObject();
             let Model = jsonSchemaToMST(jsonSchema);
+            // console.log("FULL SCHEMA");
+            // console.log(JSON.stringify(jsonSchema));
+
             Model = Model.actions(self => {
                 let initialSnapshot = {};
                 let defaultSnapshot = {};

@@ -805,7 +805,6 @@ export function watchForPatches(schema, data, ajv) {
         //     // normalizedPatchPath = patch.path;
         //     schemaPath = patchPathToSchemaPathMap.get(patch.path);
         }
-        // console.log("Some kind of OP", patch.op, normalizedPatchPath);
         if(schemaPath) {
             const schemaPathStr = pathToPatchString(schemaPath);
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
@@ -893,6 +892,7 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
             // }
         } else {
             // console.log("FAILED");
+            // console.log(JSON.stringify(validate.schema));
             // console.log(validate.errors);
             try {
                 // const processedErrors = processAjvErrors(validate.errors, paths, errorPathMaps, (validationPath, errorMapPath, error, subSchema) => {
