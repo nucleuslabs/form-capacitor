@@ -266,35 +266,35 @@ function deleteNodeErrors(errorNode, destPathString, errors) {
         errors.forEach(message => {
             nodeErrors.delete(message);
         });
-        deepCleanNode(errorNode, destPath);
+        cleanNode(errorNode, destPath);
     }
 }
 
 
-/* istanbul ignore next */
-function delErrorNodeR(map, path) {
-    if(!map.has('children')) return false;
-    const childMap = map.get('children');
-    if(path.length > 1) {
-        const [first, ...rest] = path;
-        const next = childMap.get(first);
-        if(!next) return false;
-        const deleted = delErrorNodeR(next, rest);
-        if(!next.has('children') || !next.get('children').size) {
-            childMap.delete(first);
-            cleanNode(map);
-        }
-        return deleted;
-    }
-    if(path.length > 0) {
-        if(childMap.size === 0) {
-            map.clear();
-        } else {
-            return childMap.delete(path[0]) && cleanNode(map);
-        }
-    }
-    return false;
-}
+// /* istanbul ignore next */
+// function delErrorNodeR(map, path) {
+//     if(!map.has('children')) return false;
+//     const childMap = map.get('children');
+//     if(path.length > 1) {
+//         const [first, ...rest] = path;
+//         const next = childMap.get(first);
+//         if(!next) return false;
+//         const deleted = delErrorNodeR(next, rest);
+//         if(!next.has('children') || !next.get('children').size) {
+//             childMap.delete(first);
+//             cleanNode(map);
+//         }
+//         return deleted;
+//     }
+//     if(path.length > 0) {
+//         if(childMap.size === 0) {
+//             map.clear();
+//         } else {
+//             return childMap.delete(path[0]) && cleanNode(map);
+//         }
+//     }
+//     return false;
+// }
 
 /**
  * returns true if the node is empty
@@ -332,23 +332,23 @@ function cleanNode(errorNode, path = []) {
     return empty;
 }
 
-/**
- * returns true if the nodes are empty
- * @param errorNode
- * @param path
- * @returns {*}
- */
-function deepCleanNode(errorNode, path = []) {
-    const mutablePath = [...path];
-    let empty = true;
-    for(let i = path.length - 1; i >= 0; i--) {
-        empty = cleanNode(errorNode, mutablePath);
-        if(empty) {
-            delErrorNodeR(errorNode, mutablePath);
-        }
-    }
-    return empty;
-}
+// /**
+//  * returns true if the nodes are empty
+//  * @param errorNode
+//  * @param path
+//  * @returns {*}
+//  */
+// function deepCleanNode(errorNode, path = []) {
+//     const mutablePath = [...path];
+//     let empty = true;
+//     for(let i = path.length - 1; i >= 0; i--) {
+//         empty = cleanNode(errorNode, mutablePath);
+//         if(empty) {
+//             delErrorNodeR(errorNode, mutablePath);
+//         }
+//     }
+//     return empty;
+// }
 
 /**
  *

@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import jsonSchema from "./demo-form.json";
+import anyOfArrayJsonSchema from "./anyOf-array-form";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
 import useConsume from "../src/useConsume";
@@ -105,6 +106,56 @@ function DemoForm() {
     });
 }
 
+
+
+
+
+
+function TextBoxArray({name}) {
+    const [value, set, {push, splice, clear}] = useConsumeArray(name);
+    const [hasErrors] = useConsumeErrors(name);
+
+    const handleChange = name === 'alias' ? idx => ev => {
+        splice(idx, 1, {alias: ev.target.value});
+    } : idx => ev => {
+        splice(idx, 1, ev.target.value);
+    };
+    return <div>
+        <div data-testid={`${name}_div`} className={hasErrors ? "error" : null}>
+            {value.map((inst, key) => <input key={key} type="text" data-testid={`${name}_${key}`} name={`${name}.${key}`} value={name === 'alias' ? inst.alias || "" : inst || ""}
+                                             onChange={handleChange(key)}/>)}
+        </div>
+        <button data-testid={`${name}_add1`} onClick={() => push({alias: "Big Joe"})}>+1</button>
+        <button data-testid={`${name}_add2`} onClick={() => push("Little Joe")}>+2</button>
+        <button data-testid={`${name}_clear`}  onClick={() => clear()}>clear</button>
+    </div>;
+}
+
+function AnyOfArrayForm() {
+    return useSchema(props => {
+        const {ready} = props;
+        if(!ready) {
+            return null;
+        }
+        return useObserver(() =>
+            <div>
+                <div>
+                    <span>Alias</span>
+                    <TextBoxArray name="alias"/>
+                </div>
+                <div>
+                    <span>Alias 2</span>
+                    <TextBoxArray name="alias2"/>
+                </div>
+            </div>
+        );
+    }, {
+        schema: anyOfArrayJsonSchema,
+        $ref: "#/definitions/AnyOfArrayForm"
+    });
+}
+
+
 afterEach(cleanup);
 
 test("The root anyOf keyword should be valid if anyOf the items match and invalid if they don't", async () => {
@@ -137,4 +188,41 @@ test("The root anyOf keyword should be valid if anyOf the items match and invali
     expect(getByTestId("E-lastName").childNodes.length).toBeGreaterThan(0);
     await wait(() => getByTestId("E-aka"));
     expect(getByTestId("E-aka").childNodes.length).toBeGreaterThan(0);
+});
+
+
+test("The root anyOf keyword should be valid for array elements if anyOf the items match and invalid if they don't", async () => {
+    let {getByTestId} = render(<AnyOfArrayForm/>);
+    await wait(() => getByTestId("alias_div"));
+
+    fireEvent.click(getByTestId("alias_add1"));
+
+    expect(getByTestId("alias_div").className).toBe("");
+    expect(getByTestId("alias2_div").className).toBe("");
+
+    fireEvent.click(getByTestId("alias_clear"));
+
+    expect(getByTestId("alias_div").className).toBe("error");
+    expect(getByTestId("alias2_div").className).toBe("error");
+
+
+    fireEvent.click(getByTestId("alias2_add2"));
+
+    expect(getByTestId("alias_div").className).toBe("");
+    expect(getByTestId("alias2_div").className).toBe("");
+
+    fireEvent.click(getByTestId("alias_add1"));
+
+    expect(getByTestId("alias_div").className).toBe("");
+    expect(getByTestId("alias2_div").className).toBe("");
+
+    fireEvent.click(getByTestId("alias2_clear"));
+
+    expect(getByTestId("alias_div").className).toBe("");
+    expect(getByTestId("alias2_div").className).toBe("");
+
+    fireEvent.click(getByTestId("alias_clear"));
+
+    expect(getByTestId("alias_div").className).toBe("error");
+    expect(getByTestId("alias2_div").className).toBe("error");
 });

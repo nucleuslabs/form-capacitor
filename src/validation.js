@@ -459,7 +459,6 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
                 patchPath: [...subPatchPath],
                 fieldDefinitionMap: fieldDefinitionMap,
                 patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-                relatedRefMap: relatedRefMap,
                 metaDataMap: metaDataMap,
                 errorPathMaps: errorPathMaps,
                 skeletonSchemaMap: skeletonSchemaMap
@@ -535,7 +534,7 @@ function buildAxxOfRefs(refCollection, axxOfSchema, axxOfPropType, propName, pat
     const aOfRefCollection = new Map();
     axxOfSchema.map(schema => appendFieldReferencesR(aOfRefCollection, schema, propName, [...path], patchPath, patchPathToSchemaPathMap));
     if(aOfRefCollection && aOfRefCollection.size > 0) {
-        assignFieldDefinitions([...aOfRefCollection], buildSchemaTree([...path], {[axxOfPropType]: [...axxOfSchema]}, skeletonSchemaMap), fieldDefinitionMap);
+        assignFieldDefinitions(aOfRefCollection, buildSchemaTree([...path], {[axxOfPropType]: [...axxOfSchema]}, skeletonSchemaMap), fieldDefinitionMap);
         appendRefs(refCollection, aOfRefCollection);
     }
 }
@@ -644,7 +643,7 @@ function buildSchemaTree(path, leafValue = {}, basicSchemaMap = new Map()) {
 function assignFieldDefinitions(refs, schema, fieldDefinitionMap) {
     // const refPatchPaths = [...refs].map(pathArr => pathToPatchString(pathArr));
     for (let [pathStr, fieldPath] of refs) {
-        assignFieldDefinition(schema, fieldDefinitionMap ,fieldPath, refs);
+        assignFieldDefinition(schema, fieldDefinitionMap ,fieldPath, [...refs.values()]);
     }
 }
 
@@ -655,10 +654,10 @@ function assignFieldDefinition(schema, fieldDefinitionMap, path = [], refs = [],
     if (fieldDefinitionMap.has(fieldPathId)) {
         const fDef = fieldDefinitionMap.get(fieldPathId);
         Object.assign(fDef.schema, {...schema});
-        refs.map(refPath  => setRefPath(fDef.refs, refPath));
-        depRefs.map(refPath  => fDef.depRefs.add(refPath));
+        refs.map(refPath  => setRefPath(fDef.refs, [...refPath]));
+        depRefs.map(refPath  => fDef.depRefs.add([...refPath]));
     } else {
-        fieldDefinitionMap.set(fieldPathId, {schema: {...schema}, path: [...path], refs: new Map(refs.map(refPath => [pathToPatchString(refPath), refPath])), depRefs: new Set([...depRefs])});
+        fieldDefinitionMap.set(fieldPathId, {schema: {...schema}, path: [...path], refs: new Map(refs.map(refPath => [pathToPatchString(refPath), [...refPath]])), depRefs: new Set([...depRefs])});
     }
 }
 
@@ -810,7 +809,7 @@ export function watchForPatches(schema, data, ajv) {
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
                 // console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, normalizedPatchPath, patch.op, patch.value);
-                debugger;
+                // debugger;
                 switch(patch.op) {
                     case 'add':
                     case 'replace':
