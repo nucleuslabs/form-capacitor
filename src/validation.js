@@ -138,7 +138,7 @@ function reduceAjvErrorsToPathMappedErrors(errors, pathMap, errorPathMaps, errCa
             const actionKey =`${error.parentSchema.type}-${error.keyword}`;
             // console.log(validationPath, error.dataPath ? dataStr : schemaStr);
             // console.log(error);
-            let errorPair = undefined;
+            let errorPair;
             if(validationPath.length > 0 && error.parentSchema.type && errTypeKeywordActions[actionKey]) {
                 errorPair = errTypeKeywordActions[actionKey](errCallback, validationPath, errorPath, error, subSchemaPathMap, dupeMap);
             } else if(errTypeKeywordActions[error.keyword]) {
@@ -810,6 +810,7 @@ export function watchForPatches(schema, data, ajv) {
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
                 // console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, normalizedPatchPath, patch.op, patch.value);
+                debugger;
                 switch(patch.op) {
                     case 'add':
                     case 'replace':

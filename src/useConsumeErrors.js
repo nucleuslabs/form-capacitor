@@ -12,7 +12,9 @@ import {getErrors} from "./errorMapping";
 export default function useConsumeErrors(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
-    const errors = getErrors(context.errorMap, fullPath);
     // console.log(fullPath, context.errorMap, errors);
-    return useObserver(() => [errors && errors.length > 0, errors]);
+    return useObserver(() => {
+        const errors = getErrors(context.errorMap, fullPath);
+        return [errors && errors.length > 0, errors];
+    });
 };

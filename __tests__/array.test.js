@@ -5,7 +5,6 @@ import React, {useState} from "react";
 import useConsume from "../src/useConsume";
 import useConsumeErrors from "../src/useConsumeErrors";
 import useConsumeArray from "../src/useConsumeArray";
-import useConsumeArrayErrors from "../src/useConsumeArrayErrors";
 import {useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
@@ -23,7 +22,7 @@ function SimpleTextBox(props) {
 
 function AliasString(props) {
     const [alias,set,{push, pop}] = useConsumeArray(props.name);
-    const [hasErrors, errors] = useConsumeArrayErrors(props.name);
+    const [hasErrors, errors] = useConsumeErrors(props.name);
     return <div>
         {alias.map((value, idx) => <SimpleTextBox key={idx} data-testid={`${props.name}_${idx}`} name={`${props.name}.${idx}`}/>)}
         <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>
@@ -34,7 +33,7 @@ function AliasString(props) {
 
 function AliasObject(props) {
     const [alias,set,{push}] = useConsumeArray(props.name);
-    const [hasErrors, errors] = useConsumeArrayErrors(props.name);
+    const [hasErrors, errors] = useConsumeErrors(props.name);
     return <div>
         {alias.map((value, idx) => <SimpleTextBox key={idx} data-testid={`${props.name}_${idx}`} name={`${props.name}.${idx}.alias`}/>)}
         <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>
