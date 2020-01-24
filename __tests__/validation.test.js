@@ -4,7 +4,7 @@ import $RefParser from 'json-schema-ref-parser';
 import {setValue} from "../src";
 import {observable} from "mobx";
 import {watchForPatches, createAjvObject, pathToPatchString} from "../src/validation";
-import mobxStateTreeToAjvFriendlyJs from "../src/mobxStateTreeToAjvFriendlyJs";
+import mobxTreeToSimplifiedObjectTree from "../src/mobxTreeToSimplifiedObjectTree";
 
 //tests requiring mobx state tree
 describe('watchForPatches', function() {
@@ -30,7 +30,7 @@ describe('watchForPatches', function() {
             //here to give a few cycles for stuff to happen
         }
         expect(errors).toEqual(observable.map());
-        const passed = validate(mobxStateTreeToAjvFriendlyJs(mobxStateTree));
+        const passed = validate(mobxTreeToSimplifiedObjectTree(mobxStateTree));
         expect(passed).toBeTrue();
     });
 });

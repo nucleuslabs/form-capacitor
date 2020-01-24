@@ -5,7 +5,7 @@ import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
 import UndefinedPropertyError from "./UndefinedPropertyError";
 import SchemaValidationError from "./SchemaValidationError";
-import mobxStateTreeToAjvFriendlyJs from "./mobxStateTreeToAjvFriendlyJs";
+import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
 import {deleteAllNodes, deleteAllThatAreNotInMap, setError} from "./errorMapping";
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
@@ -768,7 +768,7 @@ function setRefPath(refs, path){
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
  * @param {{}} data {MobXStateTree} object
  * @param {{}} ajv {Ajv} object
- * @returns {{errors: ObservableMap<any, any>, validate: validate}}
+ * @returns {{errors: ObservableMap<any, any>, metaDataMap: Map | ObservableMap<any, any>,  validate: function}}
  */
 export function watchForPatches(schema, data, ajv) {
     const errors = observable.map();
@@ -876,7 +876,7 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
         // validateRefs(refs, validators, data, errors, paths, errorPathMaps, [...skipPaths]);
         // const x = validate(toJS(data));
         // console.log("NOPE");
-        const theRealJs = mobxStateTreeToAjvFriendlyJs(data);
+        const theRealJs = mobxTreeToSimplifiedObjectTree(data);
         // console.log(pathStr, validate.schema, theRealJs);
         //@todo Create smart Error handling so that creation of errors where errors get cleared based on the the source validation being cleared
 

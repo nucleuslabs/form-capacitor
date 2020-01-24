@@ -1,28 +1,29 @@
 # form-capacitor - 
 
-**!!!Experimental Project!!!**
+Form capacitor is a set of React Hooks that help you manage state, validation and errors for react based forms. 
+This project makes use of mobx / mobx-state-tree for state management and AJV for validation.
 
-Form manager for [`react`](https://github.com/facebook/react) that makes 
-use of mobx & mobx-state-tree for state management  and AJV for validation.
-
-
-Form capacitor is a set of React Hooks that help you manage the state, 
-validation and errors for react forms. 
+Use json-schema to define the state and validation rules for your form then use a few simple Hooks to setup your form state management and validation.
 
 
-Use json-schema to define the state and validation rules for your form then use a few Hooks to setup your form state management and validation. 
+**Project Status: Mostly Harmless**
+
+The @latest version of this project now has reasonable test coverage using some complex form samples with react-testing-library and will soon be considered stable.
 
 **Pros:**
-1. Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields.
-2. Using Json-schema allows you to validate in the browser and server using the same ruleset.
-3. The API is hooks and the hooks for use with inputs work similar to `useState` works well with functional components.
-4. It isn't difficult to build most forms with this library even very complex forms can be created
-5. Works well with popular UI components like react-select and react-date-picker and would pair nicely with material UI   
+1. It is Fast - Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields
+2. Supports big complex forms and works well with repeatable dynamic input collections
+3. Supports nth level nesting and grouping
+4. Using Json-schema allows you to validate the form in the browser and server using the same ruleset
+5. The API is hooks based and the hooks for use with inputs work similar to `useState`
+6. Easy to use with both super simple and super complex forms
+7. Works well with popular UI components like react-select and react-date-picker and would pair nicely with material UI
+8. Not too many dependencies   
 
 **Cons:**
-1. Isn't designed to work well with classes because it uses Hooks :(
-3. 1 of the hook functions `useSchema` is actually Hook + HOC hybrids which may seem weird but it is because it uses a Context Provider which need to wrap components
-4. For complex state with deep tree structures you have to either specificy the full path in the name which employs path separation using the '.' character i.e "demographicInfo.homeAddress.postalCode" for each input or wrap them in a `<SubScehma path={name}>` set the proper paths in context
+1. Isn't designed to work with react below 16.8 or class components because it uses Hooks :(
+2. 1 of the hook functions `useSchema` is actually Hook + HOC hybrid which may seem weird but it is because it uses a Context Provider so you don't need to wrap it yourself (this was an opinionated decision because we make a lot of forms and found the strange convenience of the the hook HOC combo to outweigh the standard pattern of wrapping things in Context Providers)
+3. For complex state with deep tree structures you have to either specify the full path in the name of a Consumer Component which employs path separation using the '.' character i.e "demographicInfo.homeAddress.postalCode" for each input or wrap them in a `<SubScehma path={name}>` which will set the proper paths in context. (if you can think of a magical way to propagate paths without wrapping please submit a pull request)
 
 
 ## Usage
@@ -33,9 +34,9 @@ These are the core methods that are used to interact with the underlying mobx-st
  - getValue(obj, path) - gets a value in a mobx state tree or observable map tree based on a path array
  - setValue(obj, path, value) - sets a value in a mobx state tree or observable map tree based on a path array
  
-### Error Map  Methods
+### Error Map Methods
 
-- getFlattenedErrors(ErrorMap, path = []) 
+- getFlattenedErrors(ErrorMap, path = []) <- This method is useful. The others.. meh... not so much. 
 - getErrors(ErrorMap, path = [])
 - getErrorNode(ErrorMap, path = [])
 - setError(ErrorMap, path = [], errorObj) 
@@ -96,19 +97,21 @@ useSchema uses context to pass FormCapacitor props to your form component.
 **returns:**
 {
  - ready - boolean - a boolean which is set to true once all promises have been resolved in the initialization process
- - FormData - MST - a mobx-state-tree full of observable goodness that you can access all of your form state from the structure is based on your json schema. Import toJS() from mobx to see a snapshot of your form data tree.
+ - formData - MST - a mobx-state-tree full of observable goodness that you can access all of your form state from the structure is based on your json schema. Import toJS() from mobx to see a snapshot of your form data tree.
  - set(path, value) - func - Used to set data within the MST for the supplied path.
  - set(object) - func - set is overloaded if you pass a POJO to it as the first parameter the whole state tree will be replaced
  - reset() - func -resets the mobx state tree to the initial state
  - validate() - func - imperative validate function which returns true or false and also activates the error states and seeds the errorMap with errors for anything that is invalid 
- - ErrorMap - ObservableMap - a mobx observable map tree 
+ - hasErrors() - func - a function that tells whether or not there are any errors for this form   
+ - ErrorMap - ObservableMap - a mobx observable map tree of all the errors
 }
 
 **Special Actions:**
 
-- `FormData.isDirty()` - Returns `true` if FormData was changed at some point even if all data is returned to the original values.  
-- `FormData.isChanged()` - Returns `true` if the current data is not the same as the original data.
-
+- `formData.isDirty()` - Returns `true` if FormData was changed at some point even if all data is returned to the original values.  
+- `formData.isChanged()` - Returns `true` if the current data is not the same as the original data.
+- `formData.toJS()` - Returns a sanitized JS version of formData but with all empty arrays and undefined object properties removed. (if you want a non sanitized version mobx has a toJS method that return a full JS version of the state tree)
+- `formData.toJSON()` - Returns a JSON string of formData that is produced using the same sanitization as the FormData.toJS method.
 
 A basic form with 2 text inputs and a save button.
 ~~~
@@ -129,7 +132,7 @@ function SimpleForm() {
                 <SimpleTextBox name="lastName"/>
             </div>
             <div>
-                <button onClick={() => validate() ? console.log("Passed", formData) : console.error("Failed", formData)}>Save</button>
+                <button onClick={() => validate() ? console.log("Passed", formData.toJSON()) : console.error("Failed", formData.toJSON())}>Save</button>
             </div>
             {<ul>{errorMap && errorMap.size > 0 && errorMapToFlatArray(errorMap).map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}
         </div>)
@@ -535,7 +538,7 @@ imperative validation on submit or change in focus or whatever.
 
 Errors can be managed at the consumer/input level via props.fc.hasErrors/props.fc.errors 
 or at the form provider level via the props.errorMap observable map tree. 
-The`errorMapToFlatArray` function included in form-capacitor will turn errorMap Tree 
+The`getFlattenedErrors` function included in form-capacitor will turn errorMap Tree 
 into a flat array of error objects.    
 
 ## Why did we develop another form state / validation management library?

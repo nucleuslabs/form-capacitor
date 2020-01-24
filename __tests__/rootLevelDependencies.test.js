@@ -47,7 +47,7 @@ function AllOrNothing ({name}){
 
 function DemoForm() {
     return useSchema(props => {
-        const {formData, validate, ready, errorMap} = props;
+        const {formData, validate, ready, hasErrors, errorMap} = props;
         const [valid, setValid] = useState('Unknown');
         if(!ready) {
             return <div>Loading...</div>;
@@ -88,7 +88,7 @@ function DemoForm() {
             </div>
             {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
             <div data-testid="valid">{valid}</div>
-            <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+            <div data-testid="errorMapContainer">{hasErrors() && <ul data-testid="errors">{getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
         </div>);
     }, {
         schema: jsonSchema,
@@ -96,8 +96,7 @@ function DemoForm() {
         default: {
             firstName: "Foo",
             middleName: "J",
-            lastName: "Bar",
-            alias: []
+            lastName: "Bar"
         },
         actions: formData => ({
             addAlias(alias) {

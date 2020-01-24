@@ -155,42 +155,6 @@ export function deleteOwnNode(errorMap, path) {
     }
 }
 
-// @todo Evaluate the necessity of these functions
-//
-// May use these functions not sure at this point so for now they are commented out
-//
-// export function deleteRelatedNodes(errorMap, path) {
-//     const pathIndex = errorMap.get('pathIndex');
-//     const pathString = pathToPatchString(path);
-//     const deleteSet = new Set();
-//     if(pathIndex.has(pathString)) {
-//         const pathMap = pathIndex.get(pathString);
-//         pathMap.forEach((errors, destPathString) => {
-//             if(pathString !== destPathString) {
-//                 deleteNodeErrors(errorMap, destPathString, errors);
-//                 deleteSet.add(destPathString);
-//             }
-//         });
-//         deleteSet.forEach((delPathString) => pathMap.delete(delPathString));
-//     }
-// }
-//
-// export function deleteSpecificErrorsForNode(errorMap, path, errors) {
-//     const pathIndex = errorMap.get('pathIndex');
-//     const pathString = pathToPatchString(path);
-//     if(pathIndex.has(pathString)) {
-//         const pathMap = pathIndex.get(pathString);
-//         pathMap.forEach((compErrors, destPathString) => {
-//             if(pathString !== destPathString) {
-//                 deleteNodeErrors(errorMap, destPathString, errors);
-//                 if(pathMap.get(destPathString).size === 0) {
-//                     pathMap.delete(destPathString);
-//                 }
-//             }
-//         });
-//     }
-// }
-
 /**
  * Deletes all errors for the provided path that were triggerred on the current path as well as all errors triggered by the current path
  * that do not appear in the provide map of errors
@@ -266,35 +230,35 @@ function deleteNodeErrors(errorNode, destPathString, errors) {
         errors.forEach(message => {
             nodeErrors.delete(message);
         });
-        cleanNode(errorNode, destPath);
+        deepCleanNode(errorNode, destPath);
     }
 }
 
 
-// /* istanbul ignore next */
-// function delErrorNodeR(map, path) {
-//     if(!map.has('children')) return false;
-//     const childMap = map.get('children');
-//     if(path.length > 1) {
-//         const [first, ...rest] = path;
-//         const next = childMap.get(first);
-//         if(!next) return false;
-//         const deleted = delErrorNodeR(next, rest);
-//         if(!next.has('children') || !next.get('children').size) {
-//             childMap.delete(first);
-//             cleanNode(map);
-//         }
-//         return deleted;
-//     }
-//     if(path.length > 0) {
-//         if(childMap.size === 0) {
-//             map.clear();
-//         } else {
-//             return childMap.delete(path[0]) && cleanNode(map);
-//         }
-//     }
-//     return false;
-// }
+/* istanbul ignore next */
+function delErrorNodeR(map, path) {
+    if(!map.has('children')) return false;
+    const childMap = map.get('children');
+    if(path.length > 1) {
+        const [first, ...rest] = path;
+        const next = childMap.get(first);
+        if(!next) return false;
+        const deleted = delErrorNodeR(next, rest);
+        if(!next.has('children') || !next.get('children').size) {
+            childMap.delete(first);
+            cleanNode(map);
+        }
+        return deleted;
+    }
+    if(path.length > 0) {
+        if(childMap.size === 0) {
+            map.clear();
+        } else {
+            return childMap.delete(path[0]) && cleanNode(map);
+        }
+    }
+    return false;
+}
 
 /**
  * returns true if the node is empty
@@ -326,29 +290,29 @@ function cleanNode(errorNode, path = []) {
             empty = false;
         }
     }
-    if(node.has("pathIndex")) {
+    if(empty && node.has("pathIndex")) {
         node.delete("pathIndex");
     }
     return empty;
 }
 
-// /**
-//  * returns true if the nodes are empty
-//  * @param errorNode
-//  * @param path
-//  * @returns {*}
-//  */
-// function deepCleanNode(errorNode, path = []) {
-//     const mutablePath = [...path];
-//     let empty = true;
-//     for(let i = path.length - 1; i >= 0; i--) {
-//         empty = cleanNode(errorNode, mutablePath);
-//         if(empty) {
-//             delErrorNodeR(errorNode, mutablePath);
-//         }
-//     }
-//     return empty;
-// }
+/**
+ * returns true if the nodes are empty
+ * @param errorNode
+ * @param path
+ * @returns {*}
+ */
+function deepCleanNode(errorNode, path = []) {
+    const mutablePath = [...path];
+    for(let i = path.length - 1; i >= 0; i--) {
+        if(cleanNode(errorNode, mutablePath)) {
+            delErrorNodeR(errorNode, mutablePath);
+        } else{
+            break;
+        }
+        mutablePath.pop();
+    }
+}
 
 /**
  *

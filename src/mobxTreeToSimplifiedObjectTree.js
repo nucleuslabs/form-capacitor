@@ -12,17 +12,17 @@ import {toJS} from "mobx";
  * @param mst
  * @returns {Map<any, any> | Set<unknown> | * | {}}
  */
-export default function mobxStateTreeToAjvFriendlyJs(mst) {
+export default function mobxTreeToSimplifiedObjectTree(mst) {
     const js = toJS(mst);
-    return replaceEmptyObjectsAndArraysWithUndefinedR(js) || {};
+    return replaceEmptyObjectPropertiesAndArraysWithUndefinedR(js) || {};
 }
 
-function replaceEmptyObjectsAndArraysWithUndefinedR(obj) {
+function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
     if(Array.isArray(obj)) {
         if(obj.length === 0) {
             return undefined;
         } else {
-            const newArr =  obj.map(replaceEmptyObjectsAndArraysWithUndefinedR).filter(value => value !== undefined);
+            const newArr =  obj.map(replaceEmptyObjectPropertiesAndArraysWithUndefinedR).filter(value => value !== undefined);
             return newArr.length === 0 ? undefined : newArr;
         }
     } else if(obj instanceof Map || obj instanceof WeakMap) {
@@ -31,9 +31,9 @@ function replaceEmptyObjectsAndArraysWithUndefinedR(obj) {
         } else {
             const map = new Map();
             obj.forEach((value, key) => {
-                const newItem = replaceEmptyObjectsAndArraysWithUndefinedR(value);
+                const newItem = replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value);
                 if(newItem !== undefined) {
-                    map.set(key, replaceEmptyObjectsAndArraysWithUndefinedR(value))
+                    map.set(key, replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value))
                 }
             });
             return map.size === 0 ? undefined : map;
@@ -44,7 +44,7 @@ function replaceEmptyObjectsAndArraysWithUndefinedR(obj) {
         } else {
             const set = new Set();
             obj.forEach((value) => {
-                const newItem = replaceEmptyObjectsAndArraysWithUndefinedR(value);
+                const newItem = replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value);
                 if(newItem !== undefined) {
                     set.add(newItem);
                 }
@@ -58,15 +58,12 @@ function replaceEmptyObjectsAndArraysWithUndefinedR(obj) {
         } else {
             return keys.reduce(function(acc, prop) {
                 //filter out undefined values
-                const newProp = replaceEmptyObjectsAndArraysWithUndefinedR(obj[prop]);
-                if(newProp !== undefined) {
-                    if(acc === undefined){
-                        acc = {};
-                    }
+                const newProp = replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj[prop]);
+                if(newProp !== undefined && !(Object.prototype.toString.call(newProp) === "[object Object]" && Object.keys(newProp).length === 0)) {
                     acc[prop] = newProp;
                 }
                 return acc;
-            }, undefined);
+            }, {});
         }
     } else {
         return obj;
