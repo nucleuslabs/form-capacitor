@@ -1,6 +1,12 @@
 import {isObservableMap, observable, ObservableMap, ObservableSet, IObservableArray} from "mobx";
 import {pathToPatchString, ajvStringToPath} from "./validation";
 
+/**
+ *
+ * @param {ObservableMap} errorNode
+ * @param {string[]} path
+ * @returns {undefined|*}
+ */
 export function getErrorNode(errorNode, path = []) {
     if(!errorNode) return undefined;
     let node = errorNode;
@@ -19,8 +25,8 @@ export function getErrorNode(errorNode, path = []) {
 
 /**
  *
- * @param {Map} errorNode
- * @param path
+ * @param {ObservableMap} errorNode
+ * @param {string[]} path
  * @returns {*|Array|Array}
  */
 export function getErrors(errorNode, path = []) {
@@ -31,8 +37,8 @@ export function getErrors(errorNode, path = []) {
 
 /**
  *
- * @param {Map} errorNode
- * @param {[]} path
+ * @param {ObservableMap} errorNode
+ * @param {string[]} path
  * @param {{}} error
  * @returns {boolean}
  */
@@ -48,7 +54,6 @@ export function hasError(errorNode, path = [], error) {
  * @param {string[]} path
  * @param {{}} error
  * @param {[]} originPath
- * @returns {*}
  */
 export function setError(errorNode, path = [], error, originPath) {
     const node = setErrorNode(errorNode, path);
@@ -63,7 +68,6 @@ export function setError(errorNode, path = [], error, originPath) {
  * @param {string[]} path
  * @param {[{}]} errors
  * @param {[]} originPath
- * @returns {*}
  */
 export function setErrors(errorNode, path = [], errors, originPath) {
     const node = setErrorNode(errorNode, path);
@@ -79,7 +83,6 @@ export function setErrors(errorNode, path = [], errors, originPath) {
  * @param {ObservableMap} node
  * @param {string[]} path
  * @param {{}} error
- * @returns {*}
  */
 function _setError(node, path = [], error) {
     if(node.has('errors')) {
@@ -103,7 +106,7 @@ function setPathIndexRelationships(errorNode, originPath, newPath, error) {
         if(pathIndex.has(oPathString)) {
             pathMap = pathIndex.get(oPathString);
             if(!pathMap.has(nPathString)) {
-                pathMap.set(nPathString, observable.set([]))
+                pathMap.set(nPathString, observable.set([]));
             }
             const messageSet = pathMap.get(nPathString);
             messageSet.add(error.message);
@@ -162,7 +165,7 @@ export function deleteOwnNode(errorMap, path) {
  * @param {string[]} path
  * @param {Map|ObservableMap} mapOfErrorsByPathStr A Map keyed by error path in ajv format ("/path/to/item") where each element is an iterable of error objects with a message param
  */
-export function deleteOwnAndRelatedThatAreNotInMap(errorMap, path, mapOfErrorsByPathStr){
+export function deleteOwnAndRelatedThatAreNotInMap(errorMap, path, mapOfErrorsByPathStr) {
     if(errorMap.has('pathIndex')) {
         const pathIndex = errorMap.get('pathIndex');
         const pathString = pathToPatchString(path);
@@ -202,12 +205,12 @@ export function deleteAllThatAreNotInMap(errorMap, path, mapOfErrorsByPathStr) {
 }
 
 /* istanbul ignore next */
-function _deleteErrorsThatAreNotInMap(errorMap, pathMap, mapOfErrorsByPathStr){
+function _deleteErrorsThatAreNotInMap(errorMap, pathMap, mapOfErrorsByPathStr) {
     pathMap.forEach((errorMessageSet, destPathString) => {
         if(mapOfErrorsByPathStr.has(destPathString)) {
             const existingErrors = mapOfErrorsByPathStr.get(destPathString);
             const errorsToDelete = Array.from(errorMessageSet).filter(errorMessage => !existingErrors.has(errorMessage));
-            if(errorsToDelete.length > 0){
+            if(errorsToDelete.length > 0) {
                 deleteNodeErrors(errorMap, destPathString, errorsToDelete);
             }
         } else {
@@ -218,8 +221,8 @@ function _deleteErrorsThatAreNotInMap(errorMap, pathMap, mapOfErrorsByPathStr){
 
 /**
  *
- * @param errorNode
- * @param destPathString
+ * @param {ObservableMap} errorNode
+ * @param {string} destPathString
  * @param {string[]|Map|ObservableMap|Set|ObservableSet} errors
  */
 function deleteNodeErrors(errorNode, destPathString, errors) {
@@ -262,14 +265,14 @@ function delErrorNodeR(map, path) {
 
 /**
  * returns true if the node is empty
- * @param errorNode
- * @param path
- * @returns {*}
+ * @param {ObservableMap} errorNode
+ * @param {string[]} path
+ * @returns {boolean}
  */
 function cleanNode(errorNode, path = []) {
     const node = getErrorNode(errorNode, path);
     let empty = true;
-    if(!node){
+    if(!node) {
         return empty;
     }
     if(node.has("errors")) {
@@ -298,16 +301,15 @@ function cleanNode(errorNode, path = []) {
 
 /**
  * returns true if the nodes are empty
- * @param errorNode
- * @param path
- * @returns {*}
+ * @param {ObservableMap} errorNode
+ * @param {string[]} path
  */
 function deepCleanNode(errorNode, path = []) {
     const mutablePath = [...path];
     for(let i = path.length - 1; i >= 0; i--) {
         if(cleanNode(errorNode, mutablePath)) {
             delErrorNodeR(errorNode, mutablePath);
-        } else{
+        } else {
             break;
         }
         mutablePath.pop();

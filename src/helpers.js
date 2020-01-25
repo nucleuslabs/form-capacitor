@@ -14,6 +14,7 @@ export const EMPTY_ARRAY = Object.freeze([]);
 export const EMPTY_OBJECT = Object.freeze(Object.create(null));
 export const EMPTY_MAP = Object.freeze(new Map); // warning: this doesn't actually prevent anyone from setting things; see https://stackoverflow.com/a/35776333/65387
 export const EMPTY_SET = Object.freeze(new Set);
+
 // export const NO_OP = Object.freeze(() => {});
 
 /**
@@ -70,6 +71,7 @@ export function isMap(x) {
 export function isArray(x) {
     return isObservableArray(x) || Array.isArray(x);
 }
+
 export function isObject(obj) {
     return obj !== null && typeof obj === 'object';
 }
@@ -88,9 +90,12 @@ export function isUndefined(obj) {
 
 /**
  * Returns true if a value is null, undefined, or NaN.
+ *
+ * @param {*} obj
+ * @returns {boolean}
  */
 export function isNullish(obj) {
-    return obj === null || obj === undefined || obj !== obj;
+    return obj === null || obj === undefined;
 }
 
 export function isPlainObject(obj) {
@@ -133,27 +138,27 @@ export function setValue(obj, path, value) {
         throw new Error('Cannot set root of unboxed object');
     }
     const end = path.length - 1;
-    for(let i=0; i<end; ++i) {
+    for(let i = 0; i < end; ++i) {
         const key = path[i];
-        const path1 = path[i+1];
+        const path1 = path[i + 1];
         if(Object.isExtensible(obj[key])) {
             // Primitives like null, undefined, numbers and booleans will be overwritten
             // because they can't be extended. frozen or sealed objects will also be
             // overwritten. Objets, arrays, functions, regexes, Dates and more will
             // have new properties added.
         } else if(isIntLoose(path1)) {
-            setProperty(obj, key, new Array(parseInt(path1,10)+1));
+            setProperty(obj, key, new Array(parseInt(path1, 10) + 1));
         } else {
             setProperty(obj, key, Object.create(null));
         }
         if(isObservableObject(obj)) {
             if(!isObservableProp(obj, key)) {
-                throw new Error(`Property '${path.slice(0,i+1).join('.')}' is not observable`);
+                throw new Error(`Property '${path.slice(0, i + 1).join('.')}' is not observable`);
             }
         } else if(isObservableArray(obj)) {
             // good
         } else {
-            throw new Error(`Cannot add property '${path.slice(0,i+1).join('.')}' to non-observable`);
+            throw new Error(`Cannot add property '${path.slice(0, i + 1).join('.')}' to non-observable`);
         }
         obj = obj[key];
     }
@@ -206,10 +211,10 @@ export function getMap(map, path, def) {
 
 export function setOrDel(map, condition, path, value) {
     if(condition) {
-        setMap(map,path,value);
+        setMap(map, path, value);
         return true;
     } else {
-        delMap(map,path);
+        delMap(map, path);
         return false;
     }
 }
@@ -248,7 +253,7 @@ function setProperty(obj, key, value) {
             // console.log('already obs');
             obj[key] = value;
         } else {
-            throw new Error(`Cannot add property '${key}' to object; changes wouldn't be tracked`)
+            throw new Error(`Cannot add property '${key}' to object; changes wouldn't be tracked`);
         }
     } else if(isObservableArray(obj)) {
         obj[key] = value;
@@ -258,7 +263,7 @@ function setProperty(obj, key, value) {
 }
 
 export function toPath(value) {
-    if (Array.isArray(value)) {
+    if(Array.isArray(value)) {
         return value;
     }
     return stringToPath(value);
@@ -275,21 +280,16 @@ export function getValue(obj, path, def) {
     let ret = obj;
 
     for(let key of path) {
-
         if(isMap(ret)) {
             ret = ret.get(key);
+        } else if(isArray(ret) && ret.length <= key) {
+            return def;
         } else {
-            if(isArray(ret) && ret.length <= key){
-                return def;
-            } else {
-                ret = ret[key];
-            }
+            ret = ret[key];
         }
-
         if(ret === undefined) {
             return def;
         }
-
     }
     return ret;
 }
@@ -298,19 +298,18 @@ export function toObservable(obj) {
     return isObject(obj) && !isObservable(obj) ? observable(obj) : (isString(obj) || isNumber(obj) ? observable.box(obj) : obj);
 }
 
-export function errorMapToFlatArray(errorMap){
+export function errorMapToFlatArray(errorMap) {
     const arr = observable.array();
     errorMapToFlatArrayR(errorMap, arr);
     return toJS(arr);
 }
 
 /* istanbul ignore next */
-function errorMapToFlatArrayR(errorMap, obsArray){
-    if(isArray(errorMap)){
+function errorMapToFlatArrayR(errorMap, obsArray) {
+    if(isArray(errorMap)) {
         obsArray.push(...errorMap);
-        return errorMap;
-    } else if (isMap(errorMap)){
-        for (let eM of errorMap.values()){
+    } else if(isMap(errorMap)) {
+        for(let eM of errorMap.values()) {
             errorMapToFlatArrayR(eM, obsArray);
         }
     }

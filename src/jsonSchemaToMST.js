@@ -2,65 +2,74 @@
 // https://github.com/ralusek/jsonschema-to-mobx-state-tree/blob/fe76a08ddfae67652d13f62c015b0d9ab4b7df58/index.js
 
 import Lo from 'lodash';
-import shortid from 'shortid';
 import {types} from 'mobx-state-tree';
-import {isPlainObject} from './helpers';
+import {isPlainObject, isArray} from './helpers';
 import MstTypeError from "./MstTypeError";
 
 /* istanbul ignore next */
 const titleCase = str => Lo.deburr(Lo.upperFirst(Lo.camelCase(str)));
+/* istanbul ignore next */
+const UNDEFINED = 1 << 16;
+/* istanbul ignore next */
+// const OPTIONAL = 1 << 9;
+/* istanbul ignore next */
+const NULL = 1 << 15;
+/* istanbul ignore next */
+const UNION = 1 << 14; // https://github.com/mobxjs/mobx-state-tree/blob/878d7f312d03276304d20af9dc055837666dbc6f/packages/mobx-state-tree/src/core/type/type.ts#L36
+/* istanbul ignore next */
+// const OPTIONAL_UNION = OPTIONAL|UNION;
 
 /* istanbul ignore next */
-function hasProp(obj,prop) {
-    return Object.hasOwnProperty.call(obj,prop);
+function hasProp(obj, prop) {
+    return Object.hasOwnProperty.call(obj, prop);
 }
 
 /* istanbul ignore next */
 function getDefault(node) {
-    if(!hasProp(node,'default')) return undefined;
-    if(isPlainObject(node.default)) {
-        const keys = Object.keys(node.default);
-        if(keys.length === 1 && hasProp(defaultKeywords,keys[0])) {
-            return defaultKeywords[keys[0]](node.default[keys[0]])
-        }
-    }
+    if(!hasProp(node, 'default')) return undefined;
+    // if(isPlainObject(node.default)) {
+    //     const keys = Object.keys(node.default);
+    //     if(keys.length === 1 && hasProp(defaultKeywords,keys[0])) {
+    //         return defaultKeywords[keys[0]](node.default[keys[0]])
+    //     }
+    // }
     return node.default;
 }
 
-/* istanbul ignore next */
-const defaultKeywords = {
-    // should we have resolved all these defaults into functions during the schema resolution phase..?
-    $uuid(type) {
-        switch(type) {
-            case 'shortid':
-                return shortid;
-        }
-        throw new Error(`$uuid type "${type}" not implemented`);
-    }
-};
+// /* istanbul ignore next */
+// const defaultKeywords = {
+//     // should we have resolved all these defaults into functions during the schema resolution phase..?
+//     $uuid(type) {
+//         switch(type) {
+//             case 'shortid':
+//                 return shortid;
+//         }
+//         throw new Error(`$uuid type "${type}" not implemented`);
+//     }
+// };
 
 /* istanbul ignore next */
 const TYPE_MAP = Object.freeze({
     boolean: (node, meta) => types.boolean,
     number: (node, meta) => types.number,
-    integer: (node, meta) => types.refinement('integer',types.number, i => Number.isInteger(i)),
+    integer: (node, meta) => types.refinement('integer', types.number, i => Number.isInteger(i)),
     string: (node, meta) => {
         const format = node.format;
         if(format === 'datetime') return types.Date;
         return types.string;
     },
     object: (node, meta) => {
-        const properties = Object.entries(node.properties).reduce((acc,[k,v]) => {
+        const properties = Object.entries(node.properties).reduce((acc, [k, v]) => {
             acc[k] = makeType(v, {
                 parent: node,
                 // depth: meta.depth+1,
                 key: k,
             });
             return acc;
-        }, Object.create(null)); 
-        
+        }, Object.create(null));
+
         // console.log('properties',properties);
-        
+
         return node.title
             ? types.model(titleCase(node.title), properties)
             : types.model(properties);
@@ -70,7 +79,7 @@ const TYPE_MAP = Object.freeze({
             return types.array(makeType(node.items, {
                 parent: node,
                 // depth: meta.depth+1,
-            }))
+            }));
         } else if(isArray(node.items)) {
             throw new Error('not implemented');
         }
@@ -102,20 +111,18 @@ function makeType(node, meta) {
     if(node.allOf) {
         typeArr.push(types.compose(...node.allOf.map(x => makeType(x, {
             parent: node
-        }))))
+        }))));
     }
     if(node.oneOf) {
         throw new Error(`JsonSchema "oneOf" is presently not supported`); // I guess it would be identical to node.anyOf for the purposes of MST no?
     }
 
     if(typeArr.length) {
-        try{
-            let type = types.length > 1
-                ? types.compose(...typeArr)
-                : typeArr[0];
+        try {
+            let type = types.length > 1 ? types.compose(...typeArr) : typeArr[0];
             if(node.default !== undefined) {
                 if(node.default === null) {
-                    if(hasUnionFlag(type,NULL)) {
+                    if(hasUnionFlag(type, NULL)) {
                         return types.optional(type, null);
                     }
                     return types.maybe(type);
@@ -123,7 +130,7 @@ function makeType(node, meta) {
                 return types.optional(type, getDefault(node));
             }
             if(meta.parent && meta.key !== undefined) {
-                if(hasUnionFlag(type,UNDEFINED)) {
+                if(hasUnionFlag(type, UNDEFINED)) {
                     return types.optional(type, undefined);
                 }
                 //Added null in here due to challenges with MST undefined and to allow json schema to validate
@@ -145,17 +152,6 @@ function hasUnionFlag(type, flag) {
             && type._types.some(t => (t.flags & flag) === flag)
         );
 }
-
-/* istanbul ignore next */
-const UNDEFINED = 1 << 16;
-/* istanbul ignore next */
-const OPTIONAL = 1 << 9;
-/* istanbul ignore next */
-const NULL = 1 << 15;
-/* istanbul ignore next */
-const UNION = 1<<14; // https://github.com/mobxjs/mobx-state-tree/blob/878d7f312d03276304d20af9dc055837666dbc6f/packages/mobx-state-tree/src/core/type/type.ts#L36
-/* istanbul ignore next */
-const OPTIONAL_UNION = OPTIONAL|UNION;
 
 // TODO: scrap walkNodes, roll own
 // const foo = (schema = {}, onNode) => walkNodes(schema, (node, meta) => {
@@ -184,4 +180,4 @@ const OPTIONAL_UNION = OPTIONAL|UNION;
 // });
 
 
-export default schema => makeType(schema, {parent:null,depth:0})
+export default schema => makeType(schema, {parent: null, depth: 0});

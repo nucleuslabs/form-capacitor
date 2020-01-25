@@ -20,37 +20,9 @@ import equal from 'fast-deep-equal';
  */
 
 export default function useSchema(FunctionalComponent, options) {
-    // const [schemaData, setSchemaData] = useState({});
-    // const [errorMap, setErrorMap] = useState({});
-    // const [imperativeValidate, setValidate] = useState(() => {
-    //     return undefined;
-    // });
-
-    // const context = useLocalStore(() => ({
-    //     _init: ({formData, errorMap, set, reset, validate, path}) => {
-    //         if(!context.ready) {
-    //             context.formData = formData;
-    //             context.errorMap = errorMap;
-    //             context.set = set;
-    //             context.reset = reset;
-    //             context.validate = validate;
-    //             context.path = path;
-    //             context.ready = true;
-    //         }
-    //     },
-    //     formData: undefined,
-    //     errorMap: undefined,
-    //     set: undefined,
-    //     reset: undefined,
-    //     validate: undefined,
-    //     path: [],
-    //     ready: false,
-    // }));
     let [context, setContext] = useState({
-            ready: false,
+        ready: false,
     });
-
-    // let [disposeEffect, setDisposeEffect] = useState(() => () => {} );
 
     useEffect(() => {
         options = Object.assign({
@@ -182,7 +154,7 @@ export default function useSchema(FunctionalComponent, options) {
 
             formData._afterCreate();
 
-            if (options.default) {
+            if(options.default) {
                 formData._setRoot(options.default);
             }
 
@@ -190,13 +162,11 @@ export default function useSchema(FunctionalComponent, options) {
 
             const {errors, metaDataMap, validate} = watchForPatches(jsonSchema, formData, ajv);
 
-
-
             setContext({
                 formData: formData,
                 metaDataMap: metaDataMap,
                 errorMap: errors,
-                hasErrors: () => errors && errors.size > 0 && (errors.has('children') && errors.get('children').size >0) || (errors.has('errors') && errors.get('errors').size >0),
+                hasErrors: () => errors && errors.size > 0 && ((errors.has('children') && errors.get('children').size >0) || (errors.has('errors') && errors.get('errors').size >0)),
                 set: (path, value) => isPlainObject(path) ? formData._replaceAll({...path}) : formData._set(path, value),
                 reset: formData._reset,
                 validate: () => {

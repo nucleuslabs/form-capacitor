@@ -35,17 +35,11 @@
   ],
   "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",
   "license": "MIT",
-  "dependencies": {
-    "@testing-library/react": "^8.0.7",
-    "shortid": "^2.2.8",
-    "shouldcomponentupdate-children": "^1.1.0"
-  },
   "peerDependencies": {
     "ajv": "^6",
     "json-schema-ref-parser": "^7",
     "lodash": "^4",
     "mobx": "^4",
-    "mobx-react": "^6",
     "mobx-react-lite": "^1",
     "mobx-state-tree": "^3",
     "react": "^16.8",
@@ -65,21 +59,26 @@
     "@babel/plugin-transform-react-jsx-self": "^7",
     "@babel/plugin-transform-react-jsx-source": "^7",
     "@babel/preset-env": "^7",
+    "@testing-library/react": "^9",
     "ajv": "^6",
     "autoprefixer": "^9",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^24",
+    "babel-jest": "^25",
     "babel-loader": "^8",
-    "enzyme": "^3",
-    "enzyme-adapter-react-16": "^1.11.2",
-    "eslint": "^6",
-    "eslint-loader": "^2",
-    "jest": "^24",
-    "jest-extended": "^0.11.1",
+    "eslint": "^6.8.0",
+    "eslint-codeframe-formatter": "^1",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-loader": "^3",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.18.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^25",
+    "jest-extended": "^0.11",
     "json-schema-ref-parser": "^7",
     "lodash": "^4",
     "mobx": "^4",
-    "mobx-react": "^6",
     "mobx-react-lite": "^1",
     "mobx-state-tree": "^3",
     "react": "^16.8",
@@ -87,8 +86,9 @@
     "webpack": "^4",
     "webpack-cli": "^3"
   },
-  "scritpts": {
-    "test": "jest"
+  "scripts": {
+    "test": "jest",
+    "lint": "node_modules/.bin/eslint src/ --ext .js --format 'node_modules/eslint-codeframe-formatter'"
   },
   "jest": {
     "setupFilesAfterEnv": [

@@ -5,9 +5,8 @@ import {useContext} from "react";
 import {getErrors} from "./errorMapping";
 
 /**
- * Returns the stored value for this component and a function to set the value
- * @param {string | string[]} path
- * @returns {[Boolean, Array | null]}
+ * @param {string|string[]} path
+ * @returns {[]}
  */
 export default function useConsumeErrors(path) {
     const context = useContext(FormContext);

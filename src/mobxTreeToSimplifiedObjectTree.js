@@ -9,7 +9,7 @@ import {toJS} from "mobx";
 /**
  * This will recursively trim undefined branches and return a trimmed tree or an empty object
  *
- * @param mst
+ * @param {*} mst
  * @returns {Map<any, any> | Set<unknown> | * | {}}
  */
 export default function mobxTreeToSimplifiedObjectTree(mst) {
@@ -22,7 +22,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
         if(obj.length === 0) {
             return undefined;
         } else {
-            const newArr =  obj.map(replaceEmptyObjectPropertiesAndArraysWithUndefinedR).filter(value => value !== undefined);
+            const newArr = obj.map(replaceEmptyObjectPropertiesAndArraysWithUndefinedR).filter(value => value !== undefined);
             return newArr.length === 0 ? undefined : newArr;
         }
     } else if(obj instanceof Map || obj instanceof WeakMap) {
@@ -33,7 +33,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
             obj.forEach((value, key) => {
                 const newItem = replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value);
                 if(newItem !== undefined) {
-                    map.set(key, replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value))
+                    map.set(key, replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value));
                 }
             });
             return map.size === 0 ? undefined : map;
