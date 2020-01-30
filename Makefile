@@ -28,7 +28,10 @@ publish: dist
 	cp README.md dist/README.md
 	yarn publish dist --tag latest
 
-test: $(SRC_FILES) yarn.lock dist
+lint: $(SRC_FILES) yarn.lock
+	yarn run lint
+
+test: $(SRC_FILES) yarn.lock lint dist
 	node_modules/.bin/jest --coverage
 
 clean:

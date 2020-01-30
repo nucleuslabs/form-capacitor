@@ -170,7 +170,6 @@ export default function useSchema(FunctionalComponent, options) {
                 set: (path, value) => isPlainObject(path) ? formData._replaceAll({...path}) : formData._set(path, value),
                 reset: formData._reset,
                 validate: () => {
-                    //need to preprocess the underlying state tree before validation to convert it to js and replace all empty arrays with undefined
                     return validate(mobxTreeToSimplifiedObjectTree(formData));
                 },
                 path: [],

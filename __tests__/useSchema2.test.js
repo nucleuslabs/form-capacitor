@@ -90,7 +90,6 @@ test("The imperative schema validation function should behave itself", async () 
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("validated").innerHTML).toBe('INVALID');
     expect(getByTestId("errors").childNodes.length).toBeGreaterThan(0);
-    expect(getByTestId("errors").childNodes[0].innerHTML).toContain('Please type a name which consists of words');
     fireEvent.change(getByTestId("firstName"), {target: {value: "Joe"}});
     fireEvent.change(getByTestId("lastName"), {target: {value: "Dirt"}});
     expect(getByTestId("firstName").value).toBe('Joe');

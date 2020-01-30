@@ -1,12 +1,22 @@
 import {observable, ObservableMap, toJS} from 'mobx';
 import {isBoolean, isArray, isMap, isSet} from './helpers';
 import Ajv from "ajv";
+import ajvErrors from "ajv-errors";
 import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
 import UndefinedPropertyError from "./UndefinedPropertyError";
 import SchemaValidationError from "./SchemaValidationError";
 import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
 import {deleteAllNodes, deleteAllThatAreNotInMap, setError} from "./errorMapping";
+import {
+    setAnyOfErrorMessages,
+    setArrayLengthErrorMessage,
+    setDependenciesErrorMessage,
+    setNumberRangeErrorMessage,
+    setPatternErrorMessage,
+    setRequiredErrorMessage,
+    setTypeErrorMessage
+} from "./errorMessageBuilder";
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
 
@@ -153,8 +163,7 @@ function reduceAjvErrorsToPathMappedErrors(errors, pathMap, errorPathMaps, errCa
             }
         }
         return acc;
-    },
-    new Map());
+    }, new Map());
 }
 
 function accMapper(acc, errorPair) {
@@ -279,7 +288,7 @@ function beautifyAjvErrors(errors, path) {
 /* istanbul ignore next */
 function beautifyAjvError(error, path, subSchema) {
     const schema = subSchema || error.parentSchema;
-    return createError(schema.title, schema.errorMessage || error.message, path, error.keyword);
+    return createError(schema.title, error.message, path, error.keyword);
 }
 
 /**
@@ -297,14 +306,16 @@ function createError(title, message, path, keyword) {
 }
 
 export function createAjvObject() {
-    return new Ajv(Object.assign({
+    let ajv = new Ajv({
         allErrors: true,
         $data: true,
         ownProperties: true,
         jsonPointers: true,
         async: false,
         verbose: true,
-    }));
+    });
+    ajvErrors(ajv);
+    return ajv;
 }
 
 export function checkSchemaPathForErrors(ajv, schema, path, value) {
@@ -370,7 +381,8 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
                 patchPathToSchemaPathMap: patchPathToSchemaPathMap,
                 metaDataMap: metaDataMap,
                 errorPathMaps: errorPathMaps,
-                skeletonSchemaMap: skeletonSchemaMap
+                skeletonSchemaMap: skeletonSchemaMap,
+                parentSchema: schema
             });
             setPatchPathSchema(patchPathToSchemaPathMap, [...path, 'properties', p], [...patchPath], p);
             /* @todo #DependencyChallenge Part 1 we technically shouldn't need these dependency refs with the way Part 1 is handled currently,
@@ -390,11 +402,13 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
         // because each field can decide whether it is required on its own unless they are in a
         // codependent anyOf or allOf validation
         schema.required.forEach(p => {
+            setRequiredErrorMessage(schema);
             assignFieldDefinition(buildSchemaTree(path, {required: [p]}, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
             assignMetaData({required: true}, [...patchPath, p], metaDataMap);
         });
     }
     if(schema.dependencies) {
+        setDependenciesErrorMessage(schema.dependencies, schema);
         const depSchema = {type: schema.type, properties: baseProperties, dependencies: {...schema.dependencies}};
         assignFieldDefinition(buildSchemaTree(path, depSchema, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath])));
         /**
@@ -467,7 +481,8 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
                 patchPathToSchemaPathMap: patchPathToSchemaPathMap,
                 metaDataMap: metaDataMap,
                 errorPathMaps: errorPathMaps,
-                skeletonSchemaMap: skeletonSchemaMap
+                skeletonSchemaMap: skeletonSchemaMap,
+                parentSchema: schema
             });
         });
         if(schema.additionalItems) {
@@ -491,7 +506,8 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
                     patchPathToSchemaPathMap: patchPathToSchemaPathMap,
                     metaDataMap: metaDataMap,
                     errorPathMaps: errorPathMaps,
-                    skeletonSchemaMap: skeletonSchemaMap
+                    skeletonSchemaMap: skeletonSchemaMap,
+                    parentSchema: schema
                 });
             }
         }
@@ -517,7 +533,8 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
             patchPathToSchemaPathMap: patchPathToSchemaPathMap,
             metaDataMap: metaDataMap,
             errorPathMaps: errorPathMaps,
-            skeletonSchemaMap: skeletonSchemaMap
+            skeletonSchemaMap: skeletonSchemaMap,
+            parentSchema: schema
         });
     }
     assignFieldDefinition(fieldDefinitionMap.get(pathToPatchString(path)).schema, fieldDefinitionMap, [...path, 'items'], [[...path]]);
@@ -526,7 +543,6 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
 /**
  * Axx stands for AnyOf or AllOf
  *
- * @param {Map} refCollection
  * @param {[]} axxOfSchema
  * @param {string} axxOfPropType
  * @param {string} propName
@@ -536,12 +552,11 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
  * @param {Map|ObservableMap} skeletonSchemaMap
  * @param {Map|ObservableMap} fieldDefinitionMap
  */
-function buildAxxOfRefs(refCollection, axxOfSchema, axxOfPropType, propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap) {
+function buildAxxOfRefs(axxOfSchema, axxOfPropType, propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap) {
     const aOfRefCollection = new Map();
     axxOfSchema.map(schema => appendFieldReferencesR(aOfRefCollection, schema, propName, [...path], patchPath, patchPathToSchemaPathMap));
     if(aOfRefCollection && aOfRefCollection.size > 0) {
         assignFieldDefinitions(aOfRefCollection, buildSchemaTree([...path], {[axxOfPropType]: [...axxOfSchema]}, skeletonSchemaMap), fieldDefinitionMap);
-        appendRefs(refCollection, aOfRefCollection);
     }
 }
 
@@ -555,7 +570,7 @@ function buildAxxOfRefs(refCollection, axxOfSchema, axxOfPropType, propName, pat
  */
 
 /* istanbul ignore next */
-function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], fieldDefinitionMap = new Map(), patchPathToSchemaPathMap = new Map(), metaDataMap = new Map(), errorPathMaps = new Map([['schema', new Map()], ['data', new Map()], ['subSchema', new Map()]]), skeletonSchemaMap = new Map()}) {
+function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], fieldDefinitionMap = new Map(), patchPathToSchemaPathMap = new Map(), metaDataMap = new Map(), errorPathMaps = new Map([['schema', new Map()], ['data', new Map()], ['subSchema', new Map()]]), skeletonSchemaMap = new Map(), parentSchema = {}}) {
     if(propName !== undefined) {
         path.push(propName);
     } else {
@@ -567,31 +582,45 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
         subSchemaPathMap.set("/", []);
         patchPathToSchemaPathMap.set("/", []);
     }
-
-    switch(schema.type) {
-        case 'object':
-            skeletonSchemaMap.set(pathToPatchString(path), {type: 'object'});
-            buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
-            break;
-        case 'array':
-            skeletonSchemaMap.set(pathToPatchString(path), {type: 'array'});
-            buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
-            break;
-    }
-
-    let refCollection = new Map();
-
-    if(schema.anyOf && schema.anyOf.length > 0) {
-        buildAxxOfRefs(refCollection, schema.anyOf, "anyOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
+    if(schema.type) {
+        switch(schema.type) {
+            case 'object':
+                skeletonSchemaMap.set(pathToPatchString(path), {type: 'object'});
+                buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
+                break;
+            case 'array':
+                skeletonSchemaMap.set(pathToPatchString(path), {type: 'array'});
+                buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
+                setArrayLengthErrorMessage(schema);
+                break;
+            case 'string':
+                if(schema.pattern) {
+                    setPatternErrorMessage(schema);
+                }
+                setTypeErrorMessage(schema);
+                break;
+            case 'integer':
+            case 'number':
+                setNumberRangeErrorMessage(schema);
+                break;
+            default:
+                setTypeErrorMessage(schema);
+        }
+        if(schema.anyOf && schema.anyOf.length > 0) {
+            setAnyOfErrorMessages(schema.anyOf, schema);
+            buildAxxOfRefs(schema.anyOf, "anyOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
+        }
+    } else if(schema.anyOf && schema.anyOf.length > 0) {
+        setAnyOfErrorMessages(schema.anyOf, parentSchema.type === 'array' ? parentSchema : schema);
+        buildAxxOfRefs(schema.anyOf, "anyOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
     }
 
     if(schema.allOf && schema.allOf.length > 0) {
-        buildAxxOfRefs(refCollection, schema.allOf, "allOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
+        //@todo pre process allOf to generate custom error messages
+        buildAxxOfRefs(schema.allOf, "allOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
     }
 
-    // relatedRefMap.set([...relatedRefMap], refCollection);
-
-    return [fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps];//MAYBE ADD A REFMAP HERE THAT WILL hold refs to fields so that you can fire related validators based on that if they exist?
+    return [fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps];
 }
 
 
@@ -755,18 +784,19 @@ function setRefPath(refs, path) {
 }
 
 /**
+ *
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
  * @param {*} data Mobx State Tree
  * @param {Ajv} ajv
- * @returns {{errors: ObservableMap<any, any>, metaDataMap: Map | ObservableMap<any, any>,  validate: function}}
+ * @returns {{errors: ObservableMap<any, any>, metaDataMap: ObservableMap<any, any>,  validate: function}}
  */
 export function watchForPatches(schema, data, ajv) {
+    // console.log(JSON.stringify(schema, null, 2));
     const errors = observable.map();
     const paths = observable.map();
     const validators = new Map();
     //build field validators
     const [fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps] = buildFieldDefinitionMapR({schema: schema});
-
     const schemaErrorPathMap = errorPathMaps.get('schema');
     const dataErrorPathMap = errorPathMaps.get('data');
     const subSchemaPathMap = errorPathMaps.get('subSchema');
@@ -782,6 +812,7 @@ export function watchForPatches(schema, data, ajv) {
             refs: refs
         });
     }
+    // console.log(JSON.stringify(schema, null, 2));
     //build root avj schema
     onPatch(data, patch => {
         const skipPaths = new Set();

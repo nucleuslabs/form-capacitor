@@ -9,7 +9,6 @@
         "alias": {
           "type": "array",
           "title": "Aliases",
-          "errorMessage": "Please type a made up name which consists of words",
           "items": {
             "type": "object",
             "title": "Alias",
@@ -24,7 +23,6 @@
         "alias2": {
           "type": "array",
           "title": "Aliases Part Deux",
-          "errorMessage": "Please type a made up name which consists of words",
           "items": {
             "type": "string"
           },
@@ -33,11 +31,10 @@
       },
       "anyOf": [
         {
-          "required": ["alias"],
-          "errorMessage": "Please enter a value in either Alias 1 or Alias 2 to save"
+          "required": ["alias"]
         },
-        {"required": ["alias2"],
-          "errorMessage": "Please enter a value in either Alias 1 or Alias 2 to save"
+        {
+          "required": ["alias2"]
         }
       ]
     }

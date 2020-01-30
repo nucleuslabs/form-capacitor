@@ -169,7 +169,6 @@ test("The root anyOf keyword should be valid if anyOf the items match and invali
     fireEvent.click(getByTestId("v"));
     expect(getByTestId("valid").innerHTML).toBe('INVALID');
     expect(getByTestId("errors").childNodes.length).toBeGreaterThan(0);
-    expect(getByTestId("errors").innerHTML).toContain('Please type a name which consists of words');
 
     fireEvent.change(getByTestId("lastName"), {target: {value: "Dirt"}});
     expect(getByTestId("lastName").value).toBe('Dirt');
