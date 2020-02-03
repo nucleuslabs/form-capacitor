@@ -84,6 +84,24 @@ export function minMaxItems(title, min, max) {
     }
 }
 
+export function minMaxLength(title, min, max) {
+    if(min !== undefined && max !== undefined) {
+        if(min === max) {
+            const str = `${title} must have ${min.toString()} characters`;
+            return {minLength: str, maxLength: str};
+        } else {
+            const str = `${title} must have from ${min.toString()} to ${max.toString()} characters`;
+            return {minLength: str, maxLength: str};
+        }
+    } else if(min !== undefined) {
+        return {minLength: `${title} must have at least ${min.toString()} characters`};
+    } else if(max !== undefined) {
+        return {maxLength: `${title} must not have more than ${max.toString()} characters`};
+    } else {
+        return {};
+    }
+}
+
 export function allOfRequired(andFields) {
     return `Please fill out the ${andFields.join('and ')} fields`;
 }

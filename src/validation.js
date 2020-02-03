@@ -1,7 +1,6 @@
 import {observable, ObservableMap, toJS} from 'mobx';
 import {isBoolean, isArray, isMap, isSet} from './helpers';
 import Ajv from "ajv";
-import ajvErrors from "ajv-errors";
 import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
 import UndefinedPropertyError from "./UndefinedPropertyError";
@@ -11,12 +10,12 @@ import {deleteAllNodes, deleteAllThatAreNotInMap, setError} from "./errorMapping
 import {
     setAnyOfErrorMessages,
     setArrayLengthErrorMessage,
-    setDependenciesErrorMessage,
     setNumberRangeErrorMessage,
-    setPatternErrorMessage,
-    setRequiredErrorMessage,
-    setTypeErrorMessage
+    setTypeErrorMessage,
+    setObjectErrorMessages,
+    setStringErrorMessages
 } from "./errorMessageBuilder";
+import {replaceErrorMessage} from "./errorMessageFinder";
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
 
@@ -49,14 +48,14 @@ const errTypeKeywordActions = {
      * @param path
      * @param error
      */
-    "object-required": defaultActionCallBack,
+    "required": defaultActionCallBack,
     /**
      * Processes if keyword to see if there are children that need to be targeted
      * @param errCallback
      * @param path
      * @param error
      */
-    "object-if": defaultActionCallBack,
+    "if": defaultActionCallBack,
     /**
      * Processes dependecies keyword to see if there are children that need to be targeted
      * @param validationPath
@@ -66,8 +65,6 @@ const errTypeKeywordActions = {
      * @param {Map} subSchemaPathMap
      * @param dupeMap
      */
-    "object-dependencies": dependencyActionCallBack,
-    "required": defaultActionCallBack,
     "dependencies": dependencyActionCallBack,
     "oneOf": () => {
     },
@@ -104,12 +101,9 @@ function processAjvErrors(errors, pathMap, errorPathMaps, errCallback, computedE
             //shift off first element
             // validationPath.shift();
             //Check error message to process complex errors to see if we need to add more to the validationPath or more errors
-            const actionKey = `${error.parentSchema.type}-${error.keyword}`;
             // console.log(validationPath, error.dataPath ? dataStr : schemaStr);
             // console.log(error);
-            if(validationPath.length > 0 && error.parentSchema.type && errTypeKeywordActions[actionKey]) {
-                return errTypeKeywordActions[actionKey](errCallback, validationPath, errorPath, error, subSchemaPathMap, dupeMap);
-            } else if(errTypeKeywordActions[error.keyword]) {
+            if(errTypeKeywordActions[error.keyword]) {
                 return errTypeKeywordActions[error.keyword](errCallback, validationPath, errorPath, error, subSchemaPathMap, dupeMap);
             } else {
                 return errCallback(validationPath, errorPath, errorPath, error, subSchemaPathMap.get(validationPath));
@@ -136,7 +130,8 @@ function reduceAjvErrorsToPathMappedErrors(errors, pathMap, errorPathMaps, errCa
     const dataErrorPathMap = errorPathMaps.get("data");
     const subSchemaPathMap = errorPathMaps.get("subSchema");
     // console.log("pathMap", toJS(pathMap));
-    return errors.reduce((acc, error) => {
+    return errors.reduce((acc, preError) => {
+        const error = replaceErrorMessage(preError, errors);
         // console.log("Error.path",error.dataPath);
         //Skip any errors missing a parent schema
         if(error.parentSchema !== false) {
@@ -147,13 +142,11 @@ function reduceAjvErrorsToPathMappedErrors(errors, pathMap, errorPathMaps, errCa
             //shift off first element
             // validationPath.shift();
             //Check error message to process complex errors to see if we need to add more to the validationPath or more errors
-            const actionKey = `${error.parentSchema.type}-${error.keyword}`;
+            // const actionKey = `${error.parentSchema.type}-${error.keyword}`;
             // console.log(validationPath, error.dataPath ? dataStr : schemaStr);
             // console.log(error);
             let errorPair;
-            if(validationPath.length > 0 && error.parentSchema.type && errTypeKeywordActions[actionKey]) {
-                errorPair = errTypeKeywordActions[actionKey](errCallback, validationPath, errorPath, error, subSchemaPathMap, dupeMap);
-            } else if(errTypeKeywordActions[error.keyword]) {
+            if(errTypeKeywordActions[error.keyword]) {
                 errorPair = errTypeKeywordActions[error.keyword](errCallback, validationPath, errorPath, error, subSchemaPathMap, dupeMap);
             } else {
                 errorPair = errCallback(validationPath, errorPath, errorPath, error, subSchemaPathMap.get(validationPath));
@@ -314,7 +307,7 @@ export function createAjvObject() {
         async: false,
         verbose: true,
     });
-    ajvErrors(ajv);
+    //ajvErrors(ajv);
     return ajv;
 }
 
@@ -397,18 +390,18 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
      *
      * dependencies: The items in the dependencies keyword will get tied to the root object and a reference will lead from the dependent fields to the root validator
      *               this is not optimal but it is accurate in future the @todo will be to separate the dependency to it's own special node */
+    //setObjectErrorMessages mutates skeletonSchemaMap so that it will attach the proper errorMessages to the subschema for the validators
+    setObjectErrorMessages(skeletonSchemaMap);
     if(schema.required && schema.required.length > 0) {
         // Going to assign each root object/field level required to itself unlike anyOf or allOf
         // because each field can decide whether it is required on its own unless they are in a
         // codependent anyOf or allOf validation
         schema.required.forEach(p => {
-            setRequiredErrorMessage(schema);
             assignFieldDefinition(buildSchemaTree(path, {required: [p]}, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
             assignMetaData({required: true}, [...patchPath, p], metaDataMap);
         });
     }
     if(schema.dependencies) {
-        setDependenciesErrorMessage(schema.dependencies, schema);
         const depSchema = {type: schema.type, properties: baseProperties, dependencies: {...schema.dependencies}};
         assignFieldDefinition(buildSchemaTree(path, depSchema, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath])));
         /**
@@ -586,17 +579,19 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
         switch(schema.type) {
             case 'object':
                 skeletonSchemaMap.set(pathToPatchString(path), {type: 'object'});
+                //setObjectErrorMessages mutates schema which is weird.
+                //To combat this weirdness it is imperative that it comes before anything else that uses in this method
+                setObjectErrorMessages(schema);
                 buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
                 break;
             case 'array':
                 skeletonSchemaMap.set(pathToPatchString(path), {type: 'array'});
-                buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
                 setArrayLengthErrorMessage(schema);
+                setArrayLengthErrorMessage(skeletonSchemaMap);
+                buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
                 break;
             case 'string':
-                if(schema.pattern) {
-                    setPatternErrorMessage(schema);
-                }
+                setStringErrorMessages(schema);
                 setTypeErrorMessage(schema);
                 break;
             case 'integer':
@@ -859,7 +854,7 @@ export function watchForPatches(schema, data, ajv) {
             if(!validate(stateTreeData)) {
                 processAjvErrors(validate.errors, paths, errorPathMaps, (validationPath, errorMapPath, originPath, error, subSchema) => {
                     const checkSchema = subSchema || error.parentSchema;
-                    setError(errors, errorMapPath, beautifyAjvError(error, validationPath, checkSchema), originPath);
+                    setError(errors, errorMapPath, beautifyAjvError(replaceErrorMessage(error, validate.errors), validationPath, checkSchema), originPath);
                 });
                 return false;
             } else {

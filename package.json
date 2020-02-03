@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.63",
+  "version": "0.2.64",
   "description": "Form manager for React using json-schema, mobx observables, ajv validation and Hooks",
   "browser": "web",
   "main": "dist/index.js",
@@ -37,7 +37,6 @@
   "license": "MIT",
   "peerDependencies": {
     "ajv": "^6",
-    "ajv-errors": "^1.0",
     "json-schema-ref-parser": "^7",
     "lodash": "^4",
     "mobx": "^4",
@@ -62,7 +61,6 @@
     "@babel/preset-env": "^7",
     "@testing-library/react": "^9",
     "ajv": "^6",
-    "ajv-errors": "^1.0",
     "autoprefixer": "^9",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^25",

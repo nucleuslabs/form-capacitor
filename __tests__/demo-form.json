@@ -28,6 +28,43 @@
           "title": "AKA",
           "pattern": "\\w"
         },
+        "phone": {
+          "type": "string",
+          "title": "Phone",
+          "pattern": "\\(\\d+\\)\\d+"
+        },
+        "minLength": {
+          "type": "string",
+          "title": "Min Characters",
+          "minLength": 5
+        },
+        "maxLength": {
+          "type": "string",
+          "title": "Max Characters",
+          "maxLength": 5
+        },
+        "age": {
+          "title": "Age",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 5
+        },
+        "height": {
+          "title": "Height",
+          "type": "number",
+          "exclusiveMinimum": 2,
+          "maximum": 5
+        },
+        "min": {
+          "title": "Min",
+          "type": "number",
+          "minimum": 3
+        },
+        "max": {
+          "title": "Max",
+          "type": "number",
+          "maximum": 10
+        },
         "alias": {
           "type": "array",
           "title": "Aliases",
@@ -44,7 +81,8 @@
         },
         "alias2": {
           "type": "array",
-          "title": "Aliases Part Deux",
+          "title": "Nefarious Aliases",
+          "maxItems": 8,
           "items": {
             "type": "string"
           },
