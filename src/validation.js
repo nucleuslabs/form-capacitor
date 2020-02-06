@@ -1,5 +1,5 @@
 import {observable, ObservableMap, toJS} from 'mobx';
-import {isBoolean, isArray, isMap, isSet} from './helpers';
+import {isBoolean, isArray, isMap, isSet, isFunction} from './helpers';
 import Ajv from "ajv";
 import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
@@ -299,7 +299,7 @@ function createError(title, message, path, keyword) {
 }
 
 export function createAjvObject() {
-    let ajv = new Ajv({
+    return new Ajv({
         allErrors: true,
         $data: true,
         ownProperties: true,
@@ -307,8 +307,6 @@ export function createAjvObject() {
         async: false,
         verbose: true,
     });
-    //ajvErrors(ajv);
-    return ajv;
 }
 
 export function checkSchemaPathForErrors(ajv, schema, path, value) {
@@ -789,6 +787,7 @@ export function watchForPatches(schema, data, ajv) {
     // console.log(JSON.stringify(schema, null, 2));
     const errors = observable.map();
     const paths = observable.map();
+    const changedSet = new Set();
     const validators = new Map();
     //build field validators
     const [fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps] = buildFieldDefinitionMapR({schema: schema});
@@ -809,6 +808,8 @@ export function watchForPatches(schema, data, ajv) {
     }
     // console.log(JSON.stringify(schema, null, 2));
     //build root avj schema
+    const checkChangedStatus = isFunction(data.isChanged) && isFunction(data.updateIsChanged);
+
     onPatch(data, patch => {
         const skipPaths = new Set();
         const [normalizedPatchPath, errorPathSubstitutionMap] = getNormalizedPathFromPatchPath(patch.path, subSchemaPathMap);
@@ -822,10 +823,18 @@ export function watchForPatches(schema, data, ajv) {
         }
         if(schemaPath) {
             const schemaPathStr = pathToPatchString(schemaPath);
+            //Check to see if data has changed and update the changedSet then set isChanged to true if changedSet has anything in it
+            if(checkChangedStatus) {
+                if(data.isChanged(ajvStringToPath(patch.path))) {
+                    changedSet.add(patch.path);
+                } else {
+                    changedSet.delete(patch.path);
+                }
+                data.updateIsChanged(changedSet.size !== 0);
+            }
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
                 // console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, normalizedPatchPath, patch.op, patch.value);
-                // debugger;
                 switch(patch.op) {
                     case 'add':
                     case 'replace':
@@ -892,34 +901,18 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
             }
         }
         // validateRefs(refs, validators, data, errors, paths, errorPathMaps, [...skipPaths]);
-        // const x = validate(toJS(data));
         // console.log("NOPE");
         const theRealJs = mobxTreeToSimplifiedObjectTree(data);
         // console.log(pathStr, validate.schema, theRealJs);
-        //@todo Create smart Error handling so that creation of errors where errors get cleared based on the the source validation being cleared
-
         if(validate(theRealJs)) {
             // console.log("PASSED");
             // console.debug(JSON.stringify(toJS(errors),null,2));
             deleteAllNodes(errors, [...computedErrorPath]);
-            // delErrorNode(errors, [...computedErrorPath]);
-            //Validate references that should run only if validation passes
-            // for(let refPath of passRefs){
-            //     // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
-            //     runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths);
-            // }
         } else {
             // console.log("FAILED");
             // console.log(JSON.stringify(validate.schema));
             // console.log(validate.errors);
             try {
-                // const processedErrors = processAjvErrors(validate.errors, paths, errorPathMaps, (validationPath, errorMapPath, error, subSchema) => {
-                //     if(!hasError(errors,[...errorMapPath], error)) {
-                //         setError(errors, [...errorMapPath], beautifyAjvError(error, validationPath, subSchema), [...computedErrorPath]);
-                //     }
-                //     return computedErrorPath !== errorMapPath;
-                // }, computedErrorPath);
-
                 const reducedErrors = reduceAjvErrorsToPathMappedErrors(validate.errors, paths, errorPathMaps, (validationPath, errorMapPath, originPath, error, subSchema) => {
                     const prettyError = beautifyAjvError(error, errorMapPath, subSchema);
                     // if(!hasError(errors, errorMapPath, prettyError, originPath)) {
@@ -932,18 +925,6 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
                 } else {
                     deleteAllThatAreNotInMap(errors, computedErrorPath, reducedErrors);
                 }
-                // mapAjvErrorSet(validate.errors.filter(err => filterJsonSchemaErrors(err, errorPath.join("/"))), errorPath, subSchema, errors);
-                // if((passRefs && (!processedErrors || processedErrors.length === 0))){
-                //     for(let refPath of passRefs){
-                //         // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
-                //         runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths);
-                //     }
-                // }
-                //Validate references that should run only if validation fails
-                // for(let refPath of failRefs){
-                //     // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
-                //     runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, skipPaths);
-                // }
             } catch(err) {
                 throw new SchemaValidationError();
             }

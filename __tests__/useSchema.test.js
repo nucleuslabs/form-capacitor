@@ -13,7 +13,7 @@ function SimpleTextBox(props) {
     const [hasErrors, errors] = useConsumeErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
-            change(ev.target.value || '');
+            change(ev.target.value || undefined);
         }}/>
         {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
     </span>;
@@ -106,6 +106,14 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
 
     expect(getByTestId("firstNameDisplay").innerHTML).toBe('Joe');
     expect(getByTestId("pepsi").innerHTML).toBe('Joe');
+
+    fireEvent.change(getByTestId("firstName"), {target: {value: ""}});
+
+    expect(getByTestId("changed").innerHTML).toBe('');
+
+    fireEvent.click(getByTestId("bfn"));
+
+    expect(getByTestId("changed").innerHTML).toBe('changed');
 
     const buttonLN = getByTestId("bln");
     fireEvent.click(buttonLN);

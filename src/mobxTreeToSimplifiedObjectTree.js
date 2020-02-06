@@ -17,6 +17,7 @@ export default function mobxTreeToSimplifiedObjectTree(mst) {
     return replaceEmptyObjectPropertiesAndArraysWithUndefinedR(js) || {};
 }
 
+/* istanbul ignore next */
 function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
     if(Array.isArray(obj)) {
         if(obj.length === 0) {

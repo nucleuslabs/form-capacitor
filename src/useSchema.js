@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {checkSchemaPathForErrors, createAjvObject, watchForPatches} from "./validation";
 import jsonSchemaToMST from "./jsonSchemaToMST";
-import {getObservable, isArray, isObject, isPlainObject, setValue} from "./helpers";
+import {getObservable, getValue, isArray, isObject, isPlainObject, setValue} from "./helpers";
 import stringToPath from "./stringToPath";
 import SchemaAssignmentError from "./SchemaAssignmentError";
 import {applySnapshot, getSnapshot} from "mobx-state-tree";
@@ -51,7 +51,6 @@ export default function useSchema(FunctionalComponent, options) {
                         try {
                             setValue(self, name, value);
                             formStatus.isDirty = true;
-                            self._updateIsChanged();
                         } catch(err) {
                             const path = isArray(name) ? name : stringToPath(name);
                             const validationErrors = checkSchemaPathForErrors(ajv, jsonSchema, path, value);
@@ -75,7 +74,6 @@ export default function useSchema(FunctionalComponent, options) {
                     _replaceAll(value) {
                         applySnapshot(self, initialSnapshot);
                         this._setRoot(value);
-                        self._updateIsChanged();
                     },
                     _setRoot(value){
                         if(!isObject(value)) {
@@ -98,32 +96,26 @@ export default function useSchema(FunctionalComponent, options) {
                             }
                         }
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                     },
                     _push(name, value) {
                         getObservable(self, name).push(((isObject(value) || isArray(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                     },
                     _pop(name) {
                         getObservable(self, name).pop();
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                     },
                     _clear(name) {
                         getObservable(self, name).clear();
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                     },
                     _replace(name, arr) {
                         getObservable(self, name).replace(arr);
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                     },
                     _remove(name, value) {
                         getObservable(self, name).remove(value);
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                     },
                     _splice(name, idx, deleteCount = 1, insert = undefined) {
                         if(insert !== undefined) {
@@ -132,16 +124,23 @@ export default function useSchema(FunctionalComponent, options) {
                             getObservable(self, name).splice(idx, deleteCount);
                         }
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                     },
                     _slice(name, idx, length = 1) {
                         const arr = getObservable(self, name);
                         formStatus.isDirty = true;
-                        self._updateIsChanged();
                         return arr.slice(idx, length);
                     },
-                    _updateIsChanged(){
-                        formStatus.isChanged = !equal(getSnapshot(self), defaultSnapshot);
+                    isChanged(name) {
+                        if(name !== undefined) {
+                            return !equal(getValue(self, name), getValue(defaultSnapshot, name));
+                        } else {
+                            return !equal(self, defaultSnapshot);
+                        }
+                    },
+                    updateIsChanged(changed) {
+                        if(formStatus.isChanged !== changed) {
+                            formStatus.isChanged = changed;
+                        }
                     },
                     toJS() {
                         return mobxTreeToSimplifiedObjectTree(self);

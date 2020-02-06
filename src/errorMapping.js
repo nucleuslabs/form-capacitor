@@ -84,6 +84,7 @@ export function setErrors(errorNode, path = [], errors, originPath) {
  * @param {string[]} path
  * @param {{}} error
  */
+/* istanbul ignore next */
 function _setError(node, path = [], error) {
     if(node.has('errors')) {
         const errorMap = node.get('_errorMap');
@@ -97,6 +98,7 @@ function _setError(node, path = [], error) {
     }
 }
 
+/* istanbul ignore next */
 function setPathIndexRelationships(errorNode, originPath, newPath, error) {
     if(errorNode.has('pathIndex')) {
         const pathIndex = errorNode.get('pathIndex');
@@ -225,6 +227,7 @@ function _deleteErrorsThatAreNotInMap(errorMap, pathMap, mapOfErrorsByPathStr) {
  * @param {string} destPathString
  * @param {string[]|Map|ObservableMap|Set|ObservableSet} errors
  */
+/* istanbul ignore next */
 function deleteNodeErrors(errorNode, destPathString, errors) {
     const destPath = ajvStringToPath(destPathString);
     const node = getErrorNode(errorNode, destPath);
@@ -269,6 +272,7 @@ function delErrorNodeR(map, path) {
  * @param {string[]} path
  * @returns {boolean}
  */
+/* istanbul ignore next */
 function cleanNode(errorNode, path = []) {
     const node = getErrorNode(errorNode, path);
     let empty = true;
@@ -304,6 +308,7 @@ function cleanNode(errorNode, path = []) {
  * @param {ObservableMap} errorNode
  * @param {string[]} path
  */
+/* istanbul ignore next */
 function deepCleanNode(errorNode, path = []) {
     const mutablePath = [...path];
     for(let i = path.length - 1; i >= 0; i--) {
@@ -354,7 +359,6 @@ function errorMapToFlatArrayR(errorMap, obsArray) {
  * @param {string[]} path
  * @returns {*}
  */
-
 /* istanbul ignore next */
 function setErrorNode(errorNode, path) {
     if(!errorNode.has('pathIndex')) {
