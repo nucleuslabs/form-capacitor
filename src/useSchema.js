@@ -38,18 +38,20 @@ export default function useSchema(FunctionalComponent, options) {
         schemaPromise.then(jsonSchema => {
             const ajv = createAjvObject();
             let Model = jsonSchemaToMST(jsonSchema);
+            let formStatus = observable.object({isDirty: false, isChanged: false});
+
             // console.log("FULL SCHEMA");
             // console.log(JSON.stringify(jsonSchema));
 
             Model = Model.actions(self => {
                 let initialSnapshot = {};
                 let defaultSnapshot = {};
-                let isDirty = false;
                 return {
                     _set(name, value) {
                         try {
                             setValue(self, name, value);
-                            isDirty = true;
+                            formStatus.isDirty = true;
+                            self._updateIsChanged();
                         } catch(err) {
                             const path = isArray(name) ? name : stringToPath(name);
                             const validationErrors = checkSchemaPathForErrors(ajv, jsonSchema, path, value);
@@ -58,19 +60,22 @@ export default function useSchema(FunctionalComponent, options) {
                     },
                     _afterCreate() {
                         initialSnapshot = getSnapshot(self);
-                        isDirty = false;
+                        formStatus.isDirty = false;
                     },
                     _afterDefaults() {
                         defaultSnapshot = getSnapshot(self);
-                        isDirty = false;
+                        formStatus.isChanged = false;
+                        formStatus.isDirty = false;
                     },
                     _reset() {
                         applySnapshot(self, defaultSnapshot);
-                        isDirty = false;
+                        formStatus.isChanged = false;
+                        formStatus.isDirty = false;
                     },
                     _replaceAll(value) {
                         applySnapshot(self, initialSnapshot);
                         this._setRoot(value);
+                        self._updateIsChanged();
                     },
                     _setRoot(value){
                         if(!isObject(value)) {
@@ -92,27 +97,33 @@ export default function useSchema(FunctionalComponent, options) {
                                 throw new SchemaDataReplaceError(errs, `Error replacing some root form-capacitor props (${errProps})`, propMap);
                             }
                         }
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                     },
                     _push(name, value) {
                         getObservable(self, name).push(((isObject(value) || isArray(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                     },
                     _pop(name) {
                         getObservable(self, name).pop();
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                     },
                     _clear(name) {
                         getObservable(self, name).clear();
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                     },
                     _replace(name, arr) {
                         getObservable(self, name).replace(arr);
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                     },
                     _remove(name, value) {
                         getObservable(self, name).remove(value);
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                     },
                     _splice(name, idx, deleteCount = 1, insert = undefined) {
                         if(insert !== undefined) {
@@ -120,18 +131,17 @@ export default function useSchema(FunctionalComponent, options) {
                         } else {
                             getObservable(self, name).splice(idx, deleteCount);
                         }
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                     },
                     _slice(name, idx, length = 1) {
                         const arr = getObservable(self, name);
-                        isDirty = true;
+                        formStatus.isDirty = true;
+                        self._updateIsChanged();
                         return arr.slice(idx, length);
                     },
-                    isDirty(){
-                        return isDirty;
-                    },
-                    isChanged(){
-                        return !equal(getSnapshot(self), defaultSnapshot);
+                    _updateIsChanged(){
+                        formStatus.isChanged = !equal(getSnapshot(self), defaultSnapshot);
                     },
                     toJS() {
                         return mobxTreeToSimplifiedObjectTree(self);
@@ -164,6 +174,7 @@ export default function useSchema(FunctionalComponent, options) {
 
             setContext({
                 formData: formData,
+                formStatus: formStatus,
                 metaDataMap: metaDataMap,
                 errorMap: errors,
                 hasErrors: () => errors && errors.size > 0 && ((errors.has('children') && errors.get('children').size >0) || (errors.has('errors') && errors.get('errors').size >0)),

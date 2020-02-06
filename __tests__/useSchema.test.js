@@ -34,7 +34,7 @@ function Name(props) {
 
 function DemoForm() {
     return useSchema(props => {
-        const {formData, set, reset, ready} = props;
+        const {formData, formStatus, set, reset, ready} = props;
 
         if(!ready) {
             return <div>Loading...</div>;
@@ -52,8 +52,8 @@ function DemoForm() {
             <Alias name={"alias"}/>
             <div data-testid="pepsi">{formData.firstName}</div>
             <div data-testid="coke">{formData.lastName}</div>
-            <div data-testid="dirty">{formData.isDirty() && 'dirty'}</div>
-            <div data-testid="changed">{formData.isChanged() && 'changed'}</div>
+            <div data-testid="dirty">{formStatus.isDirty && 'dirty'}</div>
+            <div data-testid="changed">{formStatus.isChanged && 'changed'}</div>
             <Name name={'lastName'}/>
             <Name name={'firstName'}/>
             <div>
