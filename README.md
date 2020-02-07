@@ -14,18 +14,19 @@ The @latest version of this project now has reasonable test coverage using some 
 1. It is Fast - Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields
 2. Supports big complex forms and works well with repeatable dynamic input collections
 3. Supports nth level nesting and grouping
-4. Using Json-schema allows you to validate the form in the browser and server using the same ruleset
-5. The API is hooks based and the hooks for use with inputs work similar to `useState`
-6. Easy to use with both super simple and super complex forms
-7. Works well with popular UI components like react-select and react-date-picker and would pair nicely with material UI
-8. Not too many dependencies   
+4. Has pretty error messages
+5. Using Json-schema allows you to validate the form in the browser and server using the same ruleset
+6. The API is hooks based and the hooks for use with inputs work similar to `useState`
+7. Easy to use with both super simple and super complex forms
+8. Works well with popular UI components like react-select and react-date-picker and would pair nicely with material UI Components
+9. Not too many dependencies mostly peerDependencies 
 
 **Cons:**
-1. Only supports [json-schema draft 7](https://json-schema.org/draft-07/json-schema-release-notes.html) no other versions are supported
-2. Only supports React 16.8 or newer because it uses Hooks :(
-3. One of the hook functions `useSchema` is actually Hook + HOC hybrid which may seem weird but it is because it uses a Context Provider so you don't need to wrap it yourself (this was an opinionated decision because we make a lot of forms and found the strange convenience of the the hook HOC combo to outweigh the standard pattern of wrapping things in Context Providers)
-4. For complex state with deep tree structures you have to either specify the full path in the name of a Consumer Component which employs path separation using the '.' character i.e "demographicInfo.homeAddress.postalCode" for each input or wrap them in a `<SubScehma path={name}>` which will set the proper paths in context. (if you can think of a magical way to propagate paths without wrapping please submit a pull request)
-
+1. Only supports [json-schema draft 7](https://json-schema.org/draft-07/json-schema-release-notes.html) no other versions are supported at this time the main reason for this is that as of this writing AJV doesn't support version 8
+2. Does NOT support json-schema oneOf keyword (pull requests welcome)
+3. Only supports React 16.8 or newer because it uses Hooks :(
+4. One of the hook functions `useSchema` is actually Hook + HOC hybrid which may seem weird but it is because it uses a Context Provider so you don't need to wrap it yourself (this was an opinionated decision because we make a lot of forms and found the strange convenience of the the hook HOC combo to outweigh the standard pattern of wrapping things in Context Providers)
+5. For complex state with deep tree structures you have to either specify the full path in the name of a Consumer Component which employs path separation using the '.' character i.e "demographicInfo.homeAddress.postalCode" for each input or wrap them in a `<SubScehma path={name}>` which will set the proper paths in context. (if you can think of a magical way to propagate paths without wrapping please submit a pull request)
 
 ## Usage
 
@@ -99,20 +100,24 @@ useSchema uses context to pass FormCapacitor props to your form component.
 {
  - ready - boolean - a boolean which is set to true once all promises have been resolved in the initialization process
  - formData - MST - a mobx-state-tree full of observable goodness that you can access all of your form state from the structure is based on your json schema. Import toJS() from mobx to see a snapshot of your form data tree.
+ - formStatus - Observable object with properties that tell about the status of the form state.
  - set(path, value) - func - Used to set data within the MST for the supplied path.
  - set(object) - func - set is overloaded if you pass a POJO to it as the first parameter the whole state tree will be replaced
- - reset() - func -resets the mobx state tree to the initial state
+ - reset() - func -resets the mobx state tree to the initial state also resets the `formStatus.isDirty` and `formStatus.isChanged` to `false`
  - validate() - func - imperative validate function which returns true or false and also activates the error states and seeds the errorMap with errors for anything that is invalid 
  - hasErrors() - func - a function that tells whether or not there are any errors for this form   
  - ErrorMap - ObservableMap - a mobx observable map tree of all the errors
 }
 
-**Special Actions:**
+**formData Special Actions:**
 
-- `formData.isDirty()` - Returns `true` if FormData was changed at some point even if all data is returned to the original values.  
 - `formData.isChanged()` - Returns `true` if the current data is not the same as the original data.
 - `formData.toJS()` - Returns a sanitized JS version of formData but with all empty arrays and undefined object properties removed. (if you want a non sanitized version mobx has a toJS method that return a full JS version of the state tree)
 - `formData.toJSON()` - Returns a JSON string of formData that is produced using the same sanitization as the FormData.toJS method.
+
+**formStatus:**
+- `formStatus.isChanged` - boolean that is `true` if the formData is different then the when the defaults were set
+- `formStatus.isDirty` - boolean that is `true` it doesn't care about the state of data only if the formData has been changed at any point.  
 
 A basic form with 2 text inputs and a save button.
 ~~~
@@ -198,7 +203,7 @@ Use within any control to get the error state for the current path for an input 
 
 **args:**
 
-path: path to observable in the state tree within the current context 
+path {string}: period delimited string path to observable in the state tree within the current context 
 
 **returns:**
 

@@ -1,4 +1,4 @@
-import {getValue, isObject, isString} from "./helpers";
+import {getValue, isArray, isObject, isString} from "./helpers";
 import {
     requiredKeyword,
     typeKeyword,
@@ -8,8 +8,8 @@ import {
     patternKeyword,
     minMaxLength,
     minMax,
-    minMaxItems
-} from "./errorDefinition.en";
+    minMaxItems, allOfRequired
+} from "./errorDefinition";
 
 /**
  * This message will mutate the schema passed in
@@ -70,6 +70,7 @@ export function setRequiredErrorMessage(schema) {
  * @param {{}} parentSchema
  * @param {string} propName
  */
+/* istanbul ignore next */
 function _setRequiredErrorMessage(parentSchema, propName) {
     let requiredProperty = getValue(parentSchema, ['properties', propName]);
     requiredProperty.errorMessage = getMergedErrorMessage({
@@ -99,6 +100,7 @@ export function setDependenciesErrorMessage(deps, parentSchema) {
  * @param {{}} dependencies
  * @returns {Map<any, any>}
  */
+/* istanbul ignore next */
 function mapFlippedDependencies(dependencies) {
     const flipped = new Map;
     for(let level1Name of Object.keys(dependencies)) {
@@ -121,6 +123,7 @@ function mapFlippedDependencies(dependencies) {
  * @param {{}} parentSchema
  * @returns {string}
  */
+/* istanbul ignore next */
 function getSetDepTitle(name, map, parentSchema) {
     if(map.has(name)) {
         return map.get(name);
@@ -134,7 +137,7 @@ function getSetDepTitle(name, map, parentSchema) {
 /**
  * This message will mutate either the anyOfSchema or the parentSchema or both
  * @param {{}} anyOfSchema
- * @param {{}} parentSchema
+ * @param {{title: string, errorMessage: {}}} parentSchema
  */
 export function setAnyOfErrorMessages(anyOfSchema, parentSchema) {
     let anyOfFullSet = anyOfSchema.reduce((acc, schema) => {
@@ -154,6 +157,9 @@ export function setAnyOfErrorMessages(anyOfSchema, parentSchema) {
                         acc.set(keyword, [schema.type]);
                     }
                     break;
+                case 'properties':
+
+                    break;
             }
         }
         return acc;
@@ -172,21 +178,6 @@ export function setAnyOfErrorMessages(anyOfSchema, parentSchema) {
     }
 }
 
-export function setObjectErrorMessages(schema) {
-    if(schema.required && schema.required.length > 0) {
-        setRequiredErrorMessage(schema);
-    }
-    if(schema.dependencies) {
-        setDependenciesErrorMessage(schema.dependencies, schema);
-    }
-}
-
-export function setStringErrorMessages(schema) {
-    setPatternErrorMessage(schema);
-    setStringLengthErrorMessage(schema);
-}
-
-
 /**
  * This function has a bunch of commented code because there are several ways to determine
  * where anyOf required messages should go and it may change in the future
@@ -196,30 +187,98 @@ export function setStringErrorMessages(schema) {
  * @param {{}} anyOfSchema
  * @private
  */
+/* istanbul ignore next */
 function _setAnyOfRequiredMessage(requiredFields, parentSchema, anyOfSchema) {
     const reqMessage = anyOfRequired(requiredFields.map(req => req.map(propName => getPropertyTitle(parentSchema, propName))));
-    // for(let fieldGroup of requiredFields) {
-    //     for(let propName of fieldGroup) {
-    //         let fieldSchema = parentSchema.properties[propName];
-    //         fieldSchema.errorMessage = getMergedErrorMessage({required: reqMessage}, fieldSchema.errorMessage);
-    //     }
-    // }
-
-    //Apply anyOf message to the parent object but tag them to individual fields
-    // parentSchema.errorMessage = getMergedErrorMessage({
-    //     required: requiredFields.reduce((acc, propName) => {
-    //         acc[propName] = reqMessage;
-    //         return acc;
-    //     }, {})
-    // }, parentSchema.errorMessage);
-
-    //Apply anyOf message to each anyOF element
     for(let anyOfElement of anyOfSchema) {
         anyOfElement.errorMessage = getMergedErrorMessage({required: reqMessage}, anyOfElement.errorMessage);
     }
+}
 
-    //Apply anyOf message globally
-    //set the message at the root level... but inject the field names in the required
+/**
+ * This message will mutate either the allOfSchema or the parentSchema or both
+ * @param {{}} allOfSchema
+ * @param {{title: string, errorMessage: {}}} parentSchema
+ */
+export function setAllOfErrorMessages(allOfSchema, parentSchema) {
+    let allOfFullSet = allOfSchema.reduce((acc, schema) => {
+        for(let keyword of Object.keys(schema)) {
+            switch(keyword) {
+                case 'required':
+                    if(acc.has(keyword)) {
+                        acc.get(keyword).push([...schema.required]);
+                    } else {
+                        acc.set(keyword, [...schema.required]);
+                    }
+                    break;
+                case 'type':
+                    if(acc.has(keyword)) {
+                        acc.get(keyword).push(schema.type);
+                    } else {
+                        acc.set(keyword, [schema.type]);
+                    }
+                    break;
+                case 'properties':
+                    setAllErrorMessagesR(schema, parentSchema);
+                    break;
+                case 'items':
+                    setAllErrorMessagesR(schema.items, parentSchema);
+                    break;
+            }
+        }
+        return acc;
+    }, new Map());
+    if(allOfFullSet.size > 0) {
+        for(let [keyword, data] of allOfFullSet) {
+            switch(keyword) {
+                case "required":
+                    _setAllOfRequiredMessage(data, parentSchema, allOfSchema);
+                    break;
+                case 'type':
+                    parentSchema.errorMessage = getMergedErrorMessage({type: anyOfType(parentSchema.title, data)}, parentSchema.errorMessage);
+                    break;
+            }
+        }
+    }
+}
+
+/**
+ *
+ * @param {[]} requiredFields
+ * @param {{}} parentSchema
+ * @param {{}} anyOfSchema
+ * @private
+ */
+/* istanbul ignore next */
+function _setAllOfRequiredMessage(requiredFields, parentSchema, allOfSchema) {
+    const reqMessage = allOfRequired(requiredFields.map(propName => getPropertyTitle(parentSchema, propName)));
+    for(let allOfElement of allOfSchema) {
+        if(allOfElement.required) {
+            allOfElement.errorMessage = getMergedErrorMessage({required: reqMessage}, allOfElement.errorMessage);
+        }
+    }
+}
+
+/**
+ *
+ * @param {{}} schema
+ */
+export function setObjectErrorMessages(schema) {
+    if(schema.required && schema.required.length > 0) {
+        setRequiredErrorMessage(schema);
+    }
+    if(schema.dependencies) {
+        setDependenciesErrorMessage(schema.dependencies, schema);
+    }
+}
+
+/**
+ *
+ * @param {{}} schema
+ */
+export function setStringErrorMessages(schema) {
+    setPatternErrorMessage(schema);
+    setStringLengthErrorMessage(schema);
 }
 
 /**
@@ -229,6 +288,7 @@ function _setAnyOfRequiredMessage(requiredFields, parentSchema, anyOfSchema) {
  *
  * @returns {string}
  */
+/* istanbul ignore next */
 function getPropertyTitle(schema, propName) {
     const prop = getValue(schema, ['properties', propName]);
     return prop.title;
@@ -240,6 +300,7 @@ function getPropertyTitle(schema, propName) {
  * @param {{}} existingErrorMessage
  * @returns {{}}
  */
+/* istanbul ignore next */
 function getMergedErrorMessage(newErrorMessage, existingErrorMessage) {
     if(isString(existingErrorMessage)) {
         return Object.keys(newErrorMessage).reduce((acc, prop) => {
@@ -250,4 +311,55 @@ function getMergedErrorMessage(newErrorMessage, existingErrorMessage) {
         return Object.assign({}, newErrorMessage, existingErrorMessage);
     }
     return {...newErrorMessage};
+}
+
+/**
+ *
+ * @param {{}} schema
+ * @param {{}} parentSchema
+ */
+function setAllErrorMessagesR(schema, parentSchema){
+    if(schema.type) {
+        switch(schema.type) {
+            case 'object':
+                setObjectErrorMessages(schema);
+                if(schema.properties) {
+                    for(let p of Object.keys(schema.properties)) {
+                        setAllErrorMessagesR(schema.properties[p], schema);
+                    }
+                }
+                break;
+            case 'array':
+                setArrayLengthErrorMessage(schema);
+                if(isArray(schema.items)) {
+                    schema.items.forEach(item => {
+                        setAllErrorMessagesR(item, schema);
+                    });
+                    if(schema.additionalItems) {
+                        setAllErrorMessagesR(schema.additionalItems, schema);
+                    }
+                } else if(schema.items) {
+                    setAllErrorMessagesR(schema.items, schema);
+                }
+                break;
+            case 'string':
+                setStringErrorMessages(schema);
+                setTypeErrorMessage(schema);
+                break;
+            case 'integer':
+            case 'number':
+                setNumberRangeErrorMessage(schema);
+                break;
+            default:
+                setTypeErrorMessage(schema);
+        }
+        if(schema.anyOf && schema.anyOf.length > 0) {
+            setAnyOfErrorMessages(schema.anyOf, schema);
+        }
+    } else if(schema.anyOf && schema.anyOf.length > 0) {
+        setAnyOfErrorMessages(schema.anyOf, parentSchema.type === 'array' ? parentSchema : schema);
+    }
+    if(schema.allOf && schema.allOf.length > 0) {
+        setAllOfErrorMessages(schema.anyOf, schema);
+    }
 }
