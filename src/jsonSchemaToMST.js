@@ -27,26 +27,8 @@ function hasProp(obj, prop) {
 /* istanbul ignore next */
 function getDefault(node) {
     if(!hasProp(node, 'default')) return undefined;
-    // if(isPlainObject(node.default)) {
-    //     const keys = Object.keys(node.default);
-    //     if(keys.length === 1 && hasProp(defaultKeywords,keys[0])) {
-    //         return defaultKeywords[keys[0]](node.default[keys[0]])
-    //     }
-    // }
     return node.default;
 }
-
-// /* istanbul ignore next */
-// const defaultKeywords = {
-//     // should we have resolved all these defaults into functions during the schema resolution phase..?
-//     $uuid(type) {
-//         switch(type) {
-//             case 'shortid':
-//                 return shortid;
-//         }
-//         throw new Error(`$uuid type "${type}" not implemented`);
-//     }
-// };
 
 /* istanbul ignore next */
 const TYPE_MAP = Object.freeze({
@@ -152,32 +134,5 @@ function hasUnionFlag(type, flag) {
             && type._types.some(t => (t.flags & flag) === flag)
         );
 }
-
-// TODO: scrap walkNodes, roll own
-// const foo = (schema = {}, onNode) => walkNodes(schema, (node, meta) => {
-//     const type = makeType(node,meta);
-//     const hasDefault = node.default !== undefined;
-//     const isRequired = meta.isRequired || !meta.lineage; // lineage is for root element
-//     let result = type;
-//     // TODO: see https://github.com/mobxjs/mobx-state-tree#references-and-identifiers
-//     // might be able to make 'shortid' an identifier
-//     console.log(type.name,{type,hasDefault,isRequired});
-//     if(hasDefault) {
-//         // console.log(type,(type.flags & UNION)===UNION);
-//         let includesNull = (type.flags & UNION)===UNION && type.types.some(t => (t.flags & NULL) === NULL);
-//
-//
-//         result = node.default === null
-//             ? (includesNull ? type : types.maybe(type))
-//             : types.optional(type, getDefault(node));
-//     } else if(!isRequired) {
-//         result = types.maybe(type);
-//     }
-//     // console.log('result',result);
-//     return onNode
-//         ? onNode(result, {node, meta})
-//         : result;
-// });
-
 
 export default schema => makeType(schema, {parent: null, depth: 0});

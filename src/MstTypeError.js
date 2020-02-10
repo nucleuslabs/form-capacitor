@@ -4,11 +4,7 @@ export default class MstTypeError extends Error {
         this.message = message;
         this.dataType = dataType;
         this.node = node;
-        const originalErrorProps = Object.keys(originalError);
-        for(let i = 0; i < originalErrorProps.length; i++) {
-            let prop = originalErrorProps[i];
-            this[prop] = originalError[prop];
-        }
+        Object.assign(this, originalError);
         this.type = "MstTypeError";
     }
 }

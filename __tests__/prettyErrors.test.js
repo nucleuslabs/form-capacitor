@@ -15,6 +15,7 @@ function SimpleTextBox(props) {
     const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
+            //isNan is in here to test numeric values with integer and number based type errors for numeric/string values
             change((!isNaN(ev.target.value) && ev.target.value ? ev.target.value * 1 : ev.target.value || undefined));
         }}/>
         <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li
