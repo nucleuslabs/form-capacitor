@@ -2,16 +2,16 @@ import useSchema from "../src/useSchema";
 import jsonSchema from "./demo-form";
 import {render, fireEvent, wait} from "@testing-library/react";
 import React, {useState} from "react";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
-import useConsumeArray from "../src/useConsumeArray";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
+import useArrayField from "../src/useArrayField";
 import {useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
 
 function SimpleTextBox(props) {
-    const [value, change] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
@@ -21,7 +21,7 @@ function SimpleTextBox(props) {
 }
 
 function Alias(props) {
-    const [alias] = useConsumeArray(props.name);
+    const [alias] = useArrayField(props.name);
     return <ul data-testid={props.name}>
         {alias.map((obj, idx) => <li key={idx}>{obj.alias}</li>)}
     </ul>;

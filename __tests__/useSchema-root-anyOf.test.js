@@ -3,17 +3,17 @@ import jsonSchema from "./demo-form.json";
 import anyOfArrayJsonSchema from "./anyOf-array-form";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
-import useConsumeArray from "../src/useConsumeArray";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
+import useArrayField from "../src/useArrayField";
 import {useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
 
 
 function SimpleTextBox(props) {
-    const [value, change] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value === '' ? undefined : ev.target.value);
@@ -23,7 +23,7 @@ function SimpleTextBox(props) {
 }
 
 function Alias(props) {
-    const [alias] = useConsumeArray(props.name);
+    const [alias] = useArrayField(props.name);
     return <ul data-testid={props.name}>
         {alias.map((obj, idx) => <li key={idx}>{obj.alias}</li>)}
     </ul>;
@@ -68,7 +68,7 @@ function DemoForm() {
                             middleName: "Sauce",
                             lastName: undefined,
                             aka: undefined
-                        })
+                        });
                     }}>Set All The Things
                     </button>
                     <button data-testid="v" onClick={() => {
@@ -106,14 +106,9 @@ function DemoForm() {
     });
 }
 
-
-
-
-
-
 function TextBoxArray({name}) {
-    const [value, set, {push, splice, clear}] = useConsumeArray(name);
-    const [hasErrors] = useConsumeErrors(name);
+    const [value, {push, splice, clear}] = useArrayField(name);
+    const [hasErrors] = useFieldErrors(name);
 
     const handleChange = name === 'alias' ? idx => ev => {
         splice(idx, 1, {alias: ev.target.value});
@@ -122,12 +117,11 @@ function TextBoxArray({name}) {
     };
     return <div>
         <div data-testid={`${name}_div`} className={hasErrors ? "error" : null}>
-            {value.map((inst, key) => <input key={key} type="text" data-testid={`${name}_${key}`} name={`${name}.${key}`} value={name === 'alias' ? inst.alias || "" : inst || ""}
-                                             onChange={handleChange(key)}/>)}
+            {value.map((inst, key) => <input key={key} type="text" data-testid={`${name}_${key}`} name={`${name}.${key}`} value={name === 'alias' ? inst.alias || "" : inst || ""} onChange={handleChange(key)}/>)}
         </div>
         <button data-testid={`${name}_add1`} onClick={() => push({alias: "Big Joe"})}>+1</button>
         <button data-testid={`${name}_add2`} onClick={() => push("Little Joe")}>+2</button>
-        <button data-testid={`${name}_clear`}  onClick={() => clear()}>clear</button>
+        <button data-testid={`${name}_clear`} onClick={() => clear()}>clear</button>
     </div>;
 }
 

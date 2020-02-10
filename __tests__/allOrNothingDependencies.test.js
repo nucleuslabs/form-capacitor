@@ -3,27 +3,24 @@ import {oneCharAtATime} from "../src/testHelper";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
-import useConsumeArray from "../src/useConsumeArray";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
+import useArrayField from "../src/useArrayField";
 import {useObserver} from "mobx-react-lite";
 import SubSchema from "../src/SubSchema";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
 
-
-
 function TextBoxArray({dataTestId,name}) {
-    const [value, set, {push, remove, slice, splice, clear, replace}] = useConsumeArray(name);
-    const [hasErrors] = useConsumeErrors(name);
+    const [value, {set, push, remove, slice, splice, replace}] = useArrayField(name);
+    const [hasErrors] = useFieldErrors(name);
 
     const handleChange = idx => ev => {
         splice(idx, 1, ev.target.value);
     };
     return <div>
         <div data-testid={`${dataTestId}_errors`} className={hasErrors ? "error" : null}>
-            {value.map((inst, key) => <div key={key}><input type="text" data-testid={dataTestId} className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""}
-                                                  onChange={handleChange(key)}/></div>)}
+            {value.map((inst, key) => <div key={key}><input type="text" data-testid={dataTestId} className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""} onChange={handleChange(key)}/></div>)}
         </div>
         <button data-testid={`${dataTestId}_add`} onClick={() => push("Cheese")}>+</button>
         <button data-testid={`${dataTestId}_remove`} onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
@@ -34,8 +31,8 @@ function TextBoxArray({dataTestId,name}) {
 }
 
 function SimpleTextBox({errorTestId, ...props}) {
-    const [value, change] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
@@ -45,7 +42,7 @@ function SimpleTextBox({errorTestId, ...props}) {
 }
 
 function Alias(props) {
-    const [alias] = useConsumeArray(props.name);
+    const [alias] = useArrayField(props.name);
     return <ul data-testid={props.name}>
         {alias.map((obj, idx) => <li key={idx}>{obj.alias}</li>)}
     </ul>;
@@ -69,7 +66,7 @@ function AllOrNothing ({name}){
 }
 
 function DeepAllOrNothing({name}) {
-    const [items, set, {push}] = useConsumeArray(name);
+    const [items, {push}] = useArrayField(name);
     return <span><SubSchema path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</SubSchema><button data-testid="deepAllOrNothing_add" onClick={() => push({})}>add DAON</button></span>;
 }
 

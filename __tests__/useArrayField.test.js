@@ -3,24 +3,23 @@ import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
 
-import useConsumeArray from "../src/useConsumeArray";
-import useConsumeErrors from "../src/useConsumeErrors";
+import useArrayField from "../src/useArrayField";
+import useFieldErrors from "../src/useFieldErrors";
 
 function TextBoxArray({name}) {
-    const [value, set, {push, remove, slice, splice, clear, replace}] = useConsumeArray(name);
-    const [hasErrors] = useConsumeErrors(name);
+    const [value, {set, push, remove, splice, clear, replace}] = useArrayField(name);
+    const [hasErrors] = useFieldErrors(name);
 
     const handleChange = idx => ev => {
         splice(idx, 1, {alias: ev.target.value});
     };
     return <div>
         <div data-testid="alias">
-            {value.map((inst, key) => <input key={key} type="text" className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst.alias || ""}
-                                             onChange={handleChange(key)}/>)}
+            {value.map((inst, key) => <input key={key} type="text" className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst.alias || ""} onChange={handleChange(key)}/>)}
         </div>
         <button onClick={() => push({alias: "Joe"})}>+</button>
         <button onClick={() => value.length > 0 && remove(value[value.length - 1])}>-</button>
-        <button onClick={() => value.length > 0 && set(slice(0, value.length - 1))}>--</button>
+        <button onClick={() => value.length > 0 && set(value.slice(0, value.length - 1))}>--</button>
         <button onClick={() => clear()}>clear</button>
         <button onClick={() => replace([{alias: "NOT JOE"}])}>replace</button>
     </div>;

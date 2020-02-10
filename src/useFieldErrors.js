@@ -5,11 +5,11 @@ import {useContext} from "react";
 import {getErrors} from "./errorMapping";
 
 /**
- * @deprecated Use useFieldErrors as a replacement it is identical
+ * Returns an array of error objects for the provided path in relation to the current FormContext path
  * @param {string|string[]} path
  * @returns {[]}
  */
-export default function useConsumeErrors(path) {
+export default function useFieldErrors(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     // console.log(fullPath, context.errorMap, errors);

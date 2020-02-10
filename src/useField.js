@@ -6,14 +6,13 @@ import {pathToPatchString} from "./validation";
 
 /**
  * Returns the stored value for this component and a function to set the value
- * @deprecated Use useField it is exactly the same but the name is better
  * @param {string | string[]} path
  * @returns {[{any}, {func}]}
  */
-export default function useConsume(path) {
+export default function useField(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const patchPath = pathToPatchString(fullPath);
-    // console.log("useConsume", fullPath, getValue(context.formData, fullPath));
+    // console.log("useField", fullPath, getValue(context.formData, fullPath));
     return useObserver(() => [getValue(context.formData, fullPath), v => context.set(fullPath, v), context.metaDataMap && context.metaDataMap.has(patchPath) ? context.metaDataMap.get(patchPath) : {required: false}]);
 };

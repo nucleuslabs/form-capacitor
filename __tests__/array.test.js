@@ -2,16 +2,16 @@ import useSchema from "../src/useSchema";
 import jsonSchema from "./array-form";
 import {render, fireEvent, wait} from "@testing-library/react";
 import React, {useState} from "react";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
-import useConsumeArray from "../src/useConsumeArray";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
+import useArrayField from "../src/useArrayField";
 import {useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
 
 function SimpleTextBox(props) {
-    const [value, change] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
@@ -21,8 +21,8 @@ function SimpleTextBox(props) {
 }
 
 function AliasString(props) {
-    const [alias,set,{push, pop}] = useConsumeArray(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [alias, {push, pop}] = useArrayField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <div>
         {alias.map((value, idx) => <SimpleTextBox key={idx} data-testid={`${props.name}_${idx}`} name={`${props.name}.${idx}`}/>)}
         <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>
@@ -32,8 +32,8 @@ function AliasString(props) {
 }
 
 function AliasObject(props) {
-    const [alias,set,{push}] = useConsumeArray(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [alias, {push, pop}] = useArrayField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <div>
         {alias.map((value, idx) => <SimpleTextBox key={idx} data-testid={`${props.name}_${idx}`} name={`${props.name}.${idx}.alias`}/>)}
         <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>
@@ -46,7 +46,7 @@ function DemoForm() {
     return useSchema(props => {
         const [valid, setValid] = useState('Unknown');
         // const [errors, setErrors] = useState([]);
-        const {set, ready, validate, errorMap, formData} = props;
+        const {ready, validate, errorMap, formData} = props;
         if(!ready) {
             return <div>Loading...</div>;
         }

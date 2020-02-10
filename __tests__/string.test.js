@@ -2,15 +2,15 @@ import useSchema from "../src/useSchema";
 import jsonSchema from "./demo-form";
 import {render, fireEvent, wait} from "@testing-library/react";
 import React, {useState} from "react";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
 import {useObserver} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
 
 function SimpleTextBox(props) {
-    const [value, change] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
@@ -23,7 +23,7 @@ function DemoForm() {
     return useSchema(props => {
         const [valid, setValid] = useState('Unknown');
         // const [errors, setErrors] = useState([]);
-        const {set, ready, validate, errorMap, formData} = props;
+        const {ready, validate, errorMap, formData} = props;
         if(!ready) {
             return <div>Loading...</div>;
         }

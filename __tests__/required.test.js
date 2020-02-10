@@ -3,13 +3,13 @@ import {oneCharAtATime} from "../src/testHelper";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
 import {useObserver} from "mobx-react-lite";
 
 function SimpleTextBox(props) {
-    const [value, change] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : ''} value={value || ""} onChange={ev => {
             change(ev.target.value || '');
@@ -20,7 +20,7 @@ function SimpleTextBox(props) {
 
 function DemoForm() {
     return useSchema(props => {
-        const {formData, set, reset, ready} = props;
+        const {ready} = props;
 
         if(!ready) {
             return <div>Loading...</div>;
@@ -99,7 +99,4 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
 
     fireEvent.change(getByTestId("firstName"), {target: {value: ''}});
     expect(getByTestId("firstName").className).toBe('error');
-
-
-
 });

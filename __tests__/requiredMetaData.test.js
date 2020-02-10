@@ -2,15 +2,15 @@ import useSchema from "../src/useSchema";
 import jsonSchema from "./demo-form";
 import {render, wait, cleanup} from "@testing-library/react";
 import React, {useState} from "react";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
-import useConsumeArray from "../src/useConsumeArray";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
+import useArrayField from "../src/useArrayField";
 import {useObserver} from "mobx-react-lite";
 import {getFlattenedErrors} from "../src/errorMapping";
 
 function SimpleTextBox(props) {
-    const [value, change, {required}] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change, {required}] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <span data-testid={`${props.name}_required`}>{required ? "*" : "?"}</span>  <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || '');
@@ -20,7 +20,7 @@ function SimpleTextBox(props) {
 }
 
 function Alias(props) {
-    const [alias] = useConsumeArray(props.name);
+    const [alias] = useArrayField(props.name);
     return <ul data-testid={props.name}>
         {alias.map((obj, idx) => <li key={idx}>{obj.alias}</li>)}
     </ul>;
@@ -64,7 +64,7 @@ function DemoForm() {
             {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
             <div data-testid="valid">{valid}</div>
             {valid !== 'Unknown' && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}
-        </div>)
+        </div>);
     }, {
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",

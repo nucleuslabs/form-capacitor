@@ -5,19 +5,18 @@ import {useContext} from "react";
 
 /**
  * Returns an array containing the stored value for this component, a function to set the value and an object with a bunch of functions attached to it.
- * @deprecated Use useArrayField it similar but the name is better
  * @param {string | string[]} path
- * @returns {[{any}, {function}, {push: function,pop: function, splice: function, clear: function, replace: function, remove: function}]}
+ * @returns {[{any}, {set: function, push: function,pop: function, splice: function, clear: function, replace: function, remove: function}]}
  */
-export default function useConsumeArray(path) {
+export default function useArrayField(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const {_push, _pop, _splice, _clear, _replace, _remove} = context.formData;
     const value = getValue(context.formData, fullPath);
     return useObserver(() => [
-        (value && value.slice) ? value.slice() : [] ,
-        v => context.set(fullPath, v),
+        (value && value.slice) ? value.slice() : [],
         {
+            set: v => context.set(fullPath, v),
             push: v => _push(fullPath, v),
             pop: () => _pop(fullPath),
             splice: (idx, length, insert) => _splice(fullPath, idx, length, insert),

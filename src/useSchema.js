@@ -125,11 +125,6 @@ export default function useSchema(FunctionalComponent, options) {
                         }
                         formStatus.isDirty = true;
                     },
-                    _slice(name, idx, length = 1) {
-                        const arr = getObservable(self, name);
-                        formStatus.isDirty = true;
-                        return arr.slice(idx, length);
-                    },
                     isChanged(name) {
                         if(name !== undefined) {
                             return !equal(getValue(self, name), getValue(defaultSnapshot, name));

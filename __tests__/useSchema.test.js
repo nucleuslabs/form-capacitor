@@ -2,15 +2,15 @@ import React from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import useSchema from "../src/useSchema";
-import useConsume from "../src/useConsume";
-import useConsumeErrors from "../src/useConsumeErrors";
+import useField from "../src/useField";
+import useFieldErrors from "../src/useFieldErrors";
 
-import useConsumeArray from "../src/useConsumeArray";
+import useArrayField from "../src/useArrayField";
 import {useObserver} from "mobx-react-lite";
 
 function SimpleTextBox(props) {
-    const [value, change] = useConsume(props.name);
-    const [hasErrors, errors] = useConsumeErrors(props.name);
+    const [value, change] = useField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
     return <span>
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
@@ -20,7 +20,7 @@ function SimpleTextBox(props) {
 }
 
 function Alias(props) {
-    const [alias] = useConsumeArray(props.name);
+    const [alias] = useArrayField(props.name);
     return <ul data-testid={props.name}>
         {alias.map((obj, idx) => <li key={idx}>{obj.alias}</li>)}
     </ul>;
@@ -28,7 +28,7 @@ function Alias(props) {
 
 
 function Name(props) {
-    const [name] = useConsume(props.name);
+    const [name] = useField(props.name);
     return <div data-testid={`${props.name}Display`}>{name}</div>;
 }
 
