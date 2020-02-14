@@ -5,7 +5,7 @@ import {useContext} from "react";
 import {pathToPatchString} from "./validation";
 
 /**
- * Returns the stored value for this component and a function to set the value
+ * Returns the stored value for the provided path in relation to the current FormContext path and a function to set the value
  * @param {string | string[]} path
  * @returns {[{any}, {func}]}
  */
@@ -13,6 +13,9 @@ export default function useField(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const patchPath = pathToPatchString(fullPath);
-    // console.log("useField", fullPath, getValue(context.formData, fullPath));
-    return useObserver(() => [getValue(context.formData, fullPath), v => context.set(fullPath, v), context.metaDataMap && context.metaDataMap.has(patchPath) ? context.metaDataMap.get(patchPath) : {required: false}]);
+    return useObserver(() => [
+        getValue(context.stateTree, fullPath, undefined),
+        v => context.set(fullPath, v),
+        context.fieldMetaDataMap && context.fieldMetaDataMap.has(patchPath) ? context.fieldMetaDataMap.get(patchPath) : {required: false}
+    ]);
 };

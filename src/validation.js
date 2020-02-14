@@ -1,5 +1,5 @@
 import {observable, ObservableMap, toJS} from 'mobx';
-import {isBoolean, isArray, isMap, isSet, isFunction} from './helpers';
+import {isBoolean, isArrayLike, isMapLike, isSetLike} from './helpers';
 import Ajv from "ajv";
 import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
@@ -370,7 +370,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
                 patchPath: [...patchPath, p],
                 fieldDefinitionMap: fieldDefinitionMap,
                 patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-                metaDataMap: metaDataMap,
+                fieldMetaDataMap: metaDataMap,
                 errorPathMaps: errorPathMaps,
                 skeletonSchemaMap: skeletonSchemaMap,
                 parentSchema: schema
@@ -414,7 +414,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
              * In order to solve our supplementary dependency challenge I will attach a ref onto each field which has is mentioned in the dependencies keyword to a skeleton of that fields root object
              * @todo optimize the dependency loops if necessary
              */
-            if(isArray(dependency)) {
+            if(isArrayLike(dependency)) {
                 patchPathToSchemaPathMap.set(pathToPatchString([...patchPath, p]), [...path, 'properties', p]);
                 assignFieldDefinition({}, fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])), [[...path]]);
                 // console.log(JSON.stringify(fieldDefinitionMap.get(pathToPatchString(patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p]))))));
@@ -450,7 +450,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
 /* istanbul ignore next */
 function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap) {
     assignFieldDefinition(buildSchemaTree([...path], {...schema}, skeletonSchemaMap), fieldDefinitionMap, [...path], []);
-    if(isArray(schema.items)) {
+    if(isArrayLike(schema.items)) {
         schema.items.forEach((item, itemIdx) => {
             skeletonSchemaMap.set(pathToPatchString([...path, 'items', itemIdx]), {type: item.type});
             const errorSchemaPathMap = errorPathMaps.get('schema');
@@ -470,7 +470,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
                 patchPath: [...subPatchPath],
                 fieldDefinitionMap: fieldDefinitionMap,
                 patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-                metaDataMap: metaDataMap,
+                fieldMetaDataMap: metaDataMap,
                 errorPathMaps: errorPathMaps,
                 skeletonSchemaMap: skeletonSchemaMap,
                 parentSchema: schema
@@ -495,7 +495,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
                     patchPath: [...patchPath, "additionalItems"],
                     fieldDefinitionMap: fieldDefinitionMap,
                     patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-                    metaDataMap: metaDataMap,
+                    fieldMetaDataMap: metaDataMap,
                     errorPathMaps: errorPathMaps,
                     skeletonSchemaMap: skeletonSchemaMap,
                     parentSchema: schema
@@ -522,7 +522,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
             patchPath: [...subPatchPath],
             fieldDefinitionMap: fieldDefinitionMap,
             patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-            metaDataMap: metaDataMap,
+            fieldMetaDataMap: metaDataMap,
             errorPathMaps: errorPathMaps,
             skeletonSchemaMap: skeletonSchemaMap,
             parentSchema: schema
@@ -751,11 +751,11 @@ function appendFieldReferencesR(refMap, schema, propName, path = [], patchPath, 
  * @param {Map|Set|Array} ref2
  */
 function appendRefs(refMap, ref2) {
-    if(isMap(ref2)) {
+    if(isMapLike(ref2)) {
         for(const ref of ref2.values()) {
             setRefPath(refMap, ref);
         }
-    } else if(isSet(ref2) || isArray(ref2)) {
+    } else if(isSetLike(ref2) || isArrayLike(ref2)) {
         for(const ref of ref2) {
             setRefPath(refMap, ref);
         }
@@ -781,16 +781,15 @@ function setRefPath(refs, path) {
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
  * @param {*} data Mobx State Tree
  * @param {Ajv} ajv
- * @returns {{errors: ObservableMap<any, any>, metaDataMap: ObservableMap<any, any>,  validate: function}}
+ * @returns {{errors: ObservableMap<any, any>, fieldMetaDataMap: ObservableMap<any, any>,  validate: function}}
  */
 export function watchForPatches(schema, data, ajv) {
     // console.log(JSON.stringify(schema, null, 2));
     const errors = observable.map();
     const paths = observable.map();
-    const changedSet = new Set();
     const validators = new Map();
     //build field validators
-    const [fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps] = buildFieldDefinitionMapR({schema: schema});
+    const [fieldDefinitionMap, patchPathToSchemaPathMap, fieldMetaDataMap, errorPathMaps] = buildFieldDefinitionMapR({schema: schema});
     const schemaErrorPathMap = errorPathMaps.get('schema');
     const dataErrorPathMap = errorPathMaps.get('data');
     const subSchemaPathMap = errorPathMaps.get('subSchema');
@@ -808,8 +807,6 @@ export function watchForPatches(schema, data, ajv) {
     }
     // console.log(JSON.stringify(schema, null, 2));
     //build root avj schema
-    const checkChangedStatus = isFunction(data.isChanged) && isFunction(data.updateIsChanged);
-
     onPatch(data, patch => {
         const skipPaths = new Set();
         const [normalizedPatchPath, errorPathSubstitutionMap] = getNormalizedPathFromPatchPath(patch.path, subSchemaPathMap);
@@ -823,15 +820,7 @@ export function watchForPatches(schema, data, ajv) {
         }
         if(schemaPath) {
             const schemaPathStr = pathToPatchString(schemaPath);
-            //Check to see if data has changed and update the changedSet then set isChanged to true if changedSet has anything in it
-            if(checkChangedStatus) {
-                if(data.isChanged(ajvStringToPath(patch.path))) {
-                    changedSet.add(patch.path);
-                } else {
-                    changedSet.delete(patch.path);
-                }
-                data.updateIsChanged(changedSet.size !== 0);
-            }
+
             // console.log("OP MAYBE???", schemaPathStr, toJS((data)));
             if(validators.has(schemaPathStr)) {
                 // console.warn(`Observable Patch Detected for ${schemaPathStr}`, patch.path, normalizedPatchPath, patch.op, patch.value);
@@ -857,7 +846,7 @@ export function watchForPatches(schema, data, ajv) {
     const validate = ajv.compile(schema);
     return {
         errors,
-        metaDataMap,
+        fieldMetaDataMap,
         validate: (stateTreeData) => {
             errors.clear();
             if(!validate(stateTreeData)) {

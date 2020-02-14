@@ -1,11 +1,11 @@
 import React from "react";
-import {oneCharAtATime} from "../src/testHelper";
+import {oneCharAtATime} from "./testHelper";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
-import {useObserver} from "mobx-react-lite";
+import {observer} from "mobx-react-lite";
+import {useForm} from "../src";
 
 function SimpleTextBox(props) {
     const [value, change] = useField(props.name);
@@ -19,24 +19,7 @@ function SimpleTextBox(props) {
 }
 
 function DemoForm() {
-    return useSchema(props => {
-        const {ready} = props;
-
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
-
-        return useObserver(() => <div>
-            <div>
-                <span>First Name</span>
-                <SimpleTextBox data-testid="firstName" name="firstName"/>
-            </div>
-            <div>
-                <span>Last Name</span>
-                <SimpleTextBox data-testid="middleName" name="middleName"/>
-            </div>
-        </div>);
-    }, {
+    return useForm({
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",
         actions: formData => ({
@@ -50,7 +33,17 @@ function DemoForm() {
                 formData.alias.splice(idx, 1);
             },
         }),
-    });
+    }, observer(() => <div>
+        <div>
+            <span>First Name</span>
+            <SimpleTextBox data-testid="firstName" name="firstName"/>
+        </div>
+        <div>
+            <span>Last Name</span>
+            <SimpleTextBox data-testid="middleName" name="middleName"/>
+        </div>
+    </div>
+    ));
 }
 
 afterEach(cleanup);

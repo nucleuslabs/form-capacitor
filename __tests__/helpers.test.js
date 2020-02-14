@@ -8,8 +8,8 @@ import {
     isFunction,
     isString,
     isNumber,
-    isMap,
-    isArray,
+    isMapLike,
+    isArrayLike,
     isObject,
     isPlainObject,
     isSymbol,
@@ -26,7 +26,7 @@ import {
     isBoolean,
     isRegExp,
     isDate,
-    isSet,
+    isSetLike,
     isWeakMap,
     isNull,
     isUndefined,
@@ -162,6 +162,7 @@ describe('isIntLoose', function() {
 
 describe('isPromise', function() {
     it('Should be true if it is a Promise or false if it is not', function() {
+        // eslint-disable-next-line promise/param-names
         expect(isPromise(new Promise((resolver) => resolver(true)))).toBeTrue();
         expect(isPromise(String('beef'))).toBeFalse();
         expect(isPromise(new Map())).toBeFalse();
@@ -205,45 +206,45 @@ describe('isDate', function() {
 
 describe('isSet', function() {
     it('Should be true if it is a Map/ObservableMap or false if it is not', function() {
-        expect(isSet(new Set())).toBeTrue();
-        expect(isSet(new Set([["beef", "soup"]]))).toBeTrue();
-        expect(isSet(new ObservableSet([["beef", "soup"]]))).toBeTrue();
-        expect(isSet(new ObservableSet(["soup"]))).toBeTrue();
-        expect(isSet(new ObservableSet([1, 2, 3, 4, "beef"]))).toBeTrue();
-        expect(isSet(String('beef'))).toBeFalse();
-        expect(isSet(() => "beef")).toBeFalse();
-        expect(isSet({})).toBeFalse();
-        expect(isSet(`6335`)).toBeFalse();
-        expect(isSet([1, 2, 3, 4, "beef"])).toBeFalse();
+        expect(isSetLike(new Set())).toBeTrue();
+        expect(isSetLike(new Set([["beef", "soup"]]))).toBeTrue();
+        expect(isSetLike(new ObservableSet([["beef", "soup"]]))).toBeTrue();
+        expect(isSetLike(new ObservableSet(["soup"]))).toBeTrue();
+        expect(isSetLike(new ObservableSet([1, 2, 3, 4, "beef"]))).toBeTrue();
+        expect(isSetLike(String('beef'))).toBeFalse();
+        expect(isSetLike(() => "beef")).toBeFalse();
+        expect(isSetLike({})).toBeFalse();
+        expect(isSetLike(`6335`)).toBeFalse();
+        expect(isSetLike([1, 2, 3, 4, "beef"])).toBeFalse();
     });
 });
 
 describe('isMap', function() {
     it('Should be true if it is a Map/ObservableMap or false if it is not', function() {
-        expect(isMap(new Map())).toBeTrue();
-        expect(isMap(new Map([["beef", "soup"]]))).toBeTrue();
-        expect(isMap(new WeakMap())).toBeTrue();
-        expect(isMap(new ObservableMap([["beef", "soup"]]))).toBeTrue();
-        expect(isMap(new ObservableMap({beef: "soup"}))).toBeTrue();
-        expect(isMap(new ObservableMap([1, 2, 3, 4, "beef"]))).toBeTrue();
-        expect(isMap(String('beef'))).toBeFalse();
-        expect(isMap(() => "beef")).toBeFalse();
-        expect(isMap({})).toBeFalse();
-        expect(isMap(`6335`)).toBeFalse();
-        expect(isMap([1, 2, 3, 4, "beef"])).toBeFalse();
+        expect(isMapLike(new Map())).toBeTrue();
+        expect(isMapLike(new Map([["beef", "soup"]]))).toBeTrue();
+        expect(isMapLike(new WeakMap())).toBeTrue();
+        expect(isMapLike(new ObservableMap([["beef", "soup"]]))).toBeTrue();
+        expect(isMapLike(new ObservableMap({beef: "soup"}))).toBeTrue();
+        expect(isMapLike(new ObservableMap([1, 2, 3, 4, "beef"]))).toBeTrue();
+        expect(isMapLike(String('beef'))).toBeFalse();
+        expect(isMapLike(() => "beef")).toBeFalse();
+        expect(isMapLike({})).toBeFalse();
+        expect(isMapLike(`6335`)).toBeFalse();
+        expect(isMapLike([1, 2, 3, 4, "beef"])).toBeFalse();
     });
 });
 
 describe('isArray', function() {
     it('Should be true if it is an Array/ObservableArray or false if it is not', function() {
-        expect(isArray([])).toBeTrue();
-        expect(isArray([["beef", "soup"]])).toBeTrue();
-        expect(isArray(observable.array([["beef", "soup"]]))).toBeTrue();
-        expect(isArray(observable.array([1, 2, 3, 4, "beef"]))).toBeTrue();
-        expect(isArray(String('beef'))).toBeFalse();
-        expect(isArray(() => "beef")).toBeFalse();
-        expect(isArray({})).toBeFalse();
-        expect(isArray(`6335`)).toBeFalse();
+        expect(isArrayLike([])).toBeTrue();
+        expect(isArrayLike([["beef", "soup"]])).toBeTrue();
+        expect(isArrayLike(observable.array([["beef", "soup"]]))).toBeTrue();
+        expect(isArrayLike(observable.array([1, 2, 3, 4, "beef"]))).toBeTrue();
+        expect(isArrayLike(String('beef'))).toBeFalse();
+        expect(isArrayLike(() => "beef")).toBeFalse();
+        expect(isArrayLike({})).toBeFalse();
+        expect(isArrayLike(`6335`)).toBeFalse();
     });
 });
 

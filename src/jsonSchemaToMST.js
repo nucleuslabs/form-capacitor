@@ -1,13 +1,13 @@
 'use strict';
 // https://github.com/ralusek/jsonschema-to-mobx-state-tree/blob/fe76a08ddfae67652d13f62c015b0d9ab4b7df58/index.js
 
-import Lo from 'lodash';
+import {deburr, upperFirst, camelCase} from 'lodash';
 import {types} from 'mobx-state-tree';
-import {isPlainObject, isArray} from './helpers';
+import {isPlainObject, isArrayLike} from './helpers';
 import MstTypeError from "./MstTypeError";
 
 /* istanbul ignore next */
-const titleCase = str => Lo.deburr(Lo.upperFirst(Lo.camelCase(str)));
+const titleCase = str => deburr(upperFirst(camelCase(str)));
 /* istanbul ignore next */
 const UNDEFINED = 1 << 16;
 /* istanbul ignore next */
@@ -62,8 +62,20 @@ const TYPE_MAP = Object.freeze({
                 parent: node,
                 // depth: meta.depth+1,
             }));
-        } else if(isArray(node.items)) {
-            throw new Error('not implemented');
+        } else if(isArrayLike(node.items)) {
+            if(node.items.length > 0) {
+                const typesArr = node.items.map(item => makeType(item, {
+                    parent: node.items,
+                    // depth: meta.depth+1,
+                }));
+                //currently MST doesn't fully support what we are trying to achieve with
+                // json schema which is defining type for each individual element specifically ...
+                // so we are gonna allow all defined types in the node.items array...
+                // and why not throw in undefined for fun... as we do else where in this function
+                return types.array(types.union(...typesArr, types.undefined));
+            } else {
+                return types.array(types.undefined);
+            }
         }
         throw new Error('array.items must be an object or array');
     },

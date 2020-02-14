@@ -12,14 +12,14 @@ module.exports = {
         globalObject: "this"
     },
     externals: {
-        react: "react",
+        "react": "react",
         "react-dom": "react-dom",
-        mobx: "mobx",
-        "mobx-react": "mobx-react",
+        "mobx": "mobx",
+        "mobx-react-lite": "mobx-react-lite",
         "mobx-state-tree": "mobx-state-tree",
         "json-schema-ref-parser": "json-schema-ref-parser",
-        ajv: "ajv",
-        lodash: "lodash"
+        "ajv": "ajv",
+        "lodash": "lodash"
     },
     module: {
         rules: [

@@ -12,7 +12,6 @@ import {getErrors} from "./errorMapping";
 export default function useFieldErrors(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
-    // console.log(fullPath, context.errorMap, errors);
     return useObserver(() => {
         const errors = getErrors(context.errorMap, fullPath);
         return [errors && errors.length > 0, errors];

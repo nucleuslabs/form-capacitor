@@ -45,7 +45,7 @@ export function minMax(title, min, max, xMin, xMax) {
             return {minimum: str, maximum: str};
         }
     } else if(min !== undefined && xMax !== undefined) {
-        const str = `${title} must be a ${min.toString()} or more but less than ${xMax.toString()}`;
+        const str = `${title} must be ${min.toString()} or more but less than ${xMax.toString()}`;
         return {minimum: str, exclusiveMaximum: str};
     } else if(xMin !== undefined && max !== undefined) {
         const str = `${title} must be greater than ${xMin.toString()} to a maximum of ${max.toString()}`;
@@ -58,7 +58,7 @@ export function minMax(title, min, max, xMin, xMax) {
     } else if(max !== undefined) {
         return {maximum: `${title} must be ${max.toString()} or less`};
     } else if(xMin !== undefined) {
-        return {exclusiveMinimum: `${title} must more than ${xMin.toString()}`};
+        return {exclusiveMinimum: `${title} must be more than ${xMin.toString()}`};
     } else if(xMax !== undefined) {
         return {exclusiveMaximum: `${title} must be less than ${xMax.toString()}`};
     } else {

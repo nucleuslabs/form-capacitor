@@ -1,12 +1,12 @@
-import useSchema from "../src/useSchema";
 import jsonSchema from "./demo-form";
 import {render, wait, cleanup} from "@testing-library/react";
 import React, {useState} from "react";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
 import useArrayField from "../src/useArrayField";
-import {useObserver} from "mobx-react-lite";
+import {observer} from "mobx-react-lite";
 import {getFlattenedErrors} from "../src/errorMapping";
+import {useForm, useFormContext} from "../src";
 
 function SimpleTextBox(props) {
     const [value, change, {required}] = useField(props.name);
@@ -27,13 +27,20 @@ function Alias(props) {
 }
 
 function DemoForm() {
-    return useSchema(props => {
+    return useForm({
+        schema: jsonSchema,
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+            alias: [{}]
+        },
+    }, observer(() => {
         const [valid, setValid] = useState('Unknown');
-        const {set, ready, validate, errorMap} = props;
+        const {set, ready, validate, errorMap} = useFormContext();
         if(!ready) {
             return <div>Loading...</div>;
         }
-        return useObserver(() => <div>
+        return <div>
             <div>
                 <span>First Name</span>
                 <SimpleTextBox data-testid="firstName" name="firstName"/>
@@ -64,15 +71,8 @@ function DemoForm() {
             {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
             <div data-testid="valid">{valid}</div>
             {valid !== 'Unknown' && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}
-        </div>);
-    }, {
-        schema: jsonSchema,
-        $ref: "#/definitions/DemoForm",
-        default: {
-            lastName: "Bar",
-            alias: [{}]
-        },
-    });
+        </div>;
+    }));
 }
 
 afterEach(cleanup);

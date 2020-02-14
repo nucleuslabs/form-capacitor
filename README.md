@@ -5,13 +5,12 @@ This project makes use of mobx / mobx-state-tree for state management and AJV fo
 
 Use json-schema to define the state and validation rules for your form then use a few simple Hooks to setup your form state management and validation.
 
-
 **Project Status: Mostly Harmless**
 
 The @latest version of this project now has reasonable test coverage using some complex form samples with react-testing-library and will soon be considered stable.
 
 **Pros:**
-1. It is Fast - Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields
+1. It is Fast... - Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields
 2. Supports big complex forms and works well with repeatable dynamic input collections
 3. Supports nth level nesting and grouping
 4. Has pretty error messages
@@ -29,6 +28,8 @@ The @latest version of this project now has reasonable test coverage using some 
 5. For complex state with deep tree structures you have to either specify the full path in the name of a Consumer Component which employs path separation using the '.' character i.e "demographicInfo.homeAddress.postalCode" for each input or wrap them in a `<SubScehma path={name}>` which will set the proper paths in context. (if you can think of a magical way to propagate paths without wrapping please submit a pull request)
 
 ## Usage
+
+This is has changed considerably and I will be working on rewriting the docs soon.
 
 ### Helper methods
 These are the core methods that are used to interact with the underlying mobx-state-tree. Also a function that can help formating error messages.  
@@ -542,20 +543,11 @@ imperative validation on submit or change in focus or whatever.
 
 ### Errors
 
-Errors can be managed at the consumer/input level via props.fc.hasErrors/props.fc.errors 
+Errors can be managed at the consumer/input level via `useFieldErrors` 
 or at the form provider level via the props.errorMap observable map tree. 
 The`getFlattenedErrors` function included in form-capacitor will turn errorMap Tree 
 into a flat array of error objects.    
 
-## Why did we develop another form state / validation management library?
-
-We have used formik and redux-forms which are great form state 
-management libraries with many features and they make managing forms 
-much easier but the complexity and amount of fields in the forms we were using for medical applications
-caused too many performance issues due to the fact that full form state updates were causing re-renders 
-as you type in text areas and text inputs.
-We decided to make a generic form library that could handle re-renders using a mobx-state-tree.
-We also wanted to use standard validation syntax between front-end and back-end using json-schema.       
 
 ## Testing
 

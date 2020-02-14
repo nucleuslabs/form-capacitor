@@ -1,4 +1,4 @@
-import {getValue, isArray, isObject, isString} from "./helpers";
+import {getValue, isArrayLike, isObject, isString} from "./helpers";
 import {
     requiredKeyword,
     typeKeyword,
@@ -41,7 +41,16 @@ export function setStringLengthErrorMessage(schema) {
  */
 export function setNumberRangeErrorMessage(schema) {
     if(schema.minimum !== undefined || schema.maximum !== undefined || schema.exclusiveMinimum !== undefined || schema.exclusiveMaximum !== undefined) {
-        schema.errorMessage = getMergedErrorMessage(minMax(schema.title, schema.minimum, schema.maximum, schema.exclusiveMinimum, schema.exclusiveMaximum), schema.errorMessage);
+        schema.errorMessage = getMergedErrorMessage(
+            minMax(
+                schema.title,
+                schema.minimum,
+                schema.maximum,
+                schema.exclusiveMinimum,
+                schema.exclusiveMaximum
+            ),
+            schema.errorMessage
+        );
     }
 }
 
@@ -89,10 +98,16 @@ export function setDependenciesErrorMessage(deps, parentSchema) {
     for(let [level1DepName, level2DepSet] of flippedDependencies) {
         const level1Title = getSetDepTitle(level1DepName, depTitleMap, parentSchema);
         const schema = getValue(parentSchema, ["properties", level1DepName]);
-        schema.errorMessage = getMergedErrorMessage({dependencies: dependenciesKeyword(level1Title, Array.from(level2DepSet).map(level2DepName => getSetDepTitle(level2DepName, depTitleMap, parentSchema)))}, schema.errorMessage);
+        schema.errorMessage = getMergedErrorMessage(
+            {
+                dependencies: dependenciesKeyword(
+                    level1Title,
+                    Array.from(level2DepSet).map(level2DepName => getSetDepTitle(level2DepName, depTitleMap, parentSchema))
+                )
+            },
+            schema.errorMessage
+        );
     }
-    // console.log(JSON.stringify(deps));
-    // console.log(flippedDependencies);
 }
 
 /**
@@ -145,9 +160,9 @@ export function setAnyOfErrorMessages(anyOfSchema, parentSchema) {
             switch(keyword) {
                 case 'required':
                     if(acc.has(keyword)) {
-                        acc.get(keyword).push(schema.required);
+                        acc.get(keyword).push([...schema.required]);
                     } else {
-                        acc.set(keyword, [schema.required]);
+                        acc.set(keyword, [[...schema.required]]);
                     }
                     break;
                 case 'type':
@@ -179,9 +194,6 @@ export function setAnyOfErrorMessages(anyOfSchema, parentSchema) {
 }
 
 /**
- * This function has a bunch of commented code because there are several ways to determine
- * where anyOf required messages should go and it may change in the future
- *
  * @param {[]} requiredFields
  * @param {{}} parentSchema
  * @param {{}} anyOfSchema
@@ -206,7 +218,7 @@ export function setAllOfErrorMessages(allOfSchema, parentSchema) {
             switch(keyword) {
                 case 'required':
                     if(acc.has(keyword)) {
-                        acc.get(keyword).push([...schema.required]);
+                        acc.get(keyword).push(...schema.required);
                     } else {
                         acc.set(keyword, [...schema.required]);
                     }
@@ -331,7 +343,7 @@ function setAllErrorMessagesR(schema, parentSchema){
                 break;
             case 'array':
                 setArrayLengthErrorMessage(schema);
-                if(isArray(schema.items)) {
+                if(isArrayLike(schema.items)) {
                     schema.items.forEach(item => {
                         setAllErrorMessagesR(item, schema);
                     });

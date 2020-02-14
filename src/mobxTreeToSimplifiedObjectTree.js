@@ -1,30 +1,39 @@
-/**
- * This function takes in a mobxStateTree and Returns an object that is first passded through the mobx toJS function (https://mobx.js.org/refguide/tojson.html)
- * and then all empty arrays and empty objects are replaced with undefined so that AJV anyOF's, required and dependencies keywords
- * work in a more logical fashion.
- * @param mst
- */
 import {toJS} from "mobx";
+import {isPlainObject} from "./helpers";
 
 /**
- * This will recursively trim undefined branches and return a trimmed tree or an empty object
+ * This function takes in a mobxStateTree and Returns an object that is first passed through the mobx toJS function (https://mobx.js.org/refguide/tojson.html)
+ * and then all empty array like structures and empty objects are replaced with undefined so that AJV anyOF's, required and dependencies keywords
+ * don't get tripped up on empty objects and arrays which evaluated as something and will cause errors even though they do not have any data in them.
+ * Basically mobxTreeToSimplifiedObjectTree allows the mobx-state-tree to stay strongly typed and json-schema to handle required and dependency logic properly by converting empty things into undefined
  *
- * @param {*} mst
- * @returns {Map<any, any> | Set<unknown> | * | {}}
+ * @param {any} mst
+ * @returns {any}
  */
 export default function mobxTreeToSimplifiedObjectTree(mst) {
     const js = toJS(mst);
     return replaceEmptyObjectPropertiesAndArraysWithUndefinedR(js) || {};
 }
 
+/**
+ * This function does very specific tree trimming on purpose for reasons listed in mobxTreeToSimplifiedObjectTree above:
+ *  - Reduces all arrays,maps,sets that are either completely empty or only contain undefined elements into undefined
+ *  - Reduces all maps that are either completely empty or only contain undefined elements into undefined
+ *  - Reduces objects which have no elements to undefined
+ *  - Keeps all other things
+ *
+ * @param {any} obj
+ * @returns {{}|undefined|*}
+ */
 /* istanbul ignore next */
 function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
     if(Array.isArray(obj)) {
         if(obj.length === 0) {
             return undefined;
         } else {
-            const newArr = obj.map(replaceEmptyObjectPropertiesAndArraysWithUndefinedR).filter(value => value !== undefined);
-            return newArr.length === 0 ? undefined : newArr;
+            const newArr = obj.map(replaceEmptyObjectPropertiesAndArraysWithUndefinedR);
+            const justDefinedArr = newArr.filter(value => value !== undefined);
+            return justDefinedArr.length === 0 ? undefined : newArr;
         }
     } else if(obj instanceof Map || obj instanceof WeakMap) {
         if(obj.size === 0) {
@@ -34,7 +43,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
             obj.forEach((value, key) => {
                 const newItem = replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value);
                 if(newItem !== undefined) {
-                    map.set(key, replaceEmptyObjectPropertiesAndArraysWithUndefinedR(value));
+                    map.set(key, newItem);
                 }
             });
             return map.size === 0 ? undefined : map;
@@ -52,7 +61,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
             });
             return set.size === 0 ? undefined : set;
         }
-    } else if(Object.prototype.toString.call(obj) === "[object Object]") {
+    } else if(isPlainObject(obj)) {
         const keys = Object.keys(obj);
         if(!keys || keys.length === 0) {
             return undefined;

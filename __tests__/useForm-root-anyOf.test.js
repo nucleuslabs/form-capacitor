@@ -2,13 +2,14 @@ import React, {useState} from "react";
 import jsonSchema from "./demo-form.json";
 import anyOfArrayJsonSchema from "./anyOf-array-form";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
 import useArrayField from "../src/useArrayField";
-import {useObserver} from "mobx-react-lite";
+import {observer} from "mobx-react-lite";
 import {toJS} from "mobx";
-import {getFlattenedErrors} from "../src/errorMapping";
+import useFormData from "../src/useFormData";
+import useFormErrors from "../src/useFormErrors";
+import {useForm, useFormActions} from "../src";
 
 
 function SimpleTextBox(props) {
@@ -29,67 +30,8 @@ function Alias(props) {
     </ul>;
 }
 
-/**
- * @return {null|{}}
- */
 function DemoForm() {
-    return useSchema(props => {
-        const [valid, setValid] = useState('Unknown');
-        const [errs, setErrors] = useState([]);
-        const {validate, set, ready, errorMap, formData} = props;
-        if(!ready) {
-            return null;
-        }
-        return useObserver(() =>
-            <div>
-                <div>
-                    <span>First Name</span>
-                    <SimpleTextBox data-testid="firstName" name="firstName"/>
-                </div>
-                <div>
-                    <span>Middle Name</span>
-                    <SimpleTextBox data-testid="middleName" name="middleName"/>
-                </div>
-                <div>
-                    <span>AKA</span>
-                    <SimpleTextBox data-testid="aka" name="aka"/>
-                </div>
-                <div>
-                    <span>Last Name</span>
-                    <SimpleTextBox data-testid="lastName" name="lastName"/>
-                </div>
-                <Alias name={'alias'}/>
-                <div>
-                    <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
-                    <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
-                    <button data-testid="fail" onClick={() => {
-                        set({
-                            firstName: "Fail",
-                            middleName: "Sauce",
-                            lastName: undefined,
-                            aka: undefined
-                        });
-                    }}>Set All The Things
-                    </button>
-                    <button data-testid="v" onClick={() => {
-                        if(validate()) {
-                            setValid("VALID");
-                            setErrors([]);
-                        } else {
-                            setValid("INVALID");
-                            setErrors(getFlattenedErrors(errorMap));
-                        }
-                    }}>Validate
-                    </button>
-                </div>
-                <div data-testid="valid">{valid}</div>
-                <div data-testid="errors">{errs.length > 0 && errs.map(e => e.message)}</div>
-                <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="emap">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
-                <div data-testid="weird">{typeof formData.lastName}</div>
-                <div data-testid="science">{formData.lastName}</div>
-            </div>
-        );
-    }, {
+    return useForm({
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",
         actions: formData => ({
@@ -103,7 +45,59 @@ function DemoForm() {
                 formData.alias.splice(idx, 1);
             },
         })
-    });
+    }, observer(() => {
+        const [valid, setValid] = useState('Unknown');
+        const formData = useFormData();
+        const [hasErrors, errors] = useFormErrors();
+        const {validate, set} = useFormActions();
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+            <div>
+                <span>Middle Name</span>
+                <SimpleTextBox data-testid="middleName" name="middleName"/>
+            </div>
+            <div>
+                <span>AKA</span>
+                <SimpleTextBox data-testid="aka" name="aka"/>
+            </div>
+            <div>
+                <span>Last Name</span>
+                <SimpleTextBox data-testid="lastName" name="lastName"/>
+            </div>
+            <Alias name={'alias'}/>
+            <div>
+                <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
+                <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
+                <button data-testid="fail" onClick={() => {
+                    set({
+                        firstName: "Fail",
+                        middleName: "Sauce",
+                        lastName: undefined,
+                        aka: undefined
+                    });
+                }}>Set All The Things
+                </button>
+                <button data-testid="v" onClick={() => {
+                    if(validate()) {
+                        setValid("VALID");
+                    } else {
+                        setValid("INVALID");
+                    }
+                }}>Validate
+                </button>
+            </div>
+            <div data-testid="valid">{valid}</div>
+            <div data-testid="errors">{hasErrors && errors.map(e => e.message)}</div>
+            <div data-testid="errorMapContainer">{hasErrors &&
+            <ul data-testid="emap">{hasErrors && errors.map((e, eIdx) => <li
+                key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+            <div data-testid="weird">{typeof formData.lastName}</div>
+            <div data-testid="science">{formData.lastName}</div>
+        </div>;
+    }));
 }
 
 function TextBoxArray({name}) {
@@ -126,27 +120,21 @@ function TextBoxArray({name}) {
 }
 
 function AnyOfArrayForm() {
-    return useSchema(props => {
-        const {ready} = props;
-        if(!ready) {
-            return null;
-        }
-        return useObserver(() =>
-            <div>
-                <div>
-                    <span>Alias</span>
-                    <TextBoxArray name="alias"/>
-                </div>
-                <div>
-                    <span>Alias 2</span>
-                    <TextBoxArray name="alias2"/>
-                </div>
-            </div>
-        );
-    }, {
+    return useForm({
         schema: anyOfArrayJsonSchema,
         $ref: "#/definitions/AnyOfArrayForm"
-    });
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>Alias</span>
+                <TextBoxArray name="alias"/>
+            </div>
+            <div>
+                <span>Alias 2</span>
+                <TextBoxArray name="alias2"/>
+            </div>
+        </div>;
+    }));
 }
 
 

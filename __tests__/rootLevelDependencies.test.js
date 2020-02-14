@@ -1,14 +1,10 @@
 import React, {useState} from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
-import useField from "../src/useField";
-import useFieldErrors from "../src/useFieldErrors";
-import useArrayField from "../src/useArrayField";
-import {useObserver} from "mobx-react-lite";
-import SubSchema from "../src/SubSchema";
+import {observer} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
+import {FormSubNode, useForm, useFormContext, useFieldErrors, useArrayField, useField} from "../src";
 
 function SimpleTextBox(props) {
     const [value, change] = useField(props.name);
@@ -29,7 +25,7 @@ function Alias(props) {
 }
 
 function AllOrNothing ({name}){
-    return <SubSchema path={name}>
+    return <FormSubNode path={name}>
         <div>
             <span>Thing 1</span>
             <SimpleTextBox data-testid="aonthing1" name="aonthing1"/>
@@ -42,18 +38,34 @@ function AllOrNothing ({name}){
             <span>Thing 3</span>
             <SimpleTextBox data-testid="aonthing3" name="aonthing3"/>
         </div>
-    </SubSchema>;
+    </FormSubNode>;
 }
 
 function DemoForm() {
-    return useSchema(props => {
-        const {formData, validate, ready, hasErrors, errorMap} = props;
+    return useForm({
+        schema: jsonSchema,
+        $ref: "#/definitions/DemoForm",
+        default: {
+            firstName: "Foo",
+            middleName: "J",
+            lastName: "Bar"
+        },
+        actions: formData => ({
+            addAlias(alias) {
+                formData.alias.push({alias: alias});
+            },
+            clearAliases() {
+                formData.alias.length = 0;
+            },
+            spliceAlias(idx) {
+                formData.alias.splice(idx, 1);
+            },
+        }),
+    }, observer(() => {
+        const {stateTree: formData, validate, status, errorMap} = useFormContext();
         const [valid, setValid] = useState('Unknown');
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
 
-        return useObserver(() => <div>
+        return <div>
             <div>
                 <span>First Name</span>
                 <SimpleTextBox data-testid="firstName" name="firstName"/>
@@ -88,28 +100,9 @@ function DemoForm() {
             </div>
             {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
             <div data-testid="valid">{valid}</div>
-            <div data-testid="errorMapContainer">{hasErrors() && <ul data-testid="errors">{getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
-        </div>);
-    }, {
-        schema: jsonSchema,
-        $ref: "#/definitions/DemoForm",
-        default: {
-            firstName: "Foo",
-            middleName: "J",
-            lastName: "Bar"
-        },
-        actions: formData => ({
-            addAlias(alias) {
-                formData.alias.push({alias: alias});
-            },
-            clearAliases() {
-                formData.alias.length = 0;
-            },
-            spliceAlias(idx) {
-                formData.alias.splice(idx, 1);
-            },
-        }),
-    });
+            <div data-testid="errorMapContainer">{status.hasErrors && <ul data-testid="errors">{getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+        </div>;
+    }));
 }
 
 afterEach(cleanup);

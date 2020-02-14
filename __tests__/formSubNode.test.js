@@ -1,12 +1,8 @@
 import React from "react";
-import jsonSchema from "./demo-form.json";
+// import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
-import useArrayField from "../src/useArrayField";
-import useFieldErrors from "../src/useFieldErrors";
-import useField from "../src/useField";
-import {useObserver} from "mobx-react-lite";
-import SubSchema from "../src/SubSchema";
+import {FormSubNode, useForm, useField, useFieldErrors, useArrayField} from "../src";
+import {observer} from "mobx-react-lite";
 
 function SimpleTextBox(props) {
     const [value, change] = useField(props.name);
@@ -20,40 +16,34 @@ function SimpleTextBox(props) {
 }
 
 function TextBoxContainer({name}) {
-    return <SubSchema path={name}><SimpleTextBox data-testid={`alias${name}`} name={'alias'}/></SubSchema>;
+    return <FormSubNode path={name}><SimpleTextBox data-testid={`alias${name}`} name={'alias'}/></FormSubNode>;
 }
 
 function TextBoxArray({name}) {
     const [value, {push}] = useArrayField(name);
 
-    return <SubSchema path={name}>
+    return <FormSubNode path={name}>
         <div>
             <div data-testid="alias">
                 {value.map((inst, key) => <TextBoxContainer key={key} name={`${key}`}/>)}
             </div>
             <button onClick={() => push({alias: "Joe"})}>+</button>
         </div>
-    </SubSchema>;
+    </FormSubNode>;
 }
 
 function DemoForm() {
-    return useSchema(props => {
-        const {ready} = props;
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
-        return useObserver(() => <div>
-            Aliases: <TextBoxArray name="alias"/>
-        </div>);
-    }, {
-        schema: jsonSchema,
+    return useForm({
+        schema: require('./demo-form.json'),
         $ref: "#/definitions/DemoForm",
         default: {
             firstName: "Foo",
             lastName: "Bar",
             alias: []
         }
-    });
+    }, observer(() => <div>
+        Aliases: <TextBoxArray name="alias"/>
+    </div>));
 }
 
 afterEach(cleanup);

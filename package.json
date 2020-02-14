@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.67",
+  "version": "0.2.69",
   "description": "Form manager for React using json-schema, mobx observables, ajv validation and Hooks",
   "browser": "web",
   "main": "dist/index.js",
@@ -9,11 +9,14 @@
     "form",
     "state",
     "manager",
+    "errors",
     "validation",
     "react",
     "json-schema",
     "ajv",
     "mobx",
+    "mobx-state-tree",
+    "formik",
     "library"
   ],
   "contributors": [
@@ -37,8 +40,6 @@
   "license": "MIT",
   "peerDependencies": {
     "ajv": "^6",
-    "json-schema-ref-parser": "^7",
-    "lodash": "^4",
     "mobx": "^4",
     "mobx-react-lite": "^1",
     "mobx-state-tree": "^3",
@@ -91,6 +92,9 @@
     "lint": "node_modules/.bin/eslint src/ --ext .js --format 'node_modules/eslint-codeframe-formatter'"
   },
   "jest": {
+    "testMatch": [
+      "**/__tests__/**/*.(spec|test).[jt]s?(x)"
+    ],
     "setupFilesAfterEnv": [
       "jest-extended"
     ],

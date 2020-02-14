@@ -1,12 +1,9 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
-import useField from "../src/useField";
-import useFieldErrors from "../src/useFieldErrors";
-
-import useArrayField from "../src/useArrayField";
-import {useObserver} from "mobx-react-lite";
+import {observer} from "mobx-react-lite";
+import {useForm, useFormStatus, useField, useFieldErrors, useArrayField} from "../src";
+import useFormContext from "../src/useFormContext";
 
 function SimpleTextBox(props) {
     const [value, change] = useField(props.name);
@@ -15,7 +12,8 @@ function SimpleTextBox(props) {
         <input type="text" {...props} className={hasErrors ? "error" : null} value={value || ""} onChange={ev => {
             change(ev.target.value || undefined);
         }}/>
-        {hasErrors && <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}
+        <div data-testid={`${props.name}_errors`}>{hasErrors &&
+        <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}</div>
     </span>;
 }
 
@@ -32,46 +30,23 @@ function Name(props) {
     return <div data-testid={`${props.name}Display`}>{name}</div>;
 }
 
+function StatusContainer() {
+    const status = useFormStatus();
+    return <div>
+        <div data-testid="dirty">{status.isDirty && 'dirty'}</div>
+        <div data-testid="changed">{status.isChanged && 'changed'}</div>
+    </div>;
+}
+
 function DemoForm() {
-    return useSchema(props => {
-        const {formData, formStatus, set, reset, ready} = props;
-
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
-
-        return useObserver(() => <div>
-            <div>
-                <span>First Name</span>
-                <SimpleTextBox data-testid="firstName" name="firstName"/>
-            </div>
-            <div>
-                <span>Last Name</span>
-                <SimpleTextBox data-testid="lastName" name="lastName"/>
-            </div>
-            <Alias name={"alias"}/>
-            <div data-testid="pepsi">{formData.firstName}</div>
-            <div data-testid="coke">{formData.lastName}</div>
-            <div data-testid="dirty">{formStatus.isDirty && 'dirty'}</div>
-            <div data-testid="changed">{formStatus.isChanged && 'changed'}</div>
-            <Name name={'lastName'}/>
-            <Name name={'firstName'}/>
-            <div>
-                <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
-                <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
-                <button data-testid="ba" onClick={() => set("alias", [{alias: 'Charlie'}, {alias: 'Roger'}])}>Set Aliases</button>
-                <button data-testid="ba2" onClick={() => formData.addAlias('Jack')}>Set Aliases</button>
-                <button data-testid="breset" onClick={() => reset()}>Reset</button>
-                <button data-testid="breplace" onClick={() => set({firstName: "Doge"})}>Replace</button>
-            </div>
-        </div>);
-    }, {
+    return useForm({
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",
         default: {
             lastName: "Bar",
             alias: []
         },
+        Loader: <div>Loading Nice Things...</div>,
         actions: formData => ({
             addAlias(alias) {
                 formData.alias.push({alias: alias});
@@ -83,12 +58,40 @@ function DemoForm() {
                 formData.alias.splice(idx, 1);
             },
         }),
-    });
+    }, observer(() => {
+        const {stateTree: formData, reset, set} = useFormContext();
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+            <div>
+                <span>Last Name</span>
+                <SimpleTextBox data-testid="lastName" name="lastName"/>
+            </div>
+            <StatusContainer/>
+            <Alias name={"alias"}/>
+            <div data-testid="pepsi">{formData.firstName}</div>
+            <div data-testid="coke">{formData.lastName}</div>
+            <Name name={'lastName'}/>
+            <Name name={'firstName'}/>
+            <div>
+                <button data-testid="bfn" onClick={() => set("firstName", "Joe")}>Set First Name</button>
+                <button data-testid="bln" onClick={() => set("lastName", "Dirt")}>Set Last Name</button>
+                <button data-testid="ba" onClick={() => set("alias", [{alias: 'Charlie'}, {alias: 'Roger'}])}>Set
+                    Aliases
+                </button>
+                <button data-testid="ba2" onClick={() => formData.addAlias('Jack')}>Set Aliases</button>
+                <button data-testid="breset" onClick={() => reset()}>Reset</button>
+                <button data-testid="breplace" onClick={() => set({firstName: "Doge"})}>Replace</button>
+            </div>
+        </div>;
+    }));
 }
 
 afterEach(cleanup);
 
-test("The Set First Name button should set the first name to \"Joe\"", async () => {
+test("The Set First Name button should set the first name to \"Joe\"", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
     await wait(() => getByTestId("lastName"));
@@ -96,6 +99,14 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
     expect(getByTestId("dirty").innerHTML).toBe('');
     expect(getByTestId("changed").innerHTML).toBe('');
     expect(getByTestId("firstName").value).toBe('');
+
+    fireEvent.click(getByTestId("bfn"));
+
+    expect(getByTestId("firstName").value).toBe('Joe');
+
+    fireEvent.change(getByTestId("firstName"), {target: {value: ""}});
+
+    expect(getByTestId("firstName_errors").childNodes.length).toBe(1);
 
     fireEvent.click(getByTestId("bfn"));
 
@@ -137,6 +148,5 @@ test("The Set First Name button should set the first name to \"Joe\"", async () 
     fireEvent.click(buttonReset);
 
     expect(getByTestId("lastName").value).toBe('Bar');
-
 
 });

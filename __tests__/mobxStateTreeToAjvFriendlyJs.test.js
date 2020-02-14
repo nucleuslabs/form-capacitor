@@ -6,8 +6,6 @@ import {watchForPatches, createAjvObject} from "../src/validation";
 import mobxTreeToSimplifiedObjectTree from "../src/mobxTreeToSimplifiedObjectTree";
 import {destroy} from "mobx-state-tree";
 
-
-
 describe('In Regards to data converted by mobxStateTreeToAjvFriendlyJs', function() {
     it('It should convert empty arrays, maps and objects to undefined and leave every other variable as is.', async function() {
         const parser = new $RefParser();
@@ -32,9 +30,6 @@ describe('In Regards to data converted by mobxStateTreeToAjvFriendlyJs', functio
         mobxStateTree.set("lastName", "World");
         mobxStateTree.set("middleName", "MF");
         const testTree = mobxTreeToSimplifiedObjectTree(mobxStateTree);
-        for(let i=0;i<100;i++){
-            //here to give a few cycles for stuff to happen
-        }
         expect(mobxTreeToSimplifiedObjectTree(mobxStateTree.contacts[0])).toEqual({});
         expect(testTree.firstName).toEqual("Hello");
         expect(testTree.alias).toBeUndefined();

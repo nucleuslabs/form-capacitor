@@ -1,6 +1,6 @@
 import stringToPath from './stringToPath';
 // import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray,isObservableMap, set as mobSet} from 'mobx';
-import {isBoxedObservable, isObservable, observable, isObservableProp, isObservableObject, isObservableArray, isObservableMap, isObservableSet, toJS} from 'mobx';
+import {isBoxedObservable, isObservable, observable, isObservableProp, isObservableObject, isObservableArray, isObservableMap, isObservableSet} from 'mobx';
 
 // export function setDefaults(obj, defaults, overwrite) {
 //     for(let key of Object.keys(defaults)) {
@@ -25,65 +25,140 @@ export const EMPTY_SET = Object.freeze(new Set);
  * @returns {*} The value passed in or the result of calling the function
  */
 export function resolveValue(functionOrValue, ...args) {
-    return typeof functionOrValue === 'function' ? functionOrValue.call(this, ...args) : functionOrValue;
+    return isFunction(functionOrValue) ? functionOrValue.call(this, ...args) : functionOrValue;
 }
 
+/**
+ * returns only true if obj is a core js functions not user created js functions
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isNativeFunction(obj) {
     return isFunction(obj) && obj.toString().endsWith('{ [native code] }');
 }
 
+/**
+ * returns true if obj is a function
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isFunction(obj) {
     return typeof obj === 'function';
 }
 
+/**
+ * returns true if object is a string
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isString(obj) {
     return typeof obj === 'string' || obj instanceof String;
 }
 
+/**
+ * returns true if object is a number
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isNumber(obj) {
     return typeof obj === 'number' || obj instanceof Number;
 }
 
+/**
+ * returns true if obj is a promise
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isPromise(obj) {
     return obj instanceof Promise;
 }
 
+/**
+ * returns true if obj is strictly either true or false
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isBoolean(obj) {
     return obj === true || obj === false; // there's also a `Boolean` type but it doesn't behave much like a boolean
 }
 
+/**
+ * returns true if obj is a regular expression
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isRegExp(obj) {
     return obj instanceof RegExp;
 }
 
+/**
+ * returns true if obj is a native JS date object
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isDate(obj) {
     return obj instanceof Date;
 }
 
-export function isSet(obj) {
+/**
+ * returns true if obj is a Set or an ObservableSet
+ * @param {any} obj
+ * @returns {boolean}
+ */
+export function isSetLike(obj) {
     return obj instanceof Set || isObservableSet(obj);
 }
 
-export function isMap(x) {
-    return isObservableMap(x) || x instanceof Map || x instanceof WeakMap;
+/**
+ * returns true if obj is a Map, a WeakMap or an ObservableMap
+ * @param {any} obj
+ * @returns {boolean}
+ */
+export function isMapLike(obj) {
+    return obj instanceof Map || obj instanceof WeakMap || isObservableMap(obj);
 }
 
-export function isArray(x) {
-    return isObservableArray(x) || Array.isArray(x);
+/**
+ * returns true if obj is an Array or an ObservableArray
+ * @param {any} obj
+ * @returns {boolean}
+ */
+export function isArrayLike(obj) {
+    return Array.isArray(obj) || isObservableArray(obj);
 }
 
+/**
+ * returns true if obj is an Object
+ * @param {{}} obj
+ * @returns {boolean|boolean}
+ */
 export function isObject(obj) {
     return obj !== null && typeof obj === 'object';
 }
 
+/**
+ * returns true if obj is a WeakMap
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isWeakMap(obj) {
     return obj instanceof WeakMap;
 }
 
+/**
+ * returns true if obj is null
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isNull(obj) {
     return obj === null;
 }
 
+/**
+ * returns true if obj is undefined
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isUndefined(obj) {
     return obj === undefined;
 }
@@ -98,31 +173,60 @@ export function isNullish(obj) {
     return obj === null || obj === undefined;
 }
 
+/**
+ * returns true if obj is a POJO
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isPlainObject(obj) {
-    return isObject(obj) && (obj.constructor === Object // obj = {}
-        || obj.constructor === undefined // obj = Object.create(null)
-    );
+    return Object.prototype.toString.call(obj) === "[object Object]";
 }
 
+/**
+ * returns true if obj is a Symbol Object
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isSymbol(obj) {
     return typeof obj === 'symbol';
 }
 
+/**
+ * returns true if obj is an Error
+ * @param {any} obj
+ * @returns {boolean}
+ */
 export function isError(obj) {
     return obj instanceof Error;
 }
 
+/**
+ * returns true if the obj is either a string that looks like an int or an actual int
+ * @param {any} obj
+ * @returns {boolean}
+ */
 /* istanbul ignore next */
 export function isIntLoose(obj) {
     return (typeof obj === 'string' && /^(0|[1-9][0-9]*)$/.test(obj))
         || (Number.isFinite(obj) && ~~obj === obj);
 }
 
+/**
+ * returns true if the obj is an int
+ * @param {any} obj
+ * @returns {boolean|boolean}
+ */
 /* istanbul ignore next */
 export function isInt(obj) {
     return (typeof obj === 'number') && (Number.isFinite(obj) && ~~obj === obj);
 }
 
+/**
+ * sets a value in obj given a path compatible with observable objects and arrays
+ * @param {{}} obj
+ * @param {string|string[]} path
+ * @param {any} value
+ */
 export function setValue(obj, path, value) {
     if(!isObject(obj)) {
         throw new Error(`Cannot set property of non-object`);
@@ -155,17 +259,22 @@ export function setValue(obj, path, value) {
             if(!isObservableProp(obj, key)) {
                 throw new Error(`Property '${path.slice(0, i + 1).join('.')}' is not observable`);
             }
-        } else if(isObservableArray(obj)) {
-            // good
-        } else {
+        } else if(!isObservableArray(obj)) {
             throw new Error(`Cannot add property '${path.slice(0, i + 1).join('.')}' to non-observable`);
         }
         obj = obj[key];
     }
     // console.log('setting',obj,'@',path[end],'to',value);
-    setProperty(obj, path[end], typeof value === 'function' ? value(obj[path[end]]) : value);
+    setProperty(obj, path[end], isFunction(value) ? value(obj[path[end]]) : value);
 }
 
+/**
+ * Sets a value for a given path in an ObservableMap
+ * @param {Map} map
+ * @param {string|string[]} path
+ * @param {any} value
+ * @returns {*}
+ */
 export function setMap(map, path, value) {
     if(!isObservableMap(map)) {
         throw new Error(`setMap only works on observable maps`);
@@ -190,6 +299,13 @@ export function setMap(map, path, value) {
     return map;
 }
 
+/**
+ * returns a value from an ObservableMap at given path or def
+ * @param {Map} map
+ * @param {string|string[]} path
+ * @param {any} def default value
+ * @returns {*}
+ */
 export function getMap(map, path, def) {
     if(!isObservableMap(map)) {
         throw new Error(`getMap only works on observable maps`);
@@ -209,6 +325,14 @@ export function getMap(map, path, def) {
     return map;
 }
 
+/**
+ * Sets or deletes a value in a map depending on the condition expression
+ * @param {Map} map
+ * @param {expression} condition
+ * @param {string|string[]} path
+ * @param {any} value
+ * @returns {boolean}
+ */
 export function setOrDel(map, condition, path, value) {
     if(condition) {
         setMap(map, path, value);
@@ -219,6 +343,12 @@ export function setOrDel(map, condition, path, value) {
     }
 }
 
+/**
+ * deletes node from an ObservableMap
+ * @param {Map} map
+ * @param {string|string[]} path
+ * @returns {boolean}
+ */
 export function delMap(map, path) {
     if(!isObservableMap(map)) {
         throw new Error(`delMap only works on observable maps`);
@@ -230,6 +360,12 @@ export function delMap(map, path) {
     return delMapR(map, path);
 }
 
+/**
+ * recursively deletes nodes from an ObservableMap
+ * @param {Map} map
+ * @param {string|string[]} path
+ * @returns {boolean}
+ */
 /* istanbul ignore next */
 function delMapR(map, path) {
     if(path.length > 1) {
@@ -246,6 +382,12 @@ function delMapR(map, path) {
     return false;
 }
 
+/**
+ * sets properties within ObservableArrays and ObservableObjects
+ * @param {{}} obj
+ * @param {string} key
+ * @param {any} value
+ */
 /* istanbul ignore next */
 function setProperty(obj, key, value) {
     if(isObservableObject(obj)) {
@@ -262,6 +404,11 @@ function setProperty(obj, key, value) {
     }
 }
 
+/**
+ *
+ * @param {string | string[]} value
+ * @returns {string[]}
+ */
 export function toPath(value) {
     if(Array.isArray(value)) {
         return value;
@@ -269,7 +416,14 @@ export function toPath(value) {
     return stringToPath(value);
 }
 
-export function getValue(obj, path, def) {
+/**
+ * returns teh value at a given path in an Object/Map Tree or def
+ * @param {{}} obj
+ * @param {string|string[]} path
+ * @param {any} [def = undefined] default value
+ * @returns {*}
+ */
+export function getValue(obj, path, def = undefined) {
     if(!obj) return def;
     if(isBoxedObservable(obj)) {
         obj = obj.get();
@@ -280,9 +434,9 @@ export function getValue(obj, path, def) {
     let ret = obj;
 
     for(let key of path) {
-        if(isMap(ret)) {
+        if(isMapLike(ret)) {
             ret = ret.get(key);
-        } else if(isArray(ret) && ret.length <= key) {
+        } else if(isArrayLike(ret) && ret.length <= key) {
             return def;
         } else {
             ret = ret[key];
@@ -294,27 +448,21 @@ export function getValue(obj, path, def) {
     return ret;
 }
 
+/**
+ * converts a value to an observable value
+ * @param {any} obj
+ * @returns {any}
+ */
 export function toObservable(obj) {
     return isObject(obj) && !isObservable(obj) ? observable(obj) : (isString(obj) || isNumber(obj) ? observable.box(obj) : obj);
 }
 
-export function errorMapToFlatArray(errorMap) {
-    const arr = observable.array();
-    errorMapToFlatArrayR(errorMap, arr);
-    return toJS(arr);
-}
-
-/* istanbul ignore next */
-function errorMapToFlatArrayR(errorMap, obsArray) {
-    if(isArray(errorMap)) {
-        obsArray.push(...errorMap);
-    } else if(isMap(errorMap)) {
-        for(let eM of errorMap.values()) {
-            errorMapToFlatArrayR(eM, obsArray);
-        }
-    }
-}
-
+/**
+ * grab observables without converting them to values
+ * @param {{}|Map} obj
+ * @param {string|string[]} path
+ * @returns {undefined|*}
+ */
 export function getObservable(obj, path) {
     if(!obj) return undefined;
     if(!Array.isArray(path)) {
@@ -323,7 +471,7 @@ export function getObservable(obj, path) {
     let ret = obj;
 
     for(let key of path) {
-        if(isMap(ret)) {
+        if(isMapLike(ret)) {
             ret = ret.get(key);
         } else {
             ret = ret[key];
@@ -332,54 +480,3 @@ export function getObservable(obj, path) {
 
     return ret;
 }
-
-// export function getErrorsByPath(err, path) {
-//     for(let k of path) {
-//         if(isString(k)) {
-//             err = getValue(err,['properties',k]);
-//         } else if(isNumber(k)) {
-//             err = getValue(err,['items',k]);
-//         }
-//     }
-//     return err;
-// }
-// export function mergeSchemaErrorMap(schema, stateTree, errorMap){
-//     return mergeSchemaErrorMapR(schema, stateTree, errorMap, undefined);
-// }
-//
-// function mergeSchemaErrorMapR(schema, stateTree, errorMap, propName){
-//     const value = propName === undefined ? stateTree : getValue(stateTree, [propName]);
-//     switch(schema.type){
-//         case "object":
-//             const newObj = {title: schema.title, errors: [], children: []};
-//             for (let [key, err] in errorMap.entries()){
-//                 if(key === "properties") {
-//                     for(let p of Object.keys(schema.properties)){
-//                         if(err.has(p)) {
-//                             newObj.children.push(mergeSchemaErrorMapR(schema.properties[p], value, err.get(p), p));
-//                         }
-//                     }
-//                 }else if(isArray(err)){
-//                     newObj.errors.push(...err);
-//                 }
-//             }
-//             return newObj;
-//         case "array":
-//             const newArrObj = {title: schema.title, errors: [], children: []};
-//             for (let [key, err] in errorMap.entries()){
-//                 if(key === "items") {
-//                     for(let i = 0; i < value.length; ++i) {
-//                         if(err.has(i)) {
-//                             newArrObj.children.push(mergeSchemaErrorMapR(schema.items[i], value, err.get(i), i));
-//                         }
-//                     }
-//                 }else if(isArray(err)){
-//                     newArrObj.errors.push(...err);
-//                 }
-//             }
-//             return newArrObj;
-//         default:
-//             console.warn("Schema merge on unexpected schema type:", schema.type);
-//             break;
-//     }
-// }

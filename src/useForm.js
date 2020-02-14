@@ -1,44 +1,37 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {checkSchemaPathForErrors, createAjvObject, watchForPatches} from "./validation";
 import jsonSchemaToMST from "./jsonSchemaToMST";
-import {getObservable, getValue, isArray, isObject, isPlainObject, setValue} from "./helpers";
+import {getObservable, getValue, isArrayLike, isObject, isPlainObject, setValue, toPath} from "./helpers";
 import stringToPath from "./stringToPath";
 import SchemaAssignmentError from "./SchemaAssignmentError";
 import {applySnapshot, getSnapshot} from "mobx-state-tree";
 import SchemaDataReplaceError from "./SchemaDataReplaceError";
-import {isObservable, observable} from "mobx";
+import {isObservable, observable, computed, extendObservable} from "mobx";
 import $RefParser from "json-schema-ref-parser";
-import FormContext from './FormContext';
 import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
 import equal from 'fast-deep-equal';
+import FormContext from "./FormContext";
 
 /**
- *
- * @param {function} FunctionalComponent
+ * returns a form component wired up with state, field meta data, validation, and errors
  * @param {{}} options
- * @returns {*[]}
+ * @param {*} ObserverWrappedComponent
+ * @returns {*}
  */
-
-export default function useSchema(FunctionalComponent, options) {
-    let [context, setContext] = useState({
+export default function useForm(options, ObserverWrappedComponent) {
+    const [schemaContext, setContext] = useState({
         ready: false,
     });
 
     useEffect(() => {
-        options = Object.assign({
-            schema: undefined,
-            $ref: undefined,
-            actions: undefined,
-            views: undefined,
-            default: undefined,
-        }, options);
-
         const parser = new $RefParser();
         const schemaPromise = options.$ref ? parser.dereference(options.schema).then(() => parser.$refs.get(options.$ref)) : parser.dereference(options.schema);
         schemaPromise.then(jsonSchema => {
             const ajv = createAjvObject();
             let Model = jsonSchemaToMST(jsonSchema);
-            let formStatus = observable.object({isDirty: false, isChanged: false});
+            const formStatus = observable.object({ready: false, isDirty: false, isChanged: false});
+            const changedSet = new Set();
+            const dirtySet = new Set();
 
             // console.log("FULL SCHEMA");
             // console.log(JSON.stringify(jsonSchema));
@@ -47,29 +40,67 @@ export default function useSchema(FunctionalComponent, options) {
                 let initialSnapshot = {};
                 let defaultSnapshot = {};
                 return {
+                    _setIsDirty(name){
+                        dirtySet.add(toPath(name).join("."));
+                        if(formStatus.isDirty !== true) {
+                            formStatus.isDirty = true;
+                        }
+                    },
+                    _clearIsDirty(){
+                        dirtySet.clear();
+                        if(formStatus.isDirty !== false) {
+                            formStatus.isDirty = false;
+                        }
+                    },
+                    _updateIsChanged(changed) {
+                        if(formStatus.isChanged !== changed) {
+                            formStatus.isChanged = changed;
+                        }
+                    },
+                    _isChanged(name) {
+                        if(name !== undefined) {
+                            return !equal(getValue(self, name), getValue(defaultSnapshot, name));
+                        } else {
+                            return !equal(self, defaultSnapshot);
+                        }
+                    },
+                    _resetChangedState(){
+                        changedSet.clear();
+                        self._updateIsChanged(changedSet.size !== 0);
+                    },
+                    _checkFieldAfterChange(name){
+                        //Check to see if data has changed and update the changedSet then set isChanged to true if changedSet has anything in it
+                        if(self._isChanged(name)) {
+                            changedSet.add(toPath(name).join("."));
+                        } else {
+                            changedSet.delete(toPath(name).join("."));
+                        }
+                        self._updateIsChanged(changedSet.size !== 0);
+                    },
                     _set(name, value) {
                         try {
                             setValue(self, name, value);
-                            formStatus.isDirty = true;
                         } catch(err) {
-                            const path = isArray(name) ? name : stringToPath(name);
+                            const path = isArrayLike(name) ? name : stringToPath(name);
                             const validationErrors = checkSchemaPathForErrors(ajv, jsonSchema, path, value);
                             throw new SchemaAssignmentError(err, `Could not assign a value in the form-capacitor schema for path: ${path.join(".")}`, path, value, validationErrors);
                         }
+                        self._checkFieldAfterChange(name);
+                        self._setIsDirty(name);
                     },
                     _afterCreate() {
                         initialSnapshot = getSnapshot(self);
-                        formStatus.isDirty = false;
+                        self._clearIsDirty();
                     },
                     _afterDefaults() {
                         defaultSnapshot = getSnapshot(self);
-                        formStatus.isChanged = false;
-                        formStatus.isDirty = false;
+                        self._resetChangedState();
+                        self._clearIsDirty();
                     },
                     _reset() {
                         applySnapshot(self, defaultSnapshot);
-                        formStatus.isChanged = false;
-                        formStatus.isDirty = false;
+                        self._resetChangedState();
+                        self._clearIsDirty();
                     },
                     _replaceAll(value) {
                         applySnapshot(self, initialSnapshot);
@@ -89,33 +120,33 @@ export default function useSchema(FunctionalComponent, options) {
                                     errs.push(err);
                                     propMap.set(prop, value);
                                 }
+                                self._setIsDirty(prop);
                             });
                             if(errs.length > 0) {
                                 const errProps = Array.from(propMap.keys()).join(", ");
                                 throw new SchemaDataReplaceError(errs, `Error replacing some root form-capacitor props (${errProps})`, propMap);
                             }
                         }
-                        formStatus.isDirty = true;
                     },
                     _push(name, value) {
-                        getObservable(self, name).push(((isObject(value) || isArray(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
-                        formStatus.isDirty = true;
+                        getObservable(self, name).push(((isObject(value) || isArrayLike(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
+                        self._setIsDirty(name);
                     },
                     _pop(name) {
                         getObservable(self, name).pop();
-                        formStatus.isDirty = true;
+                        self._setIsDirty(name);
                     },
                     _clear(name) {
                         getObservable(self, name).clear();
-                        formStatus.isDirty = true;
+                        self._setIsDirty(name);
                     },
                     _replace(name, arr) {
                         getObservable(self, name).replace(arr);
-                        formStatus.isDirty = true;
+                        self._setIsDirty(name);
                     },
                     _remove(name, value) {
                         getObservable(self, name).remove(value);
-                        formStatus.isDirty = true;
+                        self._setIsDirty(name);
                     },
                     _splice(name, idx, deleteCount = 1, insert = undefined) {
                         if(insert !== undefined) {
@@ -123,19 +154,7 @@ export default function useSchema(FunctionalComponent, options) {
                         } else {
                             getObservable(self, name).splice(idx, deleteCount);
                         }
-                        formStatus.isDirty = true;
-                    },
-                    isChanged(name) {
-                        if(name !== undefined) {
-                            return !equal(getValue(self, name), getValue(defaultSnapshot, name));
-                        } else {
-                            return !equal(self, defaultSnapshot);
-                        }
-                    },
-                    updateIsChanged(changed) {
-                        if(formStatus.isChanged !== changed) {
-                            formStatus.isChanged = changed;
-                        }
+                        self._setIsDirty(name);
                     },
                     toJS() {
                         return mobxTreeToSimplifiedObjectTree(self);
@@ -154,47 +173,53 @@ export default function useSchema(FunctionalComponent, options) {
                 Model = Model.actions(options.actions);
             }
 
-            const formData = Model.create();
+            const stateTreeInstance = Model.create();
 
-            formData._afterCreate();
+            stateTreeInstance._afterCreate();
 
             if(options.default) {
-                formData._setRoot(options.default);
+                stateTreeInstance._setRoot(options.default);
             }
 
-            formData._afterDefaults();
+            stateTreeInstance._afterDefaults();
 
-            const {errors, metaDataMap, validate} = watchForPatches(jsonSchema, formData, ajv);
+            const {errors, fieldMetaDataMap, validate} = watchForPatches(jsonSchema, stateTreeInstance, ajv);
+
+            //Set formStatus Options
+            extendObservable(
+                formStatus,
+                {
+                    get hasErrors() {
+                        return errors && errors.size > 0 && ((errors.has('children') && errors.get('children').size > 0) || (errors.has('errors') && errors.get('errors').size > 0));
+                    },
+                },
+                {
+                    hasErrors: computed
+                }
+            );
+
+            formStatus.ready = true;
 
             setContext({
-                formData: formData,
-                formStatus: formStatus,
-                metaDataMap: metaDataMap,
+                stateTree: stateTreeInstance,
+                status: formStatus,
+                fieldMetaDataMap: fieldMetaDataMap,
                 errorMap: errors,
-                hasErrors: () => errors && errors.size > 0 && ((errors.has('children') && errors.get('children').size >0) || (errors.has('errors') && errors.get('errors').size >0)),
-                set: (path, value) => isPlainObject(path) ? formData._replaceAll({...path}) : formData._set(path, value),
-                reset: formData._reset,
+                set: (path, value) => isPlainObject(path) ? stateTreeInstance._replaceAll({...path}) : stateTreeInstance._set(path, value),
+                reset: stateTreeInstance._reset,
                 validate: () => {
-                    return validate(mobxTreeToSimplifiedObjectTree(formData));
+                    return validate(mobxTreeToSimplifiedObjectTree(stateTreeInstance));
                 },
                 path: [],
                 ready: true
             });
         });
     }, []);
-
-    // FormContext.Provider({
-    //     formData: schemaData,
-    //     errorMap: errorMap,
-    //     validate: imperativeValidate,
-    //     path: [],
-    // });
-    if(context.ready){
-        return <FormContext.Provider value={context}>
-            <FunctionalComponent {...context}/>
-        </FormContext.Provider>;
-    } else {
-        return <span/>;
-    }
-    // return [Provider(context), context];
+    const Schema = () => {
+        const context = useContext(FormContext);
+        return context.ready ? <ObserverWrappedComponent {...context}/> : (options.Loader || <div>Loading...</div>);
+    };
+    return <FormContext.Provider value={schemaContext}>
+        <Schema/>
+    </FormContext.Provider>;
 }

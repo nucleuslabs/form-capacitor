@@ -1,10 +1,8 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
-
-import useArrayField from "../src/useArrayField";
-import useFieldErrors from "../src/useFieldErrors";
+import {useForm, useFieldErrors, useArrayField} from "../src";
+import {observer} from "mobx-react-lite";
 
 function TextBoxArray({name}) {
     const [value, {set, push, remove, splice, clear, replace}] = useArrayField(name);
@@ -26,15 +24,7 @@ function TextBoxArray({name}) {
 }
 
 function DemoForm() {
-    return useSchema(props => {
-        const {ready} = props;
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
-        return <div>
-            Aliases: <TextBoxArray name="alias"/>
-        </div>;
-    }, {
+    return useForm({
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm",
         default: {
@@ -42,7 +32,9 @@ function DemoForm() {
             lastName: "Bar",
             alias: []
         }
-    });
+    }, observer(() => <div>
+        Aliases: <TextBoxArray name="alias"/>
+    </div>));
 }
 
 afterEach(cleanup);

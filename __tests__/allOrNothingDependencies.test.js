@@ -1,15 +1,15 @@
 import React, {useState} from "react";
-import {oneCharAtATime} from "../src/testHelper";
+import {oneCharAtATime} from "./testHelper";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
 import useArrayField from "../src/useArrayField";
-import {useObserver} from "mobx-react-lite";
-import SubSchema from "../src/SubSchema";
 import {toJS} from "mobx";
-import {getFlattenedErrors} from "../src/errorMapping";
+import useFormData from "../src/useFormData";
+import useFormErrors from "../src/useFormErrors";
+import {FormSubNode, useForm, useFormActions} from "../src";
+import {observer} from "mobx-react-lite";
 
 function TextBoxArray({dataTestId,name}) {
     const [value, {set, push, remove, slice, splice, replace}] = useArrayField(name);
@@ -49,7 +49,7 @@ function Alias(props) {
 }
 
 function AllOrNothing ({name}){
-    return <SubSchema path={name}>
+    return <FormSubNode path={name}>
         <div>
             <span>Thing 1</span>
             <TextBoxArray dataTestId="aonthing1" name="aonthing1" buttonId="aonthing1"/>
@@ -62,16 +62,16 @@ function AllOrNothing ({name}){
             <span>Thing 3</span>
             <SimpleTextBox data-testid="aonthing3" name="aonthing3"/>
         </div>
-    </SubSchema>;
+    </FormSubNode>;
 }
 
 function DeepAllOrNothing({name}) {
     const [items, {push}] = useArrayField(name);
-    return <span><SubSchema path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</SubSchema><button data-testid="deepAllOrNothing_add" onClick={() => push({})}>add DAON</button></span>;
+    return <span><FormSubNode path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</FormSubNode><button data-testid="deepAllOrNothing_add" onClick={() => push({})}>add DAON</button></span>;
 }
 
 function DeepAllOrNothingItem ({name}){
-    return <SubSchema path={name}>
+    return <FormSubNode path={name}>
         <div>
             <span>Thing 1</span>
             <TextBoxArray dataTestId={`daonthing1_${name}`} name="daonthing1"/>
@@ -84,75 +84,77 @@ function DeepAllOrNothingItem ({name}){
             <span>Thing 3</span>
             <SimpleTextBox data-testid={`daonthing3_${name}`} errorTestId={`daonthing3_${name}_errors`} name="daonthing3"/>
         </div>
-    </SubSchema>;
+    </FormSubNode>;
 }
 
 function DemoForm() {
-    return useSchema(props => {
-        const {formData, validate, ready, errorMap} = props;
-        const [valid, setValid] = useState('Unknown');
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
+    return useForm(
+        {
+            schema: jsonSchema,
+            $ref: "#/definitions/DemoForm",
+            default: {
+                firstName: "Foo",
+                middleName: "J",
+                lastName: "Bar",
+                alias: [],
+                deepAllOrNothing: [{}]
+            },
+            actions: formData => ({
+                addAlias(alias) {
+                    formData.alias.push({alias: alias});
+                },
+                clearAliases() {
+                    formData.alias.length = 0;
+                },
+                spliceAlias(idx) {
+                    formData.alias.splice(idx, 1);
+                },
+            }),
+        }, observer(() => {
+            const {validate} = useFormActions();
+            const formData = useFormData();
+            const [hasErrors, errors] = useFormErrors();
+            const [valid, setValid] = useState('Unknown');
 
-        return useObserver(() => <div>
-            <div>
-                <span>First Name</span>
-                <SimpleTextBox data-testid="firstName" name="firstName"/>
-            </div>
-            <div>
-                <span>Last Name</span>
-                <SimpleTextBox data-testid="lastName" name="lastName"/>
-            </div>
-            <Alias name={"alias"}/>
-            <AllOrNothing name="allOrNothing"/>
-            <DeepAllOrNothing name="deepAllOrNothing"/>
-            <div>
-                <span>Other</span>
-                <SimpleTextBox data-testid="dep1" name="dep1"/>
-            </div>
-            <div>
-                <span>If Other is set I should be Required</span>
-                <SimpleTextBox data-testid="dep2" name="dep2"/>
-            </div>
-            <div data-testid="pepsi">{formData.firstName}</div>
-            <div data-testid="coke">{formData.lastName}</div>
-            <div>
-                <button data-testid="v" onClick={() => {
-                    if(validate()) {
-                        setValid("VALID");
-                    } else {
-                        setValid("INVALID");
-                    }
-                }}>Validate
-                </button>
-            </div>
-            {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
-            <div data-testid="valid">{valid}</div>
-            <ul data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>
-        </div>);
-    }, {
-        schema: jsonSchema,
-        $ref: "#/definitions/DemoForm",
-        default: {
-            firstName: "Foo",
-            middleName: "J",
-            lastName: "Bar",
-            alias: [],
-            deepAllOrNothing: [{}]
-        },
-        actions: formData => ({
-            addAlias(alias) {
-                formData.alias.push({alias: alias});
-            },
-            clearAliases() {
-                formData.alias.length = 0;
-            },
-            spliceAlias(idx) {
-                formData.alias.splice(idx, 1);
-            },
-        }),
-    });
+            return <div>
+                <div>
+                    <span>First Name</span>
+                    <SimpleTextBox data-testid="firstName" name="firstName"/>
+                </div>
+                <div>
+                    <span>Last Name</span>
+                    <SimpleTextBox data-testid="lastName" name="lastName"/>
+                </div>
+                <Alias name={"alias"}/>
+                <AllOrNothing name="allOrNothing"/>
+                <DeepAllOrNothing name="deepAllOrNothing"/>
+                <div>
+                    <span>Other</span>
+                    <SimpleTextBox data-testid="dep1" name="dep1"/>
+                </div>
+                <div>
+                    <span>If Other is set I should be Required</span>
+                    <SimpleTextBox data-testid="dep2" name="dep2"/>
+                </div>
+                <div data-testid="pepsi">{formData.firstName}</div>
+                <div data-testid="coke">{formData.lastName}</div>
+                <div>
+                    <button data-testid="v" onClick={() => {
+                        if(validate()) {
+                            setValid("VALID");
+                        } else {
+                            setValid("INVALID");
+                        }
+                    }}>Validate
+                    </button>
+                </div>
+                {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
+                <div data-testid="valid">{valid}</div>
+                <ul data-testid="errorMapContainer">{hasErrors && errors.map((e, eIdx) => <li
+                    key={eIdx}>{e.path.join("/")} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>
+            </div>;
+        })
+    );
 }
 
 afterEach(cleanup);

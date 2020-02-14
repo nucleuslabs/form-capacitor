@@ -1,14 +1,9 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import useSchema from "../src/useSchema";
-import useField from "../src/useField";
-import useFieldErrors from "../src/useFieldErrors";
-
-import useArrayField from "../src/useArrayField";
-import {useObserver} from "mobx-react-lite";
-import SubSchema from "../src/SubSchema";
-import {oneCharAtATime} from "../src/testHelper";
+import {observer} from "mobx-react-lite";
+import {oneCharAtATime} from "./testHelper";
+import {FormSubNode, useForm, useFormContext, useFieldErrors, useField, useArrayField} from "../src";
 
 function SimpleTextBox(props) {
     const [value, change] = useField(props.name);
@@ -54,7 +49,7 @@ function TextBoxArray({dataTestId, name}) {
 }
 
 function AllOrNothing({name}) {
-    return <SubSchema path={name}>
+    return <FormSubNode path={name}>
         <div>
             <span>Thing 1</span>
             <TextBoxArray dataTestId="aonthing1" name="aonthing1" buttonId="aonthing1"/>
@@ -67,17 +62,17 @@ function AllOrNothing({name}) {
             <span>Thing 3</span>
             <SimpleTextBox data-testid="aonthing3" name="aonthing3"/>
         </div>
-    </SubSchema>;
+    </FormSubNode>;
 }
 
 function DeepAllOrNothing({name}) {
     const [items, {push}] = useArrayField(name);
-    return <span><SubSchema path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</SubSchema><button
+    return <span><FormSubNode path={name}>{items.map((item, itemIdx) => <DeepAllOrNothingItem key={itemIdx} name={itemIdx}/>)}</FormSubNode><button
         data-testid="deepAllOrNothing_add" onClick={() => push({})}>add DAON</button></span>;
 }
 
 function DeepAllOrNothingItem({name}) {
-    return <SubSchema path={name}>
+    return <FormSubNode path={name}>
         <div>
             <span>Thing 1</span>
             <TextBoxArray dataTestId={`daonthing1_${name}`} name="daonthing1"/>
@@ -90,19 +85,17 @@ function DeepAllOrNothingItem({name}) {
             <span>Thing 3</span>
             <SimpleTextBox data-testid={`daonthing3_${name}`} errorTestId={`daonthing3_${name}_errors`} name="daonthing3"/>
         </div>
-    </SubSchema>;
+    </FormSubNode>;
 }
 
-
 function DemoForm() {
-    return useSchema(props => {
-        const {ready, validate} = props;
+    return useForm({
+        schema: jsonSchema,
+        $ref: "#/definitions/DemoForm"
+    }, observer(() => {
+        const {validate} = useFormContext();
 
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
-
-        return useObserver(() => <div data-testid="form">
+        return <div data-testid="form">
             <div>
                 <span>First Name</span>
                 <SimpleTextBox data-testid="firstName" name="firstName"/>
@@ -160,11 +153,8 @@ function DemoForm() {
             <div>
                 <button data-testid="validate" onClick={() => validate()}>Validate</button>
             </div>
-        </div>);
-    }, {
-        schema: jsonSchema,
-        $ref: "#/definitions/DemoForm"
-    });
+        </div>;
+    }));
 }
 
 afterEach(cleanup);

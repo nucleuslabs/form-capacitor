@@ -1,13 +1,10 @@
-import useSchema from "../src/useSchema";
 import jsonSchema from "./array-form";
 import {render, fireEvent, wait} from "@testing-library/react";
 import React, {useState} from "react";
-import useField from "../src/useField";
-import useFieldErrors from "../src/useFieldErrors";
-import useArrayField from "../src/useArrayField";
-import {useObserver} from "mobx-react-lite";
+import {observer} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
+import {useForm, useFormContext, useField, useFieldErrors, useArrayField} from "../src";
 
 function SimpleTextBox(props) {
     const [value, change] = useField(props.name);
@@ -43,49 +40,46 @@ function AliasObject(props) {
 }
 
 function DemoForm() {
-    return useSchema(props => {
-        const [valid, setValid] = useState('Unknown');
-        // const [errors, setErrors] = useState([]);
-        const {ready, validate, errorMap, formData} = props;
-        if(!ready) {
-            return <div>Loading...</div>;
-        }
-
-        return useObserver(() =>
-            <div>
-                <div>
-                    <span>Alias String:</span>
-                    <span><AliasString name="alias"/></span>
-                </div>
-                <div>
-                    <span>Alias Object:</span>
-                    <span><AliasObject name="alias2"/></span>
-                </div>
-                <div>
-                    <button data-testid="v" onClick={() => {
-                        if(validate()) {
-                            setValid("VALID");
-                            // setErrors([]);
-                        } else {
-                            setValid("INVALID");
-                            // setErrors(errorMapToFlatArray(errorMap));
-                        }
-                    }}>Validate
-                    </button>
-                </div>
-                {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
-                <div data-testid="valid">{valid}</div>
-                {/*<div data-testid="errorContainer">{valid !== 'Unknown' && <ul data-testid="errors">{errors.length > 0 && errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}</div>*/}
-                <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 && <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) => <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
-            </div>
-        );
-    }, {
+    return useForm({
         schema: jsonSchema,
         $ref: "#/definitions/ArrayForm",
         default: {
             alias: ['Frank']
         }
-    });
+    }, observer(() => {
+        const [valid, setValid] = useState('Unknown');
+        // const [errors, setErrors] = useState([]);
+        const {validate, errorMap, formData} = useFormContext();
+
+        return <div>
+            <div>
+                <span>Alias String:</span>
+                <span><AliasString name="alias"/></span>
+            </div>
+            <div>
+                <span>Alias Object:</span>
+                <span><AliasObject name="alias2"/></span>
+            </div>
+            <div>
+                <button data-testid="v" onClick={() => {
+                    if(validate()) {
+                        setValid("VALID");
+                        // setErrors([]);
+                    } else {
+                        setValid("INVALID");
+                        // setErrors(errorMapToFlatArray(errorMap));
+                    }
+                }}>Validate
+                </button>
+            </div>
+            {valid !== 'Unknown' && <div data-testid="validated">{valid}</div>}
+            <div data-testid="valid">{valid}</div>
+            {/*<div data-testid="errorContainer">{valid !== 'Unknown' && <ul data-testid="errors">{errors.length > 0 && errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>}</div>*/}
+            <div data-testid="errorMapContainer">{errorMap && errorMap.size > 0 &&
+            <ul data-testid="errors">{errorMap && errorMap.size > 0 && getFlattenedErrors(errorMap).map((e, eIdx) =>
+                <li key={eIdx}>{e.path} : {e.message} : {JSON.stringify(toJS(formData))}</li>)}</ul>}</div>
+        </div>;
+    }));
 }
 
 //tests requiring mobx state tree

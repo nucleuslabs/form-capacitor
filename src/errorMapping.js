@@ -4,7 +4,7 @@ import {pathToPatchString, ajvStringToPath} from "./validation";
 /**
  *
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @returns {undefined|*}
  */
 export function getErrorNode(errorNode, path = []) {
@@ -15,6 +15,8 @@ export function getErrorNode(errorNode, path = []) {
             const childNode = node.get('children');
             if(childNode.has(key)) {
                 node = childNode.get(key);
+            } else {
+                return undefined;
             }
         } else {
             return undefined;
@@ -26,7 +28,7 @@ export function getErrorNode(errorNode, path = []) {
 /**
  *
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @returns {*|Array|Array}
  */
 export function getErrors(errorNode, path = []) {
@@ -38,7 +40,7 @@ export function getErrors(errorNode, path = []) {
 /**
  *
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @param {{}} error
  * @returns {boolean}
  */
@@ -51,7 +53,7 @@ export function hasError(errorNode, path = [], error) {
 /**
  *
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @param {{}} error
  * @param {[]} originPath
  */
@@ -65,7 +67,7 @@ export function setError(errorNode, path = [], error, originPath) {
 /**
  *
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @param {[{}]} errors
  * @param {[]} originPath
  */
@@ -81,7 +83,7 @@ export function setErrors(errorNode, path = [], errors, originPath) {
 /**
  *
  * @param {ObservableMap} node
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @param {{}} error
  */
 /* istanbul ignore next */
@@ -114,9 +116,7 @@ function setPathIndexRelationships(errorNode, originPath, newPath, error) {
             messageSet.add(error.message);
         } else {
             pathIndex.set(oPathString, pathMap);
-            if(!pathMap.has(nPathString)) {
-                pathMap.set(nPathString, observable.set([]));
-            }
+            pathMap.set(nPathString, observable.set([]));
             pathMap.get(nPathString).add(error.message);
         }
     }
@@ -143,6 +143,11 @@ export function deleteAllNodes(errorMap, path) {
     }
 }
 
+/**
+ *
+ * @param {ObservableMap} errorMap
+ * @param {string[]} path
+ */
 export function deleteOwnNode(errorMap, path) {
     if(errorMap.has('pathIndex')) {
         const pathIndex = errorMap.get('pathIndex');
@@ -269,7 +274,7 @@ function delErrorNodeR(map, path) {
 /**
  * returns true if the node is empty
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @returns {boolean}
  */
 /* istanbul ignore next */
@@ -306,7 +311,7 @@ function cleanNode(errorNode, path = []) {
 /**
  * returns true if the nodes are empty
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  */
 /* istanbul ignore next */
 function deepCleanNode(errorNode, path = []) {
@@ -324,7 +329,7 @@ function deepCleanNode(errorNode, path = []) {
 /**
  *
  * @param {ObservableMap} errorNode
- * @param {string[]} path
+ * @param {string[]} [path=[]]
  * @returns {IObservableArray<any>}
  */
 export function getFlattenedErrors(errorNode, path = []) {

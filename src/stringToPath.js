@@ -5,7 +5,24 @@ import {isNumber} from "./helpers";
 const charCodeOfDot = '.'.charCodeAt(0);
 const reEscapeChar = /\\(\\)?/g;
 const rePropName = RegExp(
-    '[^.[\\]]+|\\[(?:([^"\'].*)|(["\'])((?:(?!\\2)[^\\\\]|\\\\.)*?)\\2)\\]|(?=(?:\\.|\\[\\])(?:\\.|\\[\\]|$))', 'g');
+    // Match anything that isn't a dot or bracket.
+    // eslint-disable-next-line no-useless-concat
+    '[^.[\\]]+' + '|'
+    // Or match property names within brackets.
+    // eslint-disable-next-line no-useless-concat
+    + '\\[(?:'
+    // Match a non-string expression.
+    // eslint-disable-next-line no-useless-concat
+    + '([^"\'].*)' + '|'
+    // Or match strings (supports escaping characters).
+    // eslint-disable-next-line no-useless-concat
+    + '(["\'])((?:(?!\\2)[^\\\\]|\\\\.)*?)\\2'
+    // eslint-disable-next-line no-useless-concat
+    + ')\\]'+ '|'
+    // Or match "" as the space between consecutive dots or empty brackets.
+    // eslint-disable-next-line no-useless-concat
+    + '(?=(?:\\.|\\[\\])(?:\\.|\\[\\]|$))'
+    , 'g');
 /**
  * Converts `string` to a property path array.
  *
