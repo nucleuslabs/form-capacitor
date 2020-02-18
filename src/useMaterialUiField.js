@@ -22,7 +22,7 @@ export default function useMaterialUiField(path) {
         const errors = getErrors(context.errorMap, fullPath);
         if(errors.length > 0) {
             const FormHelperTextProps = {
-                children: <div>{errors.map((er, eIdx) => <div key={eIdx}>e.message</div>)}</div>
+                children: <div>{errors.map((e, eIdx) => <div key={eIdx}>e.message</div>)}</div>
             };
             return {label, FormHelperTextProps, error: true, ...metaData};
         } else {

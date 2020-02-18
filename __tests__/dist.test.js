@@ -89,7 +89,7 @@ function DemoForm() {
 
 afterEach(cleanup);
 
-test("The Set First Name button should set the first name to \"Joe\"", async() => {
+test("Testing imports from dist files to make sure they perform the same as expected after being webpack'd.", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
     await wait(() => getByTestId("lastName"));

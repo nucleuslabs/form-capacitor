@@ -14,8 +14,12 @@ This `hook` returns a react `<Component/>` so it is kinda like a nasty hook + HO
 Hooks are supposed to get rid of nesting, but we are using a <Context.Provider/> to manage all the nice form-capacitor things
 and that is one of the reasons that we are using a hook that returns a Component.
 
-The Other reason we are using this strange pattern is that if we want nice observables in our root form (which is not always the case), 
-we can use observables that are accessible using the `useFormContext()` hook such as `formStatus.isChanged` and `errorMap` and `formData` directly in our root form component.
+Another reason we are using this strange pattern is this: 
+
+If we want nice observables in our root form, we need to wrap the observables in an observer function so that they are 
+accessible using the [`useFormContext()`](#useformcontext) hook which returns nice things like `status.isChanged`, 
+and `stateTree` directly in our root form component and they will re-render automatically when they change.
+
 ###usage
 
 ```jsx harmony
@@ -182,7 +186,7 @@ Nope
 Hook that connects various form inputs to the state tree
 
 ###Usage
-```js
+```jsx harmony
 import { TextField } from '@material-ui/core';
 import {useField, useFieldErrors} from "../src";
 
@@ -256,7 +260,7 @@ hook that grabs the value of the field and an object full of array mutator funct
 import {Select} from 'react-select';
 import {useArrayField} from "../src";
 
-function SimpleTextBox({name}) {
+function SimpleSelectDropdown({name}) {
     const [value, {set, push, remove}] = useArrayField(name);    
 
     return <Select value={value}/>;
