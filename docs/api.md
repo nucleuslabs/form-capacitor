@@ -20,7 +20,7 @@ If we want nice observables in our root form, we need to wrap the observables in
 accessible using the [`useFormContext()`](#useformcontext) hook which returns nice things like `status.isChanged`, 
 and `stateTree` directly in our root form component and they will re-render automatically when they change.
 
-###usage
+###Usage
 
 ```jsx harmony
 import { useForm, useFormContext } from 'form-capacitor'; 
@@ -53,7 +53,7 @@ export default function MyForm(){
 }
 ```
 
-###params
+###Params
 
 1. options {}
    - `schema: {object}` : `require('/path/to/some-json-schema-file.json');`
@@ -103,7 +103,7 @@ export default function MyForm(){
    ```
   2. Function that returns a component wrapped in observer()
 
-###return
+###Return
 
 React Component
 
@@ -353,6 +353,6 @@ function Contacts({name}) {
     </FormSubNode>;
 }
 ```
-###props
+###Props
 
 path - string - path to nest elements under that is delimited by the . character.
