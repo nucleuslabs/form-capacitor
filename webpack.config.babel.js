@@ -1,5 +1,6 @@
 const src = `${__dirname}/src`;
 const dist = `${__dirname}/dist`;
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     mode: "production",
@@ -26,8 +27,16 @@ module.exports = {
             {
                 test: /\.(jsx?)$/,
                 include: src,
-                use: "babel-loader"
+                use: "babel-loader",
+                sideEffects: false
             }
+        ]
+    },
+    optimization: {
+        minimize: true,
+        usedExports: true,
+        minimizer: [
+            new TerserPlugin({})
         ]
     }
 };

@@ -7,7 +7,7 @@ import useFieldErrors from "../src/useFieldErrors";
 import useArrayField from "../src/useArrayField";
 import {observer} from "mobx-react-lite";
 import {toJS} from "mobx";
-import useFormData from "../src/useFormData";
+import useFormStateTree from "../src/useFormStateTree";
 import useFormErrors from "../src/useFormErrors";
 import {useForm, useFormActions} from "../src";
 
@@ -47,7 +47,7 @@ function DemoForm() {
         })
     }, observer(() => {
         const [valid, setValid] = useState('Unknown');
-        const formData = useFormData();
+        const formData = useFormStateTree();
         const [hasErrors, errors] = useFormErrors();
         const {validate, set} = useFormActions();
         return <div>

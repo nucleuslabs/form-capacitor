@@ -591,10 +591,12 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
             case 'string':
                 setStringErrorMessages(schema);
                 setTypeErrorMessage(schema);
+                assignMetaData({...schema}, [...patchPath], metaDataMap);
                 break;
             case 'integer':
             case 'number':
                 setNumberRangeErrorMessage(schema);
+                assignMetaData({...schema}, [...patchPath], metaDataMap);
                 break;
             default:
                 setTypeErrorMessage(schema);
@@ -889,7 +891,6 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
                 }
             }
         }
-        // validateRefs(refs, validators, data, errors, paths, errorPathMaps, [...skipPaths]);
         // console.log("NOPE");
         const theRealJs = mobxTreeToSimplifiedObjectTree(data);
         // console.log(pathStr, validate.schema, theRealJs);
@@ -920,7 +921,6 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
         }
         //Validate References
         for(let refPath of refs.values()) {
-            // @todo: Filter out recursive refs... Once they are filtered this check may not be necessary...
             runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths);
         }
     }

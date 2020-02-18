@@ -78,20 +78,23 @@ at the time we used them in early 2019, they may be faster now, I am not sure.
 ##Pros
 
 1. It is Fast - Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields
-2. Supports big complex forms and works well with repeatable dynamic input collections
-3. Supports nth level nesting and grouping
-4. Has pretty error messages
-5. Using Json-schema allows you to validate the form in the browser and server using the same ruleset
-6. The API is hooks based and the hooks for use with inputs work similar to `useState`
-7. Easy to use with both super simple and super complex forms
-8. Works well with popular UI components like react-select and react-datepicker and material UI Components
-9. Not too many dependencies mostly peerDependencies 
+2. Supports IE 11 
+3. Supports big complex forms and works well with repeatable dynamic input collections
+4. Supports nth level nesting and grouping
+5. Has pretty error messages
+6. Using Json-schema allows you to validate the form in the browser and server using the same ruleset
+7. React 16.8 hooks based API, the hooks work very similar to `useState` and `useContext` :)
+8. Easy to use with both simple 2 field and super complex forms
+9. Works well with popular UI components like react-select and react-datepicker and material UI Components
+10. Not too many dependencies mostly peerDependencies 
 
 ##Cons
 
-1. Only supports [json-schema draft 7](https://json-schema.org/draft-07/json-schema-release-notes.html) no other versions are supported at this time the main reason for this is that as of this writing AJV doesn't support version 8
-2. Does NOT support json-schema oneOf keyword (pull requests welcome)
-3. Only supports React 16.8 or newer because it uses Hooks :(
-4. One of the hook functions `useSchema` is actually Hook + HOC hybrid which may seem weird but it is because it uses a Context Provider so you don't need to wrap it yourself (this was an opinionated decision because we make a lot of forms and found the strange convenience of the the hook HOC combo to outweigh the standard pattern of wrapping things in Context Providers)
+1. Only supports React 16.8 or newer because it uses Hooks :(
+2. Only supports [json-schema draft 7](https://json-schema.org/draft-07/json-schema-release-notes.html) no other versions are supported at this time the main reason for this is that as of this writing AJV doesn't support version 8
+3. Does NOT support json-schema oneOf keyword (pull requests welcome)
+4. One of the hook functions `useForm` is actually Hook + HOC hybrid which may seem weird but we found this pattern very convenient and to have high performance when working with mobx observables.
 5. For complex state with deep tree structures you have to either specify the full path in the name of a Consumer Component which employs path separation using the '.' character i.e "demographicInfo.homeAddress.postalCode" for each input or wrap them in a `<SubScehma path={name}>` which will set the proper paths in context. (if you can think of a magical way to propagate paths without wrapping please submit a pull request)
-
+6. Only supports mobx 4 at this time due to having to support IE 11
+7. Does not yet support submit handling (this is on the roadmap and will be in the 1.0 or 1.1 release) 
+8. Does not yet support async validations like checking a server for the uniqueness of a username (this is on the roadmap)

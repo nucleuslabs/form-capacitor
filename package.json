@@ -39,12 +39,15 @@
   "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",
   "license": "MIT",
   "peerDependencies": {
-    "ajv": "^6",
+    "react": "^16.8",
+    "react-dom": "^16.8"
+  },
+  "dependencies": {
     "mobx": "^4",
     "mobx-react-lite": "^1",
     "mobx-state-tree": "^3",
-    "react": "^16.8",
-    "react-dom": "^16.8"
+    "ajv": "^6",
+    "json-schema-ref-parser": "^7"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -59,9 +62,9 @@
     "@babel/plugin-transform-react-jsx": "^7",
     "@babel/plugin-transform-react-jsx-self": "^7",
     "@babel/plugin-transform-react-jsx-source": "^7",
+    "@babel/plugin-transform-runtime": "^7",
     "@babel/preset-env": "^7",
     "@testing-library/react": "^9",
-    "ajv": "^6",
     "autoprefixer": "^9",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^25",
@@ -84,6 +87,7 @@
     "mobx-state-tree": "^3",
     "react": "^16.8",
     "react-dom": "^16.8",
+    "terser-webpack-plugin": "^2",
     "webpack": "^4",
     "webpack-cli": "^3"
   },

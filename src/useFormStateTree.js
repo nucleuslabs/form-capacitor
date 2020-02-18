@@ -7,7 +7,7 @@ import {useObserver} from "mobx-react-lite";
  * Warning this hook uses the useObserverHack and has not been optimized
  * @returns {{}}
  */
-export default function useFormData() {
+export default function useFormStateTree() {
     const {stateTree} = useContext(FormContext);
     return useObserver(() => stateTree);
 };

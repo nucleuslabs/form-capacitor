@@ -66,7 +66,7 @@ export default function useForm(options, ObserverWrappedComponent) {
                     },
                     _resetChangedState(){
                         changedSet.clear();
-                        self._updateIsChanged(changedSet.size !== 0);
+                        self._updateIsChanged(false);
                     },
                     _checkFieldAfterChange(name){
                         //Check to see if data has changed and update the changedSet then set isChanged to true if changedSet has anything in it
