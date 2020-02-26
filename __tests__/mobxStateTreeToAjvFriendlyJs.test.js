@@ -30,11 +30,11 @@ describe('In Regards to data converted by mobxStateTreeToAjvFriendlyJs', functio
         mobxStateTree.set("lastName", "World");
         mobxStateTree.set("middleName", "MF");
         const testTree = mobxTreeToSimplifiedObjectTree(mobxStateTree);
-        expect(mobxTreeToSimplifiedObjectTree(mobxStateTree.contacts[0])).toEqual({});
+        expect(mobxTreeToSimplifiedObjectTree(mobxStateTree).contacts).toBeUndefined();
         expect(testTree.firstName).toEqual("Hello");
         expect(testTree.alias).toBeUndefined();
         expect(testTree.alias2).toBeUndefined();
-        expect(testTree.contacts).toEqual([{}]);
+        expect(testTree.contacts).toBeUndefined();
         expect(testTree.allOrNothing).toEqual(undefined);
 
         const passed = validate(mobxTreeToSimplifiedObjectTree(mobxStateTree));

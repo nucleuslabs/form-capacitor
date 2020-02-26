@@ -2,12 +2,12 @@ import {toJS} from "mobx";
 import {isPlainObject} from "./helpers";
 
 /**
- * This function takes in a mobxStateTree and Returns an object that is first passed through the mobx toJS function (https://mobx.js.org/refguide/tojson.html)
+ * This function takes in a mobxStateTree object and Returns an object that is first passed through the mobx toJS function (https://mobx.js.org/refguide/tojson.html)
  * and then all empty array like structures and empty objects are replaced with undefined so that AJV anyOF's, required and dependencies keywords
  * don't get tripped up on empty objects and arrays which evaluated as something and will cause errors even though they do not have any data in them.
  * Basically mobxTreeToSimplifiedObjectTree allows the mobx-state-tree to stay strongly typed and json-schema to handle required and dependency logic properly by converting empty things into undefined
  *
- * @param {any} mst
+ * @param {{}} mst
  * @returns {any}
  */
 export default function mobxTreeToSimplifiedObjectTree(mst) {
@@ -19,7 +19,7 @@ export default function mobxTreeToSimplifiedObjectTree(mst) {
  * This function does very specific tree trimming on purpose for reasons listed in mobxTreeToSimplifiedObjectTree above:
  *  - Reduces all arrays,maps,sets that are either completely empty or only contain undefined elements into undefined
  *  - Reduces all maps that are either completely empty or only contain undefined elements into undefined
- *  - Reduces objects which have no elements to undefined
+ *  - Reduces objects to undefined which have no elements to where all elements have been reduced to undefined
  *  - Keeps all other things
  *
  * @param {any} obj
@@ -66,7 +66,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
         if(!keys || keys.length === 0) {
             return undefined;
         } else {
-            return keys.reduce(function(acc, prop) {
+            const returnObj = keys.reduce(function(acc, prop) {
                 //filter out undefined values
                 const newProp = replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj[prop]);
                 if(newProp !== undefined && !(Object.prototype.toString.call(newProp) === "[object Object]" && Object.keys(newProp).length === 0)) {
@@ -74,6 +74,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
                 }
                 return acc;
             }, {});
+            return Object.keys(returnObj).length > 0 ? returnObj : undefined;
         }
     } else {
         return obj;
