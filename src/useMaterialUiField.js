@@ -15,6 +15,9 @@ export default function useMaterialUiField(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const patchPath = pathToPatchString(fullPath);
+    const onChange = (event) => {
+        context.set(event.target.value || undefined);
+    };
     //transform meta data into material ui
 
     return useObserver(() => {
@@ -24,9 +27,9 @@ export default function useMaterialUiField(path) {
             const FormHelperTextProps = {
                 children: <div>{errors.map((e, eIdx) => <div key={eIdx}>e.message</div>)}</div>
             };
-            return {label, FormHelperTextProps, error: true, ...metaData};
+            return {label, onChange, FormHelperTextProps, error: true, ...metaData};
         } else {
-            return {label, ...metaData};
+            return {label, onChange, ...metaData};
         }
     });
 };

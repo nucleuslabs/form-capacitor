@@ -307,9 +307,11 @@ name - string - path to the field via the json-schema that is delimited by the .
 ```js
 {
     name: string,
+    value: string,
     label: string,
     required: boolean,
     error: boolean,
+    onChange: function//Setter function that changes the value for the field in the stateTree
 }
 
 ```

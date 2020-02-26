@@ -10,4 +10,5 @@ export {default as FormSubNode} from './FormSubNode';
 export {default as useField} from './useField';
 export {default as useArrayField} from './useArrayField';
 export {default as useFieldErrors} from './useFieldErrors';
+export {default as useMaterialUiField} from './useMaterialUiField';
 export {observer} from 'mobx-react-lite';
