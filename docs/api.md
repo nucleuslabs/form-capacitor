@@ -5,9 +5,9 @@
 - [`useFieldErrors`](#usefielderrors)
 - [`useArrayField`](#usearrayfield)
 - [`useMaterialUiField`](#usematerialuifield)
-- [`<FormSubSchema/>`](#<formsubschema\>)
+- [`<FormSubNode/>`](#formsubnode)
 
-## `useForm`
+##`useForm`
 
 This `hook` returns a react `<Component/>` so it is kinda like a nasty hook + HOC hybrid.
 
@@ -21,7 +21,6 @@ accessible using the [`useFormContext()`](#useformcontext) hook which returns ni
 and `stateTree` directly in our root form component and they will re-render automatically when they change.
 
 ###Usage
-
 ```jsx harmony
 import { useForm, useFormContext } from 'form-capacitor'; 
 import { observer } from "mobx-react-lite";
@@ -55,60 +54,60 @@ export default function MyForm(){
 
 ###Params
 
-1. options {}
-   - `schema: {object}` : `require('/path/to/some-json-schema-file.json');`
-   ```json
-    {
-      "$schema": "http://json-schema.org/draft-07/schema",
-      "definitions": {
-        "SimpleForm": {
-          "title": "Simple Form",
-          "description": "Basic Form to test form-capacitor without a lot of external stuff",
-          "type": "object",
-          "properties": {
-            "firstName": {
-              "type": "string",
-              "title": "First Name",
-              "pattern": "\\w"
-            },
-            "lastName": {
-              "type": "string",
-              "title": "Last Name",
-              "pattern": "\\w"
-            }
-          },
-          "required": [
-            "firstName"
-          ]
+####`options : {...}`
+- `schema: {object}` : `require('/path/to/some-json-schema-file.json');` 
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "SimpleForm": {
+      "title": "Simple Form",
+      "description": "Basic Form to test form-capacitor without a lot of external stuff",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "title": "First Name",
+          "pattern": "\\w"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name",
+          "pattern": "\\w"
         }
-      }
+      },
+      "required": [
+        "firstName"
+      ]
     }
-   ```   
-   - `$ref: {string}`: `"#/definitions/SimpleForm"`
-   - `default: {object}` - The default data to hydrate the form state tree with values. `optional`
-   ```js
-   {
-       firstName : "Frosty",
-       lastName  : "McCool"
-   }
-   ```
-   - `actions {object}`: - An object of functions that is passed the mobx state tree and attaches actions to it. `optional`
-   ```js
+  }
+}
+```
+- `$ref: {string}`: `"#/definitions/SimpleForm"`
+- `default: {object}` - The default data to hydrate the form state tree with values. `optional`
+```js
+{
+   firstName : "Frosty",
+   lastName  : "McCool"
+}
+```
+- `actions {object}`: - An object of functions that is passed the mobx state tree and attaches actions to it. `optional`
+```js
    (stateTree) => {
        generateCoolName: () => {   
           stateTree.firstName = "Anita";
           stateTree.lastName = "Sweater";
        } 
    }
-   ```
-   - `skipStateTreeSanitizer: {boolean}`: false - If this option is set to true the `validation`, `stateTree.toJS()` and `stateTree.toJSON()` functions will skip the sanitizer which recursively collapses empty arrays and objects to undefined.
-  2. Function that returns a component wrapped in observer()
+```
+- `skipStateTreeSanitizer: {boolean}`: false - If this option is set to true the `validation`, `stateTree.toJS()` and `stateTree.toJSON()` functions will skip the sanitizer which recursively collapses empty arrays and objects to undefined.
+####`observer(() => <Component/>)` a function that returns a component wrapped in the mobx/mobx-react-lite observer function
 
 ###Return
 
 React Component
 
-## `useFormContext`
+##`useFormContext`
 
 This `hook` returns all of the Form.
 
@@ -145,9 +144,9 @@ Nope
 ```js
 {
     stateTree        : {mobx-state-tree},
-    status           : {observable Object},
+    status           : {},
     fieldMetaDataMap : Map,
-    errorMap         : Observable Map,
+    errorMap         : ObservableMap,
     set              : function({}),
     reset            : function,
     validate         : function,
@@ -155,7 +154,7 @@ Nope
     ready            : boolean
 }
 ```
-- stateTree - The mobx-state-tree containing all of the state data and actions of the form 
+- stateTree - The mobx-state-tree containing all of the juicy form state data and actions of the form 
 ```js
 {
     toJS   : function,//returns a POJO of the state tree
@@ -163,24 +162,24 @@ Nope
 }
 ``` 
 - status - An observable object that holds various status booleans for the global state of the form 
-  ```js
-   {
-       ready       : boolean,//is the form loaded and ready for use
-       isDirty     : boolean,//Has the form state tree been touched ie has some change occured since the form defaults were set or since a 'reset' has occured
-       isChanged   : boolean,//Is the stateTree different then when the defaults were set or 'reset' was called 
-       hasErrors   : boolean//Does the form have any errors
-   }
-  ```
-- fieldMetaDataMap - Flat map of all field meta data ie `required`, `isDirty`, `isChanged`. The map is keyed by the fields full path.
+```js
+{
+    ready       : boolean,//is the form loaded and ready for use
+    isDirty     : boolean,//Has the form state tree been touched ie has some change occured since the form defaults were set or since a 'reset' has occured
+    isChanged   : boolean,//Is the stateTree different then when the defaults were set or 'reset' was called 
+    hasErrors   : boolean//Does the form have any errors
+}
+```
+- fieldMetaDataMap - Flat map of all field meta data ie {`required`, `isDirty`, `isChanged`}. The map is keyed by the fields full path.
 - errorMap - Recursive map of errors for the form 
 - set - Function which takes a POJO which will replace all of the data in the stateTree with a new set of data
-  ```js
-  set({firstName: "Flerb", lastName: "Derp"});
-  ```
+```js
+set({firstName: "Flerb", lastName: "Derp"});
+```
 - reset - Function which resets the form stateTree and errorMap to its default state
 - validate - Function which will return true if the form passes validation and false if it does not. *(technically this is done automatically but if you wanna be real sure or you just want all error fields to highlight you can run it.)*
-- path - Current path in context which will change based on if you are in a component nested in a <FormSubNode/> tag
-- ready - Set to true when the form is loaded and ready for use
+- path - Array of strings for current path in context which will change based on if you are in a component nested in a <FormSubNode/> tag
+- ready - Boolean that is set to true when the form is loaded and ready for use
 
 ## `useField`
 
@@ -201,7 +200,7 @@ function SimpleTextBox({name}) {
 ```
 ###Params
 
-name - string - String path to the field via the json-schema that is delimited by the . character.
+`name` - string - String path to the field via the json-schema that is delimited by the . character.
 
 ###Return
 ```js
@@ -217,7 +216,7 @@ name - string - String path to the field via the json-schema that is delimited b
 ]
 ```
 
-## `useFieldErrors`
+##`useFieldErrors`
 
 Hook to wire various error states and messages
 
@@ -235,7 +234,7 @@ function FieldErrors({name}) {
 ```
 ###Params
 
-name - string - path to the field via the json-schema that is delimited by the . character.
+`name` - string - path to the field via the json-schema that is delimited by the . character.
 
 ###Return
 ```js
@@ -252,7 +251,7 @@ name - string - path to the field via the json-schema that is delimited by the .
 ]
 ```
 
-## `useArrayField`
+##`useArrayField`
 
 hook that grabs the value of the field and an object full of array mutator functions 
 
@@ -269,7 +268,7 @@ function SimpleSelectDropdown({name}) {
 ```
 ###Params
 
-name - string - path to the field via the json-schema that is delimited by the . character.
+`name` - string - path to the field via the json-schema that is delimited by the . character.
 
 ###Return
 ```js
@@ -285,7 +284,7 @@ name - string - path to the field via the json-schema that is delimited by the .
     }
 ]
 ```
-## `useMaterialUiField`
+##`useMaterialUiField`
 
 Hook that connects material-ui inputs to the state tree
 
@@ -301,7 +300,7 @@ function SimpleTextBox({name}) {
 ```
 ###Params
 
-name - string - path to the field via the json-schema that is delimited by the . character.
+`name` - string - path to the field via the json-schema that is delimited by the . character.
 
 ###Return
 ```js
@@ -315,7 +314,7 @@ name - string - path to the field via the json-schema that is delimited by the .
 }
 
 ```
-## `<FormSubNode/>`
+##`<FormSubNode/>`
 
 Tag which nests the path stored in context so that you can just use the field names instead of long paths with . in them for the name params for the Field hooks.
 
@@ -358,4 +357,4 @@ function Contacts({name}) {
 ```
 ###Props
 
-path - string - path to nest elements under that is delimited by the . character.
+`path` - string - path to nest elements under that is delimited by the . character.
