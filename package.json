@@ -1,7 +1,7 @@
 {
   "name": "form-capacitor",
-  "version": "0.2.69",
-  "description": "Form manager for React using json-schema, mobx observables, ajv validation and Hooks",
+  "version": "0.3.0",
+  "description": "Form state manager for React with as you type validation and pretty errors using json-schema definition and rules and a few simple Hooks",
   "browser": "web",
   "main": "dist/index.js",
   "module": "src/index.js",

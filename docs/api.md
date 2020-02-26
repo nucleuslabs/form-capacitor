@@ -4,8 +4,8 @@
 - [`useField`](#usefield)
 - [`useFieldErrors`](#usefielderrors)
 - [`useArrayField`](#usearrayfield)
-- [`useMaterialUiField`](#usefield)
-- [`<FormSubSchema/>`](#formsubschema)
+- [`useMaterialUiField`](#usematerialuifield)
+- [`<FormSubSchema/>`](#<formsubschema\>)
 
 ## `useForm`
 
@@ -101,6 +101,7 @@ export default function MyForm(){
        } 
    }
    ```
+   - `skipStateTreeSanitizer: {boolean}`: false - If this option is set to true the `validation`, `stateTree.toJS()` and `stateTree.toJSON()` functions will skip the sanitizer which recursively collapses empty arrays and objects to undefined.
   2. Function that returns a component wrapped in observer()
 
 ###Return

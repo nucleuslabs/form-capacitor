@@ -6,7 +6,7 @@ import stringToPath from "./stringToPath";
 import SchemaAssignmentError from "./SchemaAssignmentError";
 import {applySnapshot, getSnapshot} from "mobx-state-tree";
 import SchemaDataReplaceError from "./SchemaDataReplaceError";
-import {isObservable, observable, computed, extendObservable} from "mobx";
+import {isObservable, observable, computed, extendObservable, toJS} from "mobx";
 import $RefParser from "json-schema-ref-parser";
 import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
 import equal from 'fast-deep-equal';
@@ -22,7 +22,7 @@ export default function useForm(options, ObserverWrappedComponent) {
     const [schemaContext, setContext] = useState({
         ready: false,
     });
-
+    const {skipStateTreeSanitizer} = options;
     useEffect(() => {
         const parser = new $RefParser();
         const schemaPromise = options.$ref ? parser.dereference(options.schema).then(() => parser.$refs.get(options.$ref)) : parser.dereference(options.schema);
@@ -157,10 +157,10 @@ export default function useForm(options, ObserverWrappedComponent) {
                         self._setIsDirty(name);
                     },
                     toJS() {
-                        return mobxTreeToSimplifiedObjectTree(self);
+                        return skipStateTreeSanitizer ? toJS(self): mobxTreeToSimplifiedObjectTree(self);
                     },
                     toJSON() {
-                        return JSON.stringify(mobxTreeToSimplifiedObjectTree(self));
+                        return JSON.stringify(self.toJS());
                     }
                 };
             });
@@ -183,7 +183,7 @@ export default function useForm(options, ObserverWrappedComponent) {
 
             stateTreeInstance._afterDefaults();
 
-            const {errors, fieldMetaDataMap, validate} = watchForPatches(jsonSchema, stateTreeInstance, ajv);
+            const {errors, fieldMetaDataMap, validate} = watchForPatches(jsonSchema, stateTreeInstance, ajv, {...options});
 
             //Set formStatus Options
             extendObservable(
@@ -208,7 +208,7 @@ export default function useForm(options, ObserverWrappedComponent) {
                 set: (path, value) => isPlainObject(path) ? stateTreeInstance._replaceAll({...path}) : stateTreeInstance._set(path, value),
                 reset: stateTreeInstance._reset,
                 validate: () => {
-                    return validate(mobxTreeToSimplifiedObjectTree(stateTreeInstance));
+                    return skipStateTreeSanitizer ? toJS(stateTreeInstance) : validate(mobxTreeToSimplifiedObjectTree(stateTreeInstance));
                 },
                 path: [],
                 ready: true

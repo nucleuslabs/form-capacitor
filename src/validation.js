@@ -783,10 +783,12 @@ function setRefPath(refs, path) {
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
  * @param {*} data Mobx State Tree
  * @param {Ajv} ajv
+ * @param {{}} options
  * @returns {{errors: ObservableMap<any, any>, fieldMetaDataMap: ObservableMap<any, any>,  validate: function}}
  */
-export function watchForPatches(schema, data, ajv) {
+export function watchForPatches(schema, data, ajv, options) {
     // console.log(JSON.stringify(schema, null, 2));
+    const {skipStateTreeSanitizer} = options;
     const errors = observable.map();
     const paths = observable.map();
     const validators = new Map();
@@ -832,7 +834,7 @@ export function watchForPatches(schema, data, ajv) {
                     case 'remove':
                         // console.log(toJS(data));
                         // console.log("OP was definitely detected", schemaPathStr, toJS((data)));
-                        runValidatorR([...schemaPath], validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths);
+                        runValidatorR([...schemaPath], validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths, skipStateTreeSanitizer);
                         break;
                     default:
                         console.warn(`Couldn't handle patch operation ${patch.op} for ${patch.path}.`);
@@ -876,7 +878,7 @@ export function watchForPatches(schema, data, ajv) {
  */
 
 /* istanbul ignore next */
-function runValidatorR(path, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths = new Set()) {
+function runValidatorR(path, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths = new Set(), skipStateTreeSanitizer = false) {
     const pathStr = pathToPatchString(path);
     if(!skipPaths.has(pathStr) && validators.has(pathStr)) {
         skipPaths.add(pathStr);
@@ -921,7 +923,7 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
         }
         //Validate References
         for(let refPath of refs.values()) {
-            runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths);
+            runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths, skipStateTreeSanitizer);
         }
     }
 }
