@@ -786,7 +786,7 @@ function setRefPath(refs, path) {
  * @param {{}} options
  * @returns {{errors: ObservableMap<any, any>, fieldMetaDataMap: ObservableMap<any, any>,  validate: function}}
  */
-export function watchForPatches(schema, data, ajv, options) {
+export function watchForPatches(schema, data, ajv, options = {}) {
     // console.log(JSON.stringify(schema, null, 2));
     const {skipStateTreeSanitizer} = options;
     const errors = observable.map();
