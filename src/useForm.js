@@ -82,7 +82,7 @@ export default function useForm(options, ObserverWrappedComponent) {
                             setValue(self, name, value);
                         } catch(err) {
                             const path = isArrayLike(name) ? name : stringToPath(name);
-                            const validationErrors = checkSchemaPathForErrors(ajv, jsonSchema, path, value);
+                            const validationErrors = isObject(jsonSchema) ? checkSchemaPathForErrors(ajv, jsonSchema, path, value) : [];
                             throw new SchemaAssignmentError(err, `Could not assign a value in the form-capacitor schema for path: ${path.join(".")}`, path, value, validationErrors);
                         }
                         self._checkFieldAfterChange(name);
