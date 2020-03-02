@@ -1,7 +1,17 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {checkSchemaPathForErrors, createAjvObject, watchForPatches} from "./validation";
 import jsonSchemaToMST from "./jsonSchemaToMST";
-import {getObservable, getValue, isArrayLike, isObject, isPlainObject, setValue, toPath} from "./helpers";
+import {
+    getObservable,
+    getValue,
+    isArrayLike,
+    isNull,
+    isObject,
+    isPlainObject,
+    isUndefined,
+    setValue,
+    toPath
+} from "./helpers";
 import stringToPath from "./stringToPath";
 import SchemaAssignmentError from "./SchemaAssignmentError";
 import {applySnapshot, getSnapshot} from "mobx-state-tree";
@@ -80,13 +90,13 @@ export default function useForm(options, ObserverWrappedComponent) {
                     _set(name, value) {
                         try {
                             setValue(self, name, value);
+                            self._checkFieldAfterChange(name);
+                            self._setIsDirty(name);
                         } catch(err) {
                             const path = isArrayLike(name) ? name : stringToPath(name);
-                            const validationErrors = isObject(jsonSchema) ? checkSchemaPathForErrors(ajv, jsonSchema, path, value) : [];
-                            throw new SchemaAssignmentError(err, `Could not assign a value in the form-capacitor schema for path: ${path.join(".")}`, path, value, validationErrors);
+                            // const validationErrors = !isUndefined(jsonSchema) && !isNull(jsonSchema) && isObject(jsonSchema) ? checkSchemaPathForErrors(ajv, jsonSchema, path, value) : [];
+                            throw new SchemaAssignmentError(err, `Could not assign a value in the form-capacitor schema for path: ${path.join(".")}`, path, value);
                         }
-                        self._checkFieldAfterChange(name);
-                        self._setIsDirty(name);
                     },
                     _afterCreate() {
                         initialSnapshot = getSnapshot(self);
