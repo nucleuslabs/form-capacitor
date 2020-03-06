@@ -15,6 +15,7 @@ const TYPES = new Map(
     ]
 );
 
+/* istanbul ignore next */
 function convertType(type) {
     return TYPES.has(type) ? TYPES.get(type) : 'an unknown';
 }
@@ -62,6 +63,7 @@ export function minMax(title, min, max, xMin, xMax) {
     } else if(xMax !== undefined) {
         return {exclusiveMaximum: `${title} must be less than ${xMax.toString()}`};
     } else {
+        /* istanbul ignore next */
         return {};
     }
 }
@@ -103,7 +105,7 @@ export function minMaxLength(title, min, max) {
 }
 
 export function allOfRequired(andFields) {
-    return `Please fill out the ${andFields.join('and ')} fields`;
+    return `Please fill out the ${andFields.join(' and ')} fields`;
 }
 
 export function anyOfRequired(orFields) {

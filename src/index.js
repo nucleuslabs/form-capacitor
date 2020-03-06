@@ -3,7 +3,7 @@ export {getFlattenedErrors, getErrors, getErrorNode, setError, setErrors} from '
 export {default as useForm} from './useForm';
 export {default as useFormContext} from './useFormContext';
 export {default as useFormStatus} from './useFormStatus';
-export {default as useFormData} from './useFormStateTree';
+export {default as useFormStateTree} from './useFormStateTree';
 export {default as useFormErrors} from './useFormErrors';
 export {default as useFormActions} from './useFormActions';
 export {default as FormSubNode} from './FormSubNode';

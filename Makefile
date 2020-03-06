@@ -2,7 +2,7 @@ BIN := node_modules/.bin
 SRC_FILES := $(shell find src -name '*.js')
 
 # these are not files
-.PHONY: clean publish test
+.PHONY: clean publish
 
 # disable default suffixes
 .SUFFIXES:
@@ -22,10 +22,9 @@ yarn.lock:: node_modules
 node_modules:
 	mkdir -p $@
 
-publish: dist
+publish: test
+	cp package.json dist/package.json && cp README.md dist/README.md && cp -r docs dist/
 	yarn version
-	cp package.json dist/package.json
-	cp README.md dist/README.md
 	yarn publish dist --tag latest
 
 lint: $(SRC_FILES) yarn.lock

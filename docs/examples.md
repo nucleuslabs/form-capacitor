@@ -1,5 +1,4 @@
 #form-capacitor Examples
 
-There are a few examples in the __ tests__ folder.
+There are a few examples in the __ tests__ folder. We will create some examples with material-ui in the examples folder.
  
-The form-capacitor-examples repo is **not current** but will be updated soon.

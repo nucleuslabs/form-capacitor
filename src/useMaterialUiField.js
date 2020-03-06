@@ -1,5 +1,5 @@
 import FormContext from './FormContext';
-import {toPath} from './helpers';
+import {getValue, toPath} from './helpers';
 import {useObserver} from "mobx-react-lite";
 import React, {useContext} from "react";
 import {pathToPatchString} from "./validation";
@@ -16,20 +16,21 @@ export default function useMaterialUiField(path) {
     const fullPath = [...context.path, ...toPath(path)];
     const patchPath = pathToPatchString(fullPath);
     const onChange = (event) => {
-        context.set(event.target.value || undefined);
+        context.set(fullPath, event.target.value || undefined);
     };
     //transform meta data into material ui
 
     return useObserver(() => {
         const {title: label, ...metaData} = context.fieldMetaDataMap && context.fieldMetaDataMap.has(patchPath) ? context.fieldMetaDataMap.get(patchPath) : {required: false};
+        const value = getValue(context.stateTree, fullPath, undefined);
         const errors = getErrors(context.errorMap, fullPath);
         if(errors.length > 0) {
             const FormHelperTextProps = {
                 children: <div>{errors.map((e, eIdx) => <div key={eIdx}>e.message</div>)}</div>
             };
-            return {label, onChange, FormHelperTextProps, error: true, ...metaData};
+            return {label, value, onChange, FormHelperTextProps, error: true, ...metaData};
         } else {
-            return {label, onChange, ...metaData};
+            return {label, value, onChange, ...metaData};
         }
     });
 };

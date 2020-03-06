@@ -4,7 +4,7 @@
 import {deburr, upperFirst, camelCase} from 'lodash';
 import {types} from 'mobx-state-tree';
 import {isPlainObject, isArrayLike} from './helpers';
-import MstTypeError from "./MstTypeError";
+import MstTypeError from "./errorTypes/MstTypeError";
 
 /* istanbul ignore next */
 const titleCase = str => deburr(upperFirst(camelCase(str)));

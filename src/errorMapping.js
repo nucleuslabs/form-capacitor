@@ -164,34 +164,34 @@ export function deleteOwnNode(errorMap, path) {
         }
     }
 }
+//
+// /**
+//  * Deletes all errors for the provided path that were triggerred on the current path as well as all errors triggered by the current path
+//  * that do not appear in the provide map of errors
+//  * @param {Map|ObservableMap} errorMap
+//  * @param {string[]} path
+//  * @param {Map|ObservableMap} mapOfErrorsByPathStr A Map keyed by error path in ajv format ("/path/to/item") where each element is an iterable of error objects with a message param
+//  */
+// export function deleteOwnAndRelatedThatAreNotInMap(errorMap, path, mapOfErrorsByPathStr) {
+//     if(errorMap.has('pathIndex')) {
+//         const pathIndex = errorMap.get('pathIndex');
+//         const pathString = pathToPatchString(path);
+//         if(pathIndex.has(pathString)) {
+//             const pathMap = pathIndex.get(pathString);
+//             if(pathMap.has(pathString)) {
+//                 deleteNodeErrors(errorMap, pathString, pathMap.get(pathString));
+//                 pathMap.delete(pathString);
+//             }
+//             _deleteErrorsThatAreNotInMap(errorMap, pathMap, mapOfErrorsByPathStr);
+//             if(pathMap.size === 0) {
+//                 pathIndex.delete(pathString);
+//             }
+//         }
+//     }
+// }
 
 /**
- * Deletes all errors for the provided path that were triggerred on the current path as well as all errors triggered by the current path
- * that do not appear in the provide map of errors
- * @param {Map|ObservableMap} errorMap
- * @param {string[]} path
- * @param {Map|ObservableMap} mapOfErrorsByPathStr A Map keyed by error path in ajv format ("/path/to/item") where each element is an iterable of error objects with a message param
- */
-export function deleteOwnAndRelatedThatAreNotInMap(errorMap, path, mapOfErrorsByPathStr) {
-    if(errorMap.has('pathIndex')) {
-        const pathIndex = errorMap.get('pathIndex');
-        const pathString = pathToPatchString(path);
-        if(pathIndex.has(pathString)) {
-            const pathMap = pathIndex.get(pathString);
-            if(pathMap.has(pathString)) {
-                deleteNodeErrors(errorMap, pathString, pathMap.get(pathString));
-                pathMap.delete(pathString);
-            }
-            _deleteErrorsThatAreNotInMap(errorMap, pathMap, mapOfErrorsByPathStr);
-            if(pathMap.size === 0) {
-                pathIndex.delete(pathString);
-            }
-        }
-    }
-}
-
-/**
- * Deletes all errors for the provided path that were triggerred on the current path as well as all errors triggered by the current path
+ * Deletes all errors for the provided path that were triggered on the current path as well as all errors triggered by the current path
  * that do not appear in the provide map of errors
  * @param {Map|ObservableMap} errorMap
  * @param {string[]} path

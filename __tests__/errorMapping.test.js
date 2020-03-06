@@ -3,9 +3,9 @@ import {
     getErrorNode,
     getErrors,
     getFlattenedErrors,
-    setErrors, deleteAllNodes, deleteOwnNode, deleteOwnAndRelatedThatAreNotInMap, deleteAllThatAreNotInMap
+    setErrors, deleteAllNodes, deleteOwnNode, deleteAllThatAreNotInMap, hasError
 } from '../src/errorMapping';
-import {observable, toJS} from "mobx";
+import {observable} from "mobx";
 
 describe('setError', function() {
     it('Should set an arrays of error objects in an error map', function() {
@@ -224,7 +224,7 @@ describe('deleteAllThatAreNotInMap', function() {
         const aonthing1 = {title: "All or Nothing Array", message: "Array test action"};
         const aonthing1_0 = {title: "All or Nothing Array", message: "Array test action2"};
         const aonthing2 = {title: "All or Nothing Item 2", message: "It is Tuesday"};
-        const aonthing2_0 = {title: "All or Nothing Item 2 B", message: "It is Not Tuesday"};
+        // const aonthing2_0 = {title: "All or Nothing Item 2 B", message: "It is Not Tuesday"};
         setErrors(errorMap, ['firstName'], [firstName, firstName2]);
         expect(errorMap.get('children').get('firstName').get('errors')[0]).toEqual(firstName);
         expect(errorMap.get('children').get('firstName').get('errors')[1]).toEqual(firstName2);
@@ -268,5 +268,15 @@ describe('deleteAllThatAreNotInMap', function() {
         // expect(errorMap.get('children').get('AllorNothing').get('children').get('aonthing2').get('errors')[0]).toEqual(aonthing2);
 
         // expect(errorMap.get('children').has('AllorNothing')).toBeTrue();
+    });
+});
+
+describe('hasError', function() {
+    it('Should tell if there are errors for a node', function() {
+        const errorMap = observable.map();
+        const firstName = {title: "First Name", message: "There is no First Name!!!"};
+        expect(hasError(errorMap,['firstName'],firstName)).toBeFalse();
+        setError(errorMap, ['firstName'], firstName);
+        expect(hasError(errorMap,['firstName'],firstName)).toBeTrue();
     });
 });

@@ -218,7 +218,7 @@ export function isIntLoose(obj) {
  */
 /* istanbul ignore next */
 export function isInt(obj) {
-    return (typeof obj === 'number') && (Number.isFinite(obj) && ~~obj === obj);
+    return isNumber(obj) && (Number.isFinite(obj) && ~~obj === obj);
 }
 
 /**

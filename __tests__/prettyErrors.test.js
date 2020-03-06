@@ -13,8 +13,7 @@ function SimpleTextBox(props) {
             //isNan is in here to test numeric values with integer and number based type errors for numeric/string values
             change((!isNaN(ev.target.value) && ev.target.value ? ev.target.value * 1 : ev.target.value || undefined));
         }}/>
-        <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li
-            key={eIdx}>{err.message}</li>)}</ul>
+        <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>
     </span>;
 }
 
@@ -141,6 +140,22 @@ function DemoForm() {
                 <SimpleTextBox data-testid="max" name="max"/>
             </div>
             <div>
+                <span>xmin</span>
+                <SimpleTextBox data-testid="xmin" name="xmin"/>
+            </div>
+            <div>
+                <span>xmax</span>
+                <SimpleTextBox data-testid="xmax" name="xmax"/>
+            </div>
+            <div>
+                <span>min/max</span>
+                <SimpleTextBox data-testid="minmax" name="minmax"/>
+            </div>
+            <div>
+                <span>minXmax</span>
+                <SimpleTextBox data-testid="minxmax" name="minxmax"/>
+            </div>
+            <div>
                 <span>multiple types</span>
                 <SimpleTextBox data-testid="multiple" name="multiple"/>
             </div>
@@ -193,6 +208,18 @@ test("We should have nice error things", async() => {
     //max
     fireEvent.change(getByTestId("max"), {target: {value: 100}});
     expect(getByTestId("max_errors").innerHTML).toContain('Max must be 10 or less');
+    //xmin
+    fireEvent.change(getByTestId("xmin"), {target: {value: 2}});
+    expect(getByTestId("xmin_errors").innerHTML).toContain('xMin must be more than 3');
+    //xmax
+    fireEvent.change(getByTestId("xmax"), {target: {value: 100}});
+    expect(getByTestId("xmax_errors").innerHTML).toContain('xMax must be less than 10');
+    //minmax are the same
+    fireEvent.change(getByTestId("minmax"), {target: {value: 14}});
+    expect(getByTestId("minmax_errors").innerHTML).toContain('Same Min Max must be 3');
+    //minxmax
+    fireEvent.change(getByTestId("minxmax"), {target: {value: 14}});
+    expect(getByTestId("minxmax_errors").innerHTML).toContain('Min xMax must be 3 or more but less than 5');
     //exclusiveMax
     fireEvent.change(getByTestId("height"), {target: {value: 100}});
     expect(getByTestId("height_errors").innerHTML).toContain('Height must be greater than 2 to a maximum of 5');

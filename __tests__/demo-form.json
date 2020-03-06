@@ -65,6 +65,34 @@
           "type": "number",
           "maximum": 10
         },
+        "xmin": {
+          "title": "xMin",
+          "type": "number",
+          "exclusiveMinimum": 3
+        },
+        "xmax": {
+          "title": "xMax",
+          "type": "number",
+          "exclusiveMaximum": 10
+        },
+        "minmax": {
+          "title": "Same Min Max",
+          "type": "number",
+          "minimum": 3,
+          "maximum": 3
+        },
+        "minxmax": {
+          "title": "Min xMax",
+          "type": "number",
+          "minimum": 3,
+          "exclusiveMaximum": 5
+        },
+        "xminxmax": {
+          "title": "xMax xMin",
+          "type": "number",
+          "exclusiveMinimum": 3,
+          "exclusiveMaximum": 5
+        },
         "alias": {
           "type": "array",
           "title": "Aliases",

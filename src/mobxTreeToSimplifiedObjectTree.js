@@ -69,7 +69,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
             const returnObj = keys.reduce(function(acc, prop) {
                 //filter out undefined values
                 const newProp = replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj[prop]);
-                if(newProp !== undefined && !(Object.prototype.toString.call(newProp) === "[object Object]" && Object.keys(newProp).length === 0)) {
+                if(newProp !== undefined && !(isPlainObject(newProp) && Object.keys(newProp).length === 0)) {
                     acc[prop] = newProp;
                 }
                 return acc;

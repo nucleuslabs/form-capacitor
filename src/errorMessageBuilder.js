@@ -330,6 +330,7 @@ function getMergedErrorMessage(newErrorMessage, existingErrorMessage) {
  * @param {{}} schema
  * @param {{}} parentSchema
  */
+/* istanbul ignore next */
 function setAllErrorMessagesR(schema, parentSchema){
     if(schema.type) {
         switch(schema.type) {

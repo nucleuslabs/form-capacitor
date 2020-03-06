@@ -3,8 +3,8 @@ import {isBoolean, isArrayLike, isMapLike, isSetLike} from './helpers';
 import Ajv from "ajv";
 import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
-import UndefinedPropertyError from "./UndefinedPropertyError";
-import SchemaValidationError from "./SchemaValidationError";
+import UndefinedPropertyError from "./errorTypes/UndefinedPropertyError";
+import SchemaValidationError from "./errorTypes/SchemaValidationError";
 import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
 import {deleteAllNodes, deleteAllThatAreNotInMap, setError} from "./errorMapping";
 import {
@@ -325,7 +325,6 @@ function setPatchPathSchema(patchPathToSchemaPathMap, schemaPath, rootPatchPath,
 
 /* istanbul ignore next */
 function assignMetaData(metaData, path, metaDataMap) {
-    // @todo: Filter out recursive refs...
     const fieldPathId = pathToPatchString(path);
     if(metaDataMap.has(fieldPathId)) {
         const mapInst = metaDataMap.get(fieldPathId);

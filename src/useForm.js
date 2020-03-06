@@ -1,21 +1,19 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {checkSchemaPathForErrors, createAjvObject, watchForPatches} from "./validation";
+import {createAjvObject, watchForPatches} from "./validation";
 import jsonSchemaToMST from "./jsonSchemaToMST";
 import {
     getObservable,
     getValue,
     isArrayLike,
-    isNull,
     isObject,
     isPlainObject,
-    isUndefined,
     setValue,
     toPath
 } from "./helpers";
 import stringToPath from "./stringToPath";
-import SchemaAssignmentError from "./SchemaAssignmentError";
+import SchemaAssignmentError from "./errorTypes/SchemaAssignmentError";
 import {applySnapshot, getSnapshot} from "mobx-state-tree";
-import SchemaDataReplaceError from "./SchemaDataReplaceError";
+import SchemaDataReplaceError from "./errorTypes/SchemaDataReplaceError";
 import {isObservable, observable, computed, extendObservable, toJS} from "mobx";
 import $RefParser from "json-schema-ref-parser";
 import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
@@ -39,7 +37,7 @@ export default function useForm(options, ObserverWrappedComponent) {
         schemaPromise.then(jsonSchema => {
             const ajv = createAjvObject();
             let Model = jsonSchemaToMST(jsonSchema);
-            const formStatus = observable.object({ready: false, isDirty: false, isChanged: false});
+            const formStatus = observable.object({ready: false, isDirty: false, isChanged: false, isSubmitting: false, isValidating: false, isFetching: false});
             const changedSet = new Set();
             const dirtySet = new Set();
 
@@ -218,7 +216,7 @@ export default function useForm(options, ObserverWrappedComponent) {
                 set: (path, value) => isPlainObject(path) ? stateTreeInstance._replaceAll({...path}) : stateTreeInstance._set(path, value),
                 reset: stateTreeInstance._reset,
                 validate: () => {
-                    return skipStateTreeSanitizer ? toJS(stateTreeInstance) : validate(mobxTreeToSimplifiedObjectTree(stateTreeInstance));
+                    return validate(stateTreeInstance.toJS());
                 },
                 path: [],
                 ready: true
