@@ -2,7 +2,7 @@
 
 [TOC]
 
-##`useForm`
+## `useForm`
 
 This `hook` returns a react `<Component/>` so it is kinda like a nasty hook + HOC hybrid.
 
@@ -15,7 +15,7 @@ If we want nice observables in our root form, we need to wrap the observables in
 accessible using the [`useFormContext()`](#useformcontext) hook which returns nice things like `status.isChanged`, 
 and `stateTree` directly in our root form component and they will re-render automatically when they change.
 
-###Usage
+### Usage
 ```jsx
 import { useForm, useFormContext } from 'form-capacitor'; 
 import { observer } from "mobx-react-lite";
@@ -47,7 +47,7 @@ export default function MyForm(){
 }
 ```
 
-###Params
+### Params
 #### `options`
 | OPTION                  | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
@@ -131,11 +131,11 @@ You only need to wrap the component in observer if you intend to use the useForm
 If you plan on DO NOT use any observables ie `formStateTree` or `erroMap` but only use the `useField`, `useFieldArray` and/or `useFormErrors` 
 hooks in sub components they are pre-wrapped for you so you DO NOT need to wrap your functional component in `observer()`.  
 
-##`useFormContext`
+## `useFormContext`
 
 This `hook` returns an object containing some fun observables `formState`, `status`, `errorMap` and a few actions.
 
-###Usage
+### Usage
 ```jsx
 import {useFormContext } from 'form-capacitor'; 
 
@@ -151,11 +151,11 @@ export default function InternalFormComponent(){
     </div>;
 }
 ```
-###Params
+### Params
 
 Nope... It uses context because global variables patterns are acceptable as long as they are scoped and not called global variables.
 
-###Return
+### Return
 | PROPERTY                | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `stateTree`             | `Object`    | mobx-state-tree containing all of the form state, views and actions          |
@@ -167,13 +167,13 @@ Nope... It uses context because global variables patterns are acceptable as long
 | `validate`              | `function`  | Function to call imperative  validation for the form and sets errors         |
 | `path`                  | `string[]`  | array of the current base path for the form                                  |
 
-####stateTree 
+#### stateTree 
 | BUILT-IN ACTION         | DESCRIPTION                                                                  |
 |-------------------------|------------------------------------------------------------------------------|
 | `stateTree.toJS()`      | Returns an POJO of the stateTree                                             |
 | `stateTree.toJSON()`    | Returns a json string                                                        |
 
-####status 
+#### status 
 | BOOLEAN        | DESCRIPTION                                                                       |
 |----------------|-----------------------------------------------------------------------------------|
 | `ready`        | Form is loaded and ready for action                                               |
@@ -181,11 +181,11 @@ Nope... It uses context because global variables patterns are acceptable as long
 | `isChanged`    | Is the stateTree different then when the defaults were set or 'reset' was called. |
 | `hasErrors`    | Does the form have any errors                                                     |
 
-####fieldMetaDataMap
+#### fieldMetaDataMap
 
 Flat map of all field meta data ie {`required`, `title`}. The map is keyed by the fields full path.
 
-####set
+#### set
 Usage 1 - Replace stateTree with new data:
 ```js
 set({firstName: "Flerb", lastName: "Derp"});
@@ -198,7 +198,7 @@ set('firstName', "Flerb");
 
 Hook that connects various form inputs to the state tree
 
-###Usage
+### Usage
 ```jsx harmony
 import { TextField } from '@material-ui/core';
 import {useField, useFieldErrors} from "../src";
@@ -211,24 +211,24 @@ function SimpleTextBox({name}) {
     </span>;
 }
 ```
-###Params
+### Params
 | PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
 |-----------------------|---------------|--------------------------------------------------------------------------------------------|
 | `name/path`           |  `string`     | String path for the field via the json-schema that is delimited by the ``.`` character.    |
 
-###Return
+### Return
 | PARAM                   | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `value`                 | `???`       | value for the field                                                          |
 | `change`                | `function`  | mutator function to change the value for the field in the state tree         |
 | `fieldMetaData`         | `Object`    | meta data for field                                                          |
 
-####change
+#### change
 | PARAM                   | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `newValue`              | `???`       | new value for the field                                                      |
 
-####fieldMetaData
+#### fieldMetaData
 | PROPERTY                | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `title`                 | `string`    | new value for the field                                                      |
@@ -236,11 +236,11 @@ function SimpleTextBox({name}) {
 | `isDirty`               | `boolean`   | has the field been touched?                                                  |
 | `isChanged`             | `boolean`   | has the field changed from the default                                       |
 
-##`useFieldErrors`
+## `useFieldErrors`
 
 Hook to wire various error states and messages to fields or field containers.
 
-###Usage
+### Usage
 ```jsx
 import {TextField} from '@material-ui/core';
 import {useFieldErrors} from "../src";
@@ -250,18 +250,18 @@ function FieldErrors({name}) {
     return {hasErrors && <ul> {errors.map((err, errKey) => <li key={errKey}>err.message</li>)} </ul>};
 }
 ```
-###Params
+### Params
 | PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
 |-----------------------|---------------|--------------------------------------------------------------------------------------------|
 | `name/path`           |  `string`     | String path for the field via the json-schema that is delimited by the ``.`` character.    |
 
-###Return
+### Return
 | PARAM                   | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `hasErrors`             | `boolean`   | does this field have validation errors                                       |
 | `errors`                | `Object[]`  | array of error objects with user friendly validation error messages          |
 
-####error
+#### error
 | PROPERTY                | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `title`                 | `string`    | field title... so verbose                                                    |
@@ -273,7 +273,7 @@ function FieldErrors({name}) {
 
 hook that grabs the value of the field and an object full of array mutator functions 
 
-###Usage
+### Usage
 ```jsx
 import {Select} from 'react-select';
 import {useArrayField} from "../src";
@@ -284,18 +284,18 @@ function SimpleSelectDropdown({name}) {
     return <Select value={value}/>;
 }
 ```
-###Params
+### Params
 | PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
 |-----------------------|---------------|--------------------------------------------------------------------------------------------|
 | `name/path`           |  `string`     | String path for the field via the json-schema that is delimited by the ``.`` character.    |
 
-###Return
+### Return
 | PARAM                   | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `value`                 | `Array`     | array of things in the stateTree for suplied name/path                       |
 | `Mutators`              | `Object`    | object with all the functions to mutate the array                            |
 
-####Mutators
+#### Mutators
 | MUTATOR                 | PARAMS       | DESCRIPTION                                                                  |
 |-------------------------|--------------|------------------------------------------------------------------------------|
 | `set`                   | (array)      | set the array to a new array                                                 |
@@ -305,11 +305,11 @@ function SimpleSelectDropdown({name}) {
 | `splice`                | (start, deleteCount, optionalElementToSpliceIn) | mutates and array. See [splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) |
 | `replace`               | (array)      | replaces the current array with a new array                                  |
 
-##`useMaterialUiField`
+## `useMaterialUiField`
 
 Hook that connects material-ui inputs to the state tree
 
-###Usage
+### Usage
 ```js
 import {TextField} from '@material-ui/core';
 import {useMaterialUiField} from "../src";
@@ -319,12 +319,12 @@ function SimpleTextBox({name}) {
     return <TextField name={name} {...fieldAttributes}/>;
 }
 ```
-###Params
+### Params
 | PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
 |-----------------------|---------------|--------------------------------------------------------------------------------------------|
 | `name/path`           |  `string`     | String path for the field via the json-schema that is delimited by the ``.`` character.    |
 
-###Return
+### Return
 | PROPERTY                | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `name`                  | `string`    | field name                                                                   |
@@ -334,16 +334,16 @@ function SimpleTextBox({name}) {
 | `onChange`              | `function`  | Setter function that changes the value for the field in the stateTree        |
 | `FormHelperTextProps`   | `Object`    | Object containing errors in divs                                             |
 
-####FormHelperTextProps
+#### FormHelperTextProps
 | PROPERTY                | TYPE        | DESCRIPTION                                                                  |
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `children`              |`Comopnent[]`| Returns an array of error messages wrapped in divs                           |
 
-##`useFormErrors`
+## `useFormErrors`
 
 All the errors 
 
-###Usage
+### Usage
 ```jsx
 import {useFormErrors} from "../src";
 
@@ -352,21 +352,21 @@ function SomeCoolErrorComponent({name}) {
     return {hasErrors && <ul>errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>;
 }
 ```
-###Params
+### Params
 
 Nope
 
-###Return
+### Return
 | PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
 |-----------------------|---------------|--------------------------------------------------------------------------------------------|
 | `hasErrors`           | `boolean`     | true if the form has errors                                                                |
 | `errros`              | `string[]`    | flattened array of all current validation errors                                           |
 
-##`<FormSubNode/>`
+## `<FormSubNode/>`
 
 Tag which nests the path stored in context so that you can just use the field names instead of long paths with . in them for the name params for the Field hooks.
 
-###Usage
+### Usage
 ```js
 import {FormSubNode} from "../src";
 /*This example is contrived to illustrate how you could nest/group arrays of objects on a form
@@ -403,7 +403,7 @@ function Contacts({name}) {
     </FormSubNode>;
 }
 ```
-###Props
+### Props
 | PROP                  |      TYPE     |  DESCRIPTION                                                                               |
 |-----------------------|---------------|--------------------------------------------------------------------------------------------|
 | `name/path`           |  `string`     | String path to nest components within that is delimited by the ``.`` character.            |
