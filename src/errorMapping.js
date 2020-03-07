@@ -245,7 +245,12 @@ function deleteNodeErrors(errorNode, destPathString, errors) {
     }
 }
 
-
+/**
+ *
+ * @param {Map} map
+ * @param {Array} path
+ * @returns {*|boolean}
+ */
 /* istanbul ignore next */
 function delErrorNodeR(map, path) {
     if(!map.has('children')) return false;

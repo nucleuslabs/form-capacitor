@@ -41,6 +41,22 @@ export function setStringLengthErrorMessage(schema) {
  */
 export function setNumberRangeErrorMessage(schema) {
     if(schema.minimum !== undefined || schema.maximum !== undefined || schema.exclusiveMinimum !== undefined || schema.exclusiveMaximum !== undefined) {
+        if(schema.minimum !== undefined){
+            if(schema.maximum !== undefined && schema.minimum > schema.maximum){
+                console.warn(`Warning the json schema titled ${schema.title || "Unknown"} has a minimum that is higher than the maximum`);
+            }
+            if(schema.exclusiveMaximum !== undefined && schema.minimum >= schema.exclusiveMaximum){
+                console.warn(`Warning the json schema titled ${schema.title || "Unknown"} has a minimum that is higher or equal to the exclusiveMaximum`);
+            }
+        }
+        if(schema.exclusiveMinimum !== undefined){
+            if(schema.maximum !== undefined && schema.exclusiveMinimum >= schema.maximum){
+                console.warn(`Warning the json schema titled ${schema.title || "Unknown"} has a exclusiveMinimum that is higher than or equal to the maximum`);
+            }
+            if(schema.exclusiveMaximum !== undefined && schema.exclusiveMaximum - schema.exclusiveMinimum < 1){
+                console.warn(`Warning the json schema titled ${schema.title || "Unknown"} has a exclusiveMinimum that not compatible with the exclusiveMaximum. They are too close in value`);
+            }
+        }
         schema.errorMessage = getMergedErrorMessage(
             minMax(
                 schema.title,

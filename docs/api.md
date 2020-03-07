@@ -126,10 +126,10 @@ const actions = stateTree => ({
 This acts similar to a Higher Order Component. Although most hooks are supposed to reduce nesting, in this case  we are using context and 
 we found wrapping the component with an observer function was convenient and easy to read. 
 
-You only need to wrap the component in observer if you intend to use the useFormContext hook any where within the form. 
+You only need to wrap the component in observer if you intend to use the useFormContext hook within the form. 
 
-If you plan on DO NOT use any observables ie `formStateTree` or `erroMap` but only use the `useField`, `useFieldArray` and/or `useFormErrors` 
-hooks in sub components they are pre-wrapped for you so you DO NOT need to wrap your functional component in `observer()`.  
+If you DO NOT plan on using any form-capacitor observables directly in the form component but are using the `useField`, `useFieldArray` and/or `useFormErrors` 
+hooks in sub components they will all work fine without the `observer()` wrapper because they are pre-wrapped with useObserver. 
 
 ## `useFormContext`
 
@@ -163,7 +163,7 @@ Nope... It uses context because global variables patterns are acceptable as long
 | `fieldMetaDataMap`      | `Map`       | Flat map keyed by field path containing meta data for each fields            |
 | `errorMap`              | `Map`       | Traversable Map object of all of the Errors that exist in the form           |
 | `set`                   | `function`  | Function which is a stateTree action to set data within the stateTree        |
-| `reset`                 | `function`  | Function which is a stateTree action tyhat sets a form back to default state |
+| `reset`                 | `function`  | Function which is a stateTree action that sets a form back to default state  |
 | `validate`              | `function`  | Function to call imperative  validation for the form and sets errors         |
 | `path`                  | `string[]`  | array of the current base path for the form                                  |
 
@@ -310,7 +310,7 @@ function SimpleSelectDropdown({name}) {
 Hook that connects material-ui inputs to the state tree
 
 ### Usage
-```js
+```jsx
 import {TextField} from '@material-ui/core';
 import {useMaterialUiField} from "../src";
 
@@ -367,7 +367,7 @@ Nope
 Tag which nests the path stored in context so that you can just use the field names instead of long paths with . in them for the name params for the Field hooks.
 
 ### Usage
-```js
+```jsx
 import {FormSubNode} from "../src";
 /*This example is contrived to illustrate how you could nest/group arrays of objects on a form
 */ 

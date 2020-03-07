@@ -1,5 +1,5 @@
 import {toJS} from "mobx";
-import {isPlainObject} from "./helpers";
+import {isMapLike, isPlainObject} from "./helpers";
 
 /**
  * This function takes in a mobxStateTree object and Returns an object that is first passed through the mobx toJS function (https://mobx.js.org/refguide/tojson.html)
@@ -35,7 +35,7 @@ function replaceEmptyObjectPropertiesAndArraysWithUndefinedR(obj) {
             const justDefinedArr = newArr.filter(value => value !== undefined);
             return justDefinedArr.length === 0 ? undefined : newArr;
         }
-    } else if(obj instanceof Map || obj instanceof WeakMap) {
+    } else if(isMapLike(obj)) {
         if(obj.size === 0) {
             return undefined;
         } else {

@@ -230,7 +230,7 @@ function getClosestAjvPath(pathStr, pathMap) {
 
 /* istanbul ignore next */
 function getSchemaNodeFromPath(schema, path) {
-    if(!Array.isArray(path)) {
+    if(!isArrayLike(path)) {
         path = stringToPath(path);
     }
     let ret = schema;
