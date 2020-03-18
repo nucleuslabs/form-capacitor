@@ -47,7 +47,7 @@ function DemoForm() {
         Loader: <div>Loading Nice Things...</div>,
         actions: formData => ({
             addAlias(alias) {
-                formData.alias.push({alias: alias});
+                formData.alias.push({alias});
             },
             clearAliases() {
                 formData.alias.length = 0;

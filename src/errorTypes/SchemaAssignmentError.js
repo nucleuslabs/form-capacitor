@@ -1,12 +1,13 @@
 export default class SchemaAssignmentError extends Error {
     constructor(originalError, message, path, value, validationErrors) {
         super();
-        Object.assign(this, originalError);
-        this.message = message;
-        this.path = path;
-        this.value = value;
-        this.type = "SchemaAssignmentError";
-        this.originalMessage = originalError.message;
-        this.validationErrors = validationErrors;
+        Object.assign(this, originalError, {
+            type: 'SchemaAssignmentError',
+            originalMessage: originalError.message,
+            message,
+            path,
+            value,
+            validationErrors
+        });
     }
 }

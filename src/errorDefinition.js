@@ -15,27 +15,59 @@ const TYPES = new Map(
     ]
 );
 
+
+/**
+ *
+ * @param {string} type
+ * @returns {string}
+ */
 /* istanbul ignore next */
 function convertType(type) {
     return TYPES.has(type) ? TYPES.get(type) : 'an unknown';
 }
 
+/**
+ * @param {string} title
+ * @param {string} type
+ * @returns {string}
+ */
 export function typeKeyword(title, type) {
     return `${title} must be ${convertType(type)}`;
 }
 
+/**
+ * @param {string} title
+ * @returns {string}
+ */
 export function requiredKeyword(title) {
     return `Please fill in the ${title} field`;
 }
 
+/**
+ * @param {string} dependant
+ * @param {string[]} dependencies
+ * @returns {string}
+ */
 export function dependenciesKeyword(dependant, dependencies) {
     return `Please fill in the ${dependant} field. It is required when ${dependencies.length > 1 ? `either ${dependencies.join(' or ')}` : `${dependencies[0]}`} is set`;
 }
 
+/**
+ * @param {string} title
+ * @returns {string}
+ */
 export function patternKeyword(title) {
     return `${title} does not match the expected format`;
 }
 
+/**
+ * @param {string} title
+ * @param {number} min
+ * @param {number} max
+ * @param {number} xMin
+ * @param {number} xMax
+ * @returns {{maximum: string, exclusiveMinimum: string}|{exclusiveMaximum: string, exclusiveMinimum: string}|{exclusiveMaximum: string}|{}|{minimum: string}|{maximum: string, minimum: string}|{exclusiveMaximum: string, minimum: string}|{maximum: string}|{exclusiveMinimum: string}}
+ */
 export function minMax(title, min, max, xMin, xMax) {
     if(min !== undefined && max !== undefined) {
         if(min === max) {
@@ -68,6 +100,12 @@ export function minMax(title, min, max, xMin, xMax) {
     }
 }
 
+/**
+ * @param {string} title
+ * @param {number} min
+ * @param {number} max
+ * @returns {{minItems: string}|{minItems: string, maxItems: string}|{maxItems: string}|{}}
+ */
 export function minMaxItems(title, min, max) {
     if(min !== undefined && max !== undefined) {
         if(min === max) {
@@ -86,6 +124,12 @@ export function minMaxItems(title, min, max) {
     }
 }
 
+/**
+ * @param {string} title
+ * @param {number} min
+ * @param {number} max
+ * @returns {{minLength: string, maxLength: string}|{maxLength: string}|{minLength: string}|{}}
+ */
 export function minMaxLength(title, min, max) {
     if(min !== undefined && max !== undefined) {
         if(min === max) {
@@ -104,10 +148,18 @@ export function minMaxLength(title, min, max) {
     }
 }
 
+/**
+ * @param {string[]} andFields
+ * @returns {string}
+ */
 export function allOfRequired(andFields) {
     return `Please fill out the ${andFields.join(' and ')} fields`;
 }
 
+/**
+ * @param {string[]} orFields
+ * @returns {string}
+ */
 export function anyOfRequired(orFields) {
     if(orFields.length === 1) {
         return `Please fill in the ${orFields[0].length > 1 ? `(${orFields[0].join(' and ')})` : orFields[0]} field(s)`;
@@ -116,6 +168,11 @@ export function anyOfRequired(orFields) {
     }
 }
 
+/**
+ * @param {string} title
+ * @param {string[]} types
+ * @returns {string}
+ */
 export function anyOfType(title, types) {
     return `${title} must either be ${types.map(type => {
         return convertType(type);

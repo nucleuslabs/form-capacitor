@@ -323,9 +323,11 @@ function getPropertyTitle(schema, propName) {
 }
 
 /**
- *
+ * This function merges custom ajv error messages to emulate the behaviour of ajv-errors https://github.com/epoberezkin/ajv-errors#usage
+ * if existingErrorMessage is a string then it replaces all proper properties in the newErrorMessage with the string
+ * if existingErrorMessage is an object it merges the custom error objects together
  * @param {{}} newErrorMessage
- * @param {{}} existingErrorMessage
+ * @param {{}|string} existingErrorMessage
  * @returns {{}}
  */
 /* istanbul ignore next */
