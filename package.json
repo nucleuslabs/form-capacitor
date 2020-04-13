@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "0.1.36",
+  "version": "0.1.39",
   "description": "Form manager for React/Redux",
   "main": "dist/index.js",
   "scripts": {
@@ -34,6 +34,7 @@
   "devDependencies": {
     "@babel/cli": "^7.6",
     "@babel/core": "^7.6",
+    "@babel/polyfill": "^7.6",
     "@babel/plugin-proposal-class-properties": "^7.5",
     "@babel/plugin-proposal-object-rest-spread": "^7.6",
     "@babel/plugin-syntax-object-rest-spread": "^7.2",
