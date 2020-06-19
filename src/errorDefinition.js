@@ -157,7 +157,7 @@ export function allOfRequired(andFields) {
 }
 
 /**
- * @param {string[]} orFields
+ * @param {[string[]]} orFields
  * @returns {string}
  */
 export function anyOfRequired(orFields) {

@@ -32,15 +32,16 @@ function getDefault(node) {
 
 /* istanbul ignore next */
 const TYPE_MAP = Object.freeze({
-    boolean: (node, meta) => types.boolean,
-    number: (node, meta) => types.number,
-    integer: (node, meta) => types.refinement('integer', types.number, i => Number.isInteger(i)),
-    string: (node, meta) => {
+    //type: (node, meta) => types.type,
+    boolean: () => types.boolean,
+    number: () => types.number,
+    integer: () => types.refinement('integer', types.number, i => Number.isInteger(i)),
+    string: (node) => {
         const format = node.format;
         if(format === 'datetime') return types.Date;
         return types.string;
     },
-    object: (node, meta) => {
+    object: (node) => {
         const properties = Object.entries(node.properties).reduce((acc, [k, v]) => {
             acc[k] = makeType(v, {
                 parent: node,
@@ -56,7 +57,7 @@ const TYPE_MAP = Object.freeze({
             ? types.model(titleCase(node.title), properties)
             : types.model(properties);
     },
-    array: (node, meta) => {
+    array: (node) => {
         if(isPlainObject(node.items)) {
             return types.array(makeType(node.items, {
                 parent: node,
@@ -79,7 +80,7 @@ const TYPE_MAP = Object.freeze({
         }
         throw new Error('array.items must be an object or array');
     },
-    null: (node, meta) => types.null,
+    null: () => types.null,
 });
 
 // https://github.com/mobxjs/mobx-state-tree#types-overview
@@ -95,11 +96,11 @@ function makeType(node, meta) {
     }
 
     if(node.anyOf) {
-        const anyOftypes = node.anyOf.filter(x => x.type !== undefined).map(x => makeType(x, {
+        const anyOfTypes = node.anyOf.filter(x => x.type !== undefined).map(x => makeType(x, {
             parent: node,
         }));
-        if(anyOftypes.length > 0) {
-            typeArr.push(types.union(...anyOftypes));
+        if(anyOfTypes.length > 0) {
+            typeArr.push(types.union(...anyOfTypes));
         }
     }
     if(node.allOf) {

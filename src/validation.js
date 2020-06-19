@@ -1,9 +1,8 @@
+// eslint-disable-next-line no-unused-vars
 import {observable, ObservableMap, toJS} from 'mobx';
 import {isBoolean, isArrayLike, isMapLike, isSetLike} from './helpers';
 import Ajv from "ajv";
-import stringToPath from "./stringToPath";
 import {onPatch} from "mobx-state-tree";
-import UndefinedPropertyError from "./errorTypes/UndefinedPropertyError";
 import SchemaValidationError from "./errorTypes/SchemaValidationError";
 import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
 import {deleteAllNodes, deleteAllThatAreNotInMap, setError} from "./errorMapping";
@@ -57,7 +56,7 @@ const errTypeKeywordActions = {
      */
     "if": defaultActionCallBack,
     /**
-     * Processes dependecies keyword to see if there are children that need to be targeted
+     * Processes dependencies keyword to see if there are children that need to be targeted
      * @param validationPath
      * @param errCallback
      * @param errorMapPath
@@ -199,7 +198,7 @@ function getValidationAndErrorPaths(error, pathMap, dataErrorPathMap, schemaErro
 }
 
 /**
- * Get the closest path from a map of paths for a string conatined in an ajv Error objects schemaPath
+ * Get the closest path from a map of paths for a string contained in an ajv Error objects schemaPath
  * @param {string} pathStr
  * @param {Map|ObservableMap} pathMap
  * @returns {*}
@@ -222,54 +221,55 @@ function getClosestAjvPath(pathStr, pathMap) {
     return pathMap.get("#");
 }
 
-/**
- *
- * @param {{}} schema
- * @param {[]} path
- */
-
-/* istanbul ignore next */
-function getSchemaNodeFromPath(schema, path) {
-    if(!isArrayLike(path)) {
-        path = stringToPath(path);
-    }
-    let ret = schema;
-
-    for(let key of path) {
-        switch(ret.type) {
-            case 'object':
-                if(ret.properties) {
-                    if(ret.properties[key] !== undefined) {
-                        ret = ret.properties[key];
-                    } else {
-                        throw new UndefinedPropertyError(key, ret);
-                    }
-                }
-                break;
-            case 'array':
-                if(ret.items) {
-                    ret = ret.items[key];
-                }
-                break;
-        }
-    }
-    return ret;
-}
-
-/**
- * Converts an array of ajv errors into an array of condensed pretty error objs
- * @param {{}[]} errors
- * @param {string[]} path
- * @returns {{title: {string}, message: {string}, path: {string, ""?}, keyword: {string}}[]}
- */
-
-/* istanbul ignore next */
-function beautifyAjvErrors(errors, path) {
-    // console.warn(errors);
-    return errors.map(error => {
-        return beautifyAjvError(error, path);
-    });
-}
+// @todo Evaluate if we will be using these functions in future versions
+// /**
+//  *
+//  * @param {{}} schema
+//  * @param {[]} path
+//  */
+//
+// /* istanbul ignore next */
+// function getSchemaNodeFromPath(schema, path) {
+//     if(!isArrayLike(path)) {
+//         path = stringToPath(path);
+//     }
+//     let ret = schema;
+//
+//     for(let key of path) {
+//         switch(ret.type) {
+//             case 'object':
+//                 if(ret.properties) {
+//                     if(ret.properties[key] !== undefined) {
+//                         ret = ret.properties[key];
+//                     } else {
+//                         throw new UndefinedPropertyError(key, ret);
+//                     }
+//                 }
+//                 break;
+//             case 'array':
+//                 if(ret.items) {
+//                     ret = ret.items[key];
+//                 }
+//                 break;
+//         }
+//     }
+//     return ret;
+// }
+//
+// /**
+//  * Converts an array of ajv errors into an array of condensed pretty error objs
+//  * @param {{}[]} errors
+//  * @param {string[]} path
+//  * @returns {{title: {string}, message: {string}, path: {string, ""?}, keyword: {string}}[]}
+//  */
+//
+// /* istanbul ignore next */
+// function beautifyAjvErrors(errors, path) {
+//     // console.warn(errors);
+//     return errors.map(error => {
+//         return beautifyAjvError(error, path);
+//     });
+// }
 
 /**
  * Converts an ajv error into a condensed pretty error obj
@@ -309,14 +309,15 @@ export function createAjvObject() {
     });
 }
 
-export function checkSchemaPathForErrors(ajv, schema, path, value) {
-    const subValidator = ajv.compile(getSchemaNodeFromPath(schema, path));
-    if(subValidator(value)) {
-        return [];
-    } else {
-        return beautifyAjvErrors(subValidator.errors, path);
-    }
-}
+// @todo Decide whether to remove this function
+// export function checkSchemaPathForErrors(ajv, schema, path, value) {
+//     const subValidator = ajv.compile(getSchemaNodeFromPath(schema, path));
+//     if(subValidator(value)) {
+//         return [];
+//     } else {
+//         return beautifyAjvErrors(subValidator.errors, path);
+//     }
+// }
 
 /* istanbul ignore next */
 function setPatchPathSchema(patchPathToSchemaPathMap, schemaPath, rootPatchPath, leafName) {
@@ -387,7 +388,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
      *
      * dependencies: The items in the dependencies keyword will get tied to the root object and a reference will lead from the dependent fields to the root validator
      *               this is not optimal but it is accurate in future the @todo will be to separate the dependency to it's own special node */
-    //setObjectErrorMessages mutates skeletonSchemaMap so that it will attach the proper errorMessages to the subschema for the validators
+    //setObjectErrorMessages mutates skeletonSchemaMap so that it will attach the proper errorMessages to the sub-schema for the validators
     setObjectErrorMessages(skeletonSchemaMap);
     if(schema.required && schema.required.length > 0) {
         // Going to assign each root object/field level required to itself unlike anyOf or allOf
@@ -675,6 +676,7 @@ function buildSchemaTree(path, leafValue = {}, basicSchemaMap = new Map()) {
 /* istanbul ignore next */
 function assignFieldDefinitions(refs, schema, fieldDefinitionMap) {
     // const refPatchPaths = [...refs].map(pathArr => pathToPatchString(pathArr));
+    // eslint-disable-next-line no-unused-vars
     for(let [pathStr, fieldPath] of refs) {
         assignFieldDefinition(schema, fieldDefinitionMap, fieldPath, [...refs.values()]);
     }
@@ -781,7 +783,7 @@ function setRefPath(refs, path) {
  *
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
  * @param {*} data Mobx State Tree
- * @param {Ajv} ajv
+ * @param {Ajv.ajv} ajv
  * @param {{}} options
  * @returns {{errors: ObservableMap<any, any>, fieldMetaDataMap: ObservableMap<any, any>,  validate: function}}
  */

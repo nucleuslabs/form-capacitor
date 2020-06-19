@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import {isObservableMap, observable, ObservableMap, ObservableSet, IObservableArray} from "mobx";
 import {pathToPatchString, ajvStringToPath} from "./validation";
 
@@ -166,7 +167,7 @@ export function deleteOwnNode(errorMap, path) {
 }
 //
 // /**
-//  * Deletes all errors for the provided path that were triggerred on the current path as well as all errors triggered by the current path
+//  * Deletes all errors for the provided path that were triggered on the current path as well as all errors triggered by the current path
 //  * that do not appear in the provide map of errors
 //  * @param {Map|ObservableMap} errorMap
 //  * @param {string[]} path

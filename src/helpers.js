@@ -248,7 +248,7 @@ export function setValue(obj, path, value) {
         if(Object.isExtensible(obj[key])) {
             // Primitives like null, undefined, numbers and booleans will be overwritten
             // because they can't be extended. frozen or sealed objects will also be
-            // overwritten. Objets, arrays, functions, regexes, Dates and more will
+            // overwritten. Objects, arrays, functions, regular expressions, Dates and more will
             // have new properties added.
         } else if(isIntLoose(path1)) {
             setProperty(obj, key, new Array(parseInt(path1, 10) + 1));
