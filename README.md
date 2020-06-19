@@ -1,5 +1,7 @@
 # form-capacitor
 
+![CI](https://github.com/nucleuslabs/form-capacitor/workflows/CI/badge.svg)
+
 Form capacitor is a set of React Hooks that help you manage state, validation and errors for react based forms. 
 This project makes use of mobx / mobx-state-tree for state management and AJV for validation.
 
