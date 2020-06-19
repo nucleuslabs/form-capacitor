@@ -1,15 +1,15 @@
-##Form-Capacitor
+# Form-Capacitor
 
 Form capacitor is a library for building fast responsive forms with state management, nesting, dynamic repeatable input support, serialization and as you type validation/error generation using json-schema packaged into a few hooks.  
 
-##What it does
+## What it does
 
 - Form State Management
 - Validation (Declarative As you type and Imperative Full Form Validation)
 - Provides thoughtfully combined default Error Messages (automated or parses custom Error Messages direct from json-schema)
 - Tree Serialization as a POJO or a JSON string
 
-##What it doesn't do
+## What it doesn't do
 
 - Submit handling 
   - Presently the handy `hasErrors` boolean as well as the `toJS()` and `toJSON()` methods included in `useFormContext` allow you to roll your own XHR REST Requests, Graphql Mutations or Whatever)
@@ -24,19 +24,19 @@ Form capacitor is a library for building fast responsive forms with state manage
    - json-schema versions 1-6 (will not support)
    - json-schema 8
 
-##Roadmap
+## Roadmap
 
 1. Submit handler generating hooks
 2. More json-schema keyword support/testing
 3. Custom async validation (ie checking for username uniqueness using fetch to check a service)
 4. json-schema 8 support (waiting on AJV to support 8)
 
-##browser support
+## Browser Support
 
 - Modern browsers
 - Internet Explorer 11
 
-##Peer dependencies
+## Peer dependencies
 
 - react and react-dom 16.8+ (the ones with hooks)
 - mobx 4 (the one with IE support)
@@ -56,7 +56,7 @@ Form capacitor is a library for building fast responsive forms with state manage
 - Easy to nest so that nested fields don't have to include long path names in so they are easier to move if schema changes
 - Functions that allow you to work with array data types ie multi-selects using mutators like push, pop, splice, remove that are re
 
-##Form-capacitor works great for the following:
+## Form-capacitor works great for the following:
 
 - Forms with dynamic endless repeating sections with text area's, react-selects, react-multi-selects, date pickers, email inputs and min max number inputs  
 - Complicated anyOF and All-Or-Nothing/dependency rules with conditional related field validation.
@@ -80,7 +80,7 @@ We also wanted to use standard validation syntax between front-end and back-end 
 Although Formik and redux-forms did not perform well for our complex forms with as you type validation enabled 
 at the time we used them in early 2019, they may be faster now, I am not sure. 
 
-##Pros
+## Pros
 
 1. It is Fast - Form state is stored in observables so it's performance is not hindered by challenges such as having a large number of inputs and doing as you type validation on fields
 2. Supports IE 11 
@@ -93,7 +93,7 @@ at the time we used them in early 2019, they may be faster now, I am not sure.
 9. Works well with popular UI components like react-select and react-datepicker and material UI Components
 10. Not too many dependencies mostly peerDependencies 
 
-##Cons
+## Cons
 
 1. Only supports React 16.8 or newer because it uses Hooks :(
 2. Only supports [json-schema draft 7](https://json-schema.org/draft-07/json-schema-release-notes.html) no other versions are supported at this time the main reason for this is that as of this writing AJV doesn't support version 8
