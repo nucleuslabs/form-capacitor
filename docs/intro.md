@@ -1,6 +1,6 @@
 ##Form-Capacitor
 
-Form capacitor is an easy to use library that makes building fast responsive forms easy using a few hooks.  
+Form capacitor is a library for building fast responsive forms with state management, nesting, dynamic repeatable input support, serialization and as you type validation/error generation using json-schema packaged into a few hooks.  
 
 ##What it does
 
@@ -11,18 +11,23 @@ Form capacitor is an easy to use library that makes building fast responsive for
 
 ##What it doesn't do
 
-- Submit handling (not yet but we are working on it)
+- Submit handling 
+  - Presently the handy `hasErrors` boolean as well as the `toJS()` and `toJSON()` methods included in `useFormContext` allow you to roll your own XHR REST Requests, Graphql Mutations or Whatever)
+  - In the not to distant future we are mulling over building some default REST and Apollo hooks that will pass you back a submit handler which will use a standard toast for errors and do all the submitty things)
 - Custom async validation (ie checking for username uniqueness using fetch to check a service)
+  - Presently we give you access to add and clear your own custom errors, but we know that is weaksauce
+  - We are still deciding how we want to tackle support for async validations being that the json-schema can be validated reliably on both client and server. Async validations typically rely on logic and external factors which may have a mismatch between client and server logic.  
 - a few json-schema things are not yet supported 
-   - oneOf
-   - array tuple validation
-   - json-schema versions 1-6
+   - oneOf 
+   - allOf (This might work, but has NOT been tested yet.)
+   - array tuple validation (This might work, but has NOT been tested yet.)
+   - json-schema versions 1-6 (will not support)
    - json-schema 8
 
 ##Roadmap
 
-1. Submit handling
-2. More json-schema keyword support
+1. Submit handler generating hooks
+2. More json-schema keyword support/testing
 3. Custom async validation (ie checking for username uniqueness using fetch to check a service)
 4. json-schema 8 support (waiting on AJV to support 8)
 

@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Strictly typed form state manager for React with as you type validation for many inputs with pretty errors using a json-schema definition and rules and a few simple Hooks",
   "browser": "web",
   "main": "dist/index.js",
@@ -36,7 +36,7 @@
       "url": "https://nucleuslabs.com"
     }
   ],
-  "repository": "https://bitbucket.org/nucleuslabs/form-capacitor",
+  "repository": "https://github.com/nucleuslabs/form-capacitor",
   "license": "MIT",
   "peerDependencies": {
     "react": "^16.8",
