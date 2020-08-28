@@ -2,9 +2,9 @@ import testSchema from './demo-form';
 import jsonSchemaToMST from "../src/jsonSchemaToMST";
 import $RefParser from 'json-schema-ref-parser';
 import {setValue} from "../src";
-import {observable} from "mobx";
+import { observable, toJS } from 'mobx';
 import {watchForPatches, createAjvObject, pathToPatchString} from "../src/validation";
-import mobxTreeToSimplifiedObjectTree from "../src/mobxTreeToSimplifiedObjectTree";
+import sanitizeObjectTree from "../src/sanitizeObjectTree";
 
 //tests requiring mobx state tree
 describe('watchForPatches', function() {
@@ -21,7 +21,7 @@ describe('watchForPatches', function() {
         }));
         const ajv = createAjvObject();
         let mobxStateTree = Model.create({});
-        const {errors, validate} = watchForPatches(schema, mobxStateTree, ajv);
+        const {errors, validate} = watchForPatches(schema, mobxStateTree, ajv, {treeSanitizer: sanitizeObjectTree});
         mobxStateTree.set("firstName", undefined);
         mobxStateTree.set("firstName", "Hello");
         mobxStateTree.set("lastName", "World");
@@ -30,7 +30,7 @@ describe('watchForPatches', function() {
             //here to give a few cycles for stuff to happen
         }
         expect(errors).toEqual(observable.map());
-        const passed = validate(mobxTreeToSimplifiedObjectTree(mobxStateTree));
+        const passed = validate(sanitizeObjectTree(toJS(mobxStateTree)));
         expect(passed).toBeTrue();
     });
 });

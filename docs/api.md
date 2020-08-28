@@ -53,10 +53,12 @@ export default function MyForm(){
 |-------------------------|-------------|------------------------------------------------------------------------------|
 | `schema`                | `Object`    | json-schema v7 object                                                        |
 | `$ref`                  | `string`    | json-schema path to the  core form object                                    |
-| `default`               | `Object`    | POJO with the default data for the form                                      |
+| `default`               | `Object/function/Promise` | POJO or a funciton/promise that resolves to a POJO with the default data for the form  |
 | `views`                 | `function`  | Function that defines calculated memoized functions that contain form state  |
 | `actions`               | `function`  | Function that defines actions to mutate the form state                       |
-| `skipStateTreeSanitizer`| `boolean`   | If true Skips the sanitization function to collapse empty objects and arrays |
+| `Loader`                | `React.Component` | Component to use in place of form while it loads                       | 
+| `treeSanitizer`         | `function`  | Function that is used to sanitize the data in the stateTree before validation and before being returned from toJS/toJSON accepts a POJO as it's only param (the built-in sanitizer collapses empty objects and arrays to undefined) |
+| `defaultSanitizer`      | `function`  | Function that is used to sanitize the defaults before data is rendered accepts a POJO as it's only param (the built-in sanitizer converts all null's to undefined) |
 
 ##### json-schema v7 object example 
 | PARAM    |      TYPE     |  DESCRIPTION                  |
@@ -348,7 +350,7 @@ All the errors
 import {useFormErrors} from "../src";
 
 function SomeCoolErrorComponent({name}) {
-    const [hasErrors, errors] = useFormErrors();
+    const [hasErrors, errors] = useFormErrors(name);
     return {hasErrors && <ul>errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>;
 }
 ```

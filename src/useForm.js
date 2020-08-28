@@ -4,25 +4,26 @@ import jsonSchemaToMST from "./jsonSchemaToMST";
 import {
     getObservable,
     getValue,
-    isArrayLike,
+    isArrayLike, isFunction,
     isObject,
-    isPlainObject,
+    isPlainObject, isPromise,
     setValue,
     toPath
-} from "./helpers";
+} from './helpers';
 import stringToPath from "./stringToPath";
 import SchemaAssignmentError from "./errorTypes/SchemaAssignmentError";
 import {applySnapshot, getSnapshot} from "mobx-state-tree";
 import SchemaDataReplaceError from "./errorTypes/SchemaDataReplaceError";
 import {isObservable, observable, computed, extendObservable, toJS} from "mobx";
 import $RefParser from "json-schema-ref-parser";
-import mobxTreeToSimplifiedObjectTree from "./mobxTreeToSimplifiedObjectTree";
+import sanitizeObjectTree from "./sanitizeObjectTree";
 import equal from 'fast-deep-equal';
 import FormContext from "./FormContext";
+import sanitizeDefaults from './sanitizeDefaults';
 
 /**
  * returns a form component wired up with state, field meta data, validation, and errors
- * @param {{}} options
+ * @param {{schema: {},$ref: string, defaults: {}, actions: {}, views: {},Loader: React.Component, treeSanitizer: function(tree: {}), defaultSanitizer: function(default: {})}} options
  * @param {*} ObserverWrappedComponent
  * @returns {*}
  */
@@ -30,11 +31,27 @@ export default function useForm(options, ObserverWrappedComponent) {
     const [schemaContext, setContext] = useState({
         ready: false,
     });
-    const {skipStateTreeSanitizer} = options;
+    options = Object.assign({
+        treeSanitizer: sanitizeObjectTree,
+        defaultSanitizer: sanitizeDefaults
+    }, options);
+
+    //if this is not a function scream at whoever set it
+    if(!isFunction(options.treeSanitizer)) {
+        throw new Error("options.treeSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO Tree.");
+    }
+
+    //if this is not a function scream at whoever set it
+    if(!isFunction(options.defaultSanitizer)) {
+        throw new Error("options.defaultSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+    }
+
+    const {treeSanitizer, defaultSanitizer} = options;
+
     useEffect(() => {
         const parser = new $RefParser();
         const schemaPromise = options.$ref ? parser.dereference(options.schema).then(() => parser.$refs.get(options.$ref)) : parser.dereference(options.schema);
-        schemaPromise.then(jsonSchema => {
+        schemaPromise.then(async jsonSchema => {
             const ajv = createAjvObject();
             let Model = jsonSchemaToMST(jsonSchema);
             const formStatus = observable.object({ready: false, isDirty: false, isChanged: false, isSubmitting: false, isValidating: false, isFetching: false});
@@ -132,7 +149,7 @@ export default function useForm(options, ObserverWrappedComponent) {
                             });
                             if(errs.length > 0) {
                                 const errProps = Array.from(propMap.keys()).join(", ");
-                                throw new SchemaDataReplaceError(errs, `Error replacing some root form-capacitor props (${errProps})`, propMap);
+                                throw new SchemaDataReplaceError(errs, `Error replacing some root form-capacitor props [${errProps}] - (this may be a type mismatch between your data and schema).`, propMap);
                             }
                         }
                     },
@@ -165,7 +182,7 @@ export default function useForm(options, ObserverWrappedComponent) {
                         self._setIsDirty(name);
                     },
                     toJS() {
-                        return skipStateTreeSanitizer ? toJS(self): mobxTreeToSimplifiedObjectTree(self);
+                        return treeSanitizer(toJS(self));
                     },
                     toJSON() {
                         return JSON.stringify(self.toJS());
@@ -186,7 +203,13 @@ export default function useForm(options, ObserverWrappedComponent) {
             stateTreeInstance._afterCreate();
 
             if(options.default) {
-                stateTreeInstance._setRoot(options.default);
+                if(isPromise(options.default)) {
+                    stateTreeInstance._setRoot(defaultSanitizer(await options.default));
+                } else if(isFunction(options.default)){
+                    stateTreeInstance._setRoot(defaultSanitizer(options.default()));
+                } else {
+                    stateTreeInstance._setRoot(defaultSanitizer(options.default));
+                }
             }
 
             stateTreeInstance._afterDefaults();
