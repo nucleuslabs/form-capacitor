@@ -4,7 +4,7 @@ import $RefParser from 'json-schema-ref-parser';
 import {setValue} from "../src";
 import { observable, toJS } from 'mobx';
 import {watchForPatches, createAjvObject, pathToPatchString} from "../src/validation";
-import sanitizeObjectTree from "../src/sanitizeObjectTree";
+import { builtInStateTreeSanitizer } from '../src';
 
 //tests requiring mobx state tree
 describe('watchForPatches', function() {
@@ -21,7 +21,7 @@ describe('watchForPatches', function() {
         }));
         const ajv = createAjvObject();
         let mobxStateTree = Model.create({});
-        const {errors, validate} = watchForPatches(schema, mobxStateTree, ajv, {treeSanitizer: sanitizeObjectTree});
+        const {errors, validate} = watchForPatches(schema, mobxStateTree, ajv, {treeSanitizer: builtInStateTreeSanitizer});
         mobxStateTree.set("firstName", undefined);
         mobxStateTree.set("firstName", "Hello");
         mobxStateTree.set("lastName", "World");
@@ -30,7 +30,7 @@ describe('watchForPatches', function() {
             //here to give a few cycles for stuff to happen
         }
         expect(errors).toEqual(observable.map());
-        const passed = validate(sanitizeObjectTree(toJS(mobxStateTree)));
+        const passed = validate(builtInStateTreeSanitizer(toJS(mobxStateTree)));
         expect(passed).toBeTrue();
     });
 });

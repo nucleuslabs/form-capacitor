@@ -22,4 +22,7 @@ describe('stringToPath', function() {
     it('should convert a bracket with dots inside it to an array where the dots inside the brackets are used as part of a path node', function() {
         expect(stringToPath("my[super.string]yes")).toEqual(["my","super.string","yes"]);
     });
+    it('should convert quoted things to a node', function() {
+        expect(stringToPath("some['super string'].cheese doodles")).toEqual(["some", "super string", "cheese doodles"]);
+    });
 });

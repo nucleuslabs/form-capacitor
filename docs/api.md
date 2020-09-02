@@ -57,7 +57,7 @@ export default function MyForm(){
 | `views`                 | `function`  | Function that defines calculated memoized functions that contain form state  |
 | `actions`               | `function`  | Function that defines actions to mutate the form state                       |
 | `Loader`                | `React.Component` | Component to use in place of form while it loads                       | 
-| `treeSanitizer`         | `function`  | Function that is used to sanitize the data in the stateTree before validation and before being returned from toJS/toJSON accepts a POJO as it's only param (the built-in sanitizer collapses empty objects and arrays to undefined) |
+| `treeSanitizer`         | `function`  | Function that is used to sanitize the data in the stateTree before validation and before being returned from toJS/toJSON accepts a POJO as it's only param (the built-in sanitizer collapses empty objects, arrays, maps and sets to undefined) |
 | `defaultSanitizer`      | `function`  | Function that is used to sanitize the defaults before data is rendered accepts a POJO as it's only param (the built-in sanitizer converts all null's to undefined) |
 
 ##### json-schema v7 object example 
@@ -132,6 +132,40 @@ You only need to wrap the component in observer if you intend to use the useForm
 
 If you DO NOT plan on using any form-capacitor observables directly in the form component but are using the `useField`, `useFieldArray` and/or `useFormErrors` 
 hooks in sub components they will all work fine without the `observer()` wrapper because they are pre-wrapped with useObserver. 
+
+### `santizers` *EXPERIMENTAL*
+Form capacitor uses builtin defaultSanitizer and treeSanitizer functions which decide which values to convert to undefined and trim the tree 
+so that it doesn't have empty objects and arrays around. You can make your own sanitizers or use the `sanitizeTree` function and change how defaults 
+and/or the state tree is sanitized when validation, toJS and toJSON functions run    
+
+## `sanitizeTree` *EXPERIMENTAL*
+The sanitizeTree method recursively converts and trims unwanted values in a tree to undefined. This is handy when values are coming from a source like graphql 
+where values that are considered undefined are set to `null` or empty string `''` instead. These methods make it so that you don't have to define anyOf and null 
+for every scalar field that is not required in the json schema definition for a form. You also have the option to make it more strict than the defaults.
+
+### Params
+| Param                          | TYPE        | DESCRIPTION                                                                        |
+|--------------------------------|-------------|------------------------------------------------------------------------------------|
+| `tree`                         | `Object`    | POJO stateTree or defaults POJO                                                    |
+| `options`                      | `integer`   | Bitmask which controls what basic things gets collapsed/or converted to undefined  |
+| `scalarsToConvertToUndefined`  | `Array`     | and array of strings or numbers that get converted to undefined                    |
+
+#### options
+| Option Enum/bitmask | Description                                                                                                            |
+|---------------------|------------------------------------------------------------------------------------------------------------------------| 
+| `EMPTY_OBJECTS`     | collapses all objects with no defined parameters after processing all children                                         |
+| `EMPTY_ARRAYS`      | collapses all empty arrays with no elements after processing all children                                              |
+| `EMPTY_MAPS`        | collapses all empty maps after processing all children                                                                 |
+| `EMPTY_SETS`        | collapses all empty sets after processing all children                                                                 |
+| `EMPTY_STRINGS`     | converts all empty strings to undefined                                                                                |
+| `NULLS`             | converts all `null`'s to undefined                                                                                     |
+| `ZERO`              | converts all `0` and `-0` to undefined                                                                                 |
+| `FALSE`             | converts all `false` to undefined                                                                                      |
+| `FALSY`             | converts all falsy values to undefined                                                                                 |
+| `EMPTY_SCALARS`     | convenience bitmask for triggering to convert all empty scalars to undefined                                           |
+| `EMPTY_ITERABLES`   | convenience bitmask for triggering to collapse all empty iterables to undefined                                        |
+| `DEFAULT_FILTERS`   | convenience bitmask for triggering to collapse all empty iterables, empty objects and convert nulls to undefined       |
+| `TEXT_FILTERS`      | convenience bitmask for triggering to convert nulls adn empty strings to undefined                                     |
 
 ## `useFormContext`
 

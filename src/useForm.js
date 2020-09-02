@@ -16,10 +16,9 @@ import {applySnapshot, getSnapshot} from "mobx-state-tree";
 import SchemaDataReplaceError from "./errorTypes/SchemaDataReplaceError";
 import {isObservable, observable, computed, extendObservable, toJS} from "mobx";
 import $RefParser from "json-schema-ref-parser";
-import sanitizeObjectTree from "./sanitizeObjectTree";
 import equal from 'fast-deep-equal';
 import FormContext from "./FormContext";
-import sanitizeDefaults from './sanitizeDefaults';
+import { builtInDefaultSanitizer, builtInStateTreeSanitizer } from './sanitizers';
 
 /**
  * returns a form component wired up with state, field meta data, validation, and errors
@@ -32,8 +31,8 @@ export default function useForm(options, ObserverWrappedComponent) {
         ready: false,
     });
     options = Object.assign({
-        treeSanitizer: sanitizeObjectTree,
-        defaultSanitizer: sanitizeDefaults
+        treeSanitizer: builtInStateTreeSanitizer,
+        defaultSanitizer: builtInDefaultSanitizer
     }, options);
 
     //if this is not a function scream at whoever set it
