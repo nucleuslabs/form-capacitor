@@ -1,5 +1,5 @@
 import FormContext from './FormContext';
-import {getValue, isArrayLike, toPath} from './helpers';
+import {getValue, toPath} from './helpers';
 import {useObserver} from "mobx-react-lite";
 import {useContext} from "react";
 
@@ -12,9 +12,9 @@ export default function useArrayField(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const {_push, _pop, _splice, _clear, _replace, _remove} = context.stateTree;
-    const value = getValue(context.stateTree, fullPath);
+    const value = getValue(context.stateTree, fullPath, []);
     return useObserver(() => [
-        isArrayLike(value) ? value.slice() : [],
+        value.slice(),
         {
             set: v => context.set(fullPath, v),
             push: v => _push(fullPath, v),

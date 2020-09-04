@@ -23,6 +23,20 @@ function TextBoxArray({name}) {
     </div>;
 }
 
+function TextBoxArray2({name}) {
+    const [value, {splice}] = useArrayField(name);
+    const [hasErrors] = useFieldErrors(name);
+
+    const handleChange = idx => ev => {
+        splice(idx, 1, ev.target.value);
+    };
+    return <div>
+        <div data-testid="alias2">
+            {value.map((inst, key) => <input key={key} type="text" className={hasErrors ? "error" : null} name={`${name}.${key}`} value={inst || ""} onChange={handleChange(key)}/>)}
+        </div>
+    </div>;
+}
+
 function DemoForm() {
     return useForm({
         schema: jsonSchema,
@@ -34,6 +48,7 @@ function DemoForm() {
         }
     }, observer(() => <div>
         Aliases: <TextBoxArray name="alias"/>
+        Aliases 2: <TextBoxArray2 name="alias2"/>
     </div>));
 }
 

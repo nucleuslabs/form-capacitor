@@ -1,7 +1,7 @@
 import stringToPath from './stringToPath';
 // import {isBoxedObservable,isObservable,observable,extendObservable,isObservableProp,isObservableObject,isObservableArray,isObservableMap, set as mobSet} from 'mobx';
 import {isBoxedObservable, isObservable, observable, isObservableProp, isObservableObject, isObservableArray, isObservableMap, isObservableSet} from 'mobx';
-
+import projectSettings from '../package.json';
 // export function setDefaults(obj, defaults, overwrite) {
 //     for(let key of Object.keys(defaults)) {
 //         if(obj[key] === undefined) {
@@ -14,6 +14,8 @@ export const EMPTY_ARRAY = Object.freeze([]);
 export const EMPTY_OBJECT = Object.freeze(Object.create(null));
 export const EMPTY_MAP = Object.freeze(new Map); // warning: this doesn't actually prevent anyone from setting things; see https://stackoverflow.com/a/35776333/65387
 export const EMPTY_SET = Object.freeze(new Set);
+export const PROJECT_NAME_VERSION = `${projectSettings.name} v${projectSettings.version}`;
+export const CONSOLE_WARNING_PREFIX = `${PROJECT_NAME_VERSION} : `;
 
 // export const NO_OP = Object.freeze(() => {});
 

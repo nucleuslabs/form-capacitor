@@ -1,10 +1,10 @@
 export default class SchemaDataReplaceError extends Error {
-    constructor(Errors, message) {
+    /**
+     *
+     * @param {[{prop: string, value: any, error: Error}]}schemaAssigmentErrors
+     */
+    constructor(schemaAssigmentErrors) {
         super();
-        this.message = message;
-        this.type = "SchemaDataReplaceError";
-        this.errors = Errors;
-
-        this.validationErrors = Errors;
+        this.schemaAssigmentErrors = schemaAssigmentErrors;
     }
 }
