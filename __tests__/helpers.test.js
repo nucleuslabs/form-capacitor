@@ -430,7 +430,7 @@ describe('getValue', function() {
 
 describe('setMap', function() {
     it('Should set Values in an ObservableMap using various paths', function() {
-        let map = new Map();
+        let emptyMap = new Map();
         let obsMap = observable.map();
         let obsMap2 = observable.map();
         setMap(obsMap, ["Hello"], "Dolly");
@@ -442,7 +442,7 @@ describe('setMap', function() {
 
         let exceptionCount = 0;
         try {
-            setMap(map, ["Hello"], "Dolly");
+            setMap(emptyMap, ["Hello"], "Dolly");
         } catch(err) {
             expect(err.message).toBe('setMap only works on observable maps');
             ++exceptionCount;
@@ -460,7 +460,7 @@ describe('setMap', function() {
 
 describe('getMap', function() {
     it('Should set Values in an ObservableMap using various paths', function() {
-        let map = new Map([["Hello", "World"]]);
+        let hwMap = new Map([["Hello", "World"]]);
         let obsMap = observable.map({"Hello": "World"});
         let obsMap2 = observable.map({"Hello": observable.map({World: "Yeah"})});
         expect(getMap(obsMap, "Hello")).toBe('World');
@@ -469,7 +469,7 @@ describe('getMap', function() {
         expect(getMap(obsMap, ["hi"], "hi")).toBe('hi');
         let exceptionCount = 0;
         try {
-            getMap(map, ["Hello"], null);
+            getMap(hwMap, ["Hello"], null);
         } catch(err) {
             expect(err.message).toBe('getMap only works on observable maps');
             ++exceptionCount;
@@ -478,9 +478,8 @@ describe('getMap', function() {
     });
 });
 
-describe('detMap', function() {
-    it('Should set Values in an ObservableMap using various paths', function() {
-        let notObsMap = "what";
+describe('delMap', function() {
+    it('Should delete values from an ObservableMap using various paths', function() {
         let obsMap = observable.map({"Hello": "World", "Hi": "Earth"});
         let obsMap2 = observable.map({"Hello": observable.map({World: "Yeah", Earth: "No"})});
         expect(obsMap.has("Hi")).toBeTrue();
@@ -492,7 +491,13 @@ describe('detMap', function() {
         expect(obsMap2.get("Hello").has("World")).toBeTrue();
         delMap(obsMap2, "Hello.World");
         expect(obsMap2.get("Hello")).toBeUndefined();
+    });
+});
 
+describe('delMap', function() {
+    it('Should exception when passed a scalar instead of an ObservableMap or when empty path is passed in.', function() {
+        let scalarValue = "what";
+        let obsMap = observable.map({"Hello": "World", "Hi": "Earth"});
         let exceptionCount = 0;
         try {
             delMap(obsMap, []);
@@ -501,18 +506,17 @@ describe('detMap', function() {
             ++exceptionCount;
         }
         try {
-            delMap(notObsMap, ["Hello"]);
+            delMap(scalarValue, ["Hello"]);
         } catch(err) {
             expect(err.message).toBe('delMap only works on observable maps');
             ++exceptionCount;
         }
         expect(exceptionCount).toBe(2);
-
     });
 });
 
 describe('setorDel', function() {
-    it('Should set Values in an ObservableMap using various paths', function() {
+    it('Should set or delete values in an ObservableMap based on condition using various paths', function() {
         let obsMap = observable.map();
         setOrDel(obsMap, true, ["Hello"], "Dolly");
         expect(obsMap.get("Hello")).toBe('Dolly');

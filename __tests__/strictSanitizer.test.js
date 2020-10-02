@@ -1,8 +1,8 @@
 import { strictSanitizer } from '../src';
 
 //tests requiring mobx state tree
-describe('filterNullsFromTree', function() {
-    it('Should ', async function() {
+describe('strictSanitizer', function() {
+    it('Should filter out empty objects and empty iterables', async function() {
         const testPojo = {
             firstName: "Freddy",
             lastName: "Two Toes",
@@ -18,7 +18,7 @@ describe('filterNullsFromTree', function() {
                 eObj: {}
             },
             eObj: {},
-            shouldBeEmptyObj: {
+            shouldNotBeEmptyObj: {
                 n: null,
                 u: undefined
             },
@@ -41,7 +41,7 @@ describe('filterNullsFromTree', function() {
         expect(sanitized.deep.f).toEqual(false);
         expect(sanitized.deep.eObj).toBeUndefined();
         expect(sanitized.eObj).toBeUndefined();
-        expect(sanitized.shouldBeEmptyObj).toEqual({n: null});
+        expect(sanitized.shouldNotBeEmptyObj).toEqual({n: null});
         expect(sanitized.caray.length).toEqual(3);
         expect(sanitized.caray[0]).toEqual({n: null, f: false});
         expect(sanitized.caray[1]).toBeNull();

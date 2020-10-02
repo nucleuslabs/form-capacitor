@@ -1,8 +1,8 @@
 import { looseSanitizer } from '../src';
 
 //tests requiring mobx state tree
-describe('filterNullsFromTree', function() {
-    it('Should ', async function() {
+describe('looseSanitizer', function() {
+    it('Should filter out empty strings, nulls, empty objects and empty iterables', async function() {
         const testPojo = {
             firstName: "Freddy",
             lastName: "Two Toes",

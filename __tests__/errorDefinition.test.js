@@ -27,7 +27,7 @@ describe('minMaxItems Edge Cases', function () {
 });
 
 describe('anyOfRequired Edge Cases', function () {
-    it('Should handle undefined edge case for minItems', function () {
+    it('Should handle undefined edge case for anyOfRequired', function () {
         expect(anyOfRequired([["cheese"]])).toEqual("Please fill in the cheese field(s)");
         expect(anyOfRequired([["cheese", "crackers"]])).toEqual("Please fill in the cheese, crackers field(s)");
         expect(anyOfRequired([["cheese", "crackers"],["oysters"]])).toEqual("Please fill in either the cheese, crackers or oysters field(s)");
