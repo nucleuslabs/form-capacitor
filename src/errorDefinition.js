@@ -95,7 +95,6 @@ export function minMax(title, min, max, xMin, xMax) {
     } else if(xMax !== undefined) {
         return {exclusiveMaximum: `${title} must be less than ${xMax.toString()}`};
     } else {
-        /* istanbul ignore next */
         return {};
     }
 }
@@ -162,9 +161,9 @@ export function allOfRequired(andFields) {
  */
 export function anyOfRequired(orFields) {
     if(orFields.length === 1) {
-        return `Please fill in the ${orFields[0].length > 1 ? `(${orFields[0].join(' and ')})` : orFields[0]} field(s)`;
+        return `Please fill in the ${orFields[0].length > 1 ? `${orFields[0].join(', ')}` : orFields[0]} field(s)`;
     } else {
-        return `Please fill in either the ${orFields.map((andFields) => andFields.length > 1 ? `(${andFields.join(', ')})` : andFields[0]).join(' or ')} field(s)`;
+        return `Please fill in either the ${orFields.map((andFields) => andFields.length > 1 ? `${andFields.join(', ')}` : andFields[0]).join(' or ')} field(s)`;
     }
 }
 
@@ -174,7 +173,8 @@ export function anyOfRequired(orFields) {
  * @returns {string}
  */
 export function anyOfType(title, types) {
-    return `${title} must either be ${types.map(type => {
+    const uniqueTypes = [...new Set(types)];
+    return `${title} must ${uniqueTypes.length > 1 ? 'either ' : ''}be ${uniqueTypes.map(type => {
         return convertType(type);
     }).join(' or ')}`;
 }

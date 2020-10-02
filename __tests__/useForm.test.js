@@ -84,6 +84,115 @@ function DemoForm() {
                 <button data-testid="ba2" onClick={() => formData.addAlias('Jack')}>Set Aliases</button>
                 <button data-testid="breset" onClick={() => reset()}>Reset</button>
                 <button data-testid="breplace" onClick={() => set({firstName: "Doge"})}>Replace</button>
+                <button data-testid="toJSON" onClick={() => {
+                    document.getElementById('json').innerHTML = formData.toJSON();
+                }}>json</button>
+            </div>
+            <div id="json" data-testid="json"/>
+        </div>;
+    }));
+}
+
+function ErrorComponent ({message}) {
+    return <div data-testid="err">{message}</div>;
+}
+
+function ActionsErrorForm () {
+    return useForm({
+        schema: {...jsonSchema},
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+            alias: []
+        },
+        Loader: <div>Loading Nice Things...</div>,
+        actions: "big nope!",
+        ErrorComponent: ErrorComponent
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+        </div>;
+    }));
+}
+
+function TreeErrorForm () {
+    return useForm({
+        schema: {...jsonSchema},
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+            alias: []
+        },
+        treeSanitizer: "nope",
+        ErrorComponent: ErrorComponent
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+        </div>;
+    }));
+}
+
+function DefaultErrorForm(){
+    return useForm({
+        schema: {...jsonSchema},
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+            alias: []
+        },
+        defaultSanitizer: "nope",
+        ErrorComponent: ErrorComponent
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+        </div>;
+    }));
+}
+
+function ValidationErrorForm(){
+    return useForm({
+        schema: {...jsonSchema},
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+            alias: []
+        },
+        validationSanitizer: "nope",
+        ErrorComponent: ErrorComponent
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+        </div>;
+    }));
+}
+
+function OutputErrorForm(){
+    return useForm({
+        schema: {...jsonSchema},
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+            alias: []
+        },
+        outputSanitizer: "nope",
+        ErrorComponent: ErrorComponent
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
             </div>
         </div>;
     }));
@@ -91,7 +200,7 @@ function DemoForm() {
 
 afterEach(cleanup);
 
-test("The Set First Name button should set the first name to \"Joe\"", async() => {
+test("Test useForm standard use case.", async () => {
     let {getByTestId} = render(<DemoForm/>);
 
     await wait(() => getByTestId("lastName"));
@@ -149,4 +258,37 @@ test("The Set First Name button should set the first name to \"Joe\"", async() =
 
     expect(getByTestId("lastName").value).toBe('Bar');
 
+    fireEvent.click(getByTestId("toJSON"));
+    expect(getByTestId("json").innerHTML).toBe('{"lastName":"Bar"}');
+
+});
+
+test("Test actions option not a function error case.", async () => {
+    const {getByTestId} = render(<ActionsErrorForm/>);
+    await wait(() => getByTestId("err"));
+    expect(getByTestId("err").innerHTML).toContain("options.actions must be a Function that takes in a mobx state tree and returns an object with a bunch of user defined methods (actions).");
+});
+
+test("Test treeSanitizer option not a function error case.", async () => {
+    const {getByTestId} = render(<TreeErrorForm/>);
+    await wait(() => getByTestId("err"));
+    expect(getByTestId("err").innerHTML).toContain("options.treeSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+});
+
+test("Test defaultSanitizer option not a function error case.", async () => {
+    const {getByTestId} = render(<DefaultErrorForm/>);
+    await wait(() => getByTestId("err"));
+    expect(getByTestId("err").innerHTML).toContain("options.defaultSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+});
+
+test("Test validationSanitizer option not a function error case.", async () => {
+    const {getByTestId} = render(<ValidationErrorForm/>);
+    await wait(() => getByTestId("err"));
+    expect(getByTestId("err").innerHTML).toContain("options.validationSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+});
+
+test("Test outputSanitizer option not a function error case.", async () => {
+    const {getByTestId} = render(<OutputErrorForm/>);
+    await wait(() => getByTestId("err"));
+    expect(getByTestId("err").innerHTML).toContain("options.outputSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
 });

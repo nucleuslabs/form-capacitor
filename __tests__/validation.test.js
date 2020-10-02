@@ -1,10 +1,9 @@
 import testSchema from './demo-form';
 import jsonSchemaToMST from "../src/jsonSchemaToMST";
 import $RefParser from 'json-schema-ref-parser';
-import {setValue} from "../src";
+import {setValue, builtInStateTreeSanitizer} from "../src";
 import { observable, toJS } from 'mobx';
 import {watchForPatches, createAjvObject, pathToPatchString} from "../src/validation";
-import { builtInStateTreeSanitizer } from '../src';
 
 //tests requiring mobx state tree
 describe('watchForPatches', function() {
@@ -21,7 +20,7 @@ describe('watchForPatches', function() {
         }));
         const ajv = createAjvObject();
         let mobxStateTree = Model.create({});
-        const {errors, validate} = watchForPatches(schema, mobxStateTree, ajv, {treeSanitizer: builtInStateTreeSanitizer});
+        const {errors, validate} = watchForPatches(schema, mobxStateTree, ajv, {validationSanitizer: builtInStateTreeSanitizer});
         mobxStateTree.set("firstName", undefined);
         mobxStateTree.set("firstName", "Hello");
         mobxStateTree.set("lastName", "World");

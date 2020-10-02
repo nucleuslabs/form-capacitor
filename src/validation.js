@@ -752,6 +752,7 @@ function appendFieldReferencesR(refMap, schema, propName, path = [], patchPath, 
  * @param {Map} refMap
  * @param {Map|Set|Array} ref2
  */
+/* istanbul ignore next */
 function appendRefs(refMap, ref2) {
     if(isMapLike(ref2)) {
         for(const ref of ref2.values()) {
@@ -771,6 +772,7 @@ function appendRefs(refMap, ref2) {
  * @param {Map} refs
  * @param {string[]} path
  */
+/* istanbul ignore next */
 function setRefPath(refs, path) {
     const pathStr = pathToPatchString(path);
     if(!refs.has(pathStr)) {
@@ -783,12 +785,12 @@ function setRefPath(refs, path) {
  * @param {{}} schema Root json schema must have a definitions property and all references must be parsed fully
  * @param {*} data Mobx State Tree
  * @param {Ajv.ajv} ajv
- * @param {{treeSanitizer: function}} options
+ * @param {{validationSanitizer: function}} options
  * @returns {{errors: ObservableMap<any, any>, fieldMetaDataMap: ObservableMap<any, any>,  validate: function}}
  */
-export function watchForPatches(schema, data, ajv, options = {}) {
+export function watchForPatches(schema, data, ajv, options) {
     // console.log(JSON.stringify(schema, null, 2));
-    const {treeSanitizer} = options;
+    const {validationSanitizer} = options;
     const errors = observable.map();
     const paths = observable.map();
     const validators = new Map();
@@ -834,16 +836,16 @@ export function watchForPatches(schema, data, ajv, options = {}) {
                     case 'remove':
                         // console.log(toJS(data));
                         // console.log("OP was definitely detected", schemaPathStr, toJS((data)));
-                        runValidatorR([...schemaPath], validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths, treeSanitizer);
+                        runValidatorR([...schemaPath], validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths, validationSanitizer);
                         break;
-                    default:
-                        console.warn(`Couldn't handle patch operation ${patch.op} for ${patch.path}.`);
+                    // default:
+                    //     console.warn(`Couldn't handle patch operation ${patch.op} for ${patch.path}.`);
                 }
-            } else {
-                console.warn(`COULD NOT FIND VALIDATOR FOR`, schemaPath, patch.path, patch.op, patch.value);
+            // } else {
+            //     console.warn(`COULD NOT FIND VALIDATOR FOR`, schemaPath, patch.path, patch.op, patch.value, ". This may be due to a mismatch between your schema and your stateTree or it could be a bug in form-capacitor.");
             }
-        } else {
-            console.warn(`COULD NOT FIND PATH FOR`, patch.path, normalizedPatchPath, patch.op, patch.value);
+        // } else {
+        //     console.warn(`COULD NOT FIND PATH FOR`, patch.path, normalizedPatchPath, patch.op, patch.value, ". This may be due to a mismatch between your schema and your stateTree or it could be a bug in form-capacitor.");
         }
     });
 
@@ -878,7 +880,7 @@ export function watchForPatches(schema, data, ajv, options = {}) {
  */
 
 /* istanbul ignore next */
-function runValidatorR(path, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths = new Set(), treeSanitizer) {
+function runValidatorR(path, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths = new Set(), validationSanitizer) {
     const pathStr = pathToPatchString(path);
     if(!skipPaths.has(pathStr) && validators.has(pathStr)) {
         skipPaths.add(pathStr);
@@ -894,7 +896,7 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
             }
         }
         // console.log("NOPE");
-        const theRealJs = treeSanitizer(toJS(data));
+        const theRealJs = validationSanitizer(toJS(data));
         // console.log(pathStr, validate.schema, theRealJs);
         if(validate(theRealJs)) {
             // console.log("PASSED");
@@ -923,7 +925,7 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
         }
         //Validate References
         for(let refPath of refs.values()) {
-            runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths, treeSanitizer);
+            runValidatorR(refPath, validators, data, errors, paths, errorPathMaps, errorPathSubstitutionMap, skipPaths, validationSanitizer);
         }
     }
 }

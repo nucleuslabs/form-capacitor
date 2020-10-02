@@ -28,7 +28,7 @@ export const DEFAULT_FILTERS = EMPTY_OBJECTS | EMPTY_ITERABLES | NULLS;
 export const TEXT_FILTERS = NULLS | EMPTY_STRINGS;
 
 /**
- * Built in sanitization function that converts any nulls in an object tree to undefined and collapses undefined properties and array elements
+ * Built in sanitization function that converts any nulls in an object tree to undefined
  * @param {{}} tree
  * @returns {{}}
  */
@@ -214,4 +214,22 @@ export function buildScalarConditionMap(options, specificScalarValuesToConvertTo
  */
 export function emptyStringNullSanitizer(tree){
     return sanitizeTree(tree, TEXT_FILTERS);
+}
+
+/**
+ * Sanitization function for validating that converts any nulls or empty strings to undefined and collapses undefined properties and array elements
+ * @param {{}} tree
+ * @returns {{}}
+ */
+export function looseSanitizer(tree){
+    return sanitizeTree(tree,DEFAULT_FILTERS | EMPTY_STRINGS);
+}
+
+/**
+ * Sanitization function for validating that collapses empty objects and array elements
+ * @param {{}} tree
+ * @returns {{}}
+ */
+export function strictSanitizer(tree){
+    return sanitizeTree(tree,EMPTY_OBJECTS | EMPTY_ITERABLES);
 }

@@ -31,7 +31,9 @@ import {
     isNull,
     isUndefined,
     setOrDel,
-    isInt, isIntLoose
+    isInt,
+    isIntLoose,
+    getObservable
 } from "../src/helpers";
 import {ObservableMap, observable, isObservable, ObservableSet} from "mobx";
 
@@ -343,12 +345,20 @@ describe('isError', function() {
 //@todo make more comprehensive tests for setValue that covers all exception cases
 describe('setValue', function() {
     it('Should set Values in an observable object using various paths', function() {
+        const notObj = 12;
         let obsObj = observable({Hello: "World"});
         let obsObjDeeper = observable({
             Hello: observable({
                 World: "Yeah"
             })
         });
+        const obj = {
+            Hello: {
+                World: "Yeah"
+            }
+        };
+        const boxedObs = observable.box(notObj);
+        const boxedObsObj = observable.box(obj);
         setValue(obsObj, ["Hello"], "Dolly");
         expect(obsObj.Hello).toBe('Dolly');
         setValue(obsObjDeeper, ["Hello", "World"], "Dolly");
@@ -356,11 +366,51 @@ describe('setValue', function() {
         setValue(obsObjDeeper, "Hello.World", "Dolly2");
         expect(obsObjDeeper.Hello.World).toBe('Dolly2');
 
+        let exceptionCount = 0;
+        try {
+            setValue(notObj, ["Hello"], "Dolly");
+        } catch(err) {
+            expect(err.message).toBe('Cannot set property of non-object');
+            exceptionCount++;
+        }
+        try {
+            setValue(obj, ["Hello"], "Dolly");
+        } catch(err){
+            expect(err.message).toBe('Cannot set property \'Hello\' on non-observable');
+            ++exceptionCount;
+        }
+        try {
+            setValue(obj, ["Hello", "World"], "Dolly");
+        } catch(err){
+            expect(err.message).toBe('Cannot add property \'Hello\' to non-observable');
+            ++exceptionCount;
+        }
+        try {
+            setValue(obsObjDeeper, [], "Regina");
+        } catch(err){
+            expect(err.message).toBe('Cannot set root of unboxed object');
+            ++exceptionCount;
+        }
+        expect(exceptionCount).toBe(4);
+
+        setValue(boxedObs,[],14);
+        expect(boxedObs.get()).toBe(14);
+
+        setValue(boxedObsObj,["Hello", "World"],"Boxie");
+        expect(boxedObsObj.get().Hello.World).toBe("Boxie");
+
+
     });
 });
 
 describe('getValue', function() {
     it('Should get Values in an observable object using various paths', function() {
+        const obj = {
+            Hello: {
+                World: "Yeah"
+            }
+        };
+        const boxedObsObj = observable.box(obj);
         let obsObj = observable({Hello: "World"});
         let nObj = observable({});
         let obsObjDeeper = observable({
@@ -368,15 +418,19 @@ describe('getValue', function() {
                 World: "Yeah"
             })
         });
+
         expect(getValue(obsObj, ["Hello"])).toBe('World');
         expect(getValue(nObj, ["Hello"], "World")).toBe('World');
         expect(getValue(obsObjDeeper, ["Hello", "World"])).toBe('Yeah');
         expect(getValue(obsObjDeeper, "Hello.World")).toBe('Yeah');
+        expect(getValue(toObservable({beef: new Map([["cake", "isGood"]])}), ["beef","cake"])).toEqual("isGood");
+        expect(getValue(boxedObsObj, ["Hello","World"])).toEqual("Yeah");
     });
 });
 
 describe('setMap', function() {
     it('Should set Values in an ObservableMap using various paths', function() {
+        let map = new Map();
         let obsMap = observable.map();
         let obsMap2 = observable.map();
         setMap(obsMap, ["Hello"], "Dolly");
@@ -385,21 +439,48 @@ describe('setMap', function() {
         expect(obsMap2.get("Hello").get("World")).toBe('Dolly');
         setMap(obsMap2, "Hello.World", "Dolly2");
         expect(obsMap2.get("Hello").get("World")).toBe('Dolly2');
+
+        let exceptionCount = 0;
+        try {
+            setMap(map, ["Hello"], "Dolly");
+        } catch(err) {
+            expect(err.message).toBe('setMap only works on observable maps');
+            ++exceptionCount;
+        }
+        try {
+            setMap(obsMap, [], "Dolly");
+        } catch(err) {
+            expect(err.message).toBe('Cannot set root');
+            ++exceptionCount;
+        }
+        expect(exceptionCount).toBe(2);
+
     });
 });
 
 describe('getMap', function() {
     it('Should set Values in an ObservableMap using various paths', function() {
+        let map = new Map([["Hello", "World"]]);
         let obsMap = observable.map({"Hello": "World"});
         let obsMap2 = observable.map({"Hello": observable.map({World: "Yeah"})});
         expect(getMap(obsMap, "Hello")).toBe('World');
         expect(getMap(obsMap2, ["Hello", "World"])).toBe('Yeah');
         expect(getMap(obsMap2, "Hello.World")).toBe('Yeah');
+        expect(getMap(obsMap, ["hi"], "hi")).toBe('hi');
+        let exceptionCount = 0;
+        try {
+            getMap(map, ["Hello"], null);
+        } catch(err) {
+            expect(err.message).toBe('getMap only works on observable maps');
+            ++exceptionCount;
+        }
+        expect(exceptionCount).toBe(1);
     });
 });
 
 describe('detMap', function() {
     it('Should set Values in an ObservableMap using various paths', function() {
+        let notObsMap = "what";
         let obsMap = observable.map({"Hello": "World", "Hi": "Earth"});
         let obsMap2 = observable.map({"Hello": observable.map({World: "Yeah", Earth: "No"})});
         expect(obsMap.has("Hi")).toBeTrue();
@@ -411,6 +492,22 @@ describe('detMap', function() {
         expect(obsMap2.get("Hello").has("World")).toBeTrue();
         delMap(obsMap2, "Hello.World");
         expect(obsMap2.get("Hello")).toBeUndefined();
+
+        let exceptionCount = 0;
+        try {
+            delMap(obsMap, []);
+        } catch(err) {
+            expect(err.message).toBe('Cannot delete root');
+            ++exceptionCount;
+        }
+        try {
+            delMap(notObsMap, ["Hello"]);
+        } catch(err) {
+            expect(err.message).toBe('delMap only works on observable maps');
+            ++exceptionCount;
+        }
+        expect(exceptionCount).toBe(2);
+
     });
 });
 
@@ -438,5 +535,13 @@ describe('toObservable', function() {
         expect(toObservable({beef: {"cake": "isGood"}})).toEqual(observable({beef: {"cake": "isGood"}}));
         expect(toObservable("String")).not.toEqual("String");
         expect(isObservable(toObservable({beef: {"cake": "isGood"}}))).toBeTrue();
+    });
+});
+
+describe('getObservable', function() {
+    it('Should get an observable', function() {
+        expect(getObservable()).toBeUndefined();
+        expect(getObservable(toObservable({beef: new Map([["cake", "isGood"]])}), ["beef","cake"])).toEqual("isGood");
+        expect(getObservable(toObservable({beef: "isGood"}), "beef")).toEqual("isGood");
     });
 });

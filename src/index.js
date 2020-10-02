@@ -13,4 +13,4 @@ export {default as useTextField} from './useTextField';
 export {default as useFieldErrors} from './useFieldErrors';
 export {default as useMaterialUiField} from './useMaterialUiField';
 export {observer} from 'mobx-react-lite';
-export {builtInDefaultSanitizer, builtInStateTreeSanitizer, sanitizeTree, emptyStringNullSanitizer} from './sanitizers';
+export {builtInDefaultSanitizer, builtInStateTreeSanitizer, sanitizeTree, emptyStringNullSanitizer, looseSanitizer, strictSanitizer} from './sanitizers';

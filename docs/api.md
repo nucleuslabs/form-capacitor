@@ -57,8 +57,10 @@ export default function MyForm(){
 | `views`                 | `function`  | Function that defines calculated memoized functions that contain form state  |
 | `actions`               | `function`  | Function that defines actions to mutate the form state                       |
 | `Loader`                | `React.Component` | Component to use in place of form while it loads                       | 
-| `treeSanitizer`         | `function`  | Function that is used to sanitize the data in the stateTree before validation and before being returned from toJS/toJSON accepts a POJO as it's only param (the built-in sanitizer collapses empty objects, arrays, maps and sets to undefined) |
-| `defaultSanitizer`      | `function`  | Function that is used to sanitize the defaults before data is rendered accepts a POJO as it's only param (the built-in sanitizer converts all null's to undefined) |
+| `treeSanitizer`         | `function`  | Function that is used to sanitize the data in the stateTree before validation and before being returned from toJS/toJSON; accepts a POJO as it's only param (the built-in sanitizer collapses empty objects, arrays, maps and sets to undefined) |
+| `defaultSanitizer`      | `function`  | Function that is used to sanitize the defaults before data is rendered; accepts a POJO as it's only param (the built-in sanitizer converts all null's to undefined) |
+| `validationSanitizer`   | `function`  | Function that is used to sanitize directly before data is validated; accepts a POJO as it's only param (uses treeSanitizer if no option is provided) |
+| `outputSanitizer`       | `function`  | Function that is used to sanitize data on output (`toJS()` or `toJSON()`); accepts a POJO as it's only param (uses treeSanitizer if no option is provided) |
 
 ##### json-schema v7 object example 
 | PARAM    |      TYPE     |  DESCRIPTION                  |

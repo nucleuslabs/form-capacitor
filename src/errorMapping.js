@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import {isObservableMap, observable, ObservableMap, ObservableSet, IObservableArray} from "mobx";
 import {pathToPatchString, ajvStringToPath} from "./validation";
+import {isArrayLike} from "./helpers";
 
 /**
  *
@@ -34,8 +35,13 @@ export function getErrorNode(errorNode, path = []) {
  */
 export function getErrors(errorNode, path = []) {
     const node = getErrorNode(errorNode, path);
-    if(!isObservableMap(node)) return [];
-    return node.has('errors') ? node.get('errors') || [] : [];
+    if(isObservableMap(node) && node.has('errors')){
+        const errs = node.get('errors');
+        if(isArrayLike(errs)) {
+            return errs;
+        }
+    }
+    return [];
 }
 
 /**
@@ -144,27 +150,27 @@ export function deleteAllNodes(errorMap, path) {
     }
 }
 
-/**
- *
- * @param {ObservableMap} errorMap
- * @param {string[]} path
- */
-export function deleteOwnNode(errorMap, path) {
-    if(errorMap.has('pathIndex')) {
-        const pathIndex = errorMap.get('pathIndex');
-        const pathString = pathToPatchString(path);
-        if(pathIndex.has(pathString)) {
-            const pathMap = pathIndex.get(pathString);
-            if(pathMap.has(pathString)) {
-                deleteNodeErrors(errorMap, pathString, pathMap.get(pathString));
-                pathMap.delete(pathString);
-            }
-            if(pathMap.size === 0) {
-                pathIndex.delete(pathString);
-            }
-        }
-    }
-}
+// /**
+//  *
+//  * @param {ObservableMap} errorMap
+//  * @param {string[]} path
+//  */
+// export function deleteOwnNode(errorMap, path) {
+//     if(errorMap.has('pathIndex')) {
+//         const pathIndex = errorMap.get('pathIndex');
+//         const pathString = pathToPatchString(path);
+//         if(pathIndex.has(pathString)) {
+//             const pathMap = pathIndex.get(pathString);
+//             if(pathMap.has(pathString)) {
+//                 deleteNodeErrors(errorMap, pathString, pathMap.get(pathString));
+//                 pathMap.delete(pathString);
+//             }
+//             if(pathMap.size === 0) {
+//                 pathIndex.delete(pathString);
+//             }
+//         }
+//     }
+// }
 //
 // /**
 //  * Deletes all errors for the provided path that were triggered on the current path as well as all errors triggered by the current path

@@ -1,5 +1,6 @@
 import {isString} from "./helpers";
 
+/* istanbul ignore next */
 const keywordFunctions = new Map(
     [
         ['required', findRequiredMessage],
@@ -19,6 +20,7 @@ export function findErrorMessage(error, errors){
     }
 }
 
+/* istanbul ignore next */
 function findRequiredMessage(error, errors) {
     const matches = error.schemaPath.match(/^(.+\/anyOf|allOf|oneOf)\/\d+\/required$/);
     const propName = error.params.missingProperty;
@@ -31,11 +33,13 @@ function findRequiredMessage(error, errors) {
     }
 }
 
+/* istanbul ignore next */
 function findDependenciesMessage(error) {
     const propName = error.params.missingProperty;
     return getClosestErrorMessage(error.parentSchema, 'dependencies', propName) || getClosestErrorMessage(error.schema, 'dependencies', propName) || error.message;
 }
 
+/* istanbul ignore next */
 function getClosestErrorMessage(schema, keyword, propName, skipLocalCheck = false) {
     if(schema.properties && schema.properties[propName] && !skipLocalCheck) {
         const message = getClosestErrorMessage(schema.properties[propName], keyword, propName, true);

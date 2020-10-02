@@ -313,9 +313,6 @@ export function getMap(map, path, def) {
         throw new Error(`getMap only works on observable maps`);
     }
     path = toPath(path);
-    if(!path.length) {
-        throw new Error("Cannot set root");
-    }
     for(let i = 0; i < path.length; ++i) {
         const key = path[i];
         if(map.has(key)) {

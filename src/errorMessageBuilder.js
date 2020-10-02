@@ -188,9 +188,10 @@ export function setAnyOfErrorMessages(anyOfSchema, parentSchema) {
                         acc.set(keyword, [schema.type]);
                     }
                     break;
-                case 'properties':
-
-                    break;
+                // @todo: Do we need to check properties for anyOf error message generation
+                // case 'properties':
+                //
+                //     break;
             }
         }
         return acc;
@@ -229,14 +230,17 @@ function _setAnyOfRequiredMessage(requiredFields, parentSchema, anyOfSchema) {
  * @param {{title: string, errorMessage: {}}} parentSchema
  */
 export function setAllOfErrorMessages(allOfSchema, parentSchema) {
+    const frankenSchema = {
+        properties: parentSchema.properties ? {...parentSchema.properties} : {}
+    };
     let allOfFullSet = allOfSchema.reduce((acc, schema) => {
         for(let keyword of Object.keys(schema)) {
             switch(keyword) {
                 case 'required':
                     if(acc.has(keyword)) {
-                        acc.get(keyword).push(...schema.required);
+                        acc.get(keyword).push([...schema.required]);
                     } else {
-                        acc.set(keyword, [...schema.required]);
+                        acc.set(keyword, [[...schema.required]]);
                     }
                     break;
                 case 'type':
@@ -247,7 +251,11 @@ export function setAllOfErrorMessages(allOfSchema, parentSchema) {
                     }
                     break;
                 case 'properties':
-                    setAllErrorMessagesR(schema, parentSchema);
+                    if(schema.properties){
+                        Object.keys(schema.properties).forEach((propName) => {
+                            frankenSchema.properties[propName] = Object.assign({}, frankenSchema.properties[propName], schema.properties[propName]);
+                        });
+                    }
                     break;
                 case 'items':
                     setAllErrorMessagesR(schema.items, parentSchema);
@@ -260,7 +268,7 @@ export function setAllOfErrorMessages(allOfSchema, parentSchema) {
         for(let [keyword, data] of allOfFullSet) {
             switch(keyword) {
                 case "required":
-                    _setAllOfRequiredMessage(data, parentSchema, allOfSchema);
+                    parentSchema.errorMessage = getMergedErrorMessage(allOfRequiredMessage(data, frankenSchema, allOfSchema), parentSchema.errorMessage);
                     break;
                 case 'type':
                     parentSchema.errorMessage = getMergedErrorMessage({type: anyOfType(parentSchema.title, data)}, parentSchema.errorMessage);
@@ -278,13 +286,14 @@ export function setAllOfErrorMessages(allOfSchema, parentSchema) {
  * @private
  */
 /* istanbul ignore next */
-function _setAllOfRequiredMessage(requiredFields, parentSchema, allOfSchema) {
-    const reqMessage = allOfRequired(requiredFields.map(propName => getPropertyTitle(parentSchema, propName)));
+function allOfRequiredMessage(requiredFields, parentSchema, allOfSchema) {
+    const reqMessage = allOfRequired(requiredFields.map(req => req.map(propName => getPropertyTitle(parentSchema, propName))));
     for(let allOfElement of allOfSchema) {
         if(allOfElement.required) {
             allOfElement.errorMessage = getMergedErrorMessage({required: reqMessage}, allOfElement.errorMessage);
         }
     }
+    return reqMessage ? {required: reqMessage} : {};
 }
 
 /**
@@ -391,6 +400,6 @@ function setAllErrorMessagesR(schema, parentSchema){
         setAnyOfErrorMessages(schema.anyOf, parentSchema.type === 'array' ? parentSchema : schema);
     }
     if(schema.allOf && schema.allOf.length > 0) {
-        setAllOfErrorMessages(schema.anyOf, schema);
+        setAllOfErrorMessages(schema.allOf, schema);
     }
 }

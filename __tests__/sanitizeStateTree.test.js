@@ -1,11 +1,10 @@
 import testSchema from './demo-form';
 import jsonSchemaToMST from "../src/jsonSchemaToMST";
 import $RefParser from 'json-schema-ref-parser';
-import {getValue, setValue} from "../src";
+import {getValue, setValue, builtInStateTreeSanitizer} from "../src";
 import {watchForPatches, createAjvObject} from "../src/validation";
 import {destroy} from "mobx-state-tree";
 import { toJS } from 'mobx';
-import { builtInStateTreeSanitizer } from '../src';
 
 describe('In Regards to data converted by mobxStateTreeToAjvFriendlyJs', function() {
     it('It should convert empty arrays, maps and objects to undefined and leave every other variable as is.', async function() {
@@ -25,7 +24,7 @@ describe('In Regards to data converted by mobxStateTreeToAjvFriendlyJs', functio
         }));
         const ajv = createAjvObject();
         let mobxStateTree = Model.create({});
-        const {validate} = watchForPatches(schema, mobxStateTree, ajv, {treeSanitizer: builtInStateTreeSanitizer});
+        const {validate} = watchForPatches(schema, mobxStateTree, ajv, {validationSanitizer: builtInStateTreeSanitizer});
         mobxStateTree.set("firstName", undefined);
         mobxStateTree.set("firstName", "Hello");
         mobxStateTree.set("lastName", "World");
