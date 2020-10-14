@@ -25,7 +25,6 @@ import {builtInDefaultSanitizer, builtInStateTreeSanitizer} from './sanitizers';
 import InvalidDefaultError from './errorTypes/InvalidDefaultError';
 import FormError from "./FormError";
 
-
 async function setUpForm(options, sanitizers, setContext, setError){
     const {defaultSanitizer, validationSanitizer, outputSanitizer} = sanitizers;
     const parser = new $RefParser();
@@ -207,6 +206,7 @@ async function setUpForm(options, sanitizers, setContext, setError){
                 }
             }
         } catch(err) {
+            /* istanbul ignore next */
             if(err instanceof SchemaDataReplaceError) {
                 const errMessage = `${PROJECT_NAME_VERSION} had trouble setting defaults in useForm hook. Make sure the types in options.default match what is defined in options.schema.\n${err.schemaAssigmentErrors.map(sErr => {
                     const {prop, value, error: orgError} = sErr;
@@ -254,10 +254,9 @@ async function setUpForm(options, sanitizers, setContext, setError){
                 path: [],
                 ready: true
             });
-        } catch(err) {//@todo ignoring these errors for coverage as we don't have a reliable way to break this enough to hit them yet
-            /* istanbul ignore next */
+        } catch(err) {
             console.error(`${PROJECT_NAME_VERSION} could not initialize automated stateTree validation in useForm hook. This could be a bug or a schema error.`);
-            /* istanbul ignore next */
+            console.error(err);
             throw err;
         }
     } catch(err) {
@@ -321,7 +320,8 @@ export default function useForm(options, ObserverWrappedComponent) {
     }, []);
     const Schema = () => {
         if(error) {
-            return <ErrorComponent message={error.message}/>;
+            // console.log(error);
+            return <ErrorComponent message={error.message} error={error}/>;
         }
         const context = useContext(FormContext);
         return context.ready ? <ObserverWrappedComponent {...context}/> : (options.Loader || <div>Loading...</div>);

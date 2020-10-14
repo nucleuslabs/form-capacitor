@@ -10,6 +10,8 @@ import {
     minMax,
     minMaxItems, allOfRequired
 } from "./errorDefinition";
+import RequiredFieldDoesNotExistError from "./errorTypes/RequiredFieldDoesNotExistError";
+import DependencySchemaDoesNotExistError from "./errorTypes/DependencySchemaDoesNotExistError";
 
 /**
  * This message will mutate the schema passed in
@@ -98,6 +100,9 @@ export function setRequiredErrorMessage(schema) {
 /* istanbul ignore next */
 function _setRequiredErrorMessage(parentSchema, propName) {
     let requiredProperty = getValue(parentSchema, ['properties', propName]);
+    if(!requiredProperty){
+        throw new RequiredFieldDoesNotExistError(propName, parentSchema);
+    }
     requiredProperty.errorMessage = getMergedErrorMessage({
         required: requiredKeyword(requiredProperty.title || propName)
     }, requiredProperty.errorMessage);
@@ -112,13 +117,24 @@ export function setDependenciesErrorMessage(deps, parentSchema) {
     const depTitleMap = new Map();
     let flippedDependencies = mapFlippedDependencies(deps);
     for(let [level1DepName, level2DepSet] of flippedDependencies) {
-        const level1Title = getSetDepTitle(level1DepName, depTitleMap, parentSchema);
         const schema = getValue(parentSchema, ["properties", level1DepName]);
+        if(!schema){
+            throw new DependencySchemaDoesNotExistError(level1DepName, parentSchema);
+        }
+        const level1Title = getSetDepTitle(level1DepName, depTitleMap, parentSchema);
         schema.errorMessage = getMergedErrorMessage(
             {
                 dependencies: dependenciesKeyword(
                     level1Title,
-                    Array.from(level2DepSet).map(level2DepName => getSetDepTitle(level2DepName, depTitleMap, parentSchema))
+                    Array.from(level2DepSet).map(level2DepName => {
+                        let title;
+                        try {
+                            title = getSetDepTitle(level2DepName, depTitleMap, parentSchema);
+                        } catch(e){
+                            throw new DependencySchemaDoesNotExistError(level2DepName, parentSchema);
+                        }
+                        return title;
+                    })
                 )
             },
             schema.errorMessage

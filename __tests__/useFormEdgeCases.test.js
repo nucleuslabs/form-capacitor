@@ -13,12 +13,12 @@ function SimpleTextBox(props) {
             change(ev.target.value || undefined);
         }}/>
         <div data-testid={`${props.name}_errors`}>{hasErrors &&
-        <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}</div>
+        <ul>{errors.map((error, eIdx) => <li key={eIdx}>{error.message}</li>)}</ul>}</div>
     </span>;
 }
 
 function ErrorComponent ({message}) {
-    return <div data-testid="err">{message}</div>;
+    return <div data-testid="error">{message}</div>;
 }
 
 const badSchema = {
@@ -225,18 +225,18 @@ function StateTreeFunctionTestForm() {
         try {
             stateTree._set("flergaer", "derger");
             stateTree._set(["blurgru", "sturgur"], "derger");
-        } catch(err){
-            _set = err.message;
+        } catch(error){
+            _set = error.message;
         }
         try {
             stateTree._setRoot("flergaer");
-        } catch(err){
-            _setRoot = err.message;
+        } catch(error){
+            _setRoot = error.message;
         }
         try {
             stateTree._setRoot({"firstName": ["cheese"]});
-        } catch(err){
-            _setRoot2 = JSON.stringify(err);
+        } catch(error){
+            _setRoot2 = JSON.stringify(error);
         }
         stateTree._splice('alias2',1,0,'two');
         const aliases = stateTree.alias2.join(",");
@@ -246,15 +246,15 @@ function StateTreeFunctionTestForm() {
         let _clear = "0";
         try {
             stateTree._clear('alias');
-        } catch(err){
+        } catch(error){
             _clear = "Failure";
         }
         // const _clear = stateTree.alias.length;
         try {
             stateTree._setRoot({"firstName": ["cheese"]});
             console.log("All good??!?");
-        } catch(err){
-            _setRoot2 = JSON.stringify(err);
+        } catch(error){
+            _setRoot2 = JSON.stringify(error);
         }
         return <div>
             <div data-testid="changed">{changed}</div>
@@ -275,6 +275,144 @@ function StateTreeFunctionTestForm() {
     }));
 }
 
+function RequiredFieldDoesNotExistForm() {
+    return useForm({
+        schema: {
+            "$schema": "http://json-schema.org/draft-07/schema",
+            "definitions": {
+                "DemoForm": {
+                    "title": "Demo Form",
+                    "description": "Basic Form to demo core features of FormCapacitor",
+                    "type": "object",
+                    "properties": {
+                        "firstName": {
+                            "type": "string",
+                            "title": "First Name",
+                            "maxLength": 20,
+                            "minLength": 2,
+                            "pattern": "\\w"
+                        },
+                        "lastName": {
+                            "type": "string",
+                            "title": "Last Name",
+                            "pattern": "\\w"
+                        }
+                    },
+                    "required": ["flerberderb"]
+                }
+            }
+        },
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+        }
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+                <span>Last Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+        </div>;
+    }));
+}
+
+function DependencyDoesNotExistForm() {
+    return useForm({
+        schema: {
+            "$schema": "http://json-schema.org/draft-07/schema",
+            "definitions": {
+                "DemoForm": {
+                    "title": "Demo Form",
+                    "description": "Basic Form to demo core features of FormCapacitor",
+                    "type": "object",
+                    "properties": {
+                        "firstName": {
+                            "type": "string",
+                            "title": "First Name",
+                            "maxLength": 20,
+                            "minLength": 2,
+                            "pattern": "\\w"
+                        },
+                        "lastName": {
+                            "type": "string",
+                            "title": "Last Name",
+                            "pattern": "\\w"
+                        }
+                    },
+                    "dependencies": {
+                        "flerberderb": [
+                            "firstName",
+                            "lastName"
+                        ]
+                    }
+                }
+            }
+        },
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+        }
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+                <span>Last Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+        </div>;
+    }));
+}
+
+function DependencyDoesNotExist2Form() {
+    return useForm({
+        schema: {
+            "$schema": "http://json-schema.org/draft-07/schema",
+            "definitions": {
+                "DemoForm": {
+                    "title": "Demo Form",
+                    "description": "Basic Form to demo core features of FormCapacitor",
+                    "type": "object",
+                    "properties": {
+                        "firstName": {
+                            "type": "string",
+                            "title": "First Name",
+                            "maxLength": 20,
+                            "minLength": 2,
+                            "pattern": "\\w"
+                        },
+                        "lastName": {
+                            "type": "string",
+                            "title": "Last Name",
+                            "pattern": "\\w"
+                        }
+                    },
+                    "dependencies": {
+                        "firstName": [
+                            "lastName",
+                            "flerberderb"
+                        ]
+                    }
+                }
+            }
+        },
+        $ref: "#/definitions/DemoForm",
+        default: {
+            lastName: "Bar",
+        }
+    }, observer(() => {
+        return <div>
+            <div>
+                <span>First Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+                <span>Last Name</span>
+                <SimpleTextBox data-testid="firstName" name="firstName"/>
+            </div>
+        </div>;
+    }));
+}
 
 const originalError = console.error;
 const errorSet = new Set();
@@ -293,24 +431,24 @@ afterEach(() => {
 
 test("Test erroneous schema .", async () => {
     const {getByTestId} = render(<SchemaErrorForm/>);
-    await wait(() => getByTestId("err"));
+    await wait(() => getByTestId("error"));
     const $ref = "#/definitions/DemoForm";
     const errStr = `${PROJECT_NAME_VERSION} An error occurred in the useForm hook while creating the mobx Type Model for the stateTree using options.schema${$ref ? ` for $ref: ${$ref}` : ''}. This could be a bug but it could also be an error in the json-schema, please check the schema for errors or unsupported features.`;
     expect(errorSet.has(errStr)).toBe(true);
-    expect(getByTestId("err").innerHTML).toContain("chicken");
+    expect(getByTestId("error").innerHTML).toContain("chicken");
 });
 
 test("Test erroneous schema with no ref .", async () => {
     const {getByTestId} = render(<SchemaErrorFormNoRef/>);
-    await wait(() => getByTestId("err"));
+    await wait(() => getByTestId("error"));
     const errStr = `${PROJECT_NAME_VERSION} An error occurred in the useForm hook while creating the mobx Type Model for the stateTree using options.schema. This could be a bug but it could also be an error in the json-schema, please check the schema for errors or unsupported features.`;
     expect(errorSet.has(errStr)).toBe(true);
-    expect(getByTestId("err").innerHTML).toContain("chicken");
+    expect(getByTestId("error").innerHTML).toContain("chicken");
 });
 
 test("Test erroneous defaults .", async () => {
     const {getByTestId} = render(<DefaultErrorForm/>);
-    await wait(() => getByTestId("err"));
+    await wait(() => getByTestId("error"));
     const errIterator = errorSet.values();
     for(const errStr of errIterator) {
         expect(errStr).toContain(`${PROJECT_NAME_VERSION} had trouble setting defaults in useForm hook. Make sure the types in options.default match what is defined in options.schema.`);
@@ -337,4 +475,22 @@ test("Test no $ref.", async () => {
     const {getByTestId} = render(<NoRefForm/>);
     await wait(() => getByTestId("firstName"));
     expect(getByTestId("firstName").value).toBe("Foo");
+});
+
+test("Test error when required field does not exist.", async () => {
+    const {getByTestId} = render(<div data-testid="form"><RequiredFieldDoesNotExistForm/></div>);
+    await wait(() => getByTestId("form"));
+    expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is set as required but it does not exist in the provided schema");
+});
+
+test("Test error when a root dependency does not have a corresponding field in the schema.", async () => {
+    const {getByTestId} = render(<div data-testid="form"><DependencyDoesNotExistForm/></div>);
+    await wait(() => getByTestId("form"));
+    expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is referenced in dependencies but it does not exist in the provided schema");
+});
+
+test("Test error when a dependency contains a field that doesn't exist in the schema.", async () => {
+    const {getByTestId} = render(<div data-testid="form"><DependencyDoesNotExist2Form/></div>);
+    await wait(() => getByTestId("form"));
+    expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is referenced in dependencies but it does not exist in the provided schema");
 });

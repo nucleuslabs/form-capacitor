@@ -61,6 +61,7 @@ export default function MyForm(){
 | `defaultSanitizer`      | `function`  | Function that is used to sanitize the defaults before data is rendered; accepts a POJO as it's only param (the built-in sanitizer converts all null's to undefined) |
 | `validationSanitizer`   | `function`  | Function that is used to sanitize directly before data is validated; accepts a POJO as it's only param (uses treeSanitizer if no option is provided) |
 | `outputSanitizer`       | `function`  | Function that is used to sanitize data on output (`toJS()` or `toJSON()`); accepts a POJO as it's only param (uses treeSanitizer if no option is provided) |
+| `ErrorComponent`        | `React.Component` | Optional component that you can supply that will appear to display fatal errors that occur during form initialization (usually due to a schema error) |
 
 ##### json-schema v7 object example 
 | PARAM    |      TYPE     |  DESCRIPTION                  |
@@ -122,6 +123,19 @@ const actions = stateTree => ({
        } 
    });
 ```
+##### `Loader` example
+```js
+export default function Loader() {
+    return <div>Loading a wonderfully crafted input form...</div>
+};
+```
+##### `ErrorComponent` example
+```js
+export default function ErrorComponent({message, error}) {
+    return <div>We detected the following error while loading this epic form: {message}</div>
+};
+```
+
 #### `FunctionalComponent`
 | PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
 |-----------------------|---------------|--------------------------------------------------------------------------------------------|
@@ -285,7 +299,7 @@ import {useFieldErrors} from "../src";
 
 function FieldErrors({name}) {
     const [hasErrors, errors] = useFieldErrors(name);
-    return {hasErrors && <ul> {errors.map((err, errKey) => <li key={errKey}>err.message</li>)} </ul>};
+    return {hasErrors && <ul> {errors.map((error, errKey) => <li key={errKey}>error.message</li>)} </ul>};
 }
 ```
 ### Params
@@ -387,7 +401,7 @@ import {useFormErrors} from "../src";
 
 function SomeCoolErrorComponent({name}) {
     const [hasErrors, errors] = useFormErrors(name);
-    return {hasErrors && <ul>errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)}</ul>;
+    return {hasErrors && <ul>errors.map((e, eIdx) => <li key={eIdx}>{e.message}</li>)</ul>};
 }
 ```
 ### Params

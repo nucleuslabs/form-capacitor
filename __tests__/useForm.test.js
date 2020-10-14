@@ -13,7 +13,7 @@ function SimpleTextBox(props) {
             change(ev.target.value || undefined);
         }}/>
         <div data-testid={`${props.name}_errors`}>{hasErrors &&
-        <ul>{errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>}</div>
+        <ul>{errors.map((error, eIdx) => <li key={eIdx}>{error.message}</li>)}</ul>}</div>
     </span>;
 }
 
@@ -94,7 +94,7 @@ function DemoForm() {
 }
 
 function ErrorComponent ({message}) {
-    return <div data-testid="err">{message}</div>;
+    return <div data-testid="error">{message}</div>;
 }
 
 function ActionsErrorForm () {
@@ -265,30 +265,30 @@ test("Test useForm standard use case.", async () => {
 
 test("Test actions option not a function error case.", async () => {
     const {getByTestId} = render(<ActionsErrorForm/>);
-    await wait(() => getByTestId("err"));
-    expect(getByTestId("err").innerHTML).toContain("options.actions must be a Function that takes in a mobx state tree and returns an object with a bunch of user defined methods (actions).");
+    await wait(() => getByTestId("error"));
+    expect(getByTestId("error").innerHTML).toContain("options.actions must be a Function that takes in a mobx state tree and returns an object with a bunch of user defined methods (actions).");
 });
 
 test("Test treeSanitizer option not a function error case.", async () => {
     const {getByTestId} = render(<TreeErrorForm/>);
-    await wait(() => getByTestId("err"));
-    expect(getByTestId("err").innerHTML).toContain("options.treeSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+    await wait(() => getByTestId("error"));
+    expect(getByTestId("error").innerHTML).toContain("options.treeSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
 });
 
 test("Test defaultSanitizer option not a function error case.", async () => {
     const {getByTestId} = render(<DefaultErrorForm/>);
-    await wait(() => getByTestId("err"));
-    expect(getByTestId("err").innerHTML).toContain("options.defaultSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+    await wait(() => getByTestId("error"));
+    expect(getByTestId("error").innerHTML).toContain("options.defaultSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
 });
 
 test("Test validationSanitizer option not a function error case.", async () => {
     const {getByTestId} = render(<ValidationErrorForm/>);
-    await wait(() => getByTestId("err"));
-    expect(getByTestId("err").innerHTML).toContain("options.validationSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+    await wait(() => getByTestId("error"));
+    expect(getByTestId("error").innerHTML).toContain("options.validationSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
 });
 
 test("Test outputSanitizer option not a function error case.", async () => {
     const {getByTestId} = render(<OutputErrorForm/>);
-    await wait(() => getByTestId("err"));
-    expect(getByTestId("err").innerHTML).toContain("options.outputSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
+    await wait(() => getByTestId("error"));
+    expect(getByTestId("error").innerHTML).toContain("options.outputSanitizer must be a Function that takes a single POJO Tree as the only parameter and returns a sanitized POJO.");
 });
