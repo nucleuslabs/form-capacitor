@@ -1,6 +1,6 @@
 {
   "name": "form-capacitor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Strictly typed form state manager for React with as you type validation for many inputs with pretty errors using a json-schema definition and rules and a few simple Hooks",
   "browser": "web",
   "main": "dist/index.js",
