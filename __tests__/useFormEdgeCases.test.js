@@ -312,7 +312,7 @@ function RequiredFieldDoesNotExistForm() {
                 <span>First Name</span>
                 <SimpleTextBox data-testid="firstName" name="firstName"/>
                 <span>Last Name</span>
-                <SimpleTextBox data-testid="firstName" name="firstName"/>
+                <SimpleTextBox data-testid="lastName" name="lastName"/>
             </div>
         </div>;
     }));
@@ -360,7 +360,7 @@ function DependencyDoesNotExistForm() {
                 <span>First Name</span>
                 <SimpleTextBox data-testid="firstName" name="firstName"/>
                 <span>Last Name</span>
-                <SimpleTextBox data-testid="firstName" name="firstName"/>
+                <SimpleTextBox data-testid="lastName" name="lastName"/>
             </div>
         </div>;
     }));
@@ -408,7 +408,7 @@ function DependencyDoesNotExist2Form() {
                 <span>First Name</span>
                 <SimpleTextBox data-testid="firstName" name="firstName"/>
                 <span>Last Name</span>
-                <SimpleTextBox data-testid="firstName" name="firstName"/>
+                <SimpleTextBox data-testid="lastName" name="lastName"/>
             </div>
         </div>;
     }));
