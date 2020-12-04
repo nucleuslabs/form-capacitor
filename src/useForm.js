@@ -116,9 +116,12 @@ async function setUpForm(options, sanitizers, setContext, setError){
                     self._resetChangedState();
                     self._clearIsDirty();
                 },
-                _reset() {
+                _reset(data) {
                     applySnapshot(self, defaultSnapshot);
                     self._resetChangedState();
+                    if(data) {
+                        self._setRoot(data);
+                    }
                     self._clearIsDirty();
                 },
                 _replaceAll(value) {
@@ -247,7 +250,12 @@ async function setUpForm(options, sanitizers, setContext, setError){
                 fieldMetaDataMap: fieldMetaDataMap,
                 errorMap: errors,
                 set: (path, value) => isPlainObject(path) ? stateTreeInstance._replaceAll({...path}) : stateTreeInstance._set(path, value),
-                reset: stateTreeInstance._reset,
+                reset: (data, clearErrors = true) => {
+                    stateTreeInstance._reset(data);
+                    if(clearErrors) {
+                        errors.clear();
+                    }
+                },
                 validate: () => {
                     return validate(stateTreeInstance.toJS());
                 },

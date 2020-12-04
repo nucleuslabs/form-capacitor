@@ -83,6 +83,7 @@ function DemoForm() {
                 </button>
                 <button data-testid="ba2" onClick={() => formData.addAlias('Jack')}>Set Aliases</button>
                 <button data-testid="breset" onClick={() => reset()}>Reset</button>
+                <button data-testid="breset2" onClick={() => reset({firstName: "Doge The Bounty Hunter"})}>Reset</button>
                 <button data-testid="breplace" onClick={() => set({firstName: "Doge"})}>Replace</button>
                 <button data-testid="toJSON" onClick={() => {
                     document.getElementById('json').innerHTML = formData.toJSON();
@@ -260,6 +261,10 @@ test("Test useForm standard use case.", async () => {
 
     fireEvent.click(getByTestId("toJSON"));
     expect(getByTestId("json").innerHTML).toBe('{"lastName":"Bar"}');
+
+    fireEvent.click(getByTestId("breset2"));
+    expect(getByTestId("firstName").value).toBe('Doge The Bounty Hunter');
+
 
 });
 

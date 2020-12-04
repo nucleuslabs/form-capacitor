@@ -92,7 +92,7 @@ function DemoForm() {
         schema: jsonSchema,
         $ref: "#/definitions/DemoForm"
     }, observer(() => {
-        const {validate} = useFormContext();
+        const {validate, reset} = useFormContext();
 
         return <div data-testid="form">
             <div>
@@ -167,6 +167,8 @@ function DemoForm() {
             <DeepAllOrNothing name="deepAllOrNothing"/>
             <div>
                 <button data-testid="validate" onClick={() => validate()}>Validate</button>
+                <button data-testid="reset" onClick={() => reset()}>Reset</button>
+                <button data-testid="reset2" onClick={() => reset(null, false)}>Reset 2</button>
             </div>
         </div>;
     }));
@@ -235,5 +237,16 @@ test("We should have nice error things", async() => {
         expect(getByTestId("aonthing1_errors").innerHTML).toContain("Please fill in the Thing 1 field. It is required when either Thing 2 or Thing 3 is set");
         expect(getByTestId("aonthing3_errors").innerHTML).toContain("Please fill in the Thing 3 field. It is required when either Thing 1 or Thing 2 is set");
     });
+
+    expect(getByTestId("lastName_errors").innerHTML).toContain('Please fill in either the AKA or Last Name field(s)');
+
+    fireEvent.click(getByTestId('reset2'));
+
+    expect(getByTestId("lastName_errors").innerHTML).toContain('Please fill in either the AKA or Last Name field(s)');
+
+    fireEvent.click(getByTestId('reset'));
+
+    expect(getByTestId("lastName_errors").innerHTML).not.toContain('Please fill in either the AKA or Last Name field(s)');
+
     // console.log(getByTestId("form").innerHTML);
 });
