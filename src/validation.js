@@ -266,7 +266,7 @@ function getClosestAjvPath(pathStr, pathMap) {
 // function beautifyAjvErrors(errors, path) {
 //     // console.warn(errors);
 //     return errors.map(error => {
-//         return beautifyAjvError(error, path);
+//         return transformAjvErrorToValidationError(error, path);
 //     });
 // }
 
@@ -278,9 +278,9 @@ function getClosestAjvPath(pathStr, pathMap) {
  */
 
 /* istanbul ignore next */
-function beautifyAjvError(error, path, subSchema) {
+function transformAjvErrorToValidationError(error, path, subSchema) {
     const schema = subSchema || error.parentSchema;
-    return createError(schema.title, error.message, path, error.keyword);
+    return createValidationError(schema.title, error.message, path, error.keyword);
 }
 
 /**
@@ -293,7 +293,7 @@ function beautifyAjvError(error, path, subSchema) {
  */
 
 /* istanbul ignore next */
-function createError(title, message, path, keyword) {
+function createValidationError(title, message, path, keyword) {
     return {title, message, path, keyword};
 }
 
@@ -676,7 +676,7 @@ function buildSchemaTree(path, leafValue = {}, basicSchemaMap = new Map()) {
 function assignFieldDefinitions(refs, schema, fieldDefinitionMap) {
     // const refPatchPaths = [...refs].map(pathArr => pathToPatchString(pathArr));
     // eslint-disable-next-line no-unused-vars
-    for(let [pathStr, fieldPath] of refs) {
+    for(let [, fieldPath] of refs) {
         assignFieldDefinition(schema, fieldDefinitionMap, fieldPath, [...refs.values()]);
     }
 }
@@ -858,7 +858,7 @@ export function watchForPatches(schema, data, ajv, options) {
             if(!validate(stateTreeData)) {
                 processAjvErrors(validate.errors, paths, errorPathMaps, (validationPath, errorMapPath, originPath, error, subSchema) => {
                     const checkSchema = subSchema || error.parentSchema;
-                    setError(errors, errorMapPath, beautifyAjvError(replaceErrorMessage(error, validate.errors), validationPath, checkSchema), originPath);
+                    setError(errors, errorMapPath, transformAjvErrorToValidationError(replaceErrorMessage(error, validate.errors), validationPath, checkSchema), originPath);
                 });
                 return false;
             } else {
@@ -908,7 +908,7 @@ function runValidatorR(path, validators, data, errors, paths, errorPathMaps, err
             // console.log(validate.errors);
             try {
                 const reducedErrors = reduceAjvErrorsToPathMappedErrors(validate.errors, paths, errorPathMaps, (validationPath, errorMapPath, originPath, error, subSchema) => {
-                    const prettyError = beautifyAjvError(error, errorMapPath, subSchema);
+                    const prettyError = transformAjvErrorToValidationError(replaceErrorMessage(error, validate.errors), errorMapPath, subSchema);
                     // if(!hasError(errors, errorMapPath, prettyError, originPath)) {
                     setError(errors, errorMapPath, prettyError, originPath);
                     // }
