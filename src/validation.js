@@ -369,7 +369,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
                 patchPath: [...patchPath, p],
                 fieldDefinitionMap: fieldDefinitionMap,
                 patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-                fieldMetaDataMap: metaDataMap,
+                metaDataMap: metaDataMap,
                 errorPathMaps: errorPathMaps,
                 skeletonSchemaMap: skeletonSchemaMap,
                 parentSchema: schema
@@ -469,7 +469,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
                 patchPath: [...subPatchPath],
                 fieldDefinitionMap: fieldDefinitionMap,
                 patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-                fieldMetaDataMap: metaDataMap,
+                metaDataMap: metaDataMap,
                 errorPathMaps: errorPathMaps,
                 skeletonSchemaMap: skeletonSchemaMap,
                 parentSchema: schema
@@ -494,7 +494,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
                     patchPath: [...patchPath, "additionalItems"],
                     fieldDefinitionMap: fieldDefinitionMap,
                     patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-                    fieldMetaDataMap: metaDataMap,
+                    metaDataMap: metaDataMap,
                     errorPathMaps: errorPathMaps,
                     skeletonSchemaMap: skeletonSchemaMap,
                     parentSchema: schema
@@ -521,7 +521,7 @@ function buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patc
             patchPath: [...subPatchPath],
             fieldDefinitionMap: fieldDefinitionMap,
             patchPathToSchemaPathMap: patchPathToSchemaPathMap,
-            fieldMetaDataMap: metaDataMap,
+            metaDataMap: metaDataMap,
             errorPathMaps: errorPathMaps,
             skeletonSchemaMap: skeletonSchemaMap,
             parentSchema: schema
