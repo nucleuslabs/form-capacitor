@@ -27,6 +27,9 @@ function DemoForm() {
             <div>
                 <SimpleTextBox data-testid="firstName" name="firstName"/>
             </div>
+            <div>
+                <SimpleTextBox data-testid="multiple" name="multiple"/>
+            </div>
         </div>;
     }));
 }
@@ -39,6 +42,8 @@ test("The Set First Name button should set the first name to \"Joe\"", async() =
     await wait(() => getByTestId("firstName"));
 
     expect(getByTestId("firstName_label").innerHTML).toBe('First Name');
+    expect(getByTestId("multiple_label").innerHTML).toBe('Multiple Types');
+
 
     expect(getByTestId("firstName").value).toBe('Bar');
     expect(getByTestId("firstName_errors").childNodes.length).toBe(0);
@@ -57,4 +62,6 @@ test("The Set First Name button should set the first name to \"Joe\"", async() =
 
     expect(getByTestId("firstName").value).toBe('Cheese');
     expect(getByTestId("firstName_errors").childNodes.length).toBe(0);
+    //@todo add tests for object and array metadata
+
 });

@@ -580,12 +580,14 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
                 //To combat this weirdness it is imperative that it comes before anything else that uses in this method
                 setObjectErrorMessages(schema);
                 buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
+                assignMetaData({...schema}, [...patchPath], metaDataMap);
                 break;
             case 'array':
                 skeletonSchemaMap.set(pathToPatchString(path), {type: 'array'});
                 setArrayLengthErrorMessage(schema);
                 setArrayLengthErrorMessage(skeletonSchemaMap);
                 buildFieldArraySchema(schema, path, patchPath, fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps, skeletonSchemaMap);
+                assignMetaData({...schema}, [...patchPath], metaDataMap);
                 break;
             case 'string':
                 setStringErrorMessages(schema);
@@ -607,10 +609,12 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
     } else if(schema.anyOf && schema.anyOf.length > 0) {
         setAnyOfErrorMessages(schema.anyOf, parentSchema.type === 'array' ? parentSchema : schema);
         buildAxxOfRefs(schema.anyOf, "anyOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
+        assignMetaData({...schema}, [...patchPath], metaDataMap);
     }
 
     if(schema.allOf && schema.allOf.length > 0) {
         //@todo pre process allOf to generate custom error messages
+        assignMetaData({...schema}, [...patchPath], metaDataMap);
         buildAxxOfRefs(schema.allOf, "allOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
     }
 
