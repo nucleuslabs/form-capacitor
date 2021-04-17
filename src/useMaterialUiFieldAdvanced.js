@@ -10,18 +10,18 @@ import {getErrors} from "./errorMapping";
  * @param {string | string[]} path
  * @returns {{}}
  */
-export default function useMaterialUiField(path) {
+export default function useMaterialUiFieldAdvanced(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const patchPath = pathToPatchString(fullPath);
     const onChange = (event) => {
         context.set(fullPath, event.target.value || undefined);
     };
-
     return useObserver(() => {
         return {
-            ...extractMuiProps(context, patchPath, getErrors(context.errorMap, fullPath)),
+            muiProps: extractMuiProps(context, patchPath, getErrors(context.errorMap, fullPath)),
             value: getValue(context.stateTree, fullPath, undefined),
+            set: v => context.set(fullPath, v),
             onChange
         };
     });

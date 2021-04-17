@@ -2,14 +2,16 @@ import React from "react";
 import jsonSchema from "./demo-form.json";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import {observer} from "mobx-react-lite";
-import {useForm, useMaterialUiField} from "../src";
+import {useForm, useMaterialUiFieldAdvanced} from "../src";
 
 function SimpleTextBox(props) {
-    const {required, label, error, helperText, minLength, maxLength, min, max, value, onChange} = useMaterialUiField(props.name);
+    const {muiProps, value, set, onChange} = useMaterialUiFieldAdvanced(props.name);
+    const {required, label, error, helperText, minLength, maxLength, min, max} = muiProps;
 
+    const oC = props.name === "firstName" ? onChange : (e) => set(e.target.value);
     return <span>
         <span data-testid={`${props.name}_label`}>{label}</span>
-        <input type="text" {...props} className={error ? "error" : null} value={value || ""} onChange={onChange}/>
+        <input type="text" {...props} className={error ? "error" : null} value={value || ""} onChange={oC}/>
         <div data-testid={`${props.name}_errors`}>{error && helperText}</div>
         <div data-testid={`${props.name}_required`}>{required && 'true'}</div>
         <div data-testid={`${props.name}_minLength`}>{minLength}</div>
@@ -56,7 +58,7 @@ function DemoForm() {
 
 afterEach(cleanup);
 
-test("Testing material ui field hook full test of all props", async() => {
+test("Testing advance material ui field full test of {muiProps, value, set, onChange}", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
     await wait(() => getByTestId("firstName"));

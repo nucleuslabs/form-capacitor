@@ -12,9 +12,9 @@ export default function useArrayField(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const {_push, _pop, _splice, _clear, _replace, _remove} = context.stateTree;
-    const value = getValue(context.stateTree, fullPath, []);
+
     return useObserver(() => [
-        value.slice(),
+        getValue(context.stateTree, fullPath, []).slice(),
         {
             set: v => context.set(fullPath, v),
             push: v => _push(fullPath, v),

@@ -12,5 +12,7 @@ export {default as useArrayField} from './useArrayField';
 export {default as useTextField} from './useTextField';
 export {default as useFieldErrors} from './useFieldErrors';
 export {default as useMaterialUiField} from './useMaterialUiField';
+export {default as useMaterialUiFieldAdvanced} from './useMaterialUiFieldAdvanced';
+export {default as useMaterialUiArrayField} from './useMaterialUiArrayField';
 export {observer} from 'mobx-react-lite';
 export {builtInDefaultSanitizer, builtInStateTreeSanitizer, sanitizeTree, emptyStringNullSanitizer, looseSanitizer, strictSanitizer} from './sanitizers';

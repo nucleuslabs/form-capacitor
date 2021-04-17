@@ -377,19 +377,68 @@ function SimpleTextBox({name}) {
 | `name/path`           |  `string`     | String path for the field via the json-schema that is delimited by the ``.`` character.    |
 
 ### Return
-| PROPERTY                | TYPE        | DESCRIPTION                                                                  |
-|-------------------------|-------------|------------------------------------------------------------------------------|
-| `name`                  | `string`    | field name                                                                   |
-| `value`                 | `???`       | value for the field                                                          |
-| `label`                 | `string`    | title of the field                                                           |
-| `required`              | `boolean`   | is field required?                                                           |
-| `onChange`              | `function`  | Setter function that changes the value for the field in the stateTree        |
-| `FormHelperTextProps`   | `Object`    | Object containing errors in divs                                             |
+| PROPERTY                | TYPE           | DESCRIPTION                                                                  |
+|-------------------------|----------------|------------------------------------------------------------------------------|
+| `name`                  | `string`       | field name                                                                   |
+| `value`                 | `scalar`       | value for the field                                                          |
+| `label`                 | `string`       | title of the field                                                           |
+| `required`              | `boolean`      | is field required?                                                           |
+| `error`                 | `boolean`      | is field invalid?                                                            |
+| `onChange`              | `function`     | Setter function that changes the value expects an event as the first argument|
+| `helperText`            | `string|array` | String or array of strings                                                   |
+| `min`                   | `number`       | minimum #                                                                    |
+| `max`                   | `number`       | maximum #                                                                    |
+| `minLength`             | `number`       | min string length                                                            |
+| `maxLength`             | `number`       | max string length                                                            |
 
-#### FormHelperTextProps
-| PROPERTY                | TYPE        | DESCRIPTION                                                                  |
-|-------------------------|-------------|------------------------------------------------------------------------------|
-| `children`              |`Comopnent[]`| Returns an array of error messages wrapped in divs                           |
+## muiProps 
+| `label`                 | `string`       | title of the field                                                           |
+| `required`              | `boolean`      | is field required?                                                           |
+| `error`                 | `boolean`      | is field invalid?                                                            |
+| `helperText`            | `string|array` | Object containing errors in divs                                             |
+| `min`                   | `number`       | minimum #                                                                    |
+| `max`                   | `number`       | maximum #                                                                    |
+| `minLength`             | `number`       | min string length                                                            |
+| `maxLength`             | `number`       | max string length                                                            |
+
+## `useMaterialUiFieldAdvanced`
+
+Advanced version of useMaterialUiField with different options for slightly more complex material ui field components 
+
+### Params
+| PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
+|-----------------------|---------------|--------------------------------------------------------------------------------------------|
+| `name/path`           |  `string`     | String path for the field via the json-schema that is delimited by the ``.`` character.    |
+
+### Return
+| PROPERTY                | TYPE           | DESCRIPTION                                                                  |
+|-------------------------|----------------|------------------------------------------------------------------------------|
+| `muiProps`              | `object`       | defined above                                                                |
+| `value`                 | `scalar`       | value for the field                                                          |
+| `set`                   | `function`     | setter used to set value directly                                            |
+| `onChange`              | `function`     | Setter function that changes the value expects an event as the first argument|
+
+## `useMaterialUiArrayField`
+
+Advanced version of useMaterialUiField for use with arrays 
+
+### Params
+| PARAM                 |      TYPE     |  DESCRIPTION                                                                               |
+|-----------------------|---------------|--------------------------------------------------------------------------------------------|
+| `name/path`           |  `string`     | String path for the field via the json-schema that is delimited by the ``.`` character.    |
+
+### Return
+| PROPERTY                | TYPE           | DESCRIPTION                                                                  |
+|-------------------------|----------------|------------------------------------------------------------------------------|
+| `muiProps`              | `object`       | defined above                                                                |
+| `value`                 | `scalar`       | value for the field                                                          |
+| `set`                   | (array)      | set the array to a new array                                                   |
+| `push`                  | `(...params)`| push all params onto the end of the array                                      |
+| `pop`                   | `string[]`   | pops the last element off of the end of the array                              |
+| `remove`                | (value)      | removes an element that is === to the value param                              |
+| `splice`                | (start, deleteCount, optionalElementToSpliceIn) | mutates and array. See [splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) |
+| `replace`               | (array)      | replaces the current array with a new array                                    |
+
 
 ## `useFormErrors`
 

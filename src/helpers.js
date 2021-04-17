@@ -479,3 +479,34 @@ export function getObservable(obj, path) {
 
     return ret;
 }
+
+/**
+ *
+ * @param {{}} context
+ * @param {string} patchPath
+ * @param {[]} errors
+ * @returns {{min: any, max: any, minLength: *, label, title, helperText: *, required: boolean, maxLength: *}|{min: any, max: any, minLength: *, label, title, error: boolean, helperText: *, required: boolean, maxLength: *}}
+ */
+export function extractMuiProps(context, patchPath, errors) {
+    const {title, label, helperText, required, minimum, maximum, exclusiveMinimum, exclusiveMaximum, minLength, maxLength} = context.fieldMetaDataMap && context.fieldMetaDataMap.has(patchPath) ? context.fieldMetaDataMap.get(patchPath) : {required: false};
+    const min = minimum || (isNumber(exclusiveMinimum) ? (exclusiveMinimum + 1) : undefined);
+    const max = maximum || (isNumber(exclusiveMaximum) ? (exclusiveMaximum - 1) : undefined);
+    const muiProps = {
+        label: label || title,
+        required,
+        min,
+        max,
+        minLength,
+        maxLength,
+        helperText,
+    };
+    if(errors.length > 0) {
+        return {
+            ...muiProps,
+            helperText: errors.length === 1 ? errors[0].message : errors.map((e) => e.message),
+            error: true
+        };
+    } else {
+        return {...muiProps};
+    }
+}
