@@ -7,7 +7,7 @@ SRC_FILES := $(shell find src -name '*.js')
 # disable default suffixes
 .SUFFIXES:
 
-dist: $(SRC_FILES) yarn.lock webpack.config.babel.js
+dist: $(SRC_FILES) yarn.lock webpack.config.js
 	${BIN}/webpack .
 	@touch $@
 

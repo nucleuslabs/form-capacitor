@@ -1,26 +1,21 @@
-const src = `${__dirname}/src`;
-const dist = `${__dirname}/dist`;
-const TerserPlugin = require('terser-webpack-plugin');
+const path = require('path');
+const src = path.resolve('./src');
+const dist = path.resolve('./dist');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = {
     mode: "production",
     entry: src + "/index.js",
     output: {
         library: "FormCapacitor",
-        libraryTarget: "umd",
+        libraryTarget: 'umd',
         filename: "index.js",
         path: dist,
-        globalObject: "this"
+        globalObject: 'this'
     },
     externals: {
         "react": "react",
-        "react-dom": "react-dom",
-        "mobx": "mobx",
-        "mobx-react-lite": "mobx-react-lite",
-        "mobx-state-tree": "mobx-state-tree",
-        "json-schema-ref-parser": "json-schema-ref-parser",
-        "ajv": "ajv",
-        "lodash": "lodash"
+        "react-dom": "react-dom"
     },
     module: {
         rules: [
@@ -35,8 +30,10 @@ module.exports = {
     optimization: {
         minimize: true,
         usedExports: true,
-        minimizer: [
-            new TerserPlugin({})
-        ]
-    }
+    },
+    plugins: [
+        new NodePolyfillPlugin({
+            excludeAliases: ["console"]
+        })
+    ]
 };
