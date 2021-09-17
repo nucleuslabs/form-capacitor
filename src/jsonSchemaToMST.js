@@ -104,9 +104,12 @@ function makeType(node, meta) {
         }
     }
     if(node.allOf) {
-        typeArr.push(types.compose(...node.allOf.map(x => makeType(x, {
-            parent: node
-        }))));
+        const allOfTypes = node.allOf.filter(x => x.type !== undefined).map(x => makeType(x, {
+            parent: node,
+        }));
+        if(allOfTypes) {
+            typeArr.push(types.union(...allOfTypes));
+        }
     }
     if(node.oneOf) {
         throw new Error(`JsonSchema "oneOf" is presently not supported`); // I guess it would be identical to node.anyOf for the purposes of MST no?

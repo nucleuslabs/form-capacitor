@@ -204,6 +204,13 @@ export function setAnyOfErrorMessages(anyOfSchema, parentSchema) {
                         acc.set(keyword, [schema.type]);
                     }
                     break;
+                case 'properties':
+                case 'anyOf':
+                case 'allOf':
+                case 'not':
+                    if(!anyOfFullSet.errorMessage && !parentSchema.errorMessage){
+                        console.warn(`Detected '${keyword}' nested in an anyOf schema that does not have an errorMessage property. form-capacitor does not automatically generate error messages for these nested schemas. Outputting the parent schema for reference.`, parentSchema);
+                    }
                 // @todo: Do we need to check properties for anyOf error message generation
                 // case 'properties':
                 //
@@ -276,6 +283,12 @@ export function setAllOfErrorMessages(allOfSchema, parentSchema) {
                 case 'items':
                     setAllErrorMessagesR(schema.items, parentSchema);
                     break;
+                case 'anyOf':
+                case 'allOf':
+                case 'not':
+                    if(!allOfSchema.errorMessage && !parentSchema.errorMessage){
+                        console.warn(`Detected '${keyword}' nested in an allOf schema that does not have an errorMessage property. form-capacitor does not automatically generate error messages for these nested schemas. Outputting the parent schema for reference.`, parentSchema);
+                    }
             }
         }
         return acc;

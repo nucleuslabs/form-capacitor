@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "DemoForm": {
+      "title": "anyOf Array Form",
+      "description": "Basic Form to demo core features of FormCapacitor",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "title": "First Name"
+        },
+        "middleName": {
+          "type": "string",
+          "title": "Middle Name"
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name"
+        },
+        "aka": {
+          "type": "string",
+          "title": "AKA"
+        }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "required": [
+                "lastName"
+              ]
+            },
+            {
+              "required": [
+                "firstName"
+              ]
+            }
+          ]
+        }, {
+          "anyOf": [
+            {
+              "required": [
+                "middleName"
+              ]
+            },
+            {
+              "required": [
+                "aka"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

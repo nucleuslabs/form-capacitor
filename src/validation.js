@@ -11,7 +11,7 @@ import {
     setNumberRangeErrorMessage,
     setTypeErrorMessage,
     setObjectErrorMessages,
-    setStringErrorMessages
+    setStringErrorMessages, setAllOfErrorMessages
 } from "./errorMessageBuilder";
 import {replaceErrorMessage} from "./errorMessageFinder";
 
@@ -274,7 +274,7 @@ function getClosestAjvPath(pathStr, pathMap) {
  * Converts an ajv error into a condensed pretty error obj
  * @param {{}} error
  * @param {string[]} path
- * @returns {{title: {string}, message: {string}, path: {string[]}, keyword: {string}}}
+ * @returns {{title: string, message: string, path: string[], keyword: string}}
  */
 
 /* istanbul ignore next */
@@ -613,9 +613,9 @@ function buildFieldDefinitionMapR({schema, propName, path = [], patchPath = [], 
     }
 
     if(schema.allOf && schema.allOf.length > 0) {
-        //@todo pre process allOf to generate custom error messages
-        assignMetaData({...schema}, [...patchPath], metaDataMap);
+        setAllOfErrorMessages(schema.allOf, parentSchema.type === 'array' ? parentSchema : schema);
         buildAxxOfRefs(schema.allOf, "allOf", propName, path, patchPath, patchPathToSchemaPathMap, skeletonSchemaMap, fieldDefinitionMap);
+        assignMetaData({...schema}, [...patchPath], metaDataMap);
     }
 
     return [fieldDefinitionMap, patchPathToSchemaPathMap, metaDataMap, errorPathMaps];
