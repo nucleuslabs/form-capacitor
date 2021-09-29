@@ -217,7 +217,7 @@ function getClosestAjvPath(pathStr, pathMap) {
             return pathMap.get(checkStr);
         }
     }
-    return pathMap.get("#");
+    return pathMap.get("#") || [];
 }
 
 // @todo Evaluate if we will be using these functions in future versions
