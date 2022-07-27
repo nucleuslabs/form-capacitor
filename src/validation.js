@@ -14,6 +14,7 @@ import {
     setStringErrorMessages, setAllOfErrorMessages
 } from "./errorMessageBuilder";
 import {replaceErrorMessage} from "./errorMessageFinder";
+import {requiredKeyword} from "./errorDefinition";
 
 //This object contains actions for mapping special error cases based on schema type and error keyword combo
 
@@ -394,7 +395,7 @@ function buildFieldObjectSchema(schema, path, patchPath, fieldDefinitionMap, pat
         // because each field can decide whether it is required on its own unless they are in a
         // codependent anyOf or allOf validation
         schema.required.forEach(p => {
-            assignFieldDefinition(buildSchemaTree(path, {required: [p]}, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
+            assignFieldDefinition(buildSchemaTree(path, {required: [p], errorMessage: schema.properties[p].errorMessage.required || requiredKeyword(schema.properties[p].title)}, skeletonSchemaMap), fieldDefinitionMap, patchPathToSchemaPathMap.get(pathToPatchString([...patchPath, p])));
             assignMetaData({required: true}, [...patchPath, p], metaDataMap);
         });
     }
