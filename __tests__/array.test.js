@@ -10,8 +10,7 @@ import {
     useField,
     useFieldErrors,
     useArrayField,
-    emptyStringNullSanitizer,
-    looseSanitizer
+    emptyStringNullSanitizer
 } from "../src";
 
 function SimpleTextBox(props) {
