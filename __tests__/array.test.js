@@ -4,7 +4,14 @@ import React, {useState} from "react";
 import {observer} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
-import {useForm, useFormContext, useField, useFieldErrors, useArrayField} from "../src";
+import {
+    useForm,
+    useFormContext,
+    useField,
+    useFieldErrors,
+    useArrayField,
+    emptyStringNullSanitizer
+} from "../src";
 
 function SimpleTextBox(props) {
     const [value, change] = useField(props.name);
@@ -39,19 +46,36 @@ function AliasObject(props) {
     </div>;
 }
 
+function AliasObject2(props) {
+    const [alias, {push, pop}] = useArrayField(props.name);
+    const [hasErrors, errors] = useFieldErrors(props.name);
+    return <div>
+        {alias.map((value, idx) => {
+            return <div key={idx}>
+                <SimpleTextBox key={idx} data-testid={`${props.name}_${idx}`} name={`${props.name}.${idx}.alias`}/>
+                <SimpleTextBox key={`${idx}_bread`} data-testid={`${props.name}_${idx}_bread`} name={`${props.name}.${idx}.bread`}/>
+            </div>
+        })}
+        <ul data-testid={`${props.name}_errors`}>{hasErrors && errors.map((err, eIdx) => <li key={eIdx}>{err.message}</li>)}</ul>
+        <button onClick={() => push({bread: "toast"})}>+++</button>
+        <button onClick={() => pop()}>---</button>
+    </div>;
+}
+
 function DemoForm() {
     return useForm({
         schema: jsonSchema,
         $ref: "#/definitions/ArrayForm",
         default: {
             alias: ['Frank']
-        }
+        },
+        validationSanitizer: emptyStringNullSanitizer
     }, observer(() => {
         const [valid, setValid] = useState('Unknown');
         // const [errors, setErrors] = useState([]);
         const {validate, errorMap, formData} = useFormContext();
 
-        return <div>
+        return <div data-testid={'form'}>
             <div>
                 <span>Alias String:</span>
                 <span><AliasString name="alias"/></span>
@@ -59,6 +83,10 @@ function DemoForm() {
             <div>
                 <span>Alias Object:</span>
                 <span><AliasObject name="alias2"/></span>
+            </div>
+            <div>
+                <span>Array of Objects:</span>
+                <span><AliasObject2 name="alias3"/></span>
             </div>
             <div>
                 <button data-testid="v" onClick={() => {
@@ -126,5 +154,85 @@ describe('When do defaults get validated?', function() {
         expect(getByTestId("alias2_errors").childNodes.length).toBeGreaterThan(0);
 
 
+    });
+
+    it('Should expect errors when schema "required" is not fulfilled', async () => {
+        let {getByTestId, getByText} = render(<DemoForm/>);
+        await wait(() => getByTestId("v"));
+
+        fireEvent.click(getByTestId("v"));
+        expect(getByTestId("valid").innerHTML).toBe('VALID');
+
+        fireEvent.click(getByText("+++"));
+        fireEvent.click(getByText("+++"));
+
+        // errors on all required alias textboxes
+        expect(getByTestId("alias3.0.aliasErrors").childNodes.length).toBe(1);
+        expect(getByTestId("alias3.1.aliasErrors").childNodes.length).toBe(1);
+
+        // but not on non-required bread textboxes
+        expect(getByTestId("alias3.0.breadErrors").childNodes.length).toBe(0);
+        expect(getByTestId("alias3.1.breadErrors").childNodes.length).toBe(0);
+
+        // error should be pretty error
+        expect(getByTestId("alias3.0.aliasErrors").innerHTML).toContain('Please fill in the alias field');
+        expect(getByTestId("alias3.1.aliasErrors").innerHTML).toContain('Please fill in the alias field');
+
+        fireEvent.click(getByTestId("v"));
+        expect(getByTestId("valid").innerHTML).toBe('INVALID');
+
+        // all errors should remain even after validating
+        expect(getByTestId("errors").childNodes.length).toBe(2);
+        expect(getByTestId("alias3.0.aliasErrors").childNodes.length).toBe(1);
+        expect(getByTestId("alias3.1.aliasErrors").childNodes.length).toBe(1);
+        expect(getByTestId("alias3.0.aliasErrors").innerHTML).toContain('Please fill in the alias field');
+        expect(getByTestId("alias3.1.aliasErrors").innerHTML).toContain('Please fill in the alias field');
+
+        // enter a value for all nodes to clear error
+        fireEvent.change(getByTestId("alias3_0"), {target: {value: "Joe"}});
+        expect(getByTestId("alias3_0").value).toBe('Joe');
+        expect(getByTestId("alias3.0.aliasErrors").childNodes.length).toBe(0);
+
+        fireEvent.change(getByTestId("alias3_1"), {target: {value: "Kim"}});
+        expect(getByTestId("alias3_1").value).toBe('Kim');
+        expect(getByTestId("alias3.1.aliasErrors").childNodes.length).toBe(0);
+
+        fireEvent.click(getByTestId("v"));
+        expect(getByTestId("valid").innerHTML).toBe('VALID');
+
+        // emptying value should only produce pretty error on proper node that was cleared
+        fireEvent.change(getByTestId("alias3_0"), {target: {value: ""}});
+        expect(getByTestId("alias3_0").value).toBe('');
+
+        expect(getByTestId("alias3.0.aliasErrors").childNodes.length).toBe(1);
+        expect(getByTestId("alias3.0.aliasErrors").innerHTML).toContain('Please fill in the alias field');
+        expect(getByTestId("alias3.1.aliasErrors").childNodes.length).toBe(0);
+
+        fireEvent.click(getByTestId("v"));
+        expect(getByTestId("valid").innerHTML).toBe('INVALID');
+
+        fireEvent.change(getByTestId("alias3_1"), {target: {value: ""}});
+        expect(getByTestId("alias3_1").value).toBe('');
+        expect(getByTestId("alias3.1.aliasErrors").childNodes.length).toBe(1);
+        expect(getByTestId("alias3.1.aliasErrors").innerHTML).toContain('Please fill in the alias field');
+
+        fireEvent.click(getByTestId("v"));
+        expect(getByTestId("valid").innerHTML).toBe('INVALID');
+
+        fireEvent.change(getByTestId("alias3_0"), {target: {value: "Jake"}});
+        expect(getByTestId("alias3_0").value).toBe('Jake');
+
+        expect(getByTestId("alias3.0.aliasErrors").childNodes.length).toBe(0);
+        expect(getByTestId("alias3.1.aliasErrors").childNodes.length).toBe(1);
+
+        fireEvent.click(getByTestId("v"));
+        expect(getByTestId("valid").innerHTML).toBe('INVALID');
+
+        fireEvent.change(getByTestId("alias3_1"), {target: {value: "Batman"}});
+        expect(getByTestId("alias3_1").value).toBe('Batman');
+        expect(getByTestId("alias3.1.aliasErrors").childNodes.length).toBe(0);
+
+        fireEvent.click(getByTestId("v"));
+        expect(getByTestId("valid").innerHTML).toBe('VALID');
     });
 });

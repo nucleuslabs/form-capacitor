@@ -34,6 +34,23 @@
             "maxLength": 10
           },
           "default": []
+        },
+        "alias3": {
+          "type": "array",
+          "title": "Aliases Part Trois",
+          "items": {
+            "type": "object",
+            "properties": {
+              "alias": {
+                "type": "string"
+              },
+              "bread": {
+                "type": "string"
+              }
+            },
+            "required": ["alias"]
+          },
+          "default": []
         }
       }
     },
