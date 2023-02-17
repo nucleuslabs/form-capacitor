@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import {observable, ObservableMap, toJS} from 'mobx';
+import {observable, ObservableMap, runInAction, toJS} from 'mobx';
 import {isBoolean, isArrayLike, isMapLike, isSetLike} from './helpers';
 import Ajv from "ajv";
 import {onPatch} from "mobx-state-tree";
@@ -859,7 +859,7 @@ export function watchForPatches(schema, data, ajv, options) {
         errors,
         fieldMetaDataMap,
         validate: (stateTreeData) => {
-            errors.clear();
+            runInAction(() => errors.clear());
             if(!validate(stateTreeData)) {
                 processAjvErrors(validate.errors, paths, errorPathMaps, (validationPath, errorMapPath, originPath, error, subSchema) => {
                     const checkSchema = subSchema || error.parentSchema;
