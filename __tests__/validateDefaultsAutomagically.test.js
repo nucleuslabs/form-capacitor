@@ -1,5 +1,5 @@
 import jsonSchema from "./demo-form";
-import {render, fireEvent, wait} from "@testing-library/react";
+import {render, fireEvent, waitFor, screen} from "@testing-library/react";
 import React, {useState} from "react";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
@@ -81,7 +81,7 @@ function DemoForm() {
 describe('When do defaults get validated?', function() {
     it('Should wait for an event on a specific field before applying validation errors/rules.', async function() {
         let {getByTestId} = render(<DemoForm/>);
-        await wait(() => getByTestId("lastName"));
+        await waitFor(() => getByTestId("lastName"));
 
         expect(getByTestId("valid").innerHTML).toBe('Unknown');
         expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
@@ -90,8 +90,8 @@ describe('When do defaults get validated?', function() {
 
         // fireEvent.change(getByTestId("middleName"), {target: {value: "Lloyd"}});
         fireEvent.change(getByTestId("firstName"), {target: {value: "XXX"}});
+        await waitFor(() => expect(screen.getByTestId('firstName').value).toBe('XXX'));       // React18/Mobx6 needs a burlier wait here.
         fireEvent.change(getByTestId("firstName"), {target: {value: ""}});
-
         expect(getByTestId("firstName").value).toBe('');
         expect(getByTestId("lastName").value).toBe('Bar');
         // fireEvent.click(getByTestId("v"));

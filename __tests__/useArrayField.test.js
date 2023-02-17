@@ -1,6 +1,6 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor, screen} from "@testing-library/react";
 import {useForm, useFieldErrors, useArrayField} from "../src";
 import {observer} from "mobx-react-lite";
 
@@ -56,9 +56,10 @@ afterEach(cleanup);
 
 test("Demo Form Should have buttons that use schema actions to make aliases called 'Joe' and other buttons with actions to remove them.", async () => {
     let {getByTestId, getByText} = render(<DemoForm/>);
-    await wait(() => getByText("+"));
+    await waitFor(() => getByText("+"));
     expect(getByTestId("alias").childNodes.length).toBe(0);
     fireEvent.click(getByText("+"));
+    await waitFor(() => expect(screen.getByTestId('alias').childNodes.length).toBe(1));       // React18/Mobx6 needs a burlier wait here.
     expect(getByTestId("alias").childNodes.length).toBe(1);
     expect(getByTestId("alias").childNodes[0].value).toBe('Joe');
     fireEvent.click(getByText("+"));

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {oneCharAtATime} from "./testHelper";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor} from "@testing-library/react";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
 import useArrayField from "../src/useArrayField";
@@ -162,7 +162,7 @@ afterEach(cleanup);
 test("Test the base All or Nothing validation using dependencies keyword", async () => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("aonthing1_errors"));
+    await waitFor(() => getByTestId("aonthing1_errors"));
     //Check to make sure everything is nothing
     expect(getByTestId("aonthing1_errors").innerHTML).toBe('');
     expect(getByTestId("aonthing2").value).toBe('');
@@ -279,6 +279,9 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
 
+    // TODO: This click (and all subsequent tests) was failing until I made changes to useForm._push(). This button is pushing a regular object, which that action was converting into an observable. Somewhere the code wasn't happy with observables inside an observable array.
+    // Need to check with Steve how safe that change is, this feels like dark magiks he's played with before.
+    // This discussion and in particular this comment is I think the issue: https://github.com/mobxjs/mobx/issues/1900#issuecomment-476710217
     fireEvent.click(getByTestId("deepAllOrNothing_add"));
 
     expect(getByTestId("daonthing1_0_errors").className).toBe('');

@@ -18,4 +18,8 @@ export default function useField(path) {
         v => context.set(fullPath, v),
         context.fieldMetaDataMap && context.fieldMetaDataMap.has(patchPath) ? context.fieldMetaDataMap.get(patchPath) : {required: false}
     ]);
+
+    // TODO useObserver() is deprecated, and tbqh, none of the API in mobx-react-lite looks like its meant for providing a custom hook in this manner
+    // After a zillion experiments with the API, including the useLocalObservable() hook, I'm getting nothing to work.
+    // At this point I think we might need to back up to pure mobx and create a custom Reaction for our needs.
 };

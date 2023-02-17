@@ -1,5 +1,5 @@
 import jsonSchema from "./demo-form";
-import {render, wait, cleanup} from "@testing-library/react";
+import {render, cleanup, waitFor} from "@testing-library/react";
 import React, {useState} from "react";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
@@ -79,7 +79,7 @@ afterEach(cleanup);
 
 test("The imperative schema validation function should behave itself", async () => {
     let {getByTestId} = render(<DemoForm/>);
-    await wait(() => getByTestId("firstName"));
+    await waitFor(() => getByTestId("firstName"));
     //Check Defaults
     expect(getByTestId("firstName_required").innerHTML).toBe('*');
     expect(getByTestId("middleName_required").innerHTML).toBe('*');

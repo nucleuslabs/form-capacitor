@@ -11,7 +11,8 @@ module.exports = {
         libraryTarget: 'umd',
         filename: "index.js",
         path: dist,
-        globalObject: 'this'
+        globalObject: 'this',
+        hashFunction: "xxhash64"    // Needed for node 18, which no longer allows old hash algos. Also required upgrading webpack to latest 5.54+ See. https://stackoverflow.com/a/73027407/15825770
     },
     externals: {
         "react": "react",

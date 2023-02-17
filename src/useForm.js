@@ -17,7 +17,7 @@ import stringToPath from './stringToPath';
 import SchemaAssignmentError from './errorTypes/SchemaAssignmentError';
 import {applySnapshot, getSnapshot} from 'mobx-state-tree';
 import SchemaDataReplaceError from './errorTypes/SchemaDataReplaceError';
-import {computed, extendObservable, isObservable, observable, toJS} from 'mobx';
+import {computed, extendObservable, observable, toJS} from 'mobx';
 import $RefParser from 'json-schema-ref-parser';
 import equal from 'fast-deep-equal';
 import FormContext from './FormContext';
@@ -148,7 +148,8 @@ async function setUpForm(options, sanitizers, setContext, setError){
                     }
                 },
                 _push(name, value) {
-                    getObservable(self, name).push(((isObject(value) || isArrayLike(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
+                    // getObservable(self, name).push(((isObject(value) || isArrayLike(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
+                    getObservable(self, name).push(value);                        // TODO: This is pushing non-observable objects into an observable array. The switch to React 18/mobx6/etc caused failures right here
                     self._setIsDirty(name);
                 },
                 _pop(name) {

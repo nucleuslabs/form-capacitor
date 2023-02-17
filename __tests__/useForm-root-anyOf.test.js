@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import jsonSchema from "./demo-form.json";
 import anyOfArrayJsonSchema from "./anyOf-array-form";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor, screen} from "@testing-library/react";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
 import useArrayField from "../src/useArrayField";
@@ -142,7 +142,7 @@ afterEach(cleanup);
 
 test("The root anyOf keyword should be valid if anyOf the items match and invalid if they don't", async () => {
     let {getByTestId} = render(<DemoForm/>);
-    await wait(() => getByTestId("lastName"));
+    await waitFor(() => getByTestId("lastName"));
 
     fireEvent.change(getByTestId("firstName"), {target: {value: "Fred"}});
     fireEvent.change(getByTestId("middleName"), {target: {value: "Chico"}});
@@ -165,16 +165,16 @@ test("The root anyOf keyword should be valid if anyOf the items match and invali
     fireEvent.change(getByTestId("aka"), {target: {value: ''}});
     fireEvent.change(getByTestId("lastName"), {target: {value: ''}});
     expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
-    await wait(() => getByTestId("E-lastName"));
+    await waitFor(() => getByTestId("E-lastName"));
     expect(getByTestId("E-lastName").childNodes.length).toBeGreaterThan(0);
-    await wait(() => getByTestId("E-aka"));
+    await waitFor(() => getByTestId("E-aka"));
     expect(getByTestId("E-aka").childNodes.length).toBeGreaterThan(0);
 });
 
 
 test("The root anyOf keyword should be valid for array elements if anyOf the items match and invalid if they don't", async () => {
     let {getByTestId} = render(<AnyOfArrayForm/>);
-    await wait(() => getByTestId("alias_div"));
+    await waitFor(() => getByTestId("alias_div"));
 
     fireEvent.click(getByTestId("alias_add1"));
 
@@ -183,6 +183,7 @@ test("The root anyOf keyword should be valid for array elements if anyOf the ite
 
     fireEvent.click(getByTestId("alias_clear"));
 
+    await waitFor(() => expect(screen.getByTestId('alias_div').className).toBe('error'));     // React18/Mobx6 needs this stronger wait
     expect(getByTestId("alias_div").className).toBe("error");
     expect(getByTestId("alias2_div").className).toBe("error");
 

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor} from "@testing-library/react";
 import {observer} from "mobx-react-lite";
 import {toJS} from "mobx";
 import {getFlattenedErrors} from "../src/errorMapping";
@@ -110,7 +110,7 @@ afterEach(cleanup);
 test("Test basic root level dependencies keyword", async () => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("dep1"));
+    await waitFor(() => getByTestId("dep1"));
     //Check to make sure everything is nothing
     expect(getByTestId("dep1").value).toBe('');
     expect(getByTestId("dep2").value).toBe('');
