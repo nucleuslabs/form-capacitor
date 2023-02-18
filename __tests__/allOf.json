@@ -23,6 +23,7 @@
           "title": "AKA"
         }
       },
+      "errorMessage": "Please provide a (first name OR last name) AND (a middle name OR aka)",
       "allOf": [
         {
           "anyOf": [
