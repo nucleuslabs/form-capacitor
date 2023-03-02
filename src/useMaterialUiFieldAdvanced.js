@@ -1,6 +1,5 @@
 import FormContext from './FormContext';
 import {extractMuiProps, getValue, toPath} from './helpers';
-// import {useObserver} from "mobx-react-lite";
 import {useContext, useEffect, useState} from "react";
 import {pathToPatchString} from "./validation";
 import {getErrors} from "./errorMapping";
@@ -18,17 +17,7 @@ export default function useMaterialUiFieldAdvanced(path) {
     const onChange = (event) => {
         context.set(fullPath, event.target.value || undefined);
     };
-    // return useObserver(() => {
-    //     return {
-    //         muiProps: extractMuiProps(context, patchPath, getErrors(context.errorMap, fullPath)),
-    //         value: getValue(context.stateTree, fullPath, undefined),
-    //         set: v => context.set(fullPath, v),
-    //         onChange
-    //     };
-    // });
 
-    // React18/mobx6: useObserver() is deprecated, and tbqh, none of the API in mobx-react-lite looks like its meant for providing a custom hook in this manner.
-    // Replaced with a custom hook leaning on useState, useEffect, and autorun() straight from mobx
     const [value, setValue] = useState(getValue(context.stateTree, fullPath, undefined));
     const [muiProps, setMuiProps] = useState(extractMuiProps(context, patchPath, getErrors(context.errorMap, fullPath)));
 

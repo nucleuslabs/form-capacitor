@@ -279,9 +279,6 @@ test("Test the base All or Nothing validation using dependencies keyword", async
     expect(getByTestId("daonthing2_0_errors").childNodes.length).toBeGreaterThan(0);
     expect(getByTestId("daonthing3_0_errors").childNodes.length).toBeGreaterThan(0);
 
-    // TODO: This click (and all subsequent tests) was failing until I made changes to useForm._push(). This button is pushing a regular object, which that action was converting into an observable. Somewhere the code wasn't happy with observables inside an observable array.
-    // Need to check with Steve how safe that change is, this feels like dark magiks he's played with before.
-    // This discussion and in particular this comment is I think the issue: https://github.com/mobxjs/mobx/issues/1900#issuecomment-476710217
     fireEvent.click(getByTestId("deepAllOrNothing_add"));
 
     expect(getByTestId("daonthing1_0_errors").className).toBe('');

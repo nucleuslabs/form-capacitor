@@ -148,8 +148,9 @@ async function setUpForm(options, sanitizers, setContext, setError){
                     }
                 },
                 _push(name, value) {
+                    // The switch to React 18/mobx6/etc caused failures right here, pushing observables into an array which was itself already observable
                     // getObservable(self, name).push(((isObject(value) || isArrayLike(value)) && !isObservable(value)) ? observable(value) : value);//toObservable(value));
-                    getObservable(self, name).push(value);                        // TODO: This is pushing non-observable objects into an observable array. The switch to React 18/mobx6/etc caused failures right here
+                    getObservable(self, name).push(value);
                     self._setIsDirty(name);
                 },
                 _pop(name) {

@@ -1,6 +1,5 @@
 import FormContext from './FormContext';
 import { getValue, toPath } from './helpers';
-// import { useObserver } from 'mobx-react-lite';
 import {useContext, useEffect, useState} from 'react';
 import { pathToPatchString } from './validation';
 import {autorun} from "mobx";
@@ -14,14 +13,6 @@ export default function useTextField (path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
     const patchPath = pathToPatchString(fullPath);
-    // return useObserver(() => [
-    //     getValue(context.stateTree, fullPath, ''),
-    //     v => context.set(fullPath, v === '' ? undefined : v),
-    //     context.fieldMetaDataMap && context.fieldMetaDataMap.has(patchPath) ? context.fieldMetaDataMap.get(patchPath) : { required: false }
-    // ]);
-
-    // React18/mobx6: useObserver() is deprecated, and tbqh, none of the API in mobx-react-lite looks like its meant for providing a custom hook in this manner.
-    // Replaced with a custom hook leaning on useState, useEffect, and autorun() straight from mobx
     const currValue = getValue(context.stateTree, fullPath, '');
     const [value, setValue] = useState(currValue);
 
