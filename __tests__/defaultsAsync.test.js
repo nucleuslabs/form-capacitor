@@ -1,6 +1,6 @@
 import React from 'react';
 import jsonSchema from './demo-form.json';
-import { render, wait, cleanup } from '@testing-library/react';
+import {render, cleanup, waitFor} from '@testing-library/react';
 import { observer } from 'mobx-react-lite';
 import { useForm, useTextField, useFieldErrors} from '../src';
 import useFormContext from '../src/useFormContext';
@@ -65,7 +65,7 @@ afterEach(cleanup);
 test('The Set First Name button should set the first name to "Joe"', async () => {
     let { getByTestId } = render(<DemoForm/>);
 
-    await wait(() => getByTestId('lastName'));
+    await waitFor(() => getByTestId('lastName'));
 
     expect(getByTestId('firstName').value).toBe('Porky');
     expect(getByTestId('lastName').value).toBe('Bar');

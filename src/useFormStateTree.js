@@ -1,6 +1,6 @@
 import FormContext from './FormContext';
-import {useContext} from "react";
-import {useObserver} from "mobx-react-lite";
+import {useContext, useEffect, useState} from "react";
+import {autorun} from "mobx";
 
 /**
  * Returns the whole mobx-state-tree for the form including all of it's actions and data
@@ -9,5 +9,13 @@ import {useObserver} from "mobx-react-lite";
  */
 export default function useFormStateTree() {
     const {stateTree} = useContext(FormContext);
-    return useObserver(() => stateTree);
+    const [currStateTree, setCurrStateTree] = useState(stateTree);
+
+    useEffect(() => {
+        autorun(() => {
+            setCurrStateTree(stateTree);
+        });
+    }, [stateTree]);
+
+    return currStateTree;
 };

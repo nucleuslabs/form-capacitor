@@ -1,6 +1,6 @@
 import React from "react";
 import jsonSchema from "./allOf.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor} from "@testing-library/react";
 import {observer} from "mobx-react-lite";
 import {useField, useFieldErrors, useForm, useFormContext, useFormErrors} from "../src";
 
@@ -50,7 +50,7 @@ afterEach(cleanup);
 test("Testing material ui field hook full test of all props", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("firstName"));
+    await waitFor(() => getByTestId("firstName"));
 
     expect(getByTestId("firstName_errors").childNodes.length).toBe(0);
     fireEvent.change(getByTestId("aka"), {target: {value: ""}});

@@ -1,6 +1,6 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor, screen} from "@testing-library/react";
 import {observer} from "mobx-react-lite";
 import {useForm, useMaterialUiArrayField} from "../src";
 
@@ -96,7 +96,7 @@ afterEach(cleanup);
 test("Testing advance material ui array field full test of {muiProps, value, set, push, remove, splice, clear, replace}", async() => {
     let {getByText, getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("alias"));
+    await waitFor(() => getByTestId("alias"));
 
     expect(getByTestId("minLength_minLength").innerHTML).toBe("5");
     expect(getByTestId("maxLength_maxLength").innerHTML).toBe("5");
@@ -107,6 +107,7 @@ test("Testing advance material ui array field full test of {muiProps, value, set
 
     expect(getByTestId("alias").childNodes.length).toBe(0);
     fireEvent.click(getByText("+"));
+    await waitFor(() => expect(screen.getByTestId('alias').childNodes.length).toBe(1));       // React18/Mobx6 needs a burlier wait here.
     expect(getByTestId("alias").childNodes.length).toBe(1);
     fireEvent.click(getByText("+"));
     expect(getByTestId("alias").childNodes.length).toBe(2);

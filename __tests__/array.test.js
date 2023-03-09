@@ -1,5 +1,5 @@
 import jsonSchema from "./array-form";
-import {render, fireEvent, wait} from "@testing-library/react";
+import {render, fireEvent, waitFor, screen} from "@testing-library/react";
 import React, {useState} from "react";
 import {observer} from "mobx-react-lite";
 import {toJS} from "mobx";
@@ -114,7 +114,7 @@ function DemoForm() {
 describe('When do defaults get validated?', function() {
     it('Should wait for an event on a specific field before applying validation errors/rules.', async function() {
         let {getByTestId, getByText} = render(<DemoForm/>);
-        await wait(() => getByTestId("v"));
+        await waitFor(() => getByTestId("v"));
 
         expect(getByTestId("valid").innerHTML).toBe('Unknown');
         expect(getByTestId("errorMapContainer").childNodes.length).toBe(0);
@@ -128,6 +128,7 @@ describe('When do defaults get validated?', function() {
         expect(getByTestId("alias_errors").childNodes.length).toBe(0);
 
         fireEvent.click(getByText("+"));
+        await waitFor(() => expect(screen.getByTestId('alias_1').value).toBe('Joe'));       // React18/Mobx6 needs a burlier wait here.
         expect(getByTestId("alias_1").value).toBe('Joe');
 
         expect(getByTestId("errorMapContainer").childNodes.length).toBeGreaterThan(0);
@@ -158,7 +159,7 @@ describe('When do defaults get validated?', function() {
 
     it('Should expect errors when schema "required" is not fulfilled', async () => {
         let {getByTestId, getByText} = render(<DemoForm/>);
-        await wait(() => getByTestId("v"));
+        await waitFor(() => getByTestId("v"));
 
         fireEvent.click(getByTestId("v"));
         expect(getByTestId("valid").innerHTML).toBe('VALID');

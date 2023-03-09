@@ -1,7 +1,7 @@
 import FormContext from './FormContext';
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import {getFlattenedErrors} from "./errorMapping";
-import {useObserver} from "mobx-react-lite";
+import {autorun} from "mobx";
 
 /**
  * Returns a flattened array of all form errors
@@ -9,8 +9,13 @@ import {useObserver} from "mobx-react-lite";
  */
 export default function useFormErrors() {
     const {errorMap} = useContext(FormContext);
-    return useObserver(() => {
-        const errors = getFlattenedErrors(errorMap);
-        return [errors && errors.length > 0, errors];
-    });
+    const [errors, setErrors] = useState(getFlattenedErrors(errorMap));
+
+    useEffect(() => {
+        autorun(() => {
+            setErrors(getFlattenedErrors(errorMap));
+        });
+    }, [errorMap]);
+
+    return [errors && errors.length > 0, errors];
 };

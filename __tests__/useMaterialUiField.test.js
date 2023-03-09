@@ -1,6 +1,6 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor, screen} from "@testing-library/react";
 import {observer} from "mobx-react-lite";
 import {useForm, useMaterialUiField} from "../src";
 
@@ -59,7 +59,7 @@ afterEach(cleanup);
 test("Testing material ui field hook full test of all props", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("firstName"));
+    await waitFor(() => getByTestId("firstName"));
 
     expect(getByTestId("firstName_label").innerHTML).toBe('First Name');
     expect(getByTestId("multiple_label").innerHTML).toBe('Multiple Types');
@@ -68,6 +68,7 @@ test("Testing material ui field hook full test of all props", async() => {
     expect(getByTestId("firstName_errors").childNodes.length).toBe(0);
 
     fireEvent.change(getByTestId("firstName"), {target: {value: ""}});
+    await waitFor(() => expect(screen.getByTestId('firstName').value).toBe(''));     // React18/Mobx6 needs this wait after the first event for FC2 to get up to speed.
 
     expect(getByTestId("firstName_errors").childNodes.length).toBe(1);
     expect(getByTestId("firstName_errors").innerHTML).toBe("Please fill in the First Name field");

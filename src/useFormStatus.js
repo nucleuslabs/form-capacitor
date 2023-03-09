@@ -1,6 +1,6 @@
 import FormContext from './FormContext';
-import {useContext} from "react";
-import {useObserver} from "mobx-react-lite";
+import {useContext, useEffect, useState} from "react";
+import {autorun} from "mobx";
 
 /**
  * Returns a formStatus observable object which has some boolean props for checking and for ui stuffs
@@ -9,5 +9,13 @@ import {useObserver} from "mobx-react-lite";
  */
 export default function useFormStatus() {
     const {status} = useContext(FormContext);
-    return useObserver(() => status);
+    const [currStatus, setCurrStatus] = useState(status);
+
+    useEffect(() => {
+        autorun(() => {
+            setCurrStatus(status);
+        });
+    }, [status]);
+
+    return currStatus;
 };

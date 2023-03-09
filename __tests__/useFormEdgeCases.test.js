@@ -1,7 +1,7 @@
 import {useField, useFieldErrors, useForm, useFormContext} from "../src";
 import {observer} from "mobx-react-lite";
 import React from "react";
-import {render, wait} from "@testing-library/react";
+import {render, waitFor} from "@testing-library/react";
 import {PROJECT_NAME_VERSION} from "../src/helpers";
 import jsonSchema from "./demo-form.json";
 
@@ -431,7 +431,7 @@ afterEach(() => {
 
 test("Test erroneous schema .", async () => {
     const {getByTestId} = render(<SchemaErrorForm/>);
-    await wait(() => getByTestId("error"));
+    await waitFor(() => getByTestId("error"));
     const $ref = "#/definitions/DemoForm";
     const errStr = `${PROJECT_NAME_VERSION} An error occurred in the useForm hook while creating the mobx Type Model for the stateTree using options.schema${$ref ? ` for $ref: ${$ref}` : ''}. This could be a bug but it could also be an error in the json-schema, please check the schema for errors or unsupported features.`;
     expect(errorSet.has(errStr)).toBe(true);
@@ -440,7 +440,7 @@ test("Test erroneous schema .", async () => {
 
 test("Test erroneous schema with no ref .", async () => {
     const {getByTestId} = render(<SchemaErrorFormNoRef/>);
-    await wait(() => getByTestId("error"));
+    await waitFor(() => getByTestId("error"));
     const errStr = `${PROJECT_NAME_VERSION} An error occurred in the useForm hook while creating the mobx Type Model for the stateTree using options.schema. This could be a bug but it could also be an error in the json-schema, please check the schema for errors or unsupported features.`;
     expect(errorSet.has(errStr)).toBe(true);
     expect(getByTestId("error").innerHTML).toContain("chicken");
@@ -448,7 +448,7 @@ test("Test erroneous schema with no ref .", async () => {
 
 test("Test erroneous defaults .", async () => {
     const {getByTestId} = render(<DefaultErrorForm/>);
-    await wait(() => getByTestId("error"));
+    await waitFor(() => getByTestId("error"));
     const errIterator = errorSet.values();
     for(const errStr of errIterator) {
         expect(errStr).toContain(`${PROJECT_NAME_VERSION} had trouble setting defaults in useForm hook. Make sure the types in options.default match what is defined in options.schema.`);
@@ -458,7 +458,7 @@ test("Test erroneous defaults .", async () => {
 
 test("Test _ functions bound to mobx stateTree.", async () => {
     const {getByTestId} = render(<StateTreeFunctionTestForm/>);
-    await wait(() => getByTestId("changed"));
+    await waitFor(() => getByTestId("changed"));
     expect(getByTestId("changed").innerHTML).toContain("true");
     expect(getByTestId("_set").innerHTML).toContain("Could not assign a value in the form-capacitor schema for path");
     expect(getByTestId("_setRoot").innerHTML).toContain("Replace must be passed a javascript object");
@@ -473,24 +473,24 @@ test("Test _ functions bound to mobx stateTree.", async () => {
 
 test("Test no $ref.", async () => {
     const {getByTestId} = render(<NoRefForm/>);
-    await wait(() => getByTestId("firstName"));
+    await waitFor(() => getByTestId("firstName"));
     expect(getByTestId("firstName").value).toBe("Foo");
 });
 
 test("Test error when required field does not exist.", async () => {
     const {getByTestId} = render(<div data-testid="form"><RequiredFieldDoesNotExistForm/></div>);
-    await wait(() => getByTestId("form"));
+    await waitFor(() => expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is set as required but it does not exist in the provided schema"));     // React18/Mobx6 needs this stronger wait
     expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is set as required but it does not exist in the provided schema");
 });
 
 test("Test error when a root dependency does not have a corresponding field in the schema.", async () => {
     const {getByTestId} = render(<div data-testid="form"><DependencyDoesNotExistForm/></div>);
-    await wait(() => getByTestId("form"));
+    await waitFor(() => expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is referenced in dependencies but it does not exist in the provided schema"));     // React18/Mobx6 needs this stronger wait
     expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is referenced in dependencies but it does not exist in the provided schema");
 });
 
 test("Test error when a dependency contains a field that doesn't exist in the schema.", async () => {
     const {getByTestId} = render(<div data-testid="form"><DependencyDoesNotExist2Form/></div>);
-    await wait(() => getByTestId("form"));
+    await waitFor(() => expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is referenced in dependencies but it does not exist in the provided schema"));     // React18/Mobx6 needs this stronger wait
     expect(getByTestId("form").innerHTML.toString()).toContain("The property <strong>flerberderb</strong> is referenced in dependencies but it does not exist in the provided schema");
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import jsonSchema from './demo-form.json';
-import { render, fireEvent, wait, cleanup } from '@testing-library/react';
+import {render, fireEvent, cleanup, waitFor, screen} from '@testing-library/react';
 import { observer } from 'mobx-react-lite';
 import { useForm, useTextField, useFieldErrors} from '../src';
 import useFormContext from '../src/useFormContext';
@@ -58,11 +58,13 @@ afterEach(cleanup);
 test('The Set First Name button should set the first name to "Joe"', async () => {
     let { getByTestId } = render(<DemoForm/>);
 
-    await wait(() => getByTestId('lastName'));
+    await waitFor(() => getByTestId('lastName'));
 
     expect(getByTestId('firstName').value).toBe('');
 
     fireEvent.click(getByTestId('bfn'));
+
+    await waitFor(() => expect(screen.getByTestId('firstName').value).toBe('Joe'));     // React18/Mobx6 needs this wait after the first event for FC2 to get up to speed.
 
     expect(getByTestId('firstName').value).toBe('Joe');
 

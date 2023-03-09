@@ -1,8 +1,8 @@
 import FormContext from './FormContext';
 import {toPath} from './helpers';
-import {useObserver} from "mobx-react-lite";
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import {getErrors} from "./errorMapping";
+import {autorun} from "mobx";
 
 /**
  * Returns an array of error objects for the provided path in relation to the current FormContext path
@@ -12,8 +12,14 @@ import {getErrors} from "./errorMapping";
 export default function useFieldErrors(path) {
     const context = useContext(FormContext);
     const fullPath = [...context.path, ...toPath(path)];
-    return useObserver(() => {
-        const errors = getErrors(context.errorMap, fullPath);
-        return [errors && errors.length > 0, errors];
-    });
+    const currErrors = getErrors(context.errorMap, fullPath);
+    const [errors, setErrors] = useState(currErrors);
+
+    useEffect(() => {
+        autorun(() => {
+            setErrors(getErrors(context.errorMap, fullPath));
+        });
+    }, [context.errorMap[fullPath]]);
+
+    return [errors && errors.length > 0, errors];
 };

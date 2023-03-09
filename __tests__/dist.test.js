@@ -1,6 +1,6 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor, screen} from "@testing-library/react";
 import {useForm, useFormContext, useFormStatus, useField, useFieldErrors, useArrayField, observer} from "../dist";
 
 function SimpleTextBox(props) {
@@ -92,14 +92,14 @@ afterEach(cleanup);
 test("Testing imports from dist files to make sure they perform the same as expected after being webpack'd.", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("lastName"));
+    await waitFor(() => getByTestId("lastName"));
 
     expect(getByTestId("dirty").innerHTML).toBe('');
     expect(getByTestId("changed").innerHTML).toBe('');
     expect(getByTestId("firstName").value).toBe('');
 
     fireEvent.click(getByTestId("bfn"));
-
+    await waitFor(() => expect(screen.getByTestId('firstName').value).toBe('Joe'));     // React18/Mobx6 needs this wait after the first event for FC2 to get up to speed.
     expect(getByTestId("firstName").value).toBe('Joe');
 
     fireEvent.change(getByTestId("firstName"), {target: {value: ""}});

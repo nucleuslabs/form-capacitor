@@ -1,6 +1,6 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor, screen} from "@testing-library/react";
 import {observer} from "mobx-react-lite";
 import {oneCharAtATime} from "./testHelper";
 import {FormSubNode, useForm, useFormContext, useFieldErrors, useField, useArrayField} from "../src";
@@ -179,10 +179,12 @@ afterEach(cleanup);
 test("We should have nice error things", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("lastName"));
+    await waitFor(() => getByTestId("lastName"));
     //anyOf
     fireEvent.change(getByTestId("lastName"), {target: {value: "what"}});
+    await waitFor(() => expect(screen.getByTestId('lastName').value).toBe('what'));     // React18/Mobx6 needs this stronger wait here at the start.
     fireEvent.change(getByTestId("lastName"), {target: {value: ""}});
+    await waitFor(() => expect(screen.getByTestId('lastName').value).toBe(''));         // React18/Mobx6 needs this stronger wait here at the start.
     expect(getByTestId("lastName_errors").innerHTML).toContain('Please fill in either the AKA or Last Name field(s)');
     expect(getByTestId("aka_errors").innerHTML).toContain('Please fill in either the AKA or Last Name field(s)');
     //required

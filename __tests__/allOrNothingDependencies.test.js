@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {oneCharAtATime} from "./testHelper";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor} from "@testing-library/react";
 import useField from "../src/useField";
 import useFieldErrors from "../src/useFieldErrors";
 import useArrayField from "../src/useArrayField";
@@ -162,7 +162,7 @@ afterEach(cleanup);
 test("Test the base All or Nothing validation using dependencies keyword", async () => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("aonthing1_errors"));
+    await waitFor(() => getByTestId("aonthing1_errors"));
     //Check to make sure everything is nothing
     expect(getByTestId("aonthing1_errors").innerHTML).toBe('');
     expect(getByTestId("aonthing2").value).toBe('');

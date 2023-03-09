@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import {isObservableMap, observable, ObservableMap, ObservableSet, IObservableArray} from "mobx";
+import {isObservableMap, observable, ObservableMap, ObservableSet, IObservableArray, runInAction} from "mobx";
 import {pathToPatchString, ajvStringToPath} from "./validation";
 import {isArrayLike} from "./helpers";
 
@@ -98,12 +98,16 @@ function _setError(node, path = [], error) {
     if(node.has('errors')) {
         const errorMap = node.get('_errorMap');
         if(!errorMap.has(error.message)) {
-            errorMap.set(error.message, error);
-            node.get('errors').push(error);
+            runInAction(() => {
+                errorMap.set(error.message, error);
+                node.get('errors').push(error);
+            });
         }
     } else {
-        node.set('errors', observable.array([error]));
-        node.set('_errorMap', observable.map([[error.message, error]]));
+        runInAction(() => {
+            node.set('errors', observable.array([error]));
+            node.set('_errorMap', observable.map([[error.message, error]]));
+        });
     }
 }
 
@@ -117,14 +121,16 @@ function setPathIndexRelationships(errorNode, originPath, newPath, error) {
         if(pathIndex.has(oPathString)) {
             pathMap = pathIndex.get(oPathString);
             if(!pathMap.has(nPathString)) {
-                pathMap.set(nPathString, observable.set([]));
+                runInAction(() => pathMap.set(nPathString, observable.set([])));
             }
             const messageSet = pathMap.get(nPathString);
             messageSet.add(error.message);
         } else {
-            pathIndex.set(oPathString, pathMap);
-            pathMap.set(nPathString, observable.set([]));
-            pathMap.get(nPathString).add(error.message);
+            runInAction(() => {
+                pathIndex.set(oPathString, pathMap);
+                pathMap.set(nPathString, observable.set([]));
+                pathMap.get(nPathString).add(error.message);
+            });
         }
     }
 }
@@ -275,7 +281,7 @@ function delErrorNodeR(map, path) {
     }
     if(path.length > 0) {
         if(childMap.size === 0) {
-            map.clear();
+            runInAction(() => map.clear());
         } else {
             return childMap.delete(path[0]) && cleanNode(map);
         }
@@ -376,21 +382,23 @@ function errorMapToFlatArrayR(errorMap, obsArray) {
  * @param {string[]} path
  * @returns {*}
  */
-/* istanbul ignore next */
 function setErrorNode(errorNode, path) {
     if(!errorNode.has('pathIndex')) {
-        errorNode.set('pathIndex', new Map());
+        runInAction(() => errorNode.set('pathIndex', new Map()));
     }
     let node = errorNode;
-    for(let key of path) {
-        if(!node.has('children')) {
-            node.set('children', observable.map());
+    //Wonder
+    runInAction(() => {
+        for(let key of path) {
+            if(!node.has('children')) {
+                node.set('children', observable.map());
+            }
+            const childrenNode = node.get('children');
+            if(!childrenNode.has(key)) {
+                childrenNode.set(key, observable.map());
+            }
+            node = childrenNode.get(key);
         }
-        const childrenNode = node.get('children');
-        if(!childrenNode.has(key)) {
-            childrenNode.set(key, observable.map());
-        }
-        node = childrenNode.get(key);
-    }
+    });
     return node;
 }

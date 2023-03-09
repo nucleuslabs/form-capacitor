@@ -1,6 +1,6 @@
 import React from "react";
 import jsonSchema from "./demo-form.json";
-import {render, fireEvent, wait, cleanup} from "@testing-library/react";
+import {render, fireEvent, cleanup, waitFor, screen} from "@testing-library/react";
 import {observer} from "mobx-react-lite";
 import {useForm, useMaterialUiFieldAdvanced} from "../src";
 
@@ -61,7 +61,7 @@ afterEach(cleanup);
 test("Testing advance material ui field full test of {muiProps, value, set, onChange}", async() => {
     let {getByTestId} = render(<DemoForm/>);
 
-    await wait(() => getByTestId("firstName"));
+    await waitFor(() => getByTestId("firstName"));
 
     expect(getByTestId("firstName_label").innerHTML).toBe('First Name');
     expect(getByTestId("multiple_label").innerHTML).toBe('Multiple Types');
@@ -71,6 +71,7 @@ test("Testing advance material ui field full test of {muiProps, value, set, onCh
 
     fireEvent.change(getByTestId("firstName"), {target: {value: ""}});
 
+    await waitFor(() => expect(screen.getByTestId('firstName_errors').childNodes.length).toBe(1));     // React18/Mobx6 needs this stronger wait
     expect(getByTestId("firstName_errors").childNodes.length).toBe(1);
     expect(getByTestId("firstName_errors").innerHTML).toBe("Please fill in the First Name field");
 

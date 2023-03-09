@@ -1,7 +1,7 @@
 import FormContext from './FormContext';
 import {getValue, toPath} from './helpers';
-import {useObserver} from "mobx-react-lite";
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
+import {autorun} from "mobx";
 
 /**
  * Returns an array containing the stored value for this component, a function to set the value and an object with a bunch of functions attached to it.
@@ -13,8 +13,16 @@ export default function useArrayField(path) {
     const fullPath = [...context.path, ...toPath(path)];
     const {_push, _pop, _splice, _clear, _replace, _remove} = context.stateTree;
 
-    return useObserver(() => [
-        getValue(context.stateTree, fullPath, []).slice(),
+    const [value, setValue] = useState(getValue(context.stateTree, fullPath, []).slice());
+
+    useEffect(() => {
+        autorun(() => {
+            setValue(getValue(context.stateTree, fullPath, []).slice());
+        });
+    }, [context.stateTree[fullPath]]);
+
+    return [
+        value,
         {
             set: v => context.set(fullPath, v),
             push: v => _push(fullPath, v),
@@ -24,5 +32,5 @@ export default function useArrayField(path) {
             replace: arr => _replace(fullPath, arr),
             remove: (v) => _remove(fullPath, v)
         }
-    ]);
+    ];
 };
