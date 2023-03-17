@@ -1,5 +1,5 @@
 import * as React from "react";
-import {render, fireEvent, wait} from "@testing-library/react";
+import {render, fireEvent, waitFor as wait} from "@testing-library/react";
 import {FormStoreProvider,connectForm, connectField, Rules, createReducer} from "../src";
 import {compose} from 'recompose';
 import {createStore, combineReducers} from 'redux';
