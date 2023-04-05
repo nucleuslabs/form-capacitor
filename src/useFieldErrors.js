@@ -19,7 +19,8 @@ export default function useFieldErrors(path) {
         autorun(() => {
             setErrors(getErrors(context.errorMap, fullPath));
         });
-    }, [context.errorMap[fullPath]]);
+    // }, [context.errorMap[fullPath]]);
+    }, []);     // Basically, we only setup the autorun once (see the empty dependency array), but it acts as the "effect" after that
 
     return [errors && errors.length > 0, errors];
 };

@@ -21,7 +21,8 @@ export default function useField(path) {
         autorun(() => {
             setValue(getValue(context.stateTree, fullPath, undefined));
         });
-    }, [context.stateTree[fullPath]]);
+    // }, [context.stateTree[fullPath]]);
+    }, []);     // Basically, we only setup the autorun once (see the empty dependency array), but it acts as the "effect" after that
 
     return [
         value,

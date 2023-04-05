@@ -15,7 +15,8 @@ export default function useFormStateTree() {
         autorun(() => {
             setCurrStateTree(stateTree);
         });
-    }, [stateTree]);
+    // }, [stateTree]);
+    }, []);     // Basically, we only setup the autorun once (see the empty dependency array), but it acts as the "effect" after that
 
     return currStateTree;
 };

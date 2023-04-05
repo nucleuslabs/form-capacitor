@@ -15,11 +15,18 @@ export default function useArrayField(path) {
 
     const [value, setValue] = useState(getValue(context.stateTree, fullPath, []).slice());
 
+    // Original
+    // useEffect(() => {
+    //     autorun(() => {
+    //         setValue(getValue(context.stateTree, fullPath, []).slice());
+    //     });
+    // }, [context.stateTree[fullPath]]);
+
     useEffect(() => {
         autorun(() => {
             setValue(getValue(context.stateTree, fullPath, []).slice());
         });
-    }, [context.stateTree[fullPath]]);
+    }, []);     // Basically, we only setup the autorun once (see the empty dependency array), but it acts as the "effect" after that
 
     return [
         value,

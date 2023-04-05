@@ -23,13 +23,15 @@ export default function useMaterialUiArrayField(path) {
         autorun(() => {
             setValue(getValue(context.stateTree, fullPath, []).slice());
         });
-    }, [context.stateTree[fullPath]]);
+    // }, [context.stateTree[fullPath]]);
+    }, []);     // Basically, we only setup the autorun once (see the empty dependency array), but it acts as the "effect" after that
 
     useEffect(() => {
         autorun(() => {
             setMuiProps(extractMuiProps(context, patchPath, getErrors(context.errorMap, fullPath)));
         });
-    }, [context.fieldMetaDataMap[patchPath]]);
+    // }, [context.fieldMetaDataMap[patchPath]]);
+    }, []);     // Basically, we only setup the autorun once (see the empty dependency array), but it acts as the "effect" after that
 
     return {
         muiProps: muiProps,
